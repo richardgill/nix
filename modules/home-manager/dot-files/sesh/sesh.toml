@@ -1,0 +1,2 @@
+[default_session]
+preview_command = "eza --all --git --icons --color=always {}"

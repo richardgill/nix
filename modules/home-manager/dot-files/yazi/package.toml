@@ -1,0 +1,12 @@
+[[plugin.deps]]
+use = "lpnh/fr"
+rev = "92edf0b"
+hash = "b0edc5e9b7f44b2d3303e74f785d0bc9"
+
+[[plugin.deps]]
+use = "aresler/path-from-root"
+rev = "22b6fb5"
+hash = "98cdb2e889b73c4d4a8945f166486605"
+
+[flavor]
+deps = []

@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "IS_CLAUDE": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Task",
+      "Bash(~/Scripts/mergePr:*)",
+      "Bash(~/Scripts/autoCommit)",
+      "Bash(~/Scripts/autoCommitPr)",
+      "Bash(~/Scripts/autoPr)",
+      "Bash(~/Scripts/gitPrDiff)",
+      "Bash(git:*)",
+      "Bash(gh:*)",
+      "Bash(pnpm:*)",
+      "Bash(npm:*)",
+      "Bash(yarn:*)",
+      "Bash(bun:*)",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(pip:*)",
+      "Bash(docker:*)",
+      "Bash(go build:*)",
+      "Bash(go test:*)",
+      "Bash(go doc:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(ls:*)",
+      "Bash(chmod:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(cd:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(diff:*)",
+      "Bash(mv:*)",
+      "Bash(sed:*)",
+      "Bash(cut:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(test:*)",
+      "Bash(wc:*)",
+      "Bash(which:*)",
+      "Bash(where:*)",
+      "Bash(whoami)",
+      "Bash(pwd)",
+      "Bash(echo:*)",
+      "Bash(printf:*)",
+      "Bash(open:*)",
+      "Bash(rm:*)",
+      "Bash(true)",
+      "Glob",
+      "Grep",
+      "LS",
+      "Read",
+      "Edit",
+      "MultiEdit",
+      "Write",
+      "TodoRead",
+      "TodoWrite",
+      "WebFetch",
+      "WebSearch",
+      "Bash(chezmoi:*)",
+      "Bash(mise:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf /)",
+      "Bash(sudo rm -rf:*)",
+      "Bash(eval:*)",
+      "Bash(sudo:*)",
+      "Write(/etc/**)",
+      "Write(/usr/**)",
+      "Write(/bin/**)",
+      "Write(/sbin/**)"
+    ]
+  },
+  "model": "opusplan",
+  "hooks": {
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Glass.aiff"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/Scripts/beep"
+          }
+        ]
+      }
+    ]
+  },
+  "feedbackSurveyState": {
+    "lastShownTime": 1754325484811
+  }
+}

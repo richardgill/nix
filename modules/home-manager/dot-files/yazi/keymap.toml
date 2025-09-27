@@ -1,0 +1,16 @@
+[mgr]
+
+# Defaults: https://github.com/sxyazi/yazi/blob/shipped/yazi-config/preset/keymap-default.toml
+prepend_keymap = [
+	{ on = "\\",       run = "quit",        desc = "Quit the process" },
+	{ on = "<C-Up>",   run = "arrow -50%",  desc = "Move cursor up half page" },
+	{ on = "<C-Down>", run = "arrow 50%",   desc = "Move cursor down half page" },
+	# once this lands https://github.com/sxyazi/yazi/issues/2715 (see open PR)
+	# run = "plugin fzf -- --args=\"--preview=\"bat -n --color=always --line-range :500 {}\""
+	{ on = ["f", "f"], run = "plugin fzf", desc = "Jump to a file/directory via fzf" },
+	{ on = ["f", "s"], run = "plugin fr rg", desc = "Search file by content (rg)" },
+	{ on = ["f", "a"], run = "plugin fr rga", desc = "Search file by content (rga)" },
+
+	{on = [ "c", "r" ], run = "plugin path-from-root", desc = "Copies path from git root"},
+]
+

@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+
+# Exit on any error
+set -e
+
+# Only add all files if nothing is staged
+if [ -z "$(git diff --cached --name-only)" ]; then
+    echo "$ git add ."
+    git add .
+else
+    echo "Using existing staged changes"
+fi
+
+if [ -z "$(git status --porcelain)" ]; then
+    echo "Nothing to commit, working tree clean"
+    exit 0
+fi
+
+echo -e "\nGenerating commit message with AI..."
+
+DIFF_LINES=$(git diff --cached | wc -l)
+
+PROMPT_BASE=$(cat <<EOF
+Generate a succinct commit message for these changes. Output ONLY the commit message, no explanation. Do not use prefixes like [chore], [billing], etc. Keep it simple and brief for PR review.
+
+<example>
+Made pay button green
+</example>
+
+<example>
+Fixed typo in error message
+</example>
+
+<example>
+Removed console.log from header component
+</example>
+
+All the information to understand what changed is right here, no tool calls, do it fast: 
+
+$(git diff --cached --stat)
+EOF
+)
+
+if [ "$DIFF_LINES" -gt 400 ]; then
+    PROMPT="$PROMPT_BASE"
+else
+    PROMPT="$PROMPT_BASE
+
+$(git diff --cached)"
+fi
+
+COMMIT_MSG=$(claude --model haiku -p "$PROMPT")
+# COMMIT_MSG=$(bunx opencode-ai run --model "openrouter/gpt-oss-20b" "$PROMPT")
+echo -e "\nCommit message generated: $COMMIT_MSG"
+
+git commit -m "$COMMIT_MSG"
+

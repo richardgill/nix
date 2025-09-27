@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+BRANCH=${1:-main}
+
+# upstream if upstream remote present in git
+DEFAULT_REMOTE=$(git remote | grep -q upstream && echo "upstream" || echo "origin")
+
+PREV_STATE=$(git rev-parse HEAD)
+
+while true; do
+    echo "Running: git pull $DEFAULT_REMOTE $BRANCH --ff"
+    git pull $DEFAULT_REMOTE $BRANCH --ff
+
+    CUR_STATE=$(git rev-parse HEAD)
+
+    if [ "$PREV_STATE" != "$CUR_STATE" ]; then
+        ~/Scripts/beep
+        exit 0
+    else
+        sleep 3
+    fi
+done

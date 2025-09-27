@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+force_flag=false
+if [[ "${1:-}" == "-f" ]]; then
+  force_flag=true
+  shift
+fi
+
+if ! git rev-parse --git-dir >/dev/null 2>&1; then
+  echo "Error: Not in a git repository"
+  exit 1
+fi
+
+branch=$(git rev-parse --abbrev-ref HEAD)
+if [[ "$branch" == "main" ]]; then
+  echo "You are on main branch. Nothing to merge."
+  exit 1
+fi
+
+pr_number=$(gh pr view "$branch" --json number --jq .number 2>/dev/null || true)
+if [[ -z "$pr_number" ]]; then
+  echo "No PR found for branch $branch"
+  exit 1
+fi
+
+pr_draft=$(gh pr view "$pr_number" --json isDraft --jq .isDraft)
+if [[ "$pr_draft" == "true" ]]; then
+  echo "PR #$pr_number is in draft. Marking as ready for review..."
+  gh pr ready "$pr_number"
+fi
+
+echo "Waiting for PR #$pr_number checks to pass..."
+start_time=$(date +%s)
+
+while true; do
+  pr_data=$(gh pr view "$pr_number" --json mergeable,statusCheckRollup)
+  mergeable=$(echo "$pr_data" | jq -r .mergeable)
+  checks=$(echo "$pr_data" | jq -c '.statusCheckRollup // []')
+
+  total=$(echo "$checks" | jq 'length')
+  failed=$(echo "$checks" | jq '[.[] | select(.conclusion == "FAILURE")] | length')
+  pending=$(echo "$checks" | jq '[.[] | select(.status != "COMPLETED")] | length')
+  skipped=$(echo "$checks" | jq '[.[] | select(.status == "COMPLETED" and .conclusion == "SKIPPED")] | length')
+  passed=$(echo "$checks" | jq '[.[] | select(.status == "COMPLETED" and .conclusion == "SUCCESS")] | length')
+
+  if (( failed > 0 )); then
+    echo "Some checks have failed. Exiting."
+    exit 1
+  fi
+
+  if (( total == 0 )); then
+    echo "No required checks configured; treating all checks as required."
+    # Treat this like waiting until zero checks, or all pass
+    break
+  elif (( passed == total )); then
+    echo "All required checks passed."
+    break
+  fi
+
+  echo "Checks: $passed passed / $failed failed / $skipped skipped / $pending pending — waiting..."
+  sleep 10
+done
+
+if [[ "$force_flag" == "false" ]]; then
+  current_time=$(date +%s)
+  elapsed=$((current_time - start_time))
+  
+  if (( elapsed > 5 )); then
+    echo "Checks took longer than 5 seconds, skipping confirmation prompt."
+  else
+    echo "Ready to merge PR #$pr_number from branch $branch. Are you sure? (y/N)"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+      echo "Merge cancelled."
+      exit 0
+    fi
+  fi
+fi
+
+echo "Merging PR #$pr_number from branch $branch..."
+if ! gh pr merge "$pr_number" --squash ; then
+  echo "Failed to merge PR (likely already merged). Exiting."
+  exit 1
+fi
+if [[ -d "../main" ]]; then
+  echo "In a worktree, updating main in parent dir..."
+  (cd ../main && git pull origin main)
+  echo "Killing tmux session..."
+  /Users/rich/Scripts/tmuxKillSession --yes
+else
+  echo "Not a worktree, updating main..."
+  git checkout main
+  git pull origin main
+fi

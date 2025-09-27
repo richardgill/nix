@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+force=false
+
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -f|--force)
+            force=true
+            shift
+            ;;
+        *)
+            echo "Usage: gitNuke [-f|--force]"
+            echo "  -f, --force    Skip confirmation prompt"
+            exit 1
+            ;;
+    esac
+done
+
+
+if [ "$force" = false ]; then
+    echo "This will completely reset your repository to the latest commit:"
+    echo "- All staged changes will be lost"
+    echo "- All unstaged changes will be lost"
+    echo "- All untracked files will be deleted"
+    echo ""
+    read -p "Are you sure? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Aborted"
+        exit 0
+    fi
+fi
+
+echo "Resetting to HEAD..."
+git reset --hard HEAD
+
+echo "Cleaning untracked files..."
+git clean -fd
+
+echo "Repository reset to latest commit"

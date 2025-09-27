@@ -1,0 +1,17 @@
+[general]
+# Early exit reduces the steps required to screenshot
+early-exit = true
+# Copy the screenshot to the clipboard after saving
+copy-command = "wl-copy"
+# Default save location
+output-filename = "~/Screenshots/screenshot-%Y-%m-%d_%H-%M-%S.png"
+
+[font]
+# Set the family of the font to be used in the text tool
+family = "Roboto"
+# Set the style of the font to be used in the text tool
+style = "Bold"
+
+[color-palette]
+# First line is background
+default-first-line = "#00000000"

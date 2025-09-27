@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# determine current branch name
+current_branch=$(git symbolic-ref --short HEAD)
+
+# initialize
+remote=""
+branch=""
+opts=()
+
+# no arguments → origin + current branch
+if [[ $# -eq 0 ]]; then
+  remote="origin"
+  branch="$current_branch"
+
+# first arg is an option → origin + current branch + pass all args through
+elif [[ "$1" == -* ]]; then
+  remote="origin"
+  branch="$current_branch"
+  opts=("$@")
+
+# otherwise we have at least one positional
+else
+  arg1="$1"; shift
+  # if next token exists and is not an option, treat as remote+branch
+  if [[ $# -gt 0 && "$1" != -* ]]; then
+    arg2="$1"; shift
+    remote="$arg1"
+    branch="$arg2"
+    opts=("$@")
+  # otherwise treat the one positional as branch (remote defaults to origin)
+  else
+    remote="origin"
+    branch="$arg1"
+    opts=("$@")
+  fi
+fi
+
+# build the command array
+cmd=(git push "$remote" "$branch" "${opts[@]}")
+
+echo "${cmd[@]}"
+"${cmd[@]}"

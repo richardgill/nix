@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+source "$(dirname "$0")/tmuxSetupWindows"
+
+setup_tmux_windows

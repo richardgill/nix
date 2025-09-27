@@ -1,0 +1,46 @@
+# This is Git's per-user configuration file.
+[user]
+	name = Richard Gill
+	email = richard@rgill.co.uk
+[color]
+	ui = auto
+[credential]
+	helper = !gh auth git-credential
+[diff]
+	colorMoved = default
+[push]
+	default = current
+[filter "lfs"]
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+[lfs]
+	concurrenttransfers = 10
+[init]
+	defaultBranch = main
+[alias]
+	fpush = push
+[branch]
+	sort = -committerdate
+[column]
+	ui = auto
+[maintenance]
+[merge]
+	ff = true
+	conflictstyle = diff3
+[cinnabar]
+	version-check = 1748500785
+[core]
+	editor = nvim +startinsert
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+
+[delta]
+	navigate = true    # use n and N to move between diff sections
+	side-by-side = true
+	features = chameleon
+
+[include]
+	path = ~/.config/delta/themes.gitconfig

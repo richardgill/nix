@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+SOURCE="$1"
+TARGET="$2"
+SOCKET_FILE="$3"
+
+echo "copying gitignored files"
+
+(cd "$SOURCE" && git status --ignored -s | grep '^!! ' | awk '{print $2}') | while read filename; do
+  if [[ "$filename" != *"node_modules"* ]]; then
+    echo "copying: $filename"
+    cp -Rc "$SOURCE/$filename" "$TARGET/$filename"
+  else
+    echo "skipping: $filename (node_modules)"
+  fi
+done
+
+if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
+  echo "running pnpm i"
+  cd "$TARGET" && pnpm i
+fi
+
+(cd "$TARGET" && mise trust)
+
+if [ -n "$SOCKET_FILE" ]; then
+  echo "restarting nvim LSP"
+  nvim --server "$SOCKET_FILE" --remote-expr "v:lua.require'utils'.restart_lsp()"
+fi

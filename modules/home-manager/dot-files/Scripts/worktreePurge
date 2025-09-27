@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(pwd)"
+all_folders=$(eza --sort=modified --reverse --time=modified --long --no-user --no-permissions --only-dirs \
+  | awk '{print $NF}')
+
+delete_candidates=$(printf '%s\n' "$all_folders" \
+  | grep -v -E '^(main|master)$')
+
+if [[ -z "$delete_candidates" ]]; then
+  echo "Nothing to delete."
+  return 0
+fi
+
+keeps=$(printf '%s\n' "$delete_candidates" \
+  | fzf --multi \
+       --header="Press tab to select folders to KEEP")
+
+if [[ -z "$keeps" ]]; then
+  to_delete="$delete_candidates"
+else
+  to_delete=$(printf '%s\n' "$delete_candidates" \
+    | grep -v -x -F -f <(printf '%s\n' "$keeps"))
+fi
+
+if [[ -z "$to_delete" ]]; then
+  echo "No folders selected for deletion."
+  return 0
+fi
+
+echo "The following folders will be deleted:"
+printf '  %s\n' $to_delete
+echo
+
+read -rp "Are you sure? [y/N] " confirm
+if [[ "$confirm" =~ ^[Yy]$ ]]; then
+  while read -r folder; do
+    echo "Deleting $folder"
+    rm -rf "./$folder"
+  done <<< "$to_delete"
+else
+  echo "Aborted."
+  return 1
+fi
+echo "Pruning git worktrees..."
+(cd main && git worktree prune)

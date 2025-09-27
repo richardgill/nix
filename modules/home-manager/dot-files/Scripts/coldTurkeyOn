@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+"/Applications/Cold Turkey Blocker.app/Contents/MacOS/Cold Turkey Blocker"  -start "Never"
+"/Applications/Cold Turkey Blocker.app/Contents/MacOS/Cold Turkey Blocker"  -start "LinkedIn"

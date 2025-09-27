@@ -1,0 +1,65 @@
+{
+  "files.insertFinalNewline": true,
+  "editor.fontSize": 16,
+  "files.autoSave": "onFocusChange",
+  "editor.tabSize": 2,
+  "files.trimTrailingWhitespace": true,
+  "editor.formatOnPaste": true,
+  "editor.multiCursorModifier": "alt",
+  "explorer.confirmDelete": false,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true,
+  "editor.minimap.enabled": false,
+  "javascript.validate.enable": false,
+  "workbench.editor.enablePreview": false,
+  "python.formatting.provider": "black",
+
+  "python.formatting.blackArgs": ["--line-length=180"],
+  "python.linting.enabled": true,
+  "python.linting.pylintEnabled": true,
+  "python.languageServer": "Microsoft",
+  "spellright.documentTypes": ["markdown", "latex", "plaintext"],
+  "editor.inlineSuggest.enabled": true,
+  "github.copilot.enable": {
+    "*": false,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": false,
+    "yaml": true
+  },
+  "prettier.requireConfig": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "prettier.printWidth": 120,
+  "[json]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "redhat.telemetry.enabled": false,
+  "editor.renderWhitespace": "all",
+  "nxConsole.showNodeVersionOnStartup": false,
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "terminal.integrated.shellIntegration.enabled": false,
+  "window.zoomLevel": 1,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "autoOpenWorkspace.enableAutoOpenIfSingleWorkspace": true,
+  "editor.accessibilitySupport": "off",
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "window.commandCenter": false,
+  "github.copilot.editor.enableAutoCompletions": true
+}

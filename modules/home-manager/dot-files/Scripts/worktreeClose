@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+cwd="$(pwd)"
+
+get_descendants() {
+    local parent=$1
+    local children
+    children=$(pgrep -P "$parent")
+    for pid in $children; do
+        get_descendants "$pid"
+    done
+    echo "$children"
+}
+
+tmux list-panes -a -F "#{session_name}:#{window_index}.#{pane_index} #{pane_current_path} #{pane_pid}" | while read -r pane path pid; do
+    if [ "$path" = "$cwd" ]; then
+        # Kill child processes first
+        for child in $(get_descendants "$pid"); do
+            kill -9 "$child" 2>/dev/null
+        done
+        # Kill the shell
+        kill -9 "$pid" 2>/dev/null
+        # Kill the pane
+        tmux kill-pane -t "$pane"
+    fi
+done

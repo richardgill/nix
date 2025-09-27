@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+fd -H -t d -d 4 \
+  --exclude '.Trash' \
+  --exclude 'Downloads' \
+  --exclude 'Library' \
+  --exclude 'Screenshots' \
+  --exclude 'Screen Studio Projects' \
+  . ~ | sed "s|^$HOME|~|" | awk '
+  /~\/code\//      { score = 300; print score "\t" $0; next }
+  /~\/code$/       { score = 300; print score "\t" $0; next }
+  /~\/\.config\//  { score = 200; print score "\t" $0; next }
+  /~\/\.config$/   { score = 200; print score "\t" $0; next }
+  /~\/Scripts\//   { score = 100; print score "\t" $0; next }
+  /~\/Scripts$/    { score = 100; print score "\t" $0; next }
+                   { score = 0;   print score "\t" $0 }
+' | sort -nr | cut -f2-

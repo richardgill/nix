@@ -1,0 +1,99 @@
+* {
+    bg-col: #1a1b26;
+    bg-col-light: #24283b;
+    border-col: #7aa2f7;
+    selected-col: #414868;
+    blue: #7aa2f7;
+    fg-col: #c0caf5;
+    fg-col2: #9ece6a;
+    grey: #565f89;
+
+    background-color: transparent;
+    text-color: @fg-col;
+    highlight: @blue;
+}
+
+configuration {
+    display-drun: " Apps ";
+    display-run: " Run ";
+    display-window: " Window ";
+}
+
+window {
+    height: 530px;
+    width: 400px;
+    border: 2px;
+    border-color: @border-col;
+    background-color: @bg-col;
+    border-radius: 10px;
+}
+
+mainbox {
+    background-color: @bg-col;
+}
+
+inputbar {
+    children: [prompt,entry];
+    background-color: @bg-col-light;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+prompt {
+    background-color: @blue;
+    padding: 6px;
+    text-color: @bg-col;
+    border-radius: 3px;
+    margin: 10px 0px 10px 10px;
+}
+
+entry {
+    padding: 6px;
+    margin: 10px 10px 10px 5px;
+    text-color: @fg-col;
+    background-color: @bg-col;
+    border-radius: 3px;
+}
+
+listview {
+    border: 0px 0px 0px;
+    padding: 6px 0px 0px;
+    margin: 10px 0px 0px 20px;
+    columns: 1;
+    lines: 5;
+    background-color: @bg-col;
+}
+
+element {
+    padding: 8px;
+    margin: 0px 10px 4px 4px;
+    background-color: @bg-col;
+    text-color: @fg-col;
+    border-radius: 3px;
+}
+
+element-icon {
+    size: 28px;
+}
+
+element selected {
+    background-color: @selected-col;
+    text-color: @fg-col2;
+}
+
+mode-switcher {
+    spacing: 0;
+}
+
+button {
+    padding: 10px;
+    background-color: @bg-col-light;
+    text-color: @grey;
+    vertical-align: 0.5;
+    horizontal-align: 0.5;
+}
+
+button selected {
+    background-color: @bg-col;
+    text-color: @blue;
+}

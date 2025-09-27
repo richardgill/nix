@@ -1,0 +1,8 @@
+.android
+.cache
+~/Downloads
+~/Applications
+~/Library
+node_modules/
+!~/Library/Preferences
+!~/Library/Application Support

@@ -1,0 +1,178 @@
+{
+  "killPrefix": "k ",
+  "killPortPrefix": "p ",
+  "kpUpdateFreq": 5,
+  "killSort": "ram",
+  "killOnClick": false,
+  "modeSelectOrder": [
+    {
+      "mode": "clipboard_history",
+      "enabled": true,
+      "position": 2
+    },
+    {
+      "mode": "audio_devices",
+      "enabled": true,
+      "position": 3
+    },
+    {
+      "mode": "monarch_ai",
+      "enabled": true,
+      "position": 4
+    },
+    {
+      "mode": "color_picker",
+      "enabled": true,
+      "position": 5
+    },
+    {
+      "mode": "note_capture",
+      "enabled": true,
+      "position": 6
+    }
+  ],
+  "ai": {
+    "currentModel": null,
+    "defaultModel": null,
+    "provider": null,
+    "currentChatID": null,
+    "currentChatScrollPos": null,
+    "webEnabledChat": true,
+    "enabledPresets": []
+  },
+  "aiWindowSize": {
+    "width": 750,
+    "height": 440
+  },
+  "noteCaptureWindowSize": {
+    "width": 750,
+    "height": 440
+  },
+  "writerMode": false,
+  "position": {
+    "base": {
+      "x": null,
+      "y": null
+    },
+    "web": {
+      "x": null,
+      "y": null
+    },
+    "clipboardHistory": {
+      "x": null,
+      "y": null
+    },
+    "noteCapture": {
+      "x": null,
+      "y": null
+    },
+    "colorPicker": {
+      "x": null,
+      "y": null
+    },
+    "ai": {
+      "x": null,
+      "y": null
+    }
+  },
+  "advancedSearch": false,
+  "fsMode": "none",
+  "fsPrefix": "",
+  "openPosition": "cursor",
+  "menuBarIcon": false,
+  "cbHistoryLength": 0,
+  "currentColorPalette": null,
+  "lastUsedColor": {
+    "name": "",
+    "value": "#000000",
+    "uat": 1000000,
+    "id": 0
+  },
+  "colorFormat": "hex",
+  "colorTheme": "#1556BD",
+  "clipboardHistoryEnabled": true,
+  "modeChangeKey": true,
+  "fileSearchSetting": true,
+  "autoPasteClipboardSelection": true,
+  "autorun": true,
+  "openTourmalineShortcut": "CmdOrCtrl+SPACE",
+  "hideAfterColorCopy": false,
+  "handleBookmarksAction": "default",
+  "clipboardBlacklist": [],
+  "escapeMode": "hold",
+  "browsers": [
+    "Firefox"
+  ],
+  "browserHistoryEnabled": false,
+  "historyEnabledBrowsers": [],
+  "skintone": null,
+  "cooldownEnabled": true,
+  "soundEnabled": false,
+  "skipClearClipboardConfirmation": false,
+  "defaultReminderList": null,
+  "reminderNotificationVisible": true,
+  "obsidianVault": null,
+  "currentFile": null,
+  "vault": "/Users/rich/Documents",
+  "lastUsedFileDir": null,
+  "contactsEnabled": false,
+  "searchWebInMonarch": false,
+  "calcEnabled": true,
+  "colorSearch": true,
+  "folderNavStyle": "A",
+  "folderNavReturnKeyBehavior": "run",
+  "contactInfoDisplayed": "phone",
+  "lightTheme": {
+    "name": "Default",
+    "id": 1,
+    "prompt": "Enter command or search",
+    "filename": "default",
+    "outerBorder": "#8585858a",
+    "background1": "#00000013",
+    "background2": "#00000013",
+    "caretColor": "#f5f5f5",
+    "edges": "#8585858a",
+    "text1": "#f5f5f5",
+    "text2": "#bbb",
+    "placeholderText": "#8e8e8ed0",
+    "variables": "#2196f3",
+    "text3": "#2196f3",
+    "text4": "#858585cc",
+    "text5": "#ddd",
+    "text6": "#A8A7AC",
+    "selection": "#619be2",
+    "itemHover": "#8585858a",
+    "highlightedItem": "#8585858a",
+    "controlBar": "#282a2b80",
+    "rightSideInfo": "item_type"
+  },
+  "darkTheme": {
+    "id": 1,
+    "prompt": "Enter command or search",
+    "filename": "default",
+    "name": "Default",
+    "outerBorder": "#8585858a",
+    "background1": "#00000013",
+    "background2": "#00000013",
+    "caretColor": "#f5f5f5",
+    "edges": "#8585858a",
+    "text1": "#f5f5f5",
+    "text2": "#bbb",
+    "placeholderText": "#8e8e8ed0",
+    "variables": "#2196f3",
+    "text3": "#2196f3",
+    "text4": "#858585cc",
+    "text5": "#ddd",
+    "text6": "#A8A7AC",
+    "selection": "#619be2",
+    "itemHover": "#8585858a",
+    "highlightedItem": "#8585858a",
+    "controlBar": "#282a2b80",
+    "rightSideInfo": "item_type"
+  },
+  "searchEngine": "google",
+  "chromeBookmarksSynced": false,
+  "braveBookmarksSynced": false,
+  "edgeBookmarksSynced": false,
+  "safariBookmarksSynced": false
+}

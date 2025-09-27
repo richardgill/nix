@@ -1,0 +1,14 @@
+keys:
+  # This master public/private key is in 1password
+  - &master age1hjyxqwv0nkwf59ascp7qvgvvtck0mdenv9p2f23w44k9fqv7lu0qc5kqth
+  # Machine keys (generated from the ssh public key, which is generated on first install) 
+  - &x86-vm age19c7qwluck0pv968e6xa2vqwucr2h6msnvt7l8fhqpfjf3kwafq5sg2hkk5
+  - &beelink-zoe age1pls36qehdwtqxr0543xaxqhtuc0zakca9plmhn3dnxlgyd8ypcasr6spds
+
+creation_rules:
+  - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
+    key_groups:
+      - age:
+          - *master
+          - *x86-vm
+          - *beelink-zoe

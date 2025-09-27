@@ -1,0 +1,111 @@
+configuration{
+    modi: "drun";
+    dpi: 72;
+    lines: 5;
+    cycle: false;
+    show-icons: true;
+    icon-theme: "Papirus-Dark";
+    terminal: "ghostty";
+    drun-display-format: "{icon} {name}";
+    location: 0;
+    disable-history: true;
+    hide-scrollbar: true;
+    display-drun: "";
+    display-run: " Run ";
+    display-window: " Window ";
+    sidebar-mode: true;
+    sorting-method: "fzf";
+    run-command: "hyprctl dispatch exec '[workspace 1] uwsm app -- {cmd}'";
+}
+
+@theme "custom"
+
+// element-text, element-icon , mode-switcher {
+//     background-color: inherit;
+//     text-color:       inherit;
+// }
+
+window {
+    height: 530px;
+    width: 800px;
+    border: 2px;
+    // border-color: @border-col;
+    // background-color: @bg-col;
+    border-radius: 10px;
+}
+
+// mainbox {
+//     background-color: @bg-col;
+// }
+
+inputbar {
+    children: [prompt,entry];
+    // background-color: @bg-col-light;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+prompt {
+    // background-color: @blue;
+    padding: 6px;
+    // text-color: @bg-col;
+    border-radius: 3px;
+    margin: 10px 0px 10px 10px;
+    font-size: 18px;
+}
+
+textbox-prompt-colon {
+    expand: false;
+    str: ":";
+}
+
+entry {
+    padding: 6px;
+    margin: 10px 10px 10px 5px;
+    // text-color: @fg-col;
+    // background-color: @bg-col;
+    border-radius: 3px;
+}
+
+
+listview {
+    border: 0px 0px 0px;
+    padding: 6px 0px 0px;
+    margin: 10px 0px 0px 20px;
+    columns: 1;
+    // background-color: @bg-col;
+    cycle: true;
+}
+
+element {
+    padding: 8px;
+    margin: 5px 5px 4px 4px;
+    // background-color: @bg-col;
+    // text-color: @fg-col;
+    border-radius: 3px;
+}
+
+element-icon {
+    size: 28px;
+}
+// element selected {
+//     background-color: @selected-col;
+//     text-color: @fg-col2;
+// }
+//
+// mode-switcher {
+//     spacing: 0;
+// }
+//
+// button {
+//     padding: 10px;
+//     background-color: @bg-col-light;
+//     text-color: @grey;
+//     vertical-align: 0.5;
+//     horizontal-align: 0.5;
+// }
+//
+// button selected {
+//     background-color: @bg-col;
+//     text-color: @blue;
+// }

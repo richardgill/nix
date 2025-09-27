@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+if [[ -d "$1" ]]; then
+  eza --tree --color=always "$1" | head -200
+else
+  bat -n --color=always --line-range :500 "$1"
+fi

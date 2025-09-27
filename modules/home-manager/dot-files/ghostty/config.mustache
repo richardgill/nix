@@ -1,0 +1,37 @@
+font-family = "Hack Nerd Font Mono"
+font-thicken = true
+adjust-cell-height = 12%
+theme = tokyonight
+shell-integration-features = no-cursor
+cursor-style = block
+title = ""
+command = {{zshPath}} -l -c "source ~/.zshrc; tmux attach -t root || tmux new -s root"
+window-padding-y = 10,0 
+resize-overlay = never
+
+{{#isDarwin}}
+# macOS configuration
+font-size = 18
+macos-option-as-alt = true
+macos-titlebar-style = hidden
+macos-titlebar-proxy-icon = hidden
+{{/isDarwin}}
+{{#isLinux}}
+# Linux configuration
+font-size = 14
+# override alt+left and alt+right for word navigation
+keybind = alt+left=text:\x1bB
+keybind = alt+right=text:\x1bF
+# Override ghostty's built-in tab navigation to allow tmux pane navigation
+keybind = ctrl+shift+left=text:\x1b[1;6D
+keybind = ctrl+shift+right=text:\x1b[1;6C
+# Delete to beginning of line (Cmd+Backspace equivalent)
+keybind = super+backspace=text:\x17
+# Delete to end of line (Cmd+Delete equivalent)
+keybind = super+delete=text:\x0b
+# Disable clipboard copy notifications
+app-notifications = no-clipboard-copy
+{{/isLinux}}
+
+# more bindings https://github.com/alacritty/alacritty/issues/474#issuecomment-338803299
+

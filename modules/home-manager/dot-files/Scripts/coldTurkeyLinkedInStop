@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+"/Applications/Cold Turkey Blocker.app/Contents/MacOS/Cold Turkey Blocker" -stop "LinkedIn"

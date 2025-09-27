@@ -1,0 +1,234 @@
+export XDG_CONFIG_HOME="$HOME/.config"
+
+eval "$(mise activate zsh)"
+
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000000
+SAVEHIST=10000000
+setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
+setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
+setopt SHARE_HISTORY             # Share history between all sessions.
+setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
+setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
+
+export EDITOR='nvim'
+
+# EDITOR=vim sets zsh -o vim implicitly :|
+bindkey -e
+
+if [[ -z "$IS_CLAUDE" ]]; then
+  eval "$(zoxide init zsh --cmd cd)"
+  source <(fzf --zsh)
+fi
+
+# Oh my posh prompt
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+  eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/oh-my-posh.toml)"
+fi
+
+# Debug bindkey with `cato -v`
+
+# Auto-source tmux.conf if inside a tmux session
+if [ -n "$TMUX" ]; then
+  # EDITOR="nvim" and bindkey-e mess this up in tmux :|
+  bindkey  "^[OH"   beginning-of-line
+  bindkey  "^[OF"   end-of-line
+  bindkey  "^[[3~"  delete-char
+fi
+# Ctrl+Left and Ctrl+Right for moving word-by-word
+bindkey "^[[1;5D" backward-word   # Ctrl+Left
+bindkey "^[[1;5C" forward-word    # Ctrl+Right
+
+bindkey "^[[3;3~" kill-word # alt+Delete
+bindkey "^[[3;5~" kill-word # ctrl+Delete
+
+bindkey "^[[3;9~" kill-line # cmd+Delete
+
+bindkey '^[l' autosuggest-accept
+
+# ctrl + u only deletes from where the cursor is. (which is then bound to command + left elsewhere)
+# bindkey '^U' backward-kill-line
+
+# ctrl + backspace generates ^H
+bindkey "^H" backward-kill-word
+
+# alt + left and right in /paths/like/this
+autoload -U select-word-style
+select-word-style bash
+
+
+# Git aliases
+alias s="git status"
+# git diff HEAD shows staged an unstaged changes
+alias d="git diff HEAD"
+alias hard="git reset --hard"
+alias soft="git reset --soft HEAD~1"
+alias co="git checkout"
+
+# Sourced because it needs to change directory
+alias wtb="source ~/Scripts/worktreeBranch"
+alias wto="~/Scripts/worktreeOpen"
+alias wtd="~/Scripts/worktreePurge"
+alias wtc="~/Scripts/worktreeClose"
+alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
+alias log="git log --graph --decorate --pretty=format:'%h - %an, %ar : %s'"
+alias ghdiff="~/Scripts/ghDiff"
+alias prChecks='gh pr checks --watch'
+alias bbdiff='open "$(git config remote.origin.url)/pull-requests/new#diff"'
+alias autoCommit="~/Scripts/autoCommit"
+alias autoPr="~/Scripts/autoPr"
+alias autoCommitPr="~/Scripts/autoCommitPr"
+alias ci='autoCommit'
+alias pr='autoPr'
+alias prdiff='~/Scripts/gitPrDiff'
+alias cipr='autoCommitPr'
+alias cip='~/Scripts/autoCommitPush'
+alias pull="source ~/Scripts/gitPull"
+alias push="source ~/Scripts/gitPush"
+alias fetch="source ~/Scripts/gitFetch"
+
+add() {
+  if [ $# -eq 0 ]; then
+    git add .
+  else
+    git add "$@"
+  fi
+}
+
+branch() {
+  git checkout -b "$1"
+}
+
+branches() {
+  git branch -a
+}
+
+resetTo() {
+  target_branch="${1:-main}"
+  git reset $(git merge-base origin/"$target_branch" $(git rev-parse --abbrev-ref origin/HEAD))
+  git status
+}
+
+# app aliases
+alias c="cursor"
+alias v="nvim"
+alias zed="open -a /Applications/Zed.app -n"
+alias pnx="pnpm exec nx"
+alias lso="{{coreUtilsPath}}/bin/ls"
+alias tree="ls --tree"
+alias cato="{{coreUtilsPath}}/bin/cat"
+alias as="open -a \"Android Studio\""
+alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
+
+{{#isDarwin}}
+alias sed="gsed"
+{{/isDarwin}}
+{{#isNixOS}}
+alias sound="wiremix"
+alias bluetooth="blueberry"
+alias wifi="nmtui"
+{{/isNixOS}}
+alias y='yazi'
+if [[ -z "$IS_CLAUDE" ]]; then
+  alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions --all"
+  alias cat="bat"
+fi
+
+# -- Use fd instead of fzf --
+
+export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --highlight-line \
+  --info=inline-right \
+  --ansi \
+  --layout=reverse \
+  --border=none
+  --color=bg+:#283457 \
+  --color=bg:#16161e \
+  --color=border:#27a1b9 \
+  --color=fg:#c0caf5 \
+  --color=gutter:#16161e \
+  --color=header:#ff9e64 \
+  --color=hl+:#2ac3de \
+  --color=hl:#2ac3de \
+  --color=info:#545c7e \
+  --color=marker:#ff007c \
+  --color=pointer:#ff007c \
+  --color=prompt:#2ac3de \
+  --color=query:#c0caf5:regular \
+  --color=scrollbar:#27a1b9 \
+  --color=separator:#ff9e64 \
+  --color=spinner:#ff007c \
+"
+export FZF_CTRL_T_OPTS="--preview '~/Scripts/fzfPreview {}'"
+export FZF_ALT_C_OPTS="--preview '~/Scripts/fzfPreview {}'"
+
+
+# Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+    cd)           fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
+    export|unset) fzf --preview "eval 'echo $'{}"         "$@" ;;
+    ssh)          fzf --preview 'dig {}'                   "$@" ;;
+    *)            fzf --preview "bat -n --color=always --line-range :500 {}" "$@" ;;
+  esac
+}
+
+# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fd --hidden --exclude .git . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type=d --hidden --exclude .git . "$1"
+}
+
+# Puppeteer
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
+
+# Path
+export PATH="$PATH:$HOME/Scripts"
+export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
+export PATH="$PATH:$HOME/Library/Android/sdk/build-tools/34.0.0"
+
+# Android
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+
+# For building firefox
+export PATH="$HOME/.mozbuild/git-cinnabar:$PATH"
+
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$HOME/.config/xata/bin:$PATH"
+
+
+# globally installed npm packages with versions
+alias twls="bunx tailwindcss-language-server@0.14.18"
+alias vtsls="bunx @vtsls/language-server@0.2.8"
+alias prettierd="bunx @fsouza/prettierd@0.26.1"
+alias biome="bunx @biomejs/biome@2.1.3"
+
+alias claudet="npx -y @mariozechner/claude-trace@latest"
+alias cl="bunx @anthropic-ai/claude-code@latest"
+alias codex="bunx @openai/codex@latest"
+alias vercel="bunx vercel@latest"
+alias terry="bunx @terragon-labs/cli"
+alias opencode="bunx opencode-ai"
+alias oc="opencode"
+alias cmus="$HOME/.config/cmus/start"

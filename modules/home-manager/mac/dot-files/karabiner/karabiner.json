@@ -1,0 +1,380 @@
+{
+  "global": { "show_in_menu_bar": false },
+  "profiles": [
+    {
+      "complex_modifications": {
+        "rules": [
+          {
+            "description": "<Home> to <Cmd-Left Arrow> (standard)",
+            "manipulators": [
+              {
+                "conditions": [
+                  {
+                    "identifiers": [
+                      {
+                        "product_id": 2040,
+                        "vendor_id": 1118
+                      },
+                      {
+                        "product_id": 10203,
+                        "vendor_id": 5824
+                      },
+                      {
+                        "vendor_id": 17241
+                      }
+                    ],
+                    "type": "device_if"
+                  },
+                  {
+                    "bundle_identifiers": [
+                      "^org\\.virtualbox\\.app\\.VirtualBoxVM$",
+                      "^com\\.parallels\\.desktop\\.console$",
+                      "^org\\.vmware\\.fusion$",
+                      "^com\\.utmapp\\.UTM$",
+                      "^org\\.gnu\\.emacs$",
+                      "^org\\.gnu\\.Emacs$",
+                      "^com\\.jetbrains",
+                      "^com\\.microsoft\\.VSCode$",
+                      "^com\\.vscodium$",
+                      "^com\\.todesktop.*",
+                      "^com\\.sublimetext\\.3$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.citrix\\.XenAppViewer$",
+                      "^com\\.microsoft\\.rdc\\.macos$",
+                      "^org\\.alacritty$",
+                      "^co\\.zeit\\.hyper$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
+                    ],
+                    "file_paths": ["Chrome Remote Desktop\\.app"],
+                    "type": "frontmost_application_unless"
+                  }
+                ],
+                "from": {
+                  "key_code": "home",
+                  "modifiers": { "optional": ["any"] }
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": ["command"]
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          },
+          {
+            "description": "<S-End> to <Cmd-Shift-Right Arrow> (Standard)",
+            "manipulators": [
+              {
+                "conditions": [
+                  {
+                    "identifiers": [
+                      {
+                        "product_id": 2040,
+                        "vendor_id": 1118
+                      },
+                      {
+                        "product_id": 10203,
+                        "vendor_id": 5824
+                      },
+                      {
+                        "vendor_id": 17241
+                      }
+                    ],
+                    "type": "device_if"
+                  },
+                  {
+                    "bundle_identifiers": [
+                      "^org\\.virtualbox\\.app\\.VirtualBoxVM$",
+                      "^com\\.parallels\\.desktop\\.console$",
+                      "^org\\.vmware\\.fusion$",
+                      "^com\\.utmapp\\.UTM$",
+                      "^org\\.gnu\\.emacs$",
+                      "^org\\.gnu\\.Emacs$",
+                      "^com\\.jetbrains",
+                      "^com\\.microsoft\\.VSCode$",
+                      "^com\\.vscodium$",
+                      "^com\\.todesktop.*",
+                      "^com\\.sublimetext\\.3$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.citrix\\.XenAppViewer$",
+                      "^com\\.microsoft\\.rdc\\.macos$",
+                      "^org\\.alacritty$",
+                      "^co\\.zeit\\.hyper$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
+                    ],
+                    "file_paths": ["Chrome Remote Desktop\\.app"],
+                    "type": "frontmost_application_unless"
+                  }
+                ],
+                "from": {
+                  "key_code": "end",
+                  "modifiers": {
+                    "mandatory": ["shift"],
+                    "optional": ["any"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": ["command", "shift"]
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          },
+          {
+            "description": "<End> to <Cmd-Right Arrow> (standard)",
+            "manipulators": [
+              {
+                "conditions": [
+                  {
+                    "identifiers": [
+                      {
+                        "product_id": 2040,
+                        "vendor_id": 1118
+                      },
+                      {
+                        "product_id": 10203,
+                        "vendor_id": 5824
+                      },
+                      {
+                        "vendor_id": 17241
+                      }
+                    ],
+                    "type": "device_if"
+                  },
+                  {
+                    "bundle_identifiers": [
+                      "^org\\.virtualbox\\.app\\.VirtualBoxVM$",
+                      "^com\\.parallels\\.desktop\\.console$",
+                      "^org\\.vmware\\.fusion$",
+                      "^com\\.utmapp\\.UTM$",
+                      "^org\\.gnu\\.emacs$",
+                      "^org\\.gnu\\.Emacs$",
+                      "^com\\.jetbrains",
+                      "^com\\.microsoft\\.VSCode$",
+                      "^com\\.vscodium$",
+                      "^com\\.todesktop.*",
+                      "^com\\.sublimetext\\.3$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.citrix\\.XenAppViewer$",
+                      "^com\\.microsoft\\.rdc\\.macos$",
+                      "^org\\.alacritty$",
+                      "^co\\.zeit\\.hyper$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
+                    ],
+                    "file_paths": ["Chrome Remote Desktop\\.app"],
+                    "type": "frontmost_application_unless"
+                  }
+                ],
+                "from": {
+                  "key_code": "end",
+                  "modifiers": { "optional": ["any"] }
+                },
+                "to": [
+                  {
+                    "key_code": "right_arrow",
+                    "modifiers": ["command"]
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          },
+          {
+            "description": "<S-Home> to <Cmd-Shift-Left Arrow> (standard)",
+            "manipulators": [
+              {
+                "conditions": [
+                  {
+                    "identifiers": [
+                      {
+                        "product_id": 2040,
+                        "vendor_id": 1118
+                      },
+                      {
+                        "product_id": 10203,
+                        "vendor_id": 5824
+                      },
+                      {
+                        "vendor_id": 17241
+                      }
+                    ],
+                    "type": "device_if"
+                  },
+                  {
+                    "bundle_identifiers": [
+                      "^org\\.virtualbox\\.app\\.VirtualBoxVM$",
+                      "^com\\.parallels\\.desktop\\.console$",
+                      "^org\\.vmware\\.fusion$",
+                      "^com\\.utmapp\\.UTM$",
+                      "^org\\.gnu\\.emacs$",
+                      "^org\\.gnu\\.Emacs$",
+                      "^com\\.jetbrains",
+                      "^com\\.microsoft\\.VSCode$",
+                      "^com\\.vscodium$",
+                      "^com\\.todesktop.*",
+                      "^com\\.sublimetext\\.3$",
+                      "^net\\.kovidgoyal\\.kitty$",
+                      "^com\\.citrix\\.XenAppViewer$",
+                      "^com\\.microsoft\\.rdc\\.macos$",
+                      "^org\\.alacritty$",
+                      "^co\\.zeit\\.hyper$",
+                      "^com\\.googlecode\\.iterm2$",
+                      "^com\\.apple\\.Terminal$",
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
+                    ],
+                    "file_paths": ["Chrome Remote Desktop\\.app"],
+                    "type": "frontmost_application_unless"
+                  }
+                ],
+                "from": {
+                  "key_code": "home",
+                  "modifiers": {
+                    "mandatory": ["shift"],
+                    "optional": ["any"]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "left_arrow",
+                    "modifiers": ["command", "shift"]
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          },
+          {
+            "manipulators": [
+              {
+                "description": "Change caps_lock to command+control+option+shift.",
+                "from": {
+                  "key_code": "caps_lock",
+                  "modifiers": { "optional": ["any"] }
+                },
+                "to": [
+                  {
+                    "key_code": "left_shift",
+                    "modifiers": ["left_command", "left_control", "left_option"]
+                  }
+                ],
+                "type": "basic"
+              }
+            ]
+          }
+        ]
+      },
+      "devices": [
+        {
+          "identifiers": {
+            "is_pointing_device": true,
+            "product_id": 153,
+            "vendor_id": 5426
+          },
+          "ignore": false
+        },
+        {
+          "fn_function_keys": [
+            {
+              "from": { "key_code": "f1" },
+              "to": [{ "key_code": "f1" }]
+            },
+            {
+              "from": { "key_code": "f2" },
+              "to": [{ "key_code": "f2" }]
+            },
+            {
+              "from": { "key_code": "f3" },
+              "to": [{ "key_code": "f3" }]
+            },
+            {
+              "from": { "key_code": "f4" },
+              "to": [{ "key_code": "f4" }]
+            },
+            {
+              "from": { "key_code": "f5" },
+              "to": [{ "key_code": "f5" }]
+            },
+            {
+              "from": { "key_code": "f6" },
+              "to": [{ "key_code": "f6" }]
+            },
+            {
+              "from": { "key_code": "f7" },
+              "to": [{ "key_code": "f7" }]
+            },
+            {
+              "from": { "key_code": "f8" },
+              "to": [{ "key_code": "f8" }]
+            },
+            {
+              "from": { "key_code": "f9" },
+              "to": [{ "key_code": "f9" }]
+            },
+            {
+              "from": { "key_code": "f10" },
+              "to": [{ "key_code": "f10" }]
+            },
+            {
+              "from": { "key_code": "f11" },
+              "to": [{ "key_code": "f11" }]
+            },
+            {
+              "from": { "key_code": "f12" },
+              "to": [{ "key_code": "f12" }]
+            }
+          ],
+          "identifiers": {
+            "is_keyboard": true,
+            "product_id": 10203,
+            "vendor_id": 5824
+          }
+        },
+        {
+          "identifiers": {
+            "is_keyboard": true,
+            "is_pointing_device": true,
+            "product_id": 10203,
+            "vendor_id": 5824
+          },
+          "ignore": false,
+          "manipulate_caps_lock_led": false,
+          "simple_modifications": [
+            {
+              "from": { "key_code": "f23" },
+              "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
+            }
+          ]
+        },
+        {
+          "identifiers": {
+            "is_keyboard": true,
+            "vendor_id": 17241
+          },
+          "simple_modifications": [
+            {
+              "from": { "key_code": "f23" },
+              "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
+            }
+          ]
+        }
+      ],
+      "name": "Default profile",
+      "selected": true
+    }
+  ]
+}

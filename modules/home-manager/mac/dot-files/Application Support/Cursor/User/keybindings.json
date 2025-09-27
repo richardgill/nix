@@ -1,0 +1,226 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+  {
+    "mac": "cmd+shift+d",
+    "key": "cmd+shift+d",
+    "command": "editor.action.copyLinesDownAction",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+s",
+    "command": "workbench.files.action.showActiveFileInExplorer"
+  },
+  {
+    "key": "alt+enter",
+    "command": "editor.action.quickFix",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+d",
+    "command": "-geeebe.duplicateText",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+cmd+up",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+up",
+    "command": "editor.action.moveLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+cmd+down",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "alt+down",
+    "command": "editor.action.moveLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "shift+cmd+d",
+    "command": "editor.action.duplicateSelection"
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "shift+cmd+k",
+    "command": "-editor.action.deleteLines",
+    "when": "textInputFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+space",
+    "command": "-toggleSuggestionDetails",
+    "when": "suggestWidgetVisible && textInputFocus"
+  },
+  {
+    "key": "ctrl+u",
+    "command": "multiCommand.pageUp",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+d",
+    "command": "multiCommand.pageDown",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+up",
+    "command": "multiCommand.pageUp",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+down",
+    "command": "multiCommand.pageDown",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "space f f",
+    "command": "workbench.action.quickOpen",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "space f s",
+    "command": "periscope.search",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "alt+w",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorFocus"
+  },
+  {
+    "key": "space f b",
+    "command": "workbench.action.showAllEditorsByMostRecentlyUsed",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "space c f",
+    "command": "prettier.forceFormatDocument",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "\\",
+    "command": "workbench.files.action.showActiveFileInExplorer",
+    "when": "!sideBarVisible && vim.mode == 'Normal'"
+  },
+  {
+    "key": "\\",
+    "command": "workbench.action.closeSidebar",
+    "when": "sideBarVisible && vim.mode == 'Normal'"
+  },
+  {
+    "key": "enter",
+    "command": "multiCommand.sidebarFileOpen",
+    "when": "explorerViewletVisible && !inputFocus && !explorerResourceIsFolder"
+  },
+  {
+    "key": "r",
+    "command": "renameFile",
+    "when": "explorerViewletVisible && !inputFocus"
+  },
+  {
+    "key": "escape",
+    "command": "workbench.action.closeSidebar",
+    "when": "sideBarVisible && !inputFocus"
+  },
+  {
+    "key": "p",
+    "command": "filesExplorer.paste",
+    "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "enter",
+    "command": "-renameFile",
+    "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "x",
+    "command": "filesExplorer.cut",
+    "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "y",
+    "command": "filesExplorer.copy",
+    "when": "filesExplorerFocus && foldersViewVisible && !explorerResourceIsRoot && !inputFocus"
+  },
+  {
+    "key": "d",
+    "command": "moveFileToTrash",
+    "when": "explorerResourceMoveableToTrash && filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "a",
+    "command": "explorer.newFile",
+    "when": "explorerResourceMoveableToTrash && filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "shift+a",
+    "command": "explorer.newFolder",
+    "when": "explorerResourceMoveableToTrash && filesExplorerFocus && foldersViewVisible && !explorerResourceReadonly && !inputFocus"
+  },
+  {
+    "key": "space d d",
+    "command": "workbench.view.scm",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "ctrl+r",
+    "command": "redo",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "u",
+    "command": "undo",
+    "when": "vim.mode == 'Normal' && editorFocus"
+  },
+  {
+    "key": "alt+l",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+  },
+  {
+    "key": "space c f",
+    "command": "editor.action.formatDocument",
+    "when": "vim.mode == 'Normal' && editorHasDocumentFormattingProvider && editorTextFocus && !editorReadonly && !inCompositeEditor"
+  },
+  {
+    "key": "space o i",
+    "command": "editor.action.organizeImports",
+    "when": "vim.mode == 'Normal' && textInputFocus && !editorReadonly && supportedCodeAction =~ /(\\s|^)source\\.organizeImports\\b/"
+  },
+  {
+    "key": "space c a",
+    "command": "editor.action.quickFix",
+    "when": "vim.mode == 'Normal' && editorTextFocus"
+  },
+  {
+    "key": "alt+l",
+    "command": "editor.action.inlineEdit.accept",
+    "when": "cursorAtInlineEdit && inlineEditVisible && !editorReadonly"
+  },
+  {
+    "key": "tab",
+    "command": "editor.action.inlineSuggest.commit",
+    "when": "inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+  },
+  {
+    "key": "alt+l",
+    "command": "workbench.action.terminal.acceptSelectedSuggestion",
+    "when": "terminalFocus && terminalHasBeenCreated && terminalIsOpen && terminalSuggestWidgetVisible || terminalFocus && terminalIsOpen && terminalProcessSupported && terminalSuggestWidgetVisible"
+  },
+  {
+    "key": "alt+l",
+    "command": "editor.action.acceptGPT4",
+    "when": "hasGPT4Diff"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
+]

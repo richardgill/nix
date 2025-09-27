@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Exit on any error
+set -e
+
+# Get the directory of this script
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+"$SCRIPT_DIR/autoCommit"
+git push
+"$SCRIPT_DIR/autoPr"
+

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Exit on any error
+set -e
+
+# Check for existing PR
+echo "Checking for existing pull request..."
+CURRENT_BRANCH=$(git branch --show-current)
+PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --json number --jq length)
+
+if [ "$PR_EXISTS" -eq 0 ]; then
+    echo "No existing PR found. Creating draft pull request..."
+    
+    # Generate PR title and description
+    DIFF_LINES=$(git diff origin/main...HEAD | wc -l)
+    
+    PROMPT_BASE=$(cat <<EOF
+Generate a minimal pull request title and description for these changes. The title should be on the first line, followed by a blank line, then the description. Keep it concise and follow this format for monorepo projects: [App name|Package name]: What the PR does.
+
+<example>
+[Website]: Made pay button green
+
+Updated the payment button color to improve visibility and user experience.
+</example>
+
+<example>
+[API]: Fixed user validation error
+
+Corrected the email validation logic that was causing false positives.
+</example>
+
+Here are all the details you need, you do not need any additional information. Do not think.: 
+
+Branch: $CURRENT_BRANCH
+Changes:
+$(git log origin/main...HEAD --oneline)
+
+Diff summary:
+$(git diff origin/main...HEAD --stat)
+EOF
+    )
+    
+    if [ "$DIFF_LINES" -gt 400 ]; then
+        PROMPT="$PROMPT_BASE"
+    else
+        PROMPT="$PROMPT_BASE
+
+Full diff:
+$(git diff origin/main...HEAD)"
+    fi
+    
+    PR_CONTENT=$(claude --model claude-3-5-haiku-20241022 -p "$PROMPT")
+    # PR_CONTENT=$(bunx opencode-ai run --model "openrouter/gpt-oss-120b" "$PROMPT")
+    
+    # Save to temp file and open in editor for manual editing
+    TEMP_FILE=$(mktemp)
+    echo "$PR_CONTENT" > "$TEMP_FILE"
+    echo "Opening generated PR content in editor..."
+    ${EDITOR:-nvim} "$TEMP_FILE"
+    
+    # Extract title (first line) and body (rest) from edited file
+    PR_TITLE=$(head -n1 "$TEMP_FILE")
+    PR_BODY=$(tail -n +3 "$TEMP_FILE")
+    
+    # Clean up temp file
+    rm "$TEMP_FILE"
+    
+    # Create draft PR with edited content
+    PR_URL=$(gh pr create --draft --title "$PR_TITLE" --body "$PR_BODY")
+    echo "Draft pull request created: $PR_URL"
+    
+    # Open in browser
+    gh pr view --web
+else
+    echo "Pull request already exists for branch '$CURRENT_BRANCH'"
+    gh pr view --web
+fi

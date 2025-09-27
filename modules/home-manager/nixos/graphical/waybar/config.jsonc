@@ -1,0 +1,70 @@
+{
+  "position": "top",
+  "layer": "top",
+  "height": 24,
+  "margin-top": 6,
+  "margin-bottom": 0,
+  "margin-left": 0,
+  "margin-right": 0,
+  "modules-left": [],
+  "modules-center": [],
+  "modules-right": [
+    "network",
+    "clock",
+    "custom/power"
+  ],
+  "network": {
+    "format": "↑{bandwidthUpBits:>9} ↓{bandwidthDownBits:>9}",
+    "format-disconnected": " Disconnected",
+    "format-linked": " Wired",
+    "format-wifi": "↑{bandwidthUpBits:>9} ↓{bandwidthDownBits:>9}",
+    "format-ethernet": "↑{bandwidthUpBits:>9} ↓{bandwidthDownBits:>9}",
+    "tooltip-format": "{ifname}: {ipaddr}/{cidr} via {gwaddr}",
+    "tooltip-format-wifi": "{essid} ({signalStrength}%): {ipaddr}/{cidr} via {gwaddr}",
+    "tooltip-format-ethernet": "{ifname}: {ipaddr}/{cidr} via {gwaddr}",
+    "tooltip-format-disconnected": "Disconnected",
+    "min-length": 25,
+    "max-length": 25,
+    "interval": 1,
+    "on-click": "nm-connection-editor"
+  },
+  "clock": {
+    "format": "{:%a %b %d %H:%M}",
+    "format-alt": "{:%Y-%m-%d %H:%M:%S}",
+    "tooltip-format": "<tt><small>{calendar}</small></tt>",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "on-click-right": "mode",
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-click-forward": "tz_up",
+      "on-click-backward": "tz_down",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  },
+  "custom/power": {
+    "format": "⏻",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "$HOME/.config/waybar/power_menu.xml",
+    "menu-actions": {
+      "logout": "uwsm stop",
+      "shutdown": "shutdown now",
+      "reboot": "reboot",
+      "suspend": "systemctl suspend",
+      "hibernate": "systemctl hibernate"
+    }
+  }
+}

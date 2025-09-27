@@ -1,0 +1,4 @@
+[mgr]
+show_hidden = true
+
+ratio = [2, 4, 3]

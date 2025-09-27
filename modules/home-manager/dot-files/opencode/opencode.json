@@ -1,0 +1,92 @@
+{
+	"$schema": "https://opencode.ai/config.json",
+	"theme": "tokyonight",
+	"instructions": ["AGENTS.md", "**/CLAUDE.md"],
+	"mode": {
+		"build": {
+			"model": "anthropic/claude-sonnet-4-20250514",
+			"tools": {
+				"write": true,
+				"edit": true,
+				"bash": true
+			}
+		},
+		"plan": {
+			"model": "anthropic/claude-opus-4-20250514",
+			"tools": {
+				"write": false,
+				"edit": false,
+				"bash": false
+			}
+		},
+		"readonly": {
+			"model": "anthropic/claude-opus-4-20250514",
+			"prompt": "{file:./prompts/readonly.md}",
+			"tools": {
+				"write": false,
+				"edit": false,
+				"bash": true,
+				"read": true,
+				"grep": true,
+				"glob": true
+			}
+		}
+	},
+	"mcp": {
+		"tavily": {
+			"type": "remote",
+			"url": "https://mcp.tavily.com/mcp/?tavilyApiKey={env:TAVILY_API_KEY}",
+			"enabled": true
+		}
+	},
+	"provider": {
+		"openrouter": {
+			"models": {
+				"gpt-oss-120b": {
+					"options": {
+						"provider": {
+							"order": ["cerebras"],
+							"allow_fallbacks": false
+						}
+					}
+				},
+				"qwen-3-coder-480b": {
+					"options": {
+						"provider": {
+							"order": ["cerebras"],
+							"allow_fallbacks": false
+						}
+					}
+				}
+			}
+		}
+	},
+	"keybinds": {
+		"leader": "ctrl+x",
+		"app_help": "<leader>h",
+		"switch_mode": "tab",
+		"editor_open": "<leader>e",
+		"session_new": "<leader>n",
+		"session_list": "<leader>l",
+		"session_share": "<leader>s",
+		"session_unshare": "<leader>u",
+		"session_interrupt": "esc",
+		"session_compact": "<leader>c",
+		"tool_details": "<leader>d",
+		"model_list": "<leader>m",
+		"theme_list": "<leader>t",
+		"project_init": "<leader>i",
+		"input_clear": "ctrl+c",
+		"input_paste": "ctrl+v",
+		"input_submit": "enter",
+		"input_newline": "shift+enter,ctrl+j",
+		"messages_page_up": "pgup",
+		"messages_page_down": "pgdown",
+		"messages_half_page_up": "ctrl+alt+u",
+		"messages_half_page_down": "ctrl+alt+d",
+		"messages_first": "ctrl+g",
+		"messages_last": "ctrl+alt+g",
+		"messages_copy": "<leader>y",
+		"app_exit": "ctrl+c,<leader>q"
+	}
+}

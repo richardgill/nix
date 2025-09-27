@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Cross-platform beep script
+# Uses Ping.aiff on macOS, system bell on Linux
+
+{{#isDarwin}}
+# macOS - play the classic Ping.aiff sound
+afplay /System/Library/Sounds/Ping.aiff
+{{/isDarwin}}
+{{#isLinux}}
+# Linux - use freedesktop sound theme
+pw-play /run/current-system/sw/share/sounds/freedesktop/stereo/window-attention.oga
+{{/isLinux}}

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+source "$(dirname "$0")/tmuxSetupWindows"
+
+if [ "$#" -eq 0 ]; then
+  cato << EOF
+Usage examples:
+
+  wtb new-branch-and-dirname
+    # Creates a new branch with the given name
+
+  wtb new-branch-and-dirname local-branch
+    # Creates a new branch from another local branch
+
+  wtb origin/my-branch
+    # Creates a worktree for 'my-branch' from the remote branch
+
+  wtb feature-branch origin/feature-branch
+    # Creates a worktree from a remote branch with the same name
+
+  wtb new-branch-and-dirname origin/remote-branch
+    # Creates a new branch from a remote branch
+EOF
+  return 1
+fi
+
+
+SOURCE=$(realpath .)
+
+# Handle single argument that is a remote branch (e.g., origin/branch-name)
+if [ "$#" -eq 1 ] && [[ "$1" == */* ]]; then
+  # For single remote branch argument, extract branch name and use it as both directory and branch name
+  BRANCH_NAME=$(echo "$1" | cut -d'/' -f2-)
+  TARGET="$SOURCE/../$BRANCH_NAME"
+  set -- "$BRANCH_NAME" "$1"  # Rewrite arguments to reuse existing logic
+else
+  TARGET="$SOURCE/../$1"
+fi
+
+if [ -n "$2" ]; then
+  if [[ "$2" == */* ]]; then
+    REMOTE=$(echo "$2" | cut -d'/' -f1)
+    BRANCH=$(echo "$2" | cut -d'/' -f2-)
+    echo "Fetching remote branch $2..."
+    git fetch "$REMOTE" "$BRANCH"
+    git worktree add -b "$1" "$TARGET" "$2"
+    # Push the new branch to create origin/$1 and update tracking from origin/$BRANCH to origin/$1
+    cd "$TARGET"
+    git push -u origin "$1"
+    cd -
+  else
+    git worktree add "$TARGET" "$2"
+  fi
+else
+  git worktree add "$TARGET"
+fi
+
+
+TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET"))
+SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION")
+
+
+tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktreeBranchSetup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

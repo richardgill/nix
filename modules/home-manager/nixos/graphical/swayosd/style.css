@@ -1,0 +1,33 @@
+/* Tokyo Night theme */
+@define-color background-color #1a1b26;
+@define-color border-color #33ccff;
+@define-color label #a9b1d6;
+@define-color image #a9b1d6;
+@define-color progress #a9b1d6;
+
+window {
+  border-radius: 0;
+  opacity: 0.97;
+  border: 2px solid @border-color;
+
+  background-color: @background-color;
+}
+
+label {
+  font-family: 'Hack Nerd Font';
+  font-size: 11pt;
+
+  color: @label;
+}
+
+image {
+  color: @image;
+}
+
+progressbar {
+  border-radius: 0;
+}
+
+progress {
+  background-color: @progress;
+}

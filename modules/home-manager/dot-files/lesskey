@@ -1,0 +1,5 @@
+#command
+# Bind Ctrl+Down to scroll half a screen down
+\e[1;5B forw-scroll
+# Bind Ctrl+Up to scroll half a screen up
+\e[1;5A back-scroll

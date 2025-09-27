@@ -1,0 +1,196 @@
+/* Combined from:
+ * https://github.com/basecamp/omarchy/blob/master/themes/tokyo-night/waybar.css
+ * https://github.com/basecamp/omarchy/blob/master/config/waybar/style.css
+ */
+
+/* Tokyo Night color definitions */
+@define-color background #1a1b26;
+@define-color foreground #c0caf5;
+@define-color selection #33467c;
+@define-color comment #565f89;
+@define-color red #f7768e;
+@define-color orange #ff9e64;
+@define-color yellow #e0af68;
+@define-color green #9ece6a;
+@define-color purple #bb9af7;
+@define-color cyan #7dcfff;
+@define-color pink #bb9af7;
+@define-color blue #7aa2f7;
+
+/* Main Waybar styles */
+* {
+    border: none;
+    border-radius: 0;
+    font-family: "Hack", monospace;
+    font-weight: bold;
+    font-size: 14px;
+    min-height: 0;
+}
+
+window#waybar {
+    background: transparent;
+}
+
+window#waybar.hidden {
+    opacity: 0.2;
+}
+
+/* Tooltip */
+tooltip {
+    background: @background;
+    border-radius: 10px;
+    border-width: 2px;
+    border-style: solid;
+    border-color: @blue;
+}
+
+/* Workspaces */
+#workspaces {
+    background: @background;
+    margin: 5px;
+    padding: 0px 1px;
+    border-radius: 15px;
+    border: 0px;
+    font-style: normal;
+    color: @foreground;
+}
+
+#workspaces button {
+    padding: 0px 5px;
+    margin: 4px 3px;
+    border-radius: 15px;
+    border: 0px;
+    color: @foreground;
+    background: linear-gradient(45deg, @selection, @comment);
+    opacity: 0.5;
+}
+
+#workspaces button.active {
+    color: @background;
+    background: linear-gradient(45deg, @blue, @purple);
+    opacity: 1.0;
+}
+
+#workspaces button:hover {
+    color: @background;
+    background: linear-gradient(45deg, @blue, @purple);
+    opacity: 0.8;
+}
+
+/* Common module styling */
+#tray,
+#mode,
+#battery,
+#temperature,
+#memory,
+#network,
+#pulseaudio,
+#custom-menu,
+#custom-power,
+#custom-updater,
+#custom-wallpaper,
+#custom-wbar,
+#custom-l_end,
+#custom-r_end,
+#custom-sl_end,
+#custom-sr_end,
+#custom-rl_end,
+#custom-rr_end,
+#idle_inhibitor,
+#custom-power_profile,
+#custom-weather,
+#custom-playerctl,
+#window,
+#cpu,
+#custom-hardinfo,
+#custom-wf-recorder,
+#custom-cava-internal,
+#disk,
+#custom-hyprpicker,
+#custom-system,
+#custom-cycle_wall,
+#backlight,
+#clock {
+    background: @background;
+    color: @foreground;
+    margin: 5px 0px 5px 0px;
+    padding: 0px 15px;
+    border-radius: 12px;
+}
+
+/* Module specific colors */
+#battery {
+    color: @green;
+}
+
+#battery.warning {
+    color: @orange;
+}
+
+#battery.critical {
+    color: @red;
+}
+
+#network {
+    color: @cyan;
+    font-family: "Hack", monospace;
+    min-width: 200px;
+}
+
+#network.disconnected {
+    color: @red;
+}
+
+#pulseaudio {
+    color: @blue;
+}
+
+#pulseaudio.muted {
+    color: @red;
+}
+
+#clock {
+    color: @purple;
+}
+
+#memory {
+    color: @yellow;
+}
+
+#cpu {
+    color: @green;
+}
+
+#temperature {
+    color: @orange;
+}
+
+#temperature.critical {
+    color: @red;
+}
+
+#backlight {
+    color: @cyan;
+}
+
+#custom-power {
+    color: @red;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+#custom-power:hover {
+    background: @red;
+    color: @background;
+}
+
+#tray {
+    border-radius: 15px;
+    margin-right: 10px;
+}
+
+#window {
+    border-radius: 15px;
+    margin-left: 60px;
+    margin-right: 60px;
+}

@@ -1,0 +1,9 @@
+{
+  "console_log_zzz": {
+    "prefix": "zzz",
+    "body": [
+      "console.log('zzz ${1}', ${2});"
+    ],
+    "description": "Console log with 'zzz' prefix"
+  }
+}

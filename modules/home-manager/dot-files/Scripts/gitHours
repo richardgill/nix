@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# usage: git-hours -3 git commit -m "blah"
+
+hours="$1"
+shift
+GIT_AUTHOR_DATE="$(date -v${hours}H +%s)" GIT_COMMITTER_DATE="$GIT_AUTHOR_DATE" "$@"
