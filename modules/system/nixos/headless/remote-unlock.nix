@@ -18,7 +18,7 @@
     ssh = {
       enable = true;
       shell = "/bin/cryptsetup-askpass";
-      authorizedKeys = [ vars.sshPublicKeyPersonal ];
+      authorizedKeys = [ vars.sshPublicKeyPersonal vars.sshPublicKeyWork ];
       hostKeys = [ "/nix/secret/initrd/ssh_host_ed25519_key" ];
     };
   };

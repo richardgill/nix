@@ -11,7 +11,6 @@
       PermitRootLogin = "no";
       PasswordAuthentication = true;
       PubkeyAuthentication = true;
-      AuthenticationMethods = "publickey";
       MaxAuthTries = 3;
       ClientAliveInterval = 300;
       ClientAliveCountMax = 2;
@@ -22,6 +21,7 @@
   # SSH key management for users
   users.users.${vars.userName}.openssh.authorizedKeys.keys = [
     vars.sshPublicKeyPersonal
+    vars.sshPublicKeyWork
   ];
 
   # Optional: Install useful SSH-related packages
