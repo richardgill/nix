@@ -5,32 +5,47 @@
   nixpkgs-unstable,
   ...
 }:
-
 let
-  unstable = import nixpkgs-unstable { system = pkgs.system; config.allowUnfree = true; };
+  unstable = import nixpkgs-unstable {
+    inherit (pkgs) system;
+    config.allowUnfree = true;
+  };
+  isAarch64Linux = pkgs.system == "aarch64-linux";
 in
-
 {
   home.packages =
     with pkgs;
     [
-      nautilus
-      evince
-      imv
-      sushi
-      satty
-      wl-clipboard
-      swayosd
-      walker
-      slurp
-      wl-clip-persist
+      alacritty
+      chromium
       cliphist
-      wf-recorder
+      evince
       glib
+      hyprshot
+      firefox
+      imv
+      mpv
+      nautilus
+      satty
+      slurp
+      sushi
+      swayosd
+      vscode
+      walker
       wayland
+      wf-recorder
+      wl-clip-persist
+      wl-clipboard
+      unstable.wl-screenrec
       unstable.wiremix
     ]
-    ++ lib.optionals (!pkgs.stdenv.isAarch64) [
+    ++ lib.optionals (!isAarch64Linux) [
       ghostty
+      slack
+      spotify
+      discord
+      google-chrome
+      unstable._1password-gui
+      unstable.code-cursor
     ];
 }

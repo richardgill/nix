@@ -39,35 +39,39 @@ in
     };
     brews = [
       "mise"
-      # "trash"
     ];
     taps = builtins.attrNames config.nix-homebrew.taps;
     casks = [
-      "alfred"
+      "1password"
+      "alacritty"
+      "beeper"
       "cursor"
+      "discord"
+      "firefox"
+      "flameshot"
       "ghostty"
+      "google-chrome"
       "hammerspoon"
       "karabiner-elements"
-      "monarch"
       "rectangle"
-      "signal"
-      # "1password-cli"
-      # "1password"
-      # "alacritty"
-      # "discord"
-      # "firefox"
-      # "screen-studio"
-      # "spotify"
-      # "the-unarchiver"
-      # "visual-studio-code"
-      # "vlc"
-      # "whatsapp"
+      "slack"
+      "sol"
+      "spotify"
+      "stats"
+      "todoist"
+      "visual-studio-code"
+      "zoom"
     ];
     masApps = {
     };
   };
 
   system.activationScripts.extraActivation.text = ''
+    if ! xcode-select -p &> /dev/null; then
+      echo "⚠️  Xcode Command Line Tools not found"
+      echo "Please install them using: xcode-select --install"
+      exit 1
+    fi
     softwareupdate --install-rosetta --agree-to-license
   '';
 }

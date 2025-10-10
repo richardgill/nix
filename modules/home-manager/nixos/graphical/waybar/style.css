@@ -110,6 +110,7 @@ tooltip {
 #custom-system,
 #custom-cycle_wall,
 #backlight,
+#custom-screenrecord,
 #clock {
     background: @background;
     color: @foreground;
@@ -171,6 +172,10 @@ tooltip {
 
 #backlight {
     color: @cyan;
+}
+
+#custom-screenrecord.recording {
+    color: @red;
 }
 
 #custom-power {

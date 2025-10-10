@@ -1,11 +1,8 @@
 {
-  config,
   pkgs,
-  lib,
   inputs,
   ...
 }:
-
 {
   imports = [
     inputs.stylix.nixosModules.stylix
@@ -17,7 +14,7 @@
     cursor = {
       package = pkgs.apple-cursor;
       name = "macOS";
-      size = 32;
+      size = 30;
     };
   };
 }

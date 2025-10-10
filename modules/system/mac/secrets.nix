@@ -1,9 +1,10 @@
 {
   inputs,
-  vars,
   ...
-}: {
+}:
+{
   imports = [
+    inputs.sops-nix.darwinModules.sops
     ../shared/secrets-common.nix
   ];
 

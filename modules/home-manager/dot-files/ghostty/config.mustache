@@ -1,11 +1,10 @@
-font-family = "Hack Nerd Font Mono"
+font-family = "Hack Nerd Font"
 font-thicken = true
 adjust-cell-height = 12%
 theme = tokyonight
 shell-integration-features = no-cursor
 cursor-style = block
 title = ""
-command = {{zshPath}} -l -c "source ~/.zshrc; tmux attach -t root || tmux new -s root"
 window-padding-y = 10,0 
 resize-overlay = never
 
@@ -18,7 +17,7 @@ macos-titlebar-proxy-icon = hidden
 {{/isDarwin}}
 {{#isLinux}}
 # Linux configuration
-font-size = 14
+font-size = 13
 # override alt+left and alt+right for word navigation
 keybind = alt+left=text:\x1bB
 keybind = alt+right=text:\x1bF

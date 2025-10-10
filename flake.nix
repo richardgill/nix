@@ -66,6 +66,11 @@
     mac-app-util = {
       url = "github:hraban/mac-app-util";
     };
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -73,6 +78,7 @@
       self,
       nixpkgs,
       nix-darwin,
+      treefmt-nix,
       ...
     }@inputs:
     let
@@ -85,38 +91,48 @@
       ];
       forAllSystems = nixpkgs.lib.genAttrs systems;
 
+      treefmtEval = forAllSystems (
+        system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
+      );
+
       mkNixOSConfig =
         hostName: path:
         nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs outputs vars;
-            nixpkgs-unstable = inputs.nixpkgs-unstable;
-            hostName = hostName;
+            inherit (inputs) nixpkgs-unstable;
+            inherit hostName;
           };
           modules = [ path ];
         };
 
       mkDarwinConfig =
-        path:
+        hostName: path:
         nix-darwin.lib.darwinSystem {
           specialArgs = {
             inherit inputs outputs vars;
-            nixpkgs-unstable = inputs.nixpkgs-unstable;
+            inherit (inputs) nixpkgs-unstable;
+            inherit hostName;
           };
           modules = [ path ];
         };
     in
     {
       # Enables `nix fmt` at root of repo to format all nix files
-      # todo: change this
-      formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+      formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
+
+      # for `nix flake check`
+      checks = forAllSystems (system: {
+        formatting = treefmtEval.${system}.config.build.check self;
+      });
 
       darwinConfigurations = {
-        mbp-m1 = mkDarwinConfig ./machines/mbp-m1/configuration.nix;
+        macbookair-work = mkDarwinConfig "macbookair-work" ./machines/macbookair-work/configuration.nix;
       };
 
       nixosConfigurations = {
-        beelink-zoe = mkNixOSConfig "beelink-zoe" ./machines/beelink-zoe/configuration.nix;
+        beelink-gk55 = mkNixOSConfig "beelink-gk55" ./machines/beelink-gk55/configuration.nix;
+        um790 = mkNixOSConfig "um790" ./machines/um790/configuration.nix;
         arm-vm = mkNixOSConfig "arm-vm" ./machines/arm-vm/configuration.nix;
         x86-vm = mkNixOSConfig "x86-vm" ./machines/x86-vm/configuration.nix;
       };

@@ -1,7 +1,7 @@
 {
   imports = [
     ./firefox.nix
-    ./stylix.nix
     ./packages.nix
+    ./stylix.nix
   ];
 }

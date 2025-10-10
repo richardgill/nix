@@ -11,7 +11,3 @@ output-filename = "~/Screenshots/screenshot-%Y-%m-%d_%H-%M-%S.png"
 family = "Roboto"
 # Set the style of the font to be used in the text tool
 style = "Bold"
-
-[color-palette]
-# First line is background
-default-first-line = "#00000000"

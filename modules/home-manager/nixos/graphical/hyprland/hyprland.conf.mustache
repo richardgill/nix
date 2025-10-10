@@ -5,6 +5,9 @@ $terminal = ghostty
 $browser = firefox
 $jq = {{jq}}
 
+env = XCURSOR_SIZE,30
+env = HYPRCURSOR_SIZE,30
+
 # Monitor configuration
 # Fallback for other resolutions (must come first)
 monitor = ,preferred,auto,auto
@@ -27,10 +30,14 @@ input {
     kb_layout = us
     numlock_by_default = true
     repeat_delay = 300
-
     touchpad {
         natural_scroll = true
     }
+}
+
+device {
+    name = razer-razer-basilisk-v3
+    sensitivity = -0.2
 }
 
 # General settings
@@ -82,6 +89,11 @@ master {
 # Binds configuration
 binds {
     movefocus_cycles_fullscreen = true
+}
+
+# Debug configuration
+debug {
+    disable_logs = false
 }
 
 # Decoration
@@ -141,14 +153,16 @@ xwayland {
 layerrule = dimaround, walker
 
 # Key bindings - Application launchers with descriptions
-bindd = $hyper, G, Terminal, exec, hyprctl dispatch workspace 10; pgrep $terminal || (uwsm app -- $terminal &)
+bindd = $hyper, A, Activity, exec, hyprctl dispatch workspace 13; pgrep -f '$terminal.*btop' > /dev/null || (uwsm app -- $terminal --title "btop" -e btop &)
 bindd = $hyper, B, Files, exec, hyprctl dispatch workspace 11; pgrep -x nautilus || (uwsm app -- nautilus --new-window &)
-bindd = $hyper, F, Browser, exec, hyprctl dispatch workspace 12; pgrep $browser || (uwsm app -- $browser &)
 bindd = $hyper, C, ChatGPT, exec, hyprctl dispatch workspace 12; uwsm app -- $browser "https://chatgpt.com" &
-bindd = $hyper, T, Activity, exec, hyprctl dispatch workspace 13; pgrep -f '$terminal.*btop' > /dev/null || (uwsm app -- $terminal --title "btop" -e btop &)
+bindd = $hyper, D, Discord, exec, hyprctl dispatch workspace 14; pgrep -x discord || (uwsm app -- discord &)
+bindd = $hyper, F, Browser, exec, hyprctl dispatch workspace 12; pgrep $browser || (uwsm app -- $browser &)
+bindd = $hyper, G, Terminal, exec, hyprctl dispatch workspace 10; pgrep $terminal || (uwsm app -- $terminal &)
 bindd = $hyper, H, 1Password, exec, hyprctl dispatch workspace 15; pgrep -x 1password || (uwsm app -- 1password &)
 bindd = $hyper, S, Slack, exec, hyprctl dispatch workspace 16; pgrep -x slack || (uwsm app -- slack &)
 bindd = $hyper, W, Beeper, exec, hyprctl dispatch workspace 17; pgrep -x beeper || (uwsm app -- beeper &)
+bindd = $hyper, Z, Zoom, exec, hyprctl dispatch workspace 19; pgrep -f "chromium.*app.zoom.us" > /dev/null || (omarchy-launch-webapp "https://app.zoom.us/wc/home" &)
 bindd = $hyper, M, Music, exec, hyprctl dispatch workspace 18; pgrep -f '$terminal.*cmus' > /dev/null || (uwsm app -- $terminal --title "cmus" -e cmus &)
 
 # Key bindings - General
@@ -177,27 +191,10 @@ bind = $mainMod, l, alterzorder, top
 # Workspace switching
 bind = $mainMod, 1, workspace, 1
 bind = $mainMod, 2, workspace, 2
-bind = $mainMod, 3, workspace, 3
-bind = $mainMod, 4, workspace, 4
-bind = $mainMod, 5, workspace, 5
-bind = $mainMod, 6, workspace, 6
-bind = $mainMod, 7, workspace, 7
-bind = $mainMod, 8, workspace, 8
-bind = $mainMod, 9, workspace, 9
-bind = $mainMod, 0, workspace, 10
 
 # Move to workspace silently
 bind = $mainMod SHIFT, 1, movetoworkspacesilent, 1
 bind = $mainMod SHIFT, 2, movetoworkspacesilent, 2
-bind = $mainMod SHIFT, 3, movetoworkspacesilent, 3
-bind = $mainMod SHIFT, 4, movetoworkspacesilent, 4
-bind = $mainMod SHIFT, 5, movetoworkspacesilent, 5
-bind = $mainMod SHIFT, 6, movetoworkspacesilent, 6
-bind = $mainMod SHIFT, 7, movetoworkspacesilent, 7
-bind = $mainMod SHIFT, 8, movetoworkspacesilent, 8
-bind = $mainMod SHIFT, 9, movetoworkspacesilent, 9
-bind = $mainMod SHIFT, 0, movetoworkspacesilent, 10
-bind = $mainMod CTRL, c, movetoworkspace, empty
 
 # Window control
 bind = $mainMod SHIFT, left, movewindow, l
@@ -239,18 +236,20 @@ bind = ,XF86AudioStop, exec, playerctl stop
 bind = $mainMod, mouse_down, workspace, e-1
 bind = $mainMod, mouse_up, workspace, e+1
 
-# Walker application launcher
+# Application launcher
 bind = SUPER, SPACE, exec, rofi -show drun
-# This is really SUPER ALT V, but xremap remaps it.
-bind = CTRL ALT, V, exec, cliphist list | rofi -dmenu -display-columns 2 -sort -window-title "" | cliphist decode | wl-copy; wl-paste
+# Paste from paste history
+bind = SUPER ALT, V, exec, cliphist list | rofi -dmenu -display-columns 2 -sort -window-title "" | cliphist decode | wl-copy && ~/Scripts/paste
+
 
 # Lock screen
 bind = CTRL SUPER, Q, exec, hyprlock
 
 # Screenshots
-bind = SUPER SHIFT, 4, exec, pkill slurp || hyprshot -m region --raw --freeze | satty --filename - --fullscreen --output-filename ~/Screenshots/screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png --early-exit --copy-command 'wl-copy'
-bind = SUPER SHIFT, 3, exec, pkill slurp || hyprshot -m output --raw --freeze | satty --filename - --fullscreen --output-filename ~/Screenshots/screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png --early-exit --copy-command 'wl-copy'
-bind = SUPER SHIFT, 5, exec, region=$(slurp) && wl-screenrec -g "$region" -f ~/Screenshots/recording-$(date +'%Y-%m-%d_%H-%M-%S').mp4
+bind = SUPER SHIFT, 3, exec, pkill slurp || filename="screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png" && hyprshot -m active -m output -o "$HOME/Screenshots" -f "$filename" && sleep 0.2 && satty --filename "$HOME/Screenshots/$filename" --output-filename "$HOME/Screenshots/$filename"
+bind = SUPER SHIFT, 4, exec, pkill slurp || filename="screenshot-$(date +'%Y-%m-%d_%H-%M-%S').png" && hyprshot -m region --freeze -o "$HOME/Screenshots" -f "$filename" && sleep 0.2 && satty --filename "$HOME/Screenshots/$filename" --output-filename "$HOME/Screenshots/$filename"
+bind = SUPER SHIFT, 5, exec, ~/Scripts/screenRecord output
+bind = SUPER SHIFT, 6, exec, ~/Scripts/screenRecord
 
 # Volume and brightness controls with OSD (with descriptions)
 bindeld = ,XF86AudioRaiseVolume, Volume up, exec, swayosd-client --monitor "$(hyprctl monitors -j | $jq -r '.[] | select(.focused == true).name')" --output-volume raise
@@ -280,29 +279,75 @@ binde = ,XF86AudioRaiseVolume, exec, pamixer -i 2
 binde = ,XF86AudioLowerVolume, exec, pamixer -d 2
 
 # Mouse bindings
-bindm = $mainMod, mouse:272, movewindow
-bindm = $mainMod, mouse:273, resizewindow
+bindm = $hyper, mouse:272, movewindow
+bindm = $hyper, mouse:273, resizewindow
 
 # Window rules
 # hyprctl clients to find values
 windowrulev2 = noborder, class:^(swayosd)$
 windowrulev2 = noborder, class:^(walker)$
-windowrulev2 = workspace 10, class:^(com.mitchellh.ghostty)$
-windowrulev2 = tile, class:^(com.mitchellh.ghostty)$
-windowrulev2 = workspace 11, class:^(org.gnome.Nautilus|Nautilus)$
-windowrulev2 = tile, class:^(org.gnome.Nautilus|Nautilus)$
-windowrulev2 = workspace 12, class:^(firefox)$
-windowrulev2 = tile, class:^(firefox)$
-windowrulev2 = workspace 13, title:^(btop)$
-windowrulev2 = tile, title:^(btop)$
-windowrulev2 = workspace 15, class:^(1Password)$
-windowrulev2 = tile, class:^(1Password)$
-windowrulev2 = workspace 16, class:^(Slack)$
-windowrulev2 = tile, class:^(Slack)$
-windowrulev2 = workspace 17, class:^(Beeper)$
-windowrulev2 = tile, class:^(Beeper)$
-windowrulev2 = workspace 18, title:^(cmus)$
-windowrulev2 = tile, title:^(cmus)$
-windowrulev2 = workspace 18, title:.*Spotify.*
-windowrulev2 = tile, title:.*Spotify.*
+
+windowrulev2 = float, class:^(com.gabm.satty)$
+windowrulev2 = size 90% 90%, class:^(com.gabm.satty)$
+windowrulev2 = center, class:^(com.gabm.satty)$
+windowrulev2 = dimaround 0.7, class:^(com.gabm.satty)$
+
+# Workspace and window pattern assignments
+$ws_terminal = 10
+$class_terminal = com.mitchellh.ghostty
+
+$ws_files = 11
+$class_files = org.gnome.Nautilus|Nautilus
+
+$ws_browser = 12
+$class_browser = firefox
+
+$ws_activity = 13
+$title_activity = btop
+
+$ws_discord = 14
+$class_discord = discord
+
+$ws_password = 15
+$class_password = 1Password
+
+$ws_slack = 16
+$class_slack = Slack
+
+$ws_beeper = 17
+$class_beeper = Beeper
+
+$ws_music = 18
+$title_music = cmus
+$class_spotify = spotify
+
+$ws_zoom = 19
+$class_zoom = zoom
+
+# Workspace assignment rules
+windowrulev2 = workspace $ws_terminal, class:^($class_terminal)$
+windowrulev2 = tile, class:^($class_terminal)$
+windowrulev2 = workspace $ws_files, class:^($class_files)$
+windowrulev2 = tile, class:^($class_files)$
+windowrulev2 = workspace $ws_browser, class:^($class_browser)$
+windowrulev2 = tile, class:^($class_browser)$
+windowrulev2 = workspace $ws_activity, title:^($title_activity)$
+windowrulev2 = tile, title:^($title_activity)$
+windowrulev2 = workspace $ws_discord, class:^($class_discord)$
+windowrulev2 = tile, class:^($class_discord)$
+windowrulev2 = workspace $ws_password, class:^($class_password)$
+windowrulev2 = tile, class:^($class_password)$
+windowrulev2 = workspace $ws_slack, class:^($class_slack)$
+windowrulev2 = tile, class:^($class_slack)$
+windowrulev2 = workspace $ws_beeper, class:^($class_beeper)$
+windowrulev2 = tile, class:^($class_beeper)$
+windowrulev2 = workspace $ws_music, title:^($title_music)$
+windowrulev2 = tile, title:^($title_music)$
+windowrulev2 = workspace $ws_music, class:^($class_spotify)$
+windowrulev2 = tile, class:^($class_spotify)$
+windowrulev2 = workspace $ws_zoom, class:^($class_zoom)$
+windowrulev2 = tile, class:^($class_zoom)$
+
+# Move all windows to their assigned workspaces based on window rules
+bind = $mainMod ALT, R, exec, hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_terminal)$")) | "movetoworkspacesilent $ws_terminal,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_files)$")) | "movetoworkspacesilent $ws_files,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_browser)$")) | "movetoworkspacesilent $ws_browser,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.title | test("^($title_activity)$")) | "movetoworkspacesilent $ws_activity,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_discord)$")) | "movetoworkspacesilent $ws_discord,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_password)$")) | "movetoworkspacesilent $ws_password,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_slack)$")) | "movetoworkspacesilent $ws_slack,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_beeper)$")) | "movetoworkspacesilent $ws_beeper,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.title | test("^($title_music)$")) | "movetoworkspacesilent $ws_music,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("$class_spotify")) | "movetoworkspacesilent $ws_music,address:\(.address)"' | xargs -I {} hyprctl dispatch {} ; hyprctl clients -j | $jq -r '.[] | select(.class | test("^($class_zoom)$")) | "movetoworkspacesilent $ws_zoom,address:\(.address)"' | xargs -I {} hyprctl dispatch {}
 

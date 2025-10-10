@@ -4,10 +4,10 @@
   pkgs,
   ...
 }:
-
 {
   # Enable Avahi for .local hostname resolution
   services.avahi = {
+    enable = true;
     nssmdns4 = true;
     publish = {
       enable = true;

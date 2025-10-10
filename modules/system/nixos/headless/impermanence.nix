@@ -20,18 +20,13 @@
     directories = [
       "/var/log"
       "/var/lib/bluetooth"
+      "/var/lib/boltd"
       "/var/lib/nixos"
       "/var/lib/systemd/coredump"
       "/var/lib/fprint"
       "/var/lib/NetworkManager"
       "/var/lib/iwd"
       "/etc/NetworkManager/system-connections"
-      {
-        directory = "/var/lib/colord";
-        user = "colord";
-        group = "colord";
-        mode = "u=rwx,g=rx,o=";
-      }
     ];
     files = [
       "/etc/machine-id"
@@ -51,6 +46,7 @@
       "Screenshots"
       "go"
       ".cargo"
+      ".claude/file-history"
       ".claude/plugins"
       ".claude/projects"
       ".claude/shell-snapshots"
@@ -82,6 +78,7 @@
       ".zsh_history"
       ".claude.json"
       ".claude/.credentials.json"
+      ".claude/history.jsonl"
     ];
   };
 

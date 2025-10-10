@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+current_branch=$(git symbolic-ref --short HEAD)
+remote=$(git remote | grep -q upstream && echo "upstream" || echo "origin")
+username=$(grep "user:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
+
+if [ "$remote" = "upstream" ]; then
+    branch_ref="$username:$current_branch"
+else
+    branch_ref="$current_branch"
+fi
+
+open "$(gh browse --no-browser)/compare/main...$branch_ref?expand=1"

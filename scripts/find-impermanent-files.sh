@@ -24,6 +24,7 @@ while read path; do
   case "$path" in
     /var/log/* | \
     /var/lib/bluetooth/* | \
+    /var/lib/boltd/* | \
     /var/lib/nixos/* | \
     /var/lib/systemd/coredump/* | \
     /var/lib/fprint/* | \
@@ -102,7 +103,9 @@ while read path; do
     /home/*/.lesskey | \
     /home/*/.gitconfig | \
     /home/*/.claude.json | \
-    /home/*/.claude/.credentials.json )
+    /home/*/.claude/.credentials.json | \
+    /home/*/.claude/history.jsonl | \
+    /home/*/.claude/file-history/* )
       continue
       ;;
   esac
@@ -110,7 +113,8 @@ while read path; do
   # Skip ephemeral files (cache, temp, etc.)
   case "$path" in
     /home/*/.cache/* | \
-    /tmp/node-compile-cache/* )
+    /tmp/node-compile-cache/* | \
+    /tmp/mise/* )
       continue
       ;;
   esac

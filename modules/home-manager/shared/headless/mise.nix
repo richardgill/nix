@@ -5,7 +5,7 @@
   ...
 }:
 let
-  unstable = import nixpkgs-unstable { system = pkgs.system; };
+  unstable = import nixpkgs-unstable { inherit (pkgs) system; };
   utils = import ../../../../utils { inherit pkgs; };
 in
 {
@@ -13,7 +13,7 @@ in
   home.file.".config/mise/config.toml" = {
     text = builtins.readFile (
       utils.renderMustache "mise-config" ../../dot-files/mise/config.toml.mustache {
-        isDarwin = pkgs.stdenv.isDarwin;
+        inherit (pkgs.stdenv) isDarwin;
       }
     );
   };

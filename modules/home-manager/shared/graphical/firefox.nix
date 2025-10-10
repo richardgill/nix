@@ -1,90 +1,81 @@
 {
-  lib,
-  pkgs,
   config,
+  pkgs,
   ...
-}: {
-  programs.firefox = {
-    enable = true;
-    profiles.default = {
-      isDefault = true;
-      search = {
-        force = true;
-        default = "Kagi";
-        engines = {
-          "Kagi" = {
-            urls = [{
-              template = "https://kagi.com/search";
-              params = [
-                { name = "q"; value = "{searchTerms}"; }
-              ];
-            }];
-            icon = "https://kagi.com/assets/favicon.ico";
-            definedAliases = [ "@kagi" ];
-          };
-        };
-      };
-      settings = {
-        "browser.startup.homepage" = "about:blank";
-        "browser.newtabpage.enabled" = false;
-        "browser.search.region" = "GB";
-        "browser.search.isUS" = true;
-        "general.useragent.locale" = "en-US";
+}:
+let
+  utils = import ../../../../utils { inherit pkgs; };
 
-        # Privacy settings
-        "privacy.trackingprotection.enabled" = true;
-        "privacy.trackingprotection.socialtracking.enabled" = true;
-        "privacy.donottrackheader.enabled" = true;
-        "privacy.clearOnShutdown.cookies" = false;
-        "privacy.clearOnShutdown.history" = false;
+  firefoxProfilePath =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Library/Application Support/Firefox/Profiles/default"
+    else
+      "${config.home.homeDirectory}/.mozilla/firefox/default";
 
-        # Security settings
-        "security.tls.version.min" = 3;
-        "dom.security.https_only_mode" = true;
+  policyFolder =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Applications/Firefox.app/Contents/Resources/distribution"
+    else
+      "/etc/firefox/policies";
 
-        # UI preferences
-        "browser.toolbars.bookmarks.visibility" = "never";
-        "browser.tabs.warnOnClose" = false;
-        "browser.download.useDownloadDir" = true;
-        "browser.download.dir" = "${config.home.homeDirectory}/Downloads";
+  disclaimer =
+    "By modifying this file, I agree that I am doing so "
+    + "only within Firefox itself, using official, user-driven search "
+    + "engine selection processes, and in a way which does not circumvent "
+    + "user consent. I acknowledge that any attempt to change this file "
+    + "from outside of Firefox is a malicious act, and will be responded "
+    + "to accordingly.";
 
-        # Performance
-        "browser.cache.disk.enable" = false;
-        "browser.sessionstore.privacy_level" = 2;
+  salt = "default" + "Kagi" + disclaimer;
 
-        # Disable telemetry
-        "datareporting.healthreport.uploadEnabled" = false;
-        "datareporting.policy.dataSubmissionEnabled" = false;
-        "toolkit.telemetry.enabled" = false;
-        "toolkit.telemetry.unified" = false;
+  defaultEngineIdHash = pkgs.lib.removeSuffix "\n" (builtins.readFile (
+    pkgs.runCommand "firefox-search-hash" { } ''
+      echo -n "${salt}" | ${pkgs.openssl}/bin/openssl dgst -sha256 -binary | ${pkgs.coreutils}/bin/base64 > "$out"
+    ''
+  ));
 
-        # Extension settings for impermanence
-        "extensions.autoDisableScopes" = 0;
+  userJs = builtins.readFile (
+    utils.renderMustache "firefox-user-js" ../../dot-files/firefox/user.js.mustache {
+      homeDirectory = config.home.homeDirectory;
+    }
+  );
 
-        # New sidebar layout
-        "sidebar.revamp" = true;
-        "sidebar.verticalTabs" = true;
-        "sidebar.position_start" = false;
-        "sidebar.visibility.sidebar-main" = true;
-      };
-    };
+  searchJson = builtins.readFile (
+    utils.renderMustache "firefox-search-json" ../../dot-files/firefox/search.json.mustache {
+      inherit defaultEngineIdHash;
+    }
+  );
 
-    # Extension policies
-    policies = {
-      ExtensionSettings = {
-        "*" = {
-          installation_mode = "blocked";
-        };
-        "uBlock0@raymondhill.net" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-          installation_mode = "force_installed";
-        };
-        "{d634138d-c276-4fc8-924b-40a0ea21d284}" = {
-          install_url = "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi";
-          installation_mode = "force_installed";
-          default_area = "navbar";
-        };
-      };
-    };
+  # This file is not raw .json it's compressed in a mozilla specific way
+  searchJsonMozlz4 = pkgs.runCommand "search.json.mozlz4" { } ''
+    echo '${searchJson}' | ${pkgs.mozlz4a}/bin/mozlz4a /dev/stdin "$out"
+  '';
+
+  policiesJson = ../../dot-files/firefox/policies.json;
+
+  profilePath = if pkgs.stdenv.isDarwin then "Profiles/default" else "default";
+
+  profilesIni = builtins.readFile (
+    utils.renderMustache "firefox-profiles-ini" ../../dot-files/firefox/profiles.ini.mustache {
+      inherit profilePath;
+    }
+  );
+in
+{
+  home.file = pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
+    "${policyFolder}/policies.json".source = policiesJson;
+  };
+
+  home.activation.copyFirefoxConfig = {
+    after = [ "writeBoundary" ];
+    before = [ ];
+    data = ''
+      mkdir -p "${config.home.homeDirectory}/.mozilla/firefox"
+      echo '${profilesIni}' > "${config.home.homeDirectory}/.mozilla/firefox/profiles.ini"
+      mkdir -p "${firefoxProfilePath}"
+      echo '${userJs}' > "${firefoxProfilePath}/user.js"
+      rm -f "${firefoxProfilePath}/search.json.mozlz4"
+      cp -f "${searchJsonMozlz4}" "${firefoxProfilePath}/search.json.mozlz4"
+    '';
   };
 }

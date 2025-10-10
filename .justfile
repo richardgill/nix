@@ -1,33 +1,29 @@
 default:
     just --list
 
-_rebuild action machine='' ip='':
+_rebuild action machine='':
     @if [ "$(uname)" = "Darwin" ]; then \
       command="nix run nix-darwin --"; \
-      sudo_flag=""; \
+      sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
     else \
       command="nixos-rebuild"; \
-      sudo_flag="{{ if action == "switch" { "--use-remote-sudo" } else { "" } }}"; \
+      sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
     fi; \
-    if [ -z "{{ machine }}" ] && [ -z "{{ ip }}" ]; then \
-      full_command="$command {{ action }} $sudo_flag --flake ."; \
+    if [ -z "{{ machine }}" ]; then \
+      full_command="$sudo_prefix $command {{ action }} --flake ."; \
       echo "Running: $full_command"; \
-      $full_command; \
-    elif [ -z "{{ ip }}" ]; then \
-      full_command="$command {{ action }} $sudo_flag --flake \".#{{ machine }}\""; \
-      echo "Running: $full_command"; \
-      $full_command; \
+      $sudo_prefix $command {{ action }} --flake .; \
     else \
-      full_command="$command {{ action }} --fast --flake \".#{{ machine }}\" $sudo_flag --target-host \"eh8@{{ ip }}\" --build-host \"eh8@{{ ip }}\""; \
+      full_command="$sudo_prefix $command {{ action }} --flake \".#{{ machine }}\""; \
       echo "Running: $full_command"; \
-      $full_command; \
+      $sudo_prefix $command {{ action }} --flake ".#{{ machine }}"; \
     fi
 
-build machine='' ip='':
-    @just _rebuild build "{{ machine }}" "{{ ip }}"
+build machine='':
+    @just _rebuild build "{{ machine }}"
 
-deploy machine='' ip='':
-    @just _rebuild switch "{{ machine }}" "{{ ip }}"
+switch machine='':
+    @just _rebuild switch "{{ machine }}"
 
 update:
     nix flake update
@@ -42,7 +38,7 @@ gc:
     sudo nix-collect-garbage -d && nix-collect-garbage -d
 
 optimize:
-  nix-store --optimize -v
+    nix-store --optimize -v
 
 repair:
     sudo nix-store --verify --check-contents --repair
@@ -56,12 +52,12 @@ sops-rotate:
 sops-update:
     for file in secrets/*; do sops updatekeys "$file"; done
 
-first-install machine:
-  ./first-install.sh {{machine}}
-
 find-impermanent:
   @scripts/find-impermanent-files.sh
 
+mac-install:
+  @./scripts/darwin-install.sh
+
 # Publish dotfiles to public repository
 publish:
-    ./scripts/publish.sh
+  ./scripts/publish.sh

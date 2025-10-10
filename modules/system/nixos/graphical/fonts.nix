@@ -1,11 +1,10 @@
 {
-  config,
   pkgs,
-  lib,
   ...
 }:
-
 {
+  imports = [ ../../shared/fonts.nix ];
+
   # list fonts: fc-list : family | sort -u
   fonts = {
     packages = with pkgs; [
@@ -17,10 +16,6 @@
 
       # UI fonts
       inter
-
-      # Nerd Fonts (NixOS 25.05+ syntax)
-      nerd-fonts.hack
-      nerd-fonts.jetbrains-mono
 
       # Additional fonts
       dejavu_fonts

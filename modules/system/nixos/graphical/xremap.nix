@@ -5,7 +5,6 @@
   inputs,
   ...
 }:
-
 {
   # Logs: journalctl --user -u xremap --no-pager
   # Restart: systemctl --user restart xremap
@@ -27,6 +26,7 @@
       keymap = [
         {
           name = "Hyper key mappings";
+          exact_match = true;
           remap = lib.listToAttrs (
             map (key: lib.nameValuePair "CapsLock-${key}" "SHIFT-C-M-SUPER-${key}") [
               "a"
@@ -69,6 +69,7 @@
         }
         {
           name = "Universal bindings";
+          exact_match = true; # Only trigger when modifiers match exactly (prevents Super-Shift-v from triggering Super-v)
           remap = {
             "Super-Left" = "Home";
             "Super-Right" = "End";
@@ -78,6 +79,7 @@
         }
         {
           name = "Mac-like bindings";
+          exact_match = true;
           application = {
             not = [
               "Alacritty"
@@ -101,11 +103,11 @@
             "Super-a" = "C-a";
             "Super-c" = "C-c";
             "Super-v" = "C-v";
-            "Super-alt-v" = "Super-alt-v";
           };
         }
         {
           name = "Mac-like bindings for Firefox";
+          exact_match = true;
           application = {
             only = [
               "firefox"
@@ -120,11 +122,17 @@
             "Super-w" = "C-w";
             "Super-t" = "C-t";
             "Super-r" = "C-r";
+            "Super-Shift-r" = "C-Shift-r";
             "Super-l" = "C-l";
+            "Super-Alt-i" = "C-Shift-i";
+            "Super-BTN_LEFT" = "C-BTN_LEFT";
+            "Super-equal" = "C-equal";
+            "Super-minus" = "C-minus";
           };
         }
         {
           name = "Terminal bindings";
+          exact_match = true;
           application = {
             only = [
               "Alacritty"
@@ -172,5 +180,4 @@
       ExecStart = "${pkgs.systemd}/bin/systemctl --user restart xremap.service";
     };
   };
-
 }

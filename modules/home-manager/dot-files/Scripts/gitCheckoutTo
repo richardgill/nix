@@ -1,0 +1,69 @@
+#!/usr/bin/env bash
+
+# Usage: gitCheckoutTo [remote/branch] -- file1 file2 ...
+# Examples:
+#   gitCheckoutTo upstream/main -- Tiltfile kustomize/Makefile
+#   gitCheckoutTo -- Tiltfile kustomize/Makefile  (uses default {origin,upstream}/main)
+
+current_branch=$(git symbolic-ref --short HEAD)
+
+get_default_remote() {
+  local resolved_branch="$1"
+  if git remote | grep -q upstream && [[ "$resolved_branch" == "main" ]]; then
+    echo "upstream"
+  else
+    echo "origin"
+  fi
+}
+
+# no arguments → show help
+if [[ $# -eq 0 ]]; then
+  echo "Usage: gitCheckoutTo [remote/branch] -- file1 file2 ..."
+  echo "Examples:"
+  echo "  gitCheckoutTo upstream/main -- Tiltfile kustomize/Makefile"
+  echo "  gitCheckoutTo -- Tiltfile kustomize/Makefile" # uses upstream (forks) or origin
+  exit 0
+fi
+
+# find the -- separator
+separator_index=-1
+for ((i=1; i<=$#; i++)); do
+  if [[ "${!i}" == "--" ]]; then
+    separator_index=$i
+    break
+  fi
+done
+
+if [[ $separator_index -eq -1 ]]; then
+  echo "Error: Missing '--' separator"
+  echo "Usage: gitCheckoutTo [remote/branch] -- file1 file2 ..."
+  exit 1
+fi
+
+# parse arguments before --
+if [[ $separator_index -eq 1 ]]; then
+  # format: gitCheckoutTo -- files...
+  remote=$(get_default_remote "main")
+  branch="main"
+  ref="$remote/$branch"
+else
+  # format: gitCheckoutTo remote/branch -- files...
+  ref="$1"
+fi
+
+# get files after --
+files=()
+for ((i=separator_index+1; i<=$#; i++)); do
+  files+=("${!i}")
+done
+
+if [[ ${#files[@]} -eq 0 ]]; then
+  echo "Error: No files specified after '--'"
+  exit 1
+fi
+
+# build the command array
+cmd=(git checkout "$ref" -- "${files[@]}")
+
+echo "${cmd[@]}"
+"${cmd[@]}"

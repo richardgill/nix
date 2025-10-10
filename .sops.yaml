@@ -3,7 +3,8 @@ keys:
   - &master age1hjyxqwv0nkwf59ascp7qvgvvtck0mdenv9p2f23w44k9fqv7lu0qc5kqth
   # Machine keys (generated from the ssh public key, which is generated on first install) 
   - &x86-vm age19c7qwluck0pv968e6xa2vqwucr2h6msnvt7l8fhqpfjf3kwafq5sg2hkk5
-  - &beelink-zoe age1pls36qehdwtqxr0543xaxqhtuc0zakca9plmhn3dnxlgyd8ypcasr6spds
+  - &beelink-gk55 age1tuu4d5w4h9ewls78vur6v8kqxccr643wraegrlpquwahch884ywsmwjn6v
+  - &um790 age16t9pm2nq3mxz334wfd9nq3jy4aynqu7ccvd9xj9l6zq3s632kqtq0fz53q
 
 creation_rules:
   - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
@@ -11,4 +12,5 @@ creation_rules:
       - age:
           - *master
           - *x86-vm
-          - *beelink-zoe
+          - *beelink-gk55
+          - *um790

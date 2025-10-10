@@ -9,6 +9,7 @@
   "modules-left": [],
   "modules-center": [],
   "modules-right": [
+    "custom/screenrecord",
     "network",
     "clock",
     "custom/power"
@@ -53,6 +54,12 @@
       "on-scroll-up": "shift_up",
       "on-scroll-down": "shift_down"
     }
+  },
+  "custom/screenrecord": {
+    "exec": "pgrep -x wl-screenrec >/dev/null && echo '{\"text\":\"󰻂\",\"class\":\"recording\"}' || echo ''",
+    "return-type": "json",
+    "on-click": "$HOME/Scripts/screenRecord",
+    "interval": 1
   },
   "custom/power": {
     "format": "⏻",
