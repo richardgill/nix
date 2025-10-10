@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-# Exit on any error
-set -e
+set -euo pipefail
+
+trap 'echo "Error on line $LINENO" >&2; exit 1' ERR
 
 # Only add all files if nothing is staged
 if [ -z "$(git diff --cached --name-only)" ]; then
@@ -49,9 +50,15 @@ else
 $(git diff --cached)"
 fi
 
-COMMIT_MSG=$(claude --model haiku -p "$PROMPT")
-# COMMIT_MSG=$(bunx opencode-ai run --model "openrouter/gpt-oss-20b" "$PROMPT")
+if ! COMMIT_MSG=$(claude --model haiku -p "$PROMPT" 2>&1); then
+  echo "Error generating commit message: $COMMIT_MSG" >&2
+  exit 1
+fi
+
 echo -e "\nCommit message generated: $COMMIT_MSG"
 
-git commit -m "$COMMIT_MSG"
+if ! git commit -m "$COMMIT_MSG" 2>&1; then
+  echo "Error: git commit failed" >&2
+  exit 1
+fi
 

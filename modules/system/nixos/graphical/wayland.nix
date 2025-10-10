@@ -1,4 +1,8 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  ...
+}:
 {
   environment.sessionVariables = {
     NIXOS_OZONE_WL = 1;
@@ -19,6 +23,14 @@
     enable = true;
     package = pkgs.hyprland;
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
+  };
+
+  services.xserver = {
+    enable = true;
+    displayManager.gdm = {
+      enable = true;
+      autoSuspend = false;
+    };
   };
 
   xdg.portal = {

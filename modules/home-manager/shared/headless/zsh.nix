@@ -1,15 +1,16 @@
-
 {
   pkgs,
   lib,
   ...
-}: let
-  utils = import ../../../../utils {inherit pkgs;};
+}:
+let
+  utils = import ../../../../utils { inherit pkgs; };
 
   zshrcFile = utils.renderMustache "zshrc" ../../dot-files/zsh/zshrc.mustache {
-    isDarwin = pkgs.stdenv.isDarwin;
+    inherit (pkgs.stdenv) isDarwin;
   };
-in {
+in
+{
   programs.zsh = {
     enable = true;
     enableCompletion = true;

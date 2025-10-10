@@ -1,5 +1,9 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   waybarConfig = builtins.fromJSON (builtins.readFile ./config.jsonc);
 in

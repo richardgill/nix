@@ -2,13 +2,16 @@
   config,
   pkgs,
   lib,
+  vars,
   ...
 }:
 # inspo: https://github.com/dustinlyons/nixos-config/blob/main/modules/darwin/dock/default.nix
-with lib; let
+with lib;
+let
   cfg = config.local.dock;
   inherit (pkgs) stdenv dockutil;
-in {
+in
+{
   options = {
     local.dock = {
       enable = mkOption {
@@ -18,10 +21,11 @@ in {
 
       entries = mkOption {
         description = "Entries on the Dock";
-        type = with types;
+        type =
+          with types;
           listOf (submodule {
             options = {
-              path = lib.mkOption {type = str;};
+              path = lib.mkOption { type = str; };
               section = lib.mkOption {
                 type = str;
                 default = "apps";
@@ -42,31 +46,55 @@ in {
     };
   };
 
-  config = mkIf cfg.enable (
+  config =
     let
-      normalize = path:
-        if hasSuffix ".app" path
-        then path + "/"
-        else path;
-      entryURI = path:
+      normalize = path: if hasSuffix ".app" path then path + "/" else path;
+      entryURI =
+        path:
         "file://"
-        + (
-          builtins.replaceStrings
-          [" " "!" "\"" "#" "$" "%" "&" "'" "(" ")"]
-          ["%20" "%21" "%22" "%23" "%24" "%25" "%26" "%27" "%28" "%29"]
+        + (builtins.replaceStrings
+          [
+            " "
+            "!"
+            "\""
+            "#"
+            "$"
+            "%"
+            "&"
+            "'"
+            "("
+            ")"
+          ]
+          [
+            "%20"
+            "%21"
+            "%22"
+            "%23"
+            "%24"
+            "%25"
+            "%26"
+            "%27"
+            "%28"
+            "%29"
+          ]
           (normalize path)
         );
       wantURIs = concatMapStrings (entry: "${entryURI entry.path}\n") cfg.entries;
-      createEntries =
-        concatMapStrings
-        (
-          entry: "${dockutil}/bin/dockutil --no-restart --add '${entry.path}' --section ${entry.section} ${entry.options}\n"
-        )
-        cfg.entries;
-    in {
+      createEntries = concatMapStrings (
+        entry:
+        "${dockutil}/bin/dockutil --no-restart --add '${entry.path}' --section ${entry.section} ${entry.options}\n"
+      ) cfg.entries;
+    in
+    {
+      local.dock = {
+        enable = true;
+        username = vars.userName;
+        entries = [ ];
+      };
+
       system.activationScripts.postActivation.text = ''
-          echo >&2 "Setting up the Dock for ${cfg.username}..."
-          su ${cfg.username} -s /bin/sh <<'USERBLOCK'
+        echo >&2 "Setting up the Dock for ${cfg.username}..."
+        su ${cfg.username} -s /bin/sh <<'USERBLOCK'
         haveURIs="$(${dockutil}/bin/dockutil --list | ${pkgs.coreutils}/bin/cut -f2)"
         if ! diff -wu <(echo -n "$haveURIs") <(echo -n '${wantURIs}') >&2 ; then
           echo >&2 "Resetting Dock."
@@ -78,6 +106,5 @@ in {
         fi
         USERBLOCK
       '';
-    }
-  );
+    };
 }

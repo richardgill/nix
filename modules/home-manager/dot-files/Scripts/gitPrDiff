@@ -1,0 +1,7 @@
+
+#!/usr/bin/env bash
+
+current_branch=$(git symbolic-ref --short HEAD)
+remote=$(git remote | grep -q upstream && echo "upstream" || echo "origin")
+git fetch $remote
+git diff $remote/main...$current_branch

@@ -20,19 +20,30 @@ git checkout -b "$branch_name"
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git
-rsync -av --exclude='.git' "$source_dir/" .
+rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/finalCutPro.swift' "$source_dir/" .
 
 git add -A
 
 if git diff --staged --quiet; then
   echo "No changes to commit"
-else
-  git commit -m "Update configuration files"
-  git push origin "$branch_name"
+  exit 0
 fi
 
-echo "Repository cloned and updated at: $github_repo_dir"
-echo "You can manually inspect the repository in this directory."
+echo "=== Changes to be published ==="
+git diff --cached
 
-# Open GitHub compare page for the new branch
-open "${repo_url%.git}/compare/main...$branch_name"
+echo ""
+echo "Repository prepared at: $github_repo_dir"
+echo ""
+read -p "Push these changes to GitHub? (y/n): " -n 1 -r
+echo ""
+
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+  git commit -m "Update configuration files"
+  git push origin "$branch_name"
+  echo ""
+  echo "Changes pushed successfully!"
+  open "${repo_url%.git}/compare/main...$branch_name"
+else
+  echo "Push cancelled. You can manually inspect the repository at: $github_repo_dir"
+fi

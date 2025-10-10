@@ -1,13 +1,13 @@
-# Setup
-
 Based on [Misterio77/nix-starter-configs](https://github.com/Misterio77/nix-starter-configs) and https://github.com/dbeley/nixos-config and https://github.com/eh8/chenglab
+
+# Setup
 
 ## First time setup
 
 ### Linux
 (reference: https://github.com/nix-community/nixos-anywhere/blob/main/docs/howtos/no-os.md#installing-on-a-machine-with-no-operating-system)
 
-Download the minimal ISO for your platform from the official NixOS website: https://nixos.org/download/
+Download the minimal ISO for your platform from the official NixOS website: https://nixos.org/download/ (also works in graphical, just run the steps below in a terminal)
 
 Set a password to enable ssh: `passwd`
 
@@ -42,19 +42,26 @@ scp scripts/clone-and-install.sh nixos@$ISO_IP:/tmp/ && \
 
 ### Mac
 
-todo: look a cheng instructions
+- Install a fresh copy of MacOS
+- Install the [Determinate Systems Nix installer](https://docs.determinate.systems/) for Mac
+- nix-shell -p git gh just
 
-Install macos
+Then:
 
-Use the determinate nix installer .pkg
+```
+gh auth login  # use web browser option and do it on another machine where you're logged into github
+gh repo clone nix-private
+cd nix-private
+just mac-install
+```
 
-nix-shell -p git gh just vim darwin-nix
+sops will fail, you need to place you sops key in ~/.config/sops/age/keys.txt (login to 1password to find it)
 
-gh auth login  # use web browser option and do it on another machine
-gh repo clone nix
-cd nix
-just deploy mbp-m1
+rebuild with `just switch`
 
+Go to System Settings > Keyboard > Keyboard Shortcuts and aggressively turn off all shortcuts to prevent conflicts
+
+If Homebrew casks are blocked as malicious, go to System Settings → Privacy & Security and click "Open Anyway"
 
 ## Impermanence Conflicts
 

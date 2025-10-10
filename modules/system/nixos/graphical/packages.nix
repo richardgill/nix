@@ -1,8 +1,12 @@
-{ config, lib, pkgs, nixpkgs-unstable, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  nixpkgs-unstable,
+  ...
+}:
 {
   environment.systemPackages = with pkgs; [
-    hack-font
     wl-clipboard
     xclip
     xdg-utils
@@ -14,6 +18,5 @@
     playerctl
   ];
 
-  # User applications moved to home-manager: modules/home-manager/nixos/graphical/packages.nix
-  # XDG mime configuration moved to home-manager: modules/home-manager/nixos/graphical/mimetypes.nix
+  programs.ydotool.enable = true;
 }

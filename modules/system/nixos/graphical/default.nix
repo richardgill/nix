@@ -1,10 +1,9 @@
+{ ... }:
 {
-  pkgs,
-  vars,
-  ...
-}: {
   imports = [
     ../headless
+    ./1password.nix
+    ./firefox.nix
     ./fonts.nix
     ./gnome-desktop-manager.nix
     ./hyprland.nix
@@ -14,12 +13,4 @@
     ./wayland.nix
     ./xremap.nix
   ];
-
-  services.xserver = {
-    enable = true;
-    displayManager.gdm.enable = true;
-  };
-
-  programs._1password.enable = true;
-  programs._1password-gui.enable = true;
 }

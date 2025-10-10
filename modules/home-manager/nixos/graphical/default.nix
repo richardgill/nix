@@ -1,7 +1,4 @@
 {
-  lib,
-  pkgs,
-  inputs,
   ...
 }:
 {
@@ -9,13 +6,14 @@
     ../headless
     ../../shared/graphical
     ./hyprland
-    ./waybar/waybar.nix
-    ./walker/walker.nix
-    ./rofi/rofi.nix
-    ./packages.nix
     ./mimetypes.nix
+    ./packages.nix
+    ./rofi/rofi.nix
     ./satty.nix
     ./swayosd.nix
+    ./walker/walker.nix
+    ./waybar/waybar.nix
+    ./webapps.nix
   ];
 
   # Auto-restart changed services on switch (default: "suggest" only prints hints)

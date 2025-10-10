@@ -3,7 +3,8 @@
   pkgs,
   vars,
   ...
-}: {
+}:
+{
   boot.loader = {
     systemd-boot = {
       enable = true;
@@ -16,14 +17,16 @@
   users.users.${vars.userName} = {
     isNormalUser = true;
     description = lib.mkDefault vars.userName;
-    extraGroups = ["networkmanager" "wheel"];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
     shell = pkgs.zsh;
   };
 
   services = {
     fstrim.enable = true;
   };
-
 
   security.sudo.wheelNeedsPassword = false;
   zramSwap.enable = true;

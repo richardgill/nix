@@ -1,11 +1,13 @@
-{pkgs, ...}: {
-  renderMustache = name: template: data:
+{ pkgs, ... }:
+{
+  renderMustache =
+    name: template: data:
     pkgs.stdenv.mkDerivation {
       name = "${name}";
 
-      nativeBuildInputs = [pkgs.mustache-go];
+      nativeBuildInputs = [ pkgs.mustache-go ];
 
-      passAsFile = ["jsonData"];
+      passAsFile = [ "jsonData" ];
       jsonData = builtins.toJSON data;
 
       phases = [

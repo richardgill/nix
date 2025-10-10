@@ -5,8 +5,9 @@ return {
   opts = {},
   ft = { 'js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
   config = function()
-    require('lspconfig.configs').vtsls = require('vtsls').lspconfig -- set default server config, optional but recommended
-    require('lspconfig').vtsls.setup { --[[ your custom server config here ]]
+    require('lspconfig.configs').vtsls = require('vtsls').lspconfig
+    require('lspconfig').vtsls.setup {
+      cmd = { 'bunx', '@vtsls/language-server@0.2.8', '--stdio' },
     }
 
     require('vtsls').config {

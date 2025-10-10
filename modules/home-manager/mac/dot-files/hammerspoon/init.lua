@@ -3,10 +3,20 @@ hs.window.animationDuration = 0 -- Disable animations globally
 -- Define hyper key (all modifiers)
 local hyper = { "cmd", "alt", "ctrl", "shift" }
 
+-- Requires Hammerspoon to have Privacy -> Screen Recording permissions
+hs.hotkey.bind({ "cmd", "shift" }, "4", function()
+	hs.task.new("/Applications/flameshot.app/Contents/MacOS/flameshot", function()
+	end, { "gui" }):start()
+end)
+
 -- Application bindings
 
 hs.hotkey.bind(hyper, "a", function()
-	hs.application.launchOrFocus("Android Studio")
+	hs.application.launchOrFocus("Activity Monitor")
+end)
+
+hs.hotkey.bind(hyper, "b", function()
+	hs.application.launchOrFocus("Finder")
 end)
 
 hs.hotkey.bind(hyper, "c", function()
@@ -18,7 +28,7 @@ hs.hotkey.bind(hyper, "d", function()
 end)
 
 hs.hotkey.bind(hyper, "f", function()
-	hs.application.launchOrFocus("Firefox")
+	hs.application.launchOrFocus("Firefox.app")
 end)
 
 hs.hotkey.bind(hyper, "g", function()
@@ -29,24 +39,20 @@ hs.hotkey.bind(hyper, "h", function()
 	hs.application.launchOrFocus("1Password")
 end)
 
-hs.hotkey.bind(hyper, "m", function()
-	hs.application.launchOrFocus("WezTerm")
-end)
-
 hs.hotkey.bind(hyper, "t", function()
 	hs.application.launchOrFocus("Todoist")
 end)
 
 hs.hotkey.bind(hyper, "s", function()
-	hs.application.launchOrFocus("Slack")
+	hs.application.launchOrFocus("Slack.app")
 end)
 
 hs.hotkey.bind(hyper, "w", function()
-	hs.application.launchOrFocus("WhatsApp")
+	hs.application.launchOrFocus("Beeper Desktop")
 end)
 
 hs.hotkey.bind(hyper, "z", function()
-	hs.application.launchOrFocus("zoom.us")
+	hs.application.launchOrFocus("zoom.us.app")
 end)
 
 local menu = hs.menubar.new()

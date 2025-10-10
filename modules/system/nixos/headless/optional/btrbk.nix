@@ -1,4 +1,8 @@
 {
+  # See the snapshots ls /btrbk/
+  # See the space taken sudo btrfs filesystem du -s /btrbk/*
+  # Manually delete a snapshot: sudo btrfs subvolume delete /btrbk/persistent.2025...
+
   services.btrbk.instances = {
     persistent = {
       onCalendar = "hourly";

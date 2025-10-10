@@ -1,7 +1,5 @@
+{ pkgs, ... }:
 {
-  pkgs,
-  ...
-}: {
   environment.sessionVariables = {
     GDK_SCALE = "2";
     GDK_DPI_SCALE = "0.833333";
@@ -35,14 +33,16 @@
     ''}"
   ];
 
-  programs.dconf.profiles.gdm.databases = [{
-    settings = {
-      "org/gnome/mutter" = {
-        experimental-features = [
-          "scale-monitor-framebuffer"
-          "xwayland-native-scaling"
-        ];
+  programs.dconf.profiles.gdm.databases = [
+    {
+      settings = {
+        "org/gnome/mutter" = {
+          experimental-features = [
+            "scale-monitor-framebuffer"
+            "xwayland-native-scaling"
+          ];
+        };
       };
-    };
-  }];
+    }
+  ];
 }

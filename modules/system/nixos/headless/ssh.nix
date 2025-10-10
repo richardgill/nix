@@ -1,11 +1,17 @@
-{ pkgs, lib, config, vars, ... }: {
+{
+  pkgs,
+  lib,
+  vars,
+  ...
+}:
+{
   services.openssh = {
     enable = true;
     settings = {
       PermitRootLogin = "no";
       PasswordAuthentication = true;
       PubkeyAuthentication = true;
-      AuthenticationMethods = "publickey,password";
+      AuthenticationMethods = "publickey";
       MaxAuthTries = 3;
       ClientAliveInterval = 300;
       ClientAliveCountMax = 2;

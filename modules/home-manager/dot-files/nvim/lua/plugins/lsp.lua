@@ -223,10 +223,10 @@ return {
             },
             options = {
               nixos = {
-                expr = '(builtins.getFlake "' .. vim.fn.getcwd() .. '").nixosConfigurations.beelink-zoe.options',
+                expr = '(builtins.getFlake "' .. vim.fn.getcwd() .. '").nixosConfigurations.beelink-gk55.options',
               },
               home_manager = {
-                expr = '(builtins.getFlake "' .. vim.fn.getcwd() .. '").nixosConfigurations.beelink-zoe.options.home-manager.users.type.getSubOptions []',
+                expr = '(builtins.getFlake "' .. vim.fn.getcwd() .. '").nixosConfigurations.beelink-gk55.options.home-manager.users.type.getSubOptions []',
               },
             },
           },

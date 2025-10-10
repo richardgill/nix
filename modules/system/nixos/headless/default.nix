@@ -1,18 +1,21 @@
+{ inputs, ... }:
 {
-  inputs,
-  ...
-}: {
   imports = [
     inputs.home-manager.nixosModules.home-manager
     ../../shared
-    ./secrets.nix
+    ./1password.nix
     ./avahi.nix
-    ./system.nix
+    ./compat.nix
     ./impermanence.nix
+    ./mise.nix
     ./networking.nix
     ./packages.nix
-    ./mise.nix
+    ./power-management.nix
     ./remote-unlock.nix
+    ./secrets.nix
     ./ssh.nix
+    ./system.nix
   ];
+
+  home-manager.backupFileExtension = "backup";
 }

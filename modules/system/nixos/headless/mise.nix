@@ -1,19 +1,16 @@
 {
-  config,
-  lib,
   pkgs,
   nixpkgs-unstable,
   ...
 }:
-
 # grabbed from lazarus.co.uk website
 let
-  unstable = import nixpkgs-unstable { system = pkgs.system; };
+  unstable = import nixpkgs-unstable { inherit (pkgs) system; };
   # Pin specific nixpkgs revision for Node.js 23.11.0
   nodeRevision = import (builtins.fetchTarball {
     url = "https://github.com/NixOS/nixpkgs/archive/3e2cf88148e732abc1d259286123e06a9d8c964a.tar.gz";
     sha256 = "sha256:1gvlrbl3fx1fwyb26w5k8rdlxnhzf11si7pzf3khw9n1v4jhqdw0";
-  }) { system = pkgs.system; };
+  }) { inherit (pkgs) system; };
 in
 {
   environment.systemPackages = with pkgs; [
@@ -32,7 +29,6 @@ in
   ];
 
   # Enable nix-ld for dynamically linked executables this is needed to install some packages in mise
-  programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     stdenv.cc.cc.lib
     openssl

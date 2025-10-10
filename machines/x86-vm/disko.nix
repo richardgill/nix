@@ -1,7 +1,14 @@
 # WARNING: Cannot update partitions with disko in-place, so get this right first time!
 # https://github.com/nix-community/disko/issues/295
-{ hostName, ... }:
 {
+  inputs,
+  hostName,
+  ...
+}:
+{
+  imports = [
+    inputs.disko.nixosModules.disko
+  ];
   boot = {
     supportedFilesystems = [ "btrfs" ];
     # Needed to resume from hibernate

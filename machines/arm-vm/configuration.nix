@@ -4,16 +4,19 @@
   vars,
   hostName,
   ...
-}: {
+}:
+{
   imports = [
-    inputs.disko.nixosModules.disko
     ./hardware-configuration.nix
     ./disko.nix
     ../../modules/system/nixos/graphical
   ];
 
   home-manager = {
-    extraSpecialArgs = {inherit inputs outputs vars; nixpkgs-unstable = inputs.nixpkgs-unstable;};
+    extraSpecialArgs = {
+      inherit inputs outputs vars;
+      inherit (inputs) nixpkgs-unstable;
+    };
     useGlobalPkgs = true;
     useUserPackages = true;
     users = {
@@ -25,5 +28,4 @@
     };
   };
 
-  networking.hostName = hostName;
 }

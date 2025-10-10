@@ -35,6 +35,11 @@ return {
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = false },
       },
+      cmdline = {
+        keymap = {
+          ['<A-l>'] = { 'accept', 'fallback' },
+        },
+      },
     }
   end,
   -- allows extending the providers array elsewhere in your config
