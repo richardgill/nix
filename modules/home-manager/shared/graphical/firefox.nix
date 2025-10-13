@@ -4,7 +4,7 @@
   ...
 }:
 let
-  utils = import ../../../../utils { inherit pkgs; };
+  template = import ../../../../utils/template.nix { inherit pkgs; };
 
   firefoxProfilePath =
     if pkgs.stdenv.isDarwin then
@@ -35,13 +35,14 @@ let
   ));
 
   userJs = builtins.readFile (
-    utils.renderMustache "firefox-user-js" ../../dot-files/firefox/user.js.mustache {
+    template.renderMustache "firefox-user-js" ../../dot-files/firefox/user.js.mustache {
       homeDirectory = config.home.homeDirectory;
+      isLinux = !pkgs.stdenv.isDarwin;
     }
   );
 
   searchJson = builtins.readFile (
-    utils.renderMustache "firefox-search-json" ../../dot-files/firefox/search.json.mustache {
+    template.renderMustache "firefox-search-json" ../../dot-files/firefox/search.json.mustache {
       inherit defaultEngineIdHash;
     }
   );
@@ -56,7 +57,7 @@ let
   profilePath = if pkgs.stdenv.isDarwin then "Profiles/default" else "default";
 
   profilesIni = builtins.readFile (
-    utils.renderMustache "firefox-profiles-ini" ../../dot-files/firefox/profiles.ini.mustache {
+    template.renderMustache "firefox-profiles-ini" ../../dot-files/firefox/profiles.ini.mustache {
       inherit profilePath;
     }
   );

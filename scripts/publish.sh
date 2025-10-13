@@ -2,6 +2,15 @@
 
 source_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 repo_url="https://github.com/richardgill/nix.git"
+OPENER=$(command -v xdg-open || command -v open)
+
+cd "$source_dir"
+
+if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+  echo "Error: Working directory has uncommitted changes or untracked files"
+  echo "Please commit or stash your changes before publishing"
+  exit 1
+fi
 
 github_repo_dir=$(mktemp -d)
 
@@ -39,11 +48,12 @@ read -p "Push these changes to GitHub? (y/n): " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  git commit -m "Update configuration files"
+  short_sha=$(cd "$source_dir" && git rev-parse --short HEAD)
+  git commit -m "nix-private $short_sha"
   git push origin "$branch_name"
   echo ""
   echo "Changes pushed successfully!"
-  open "${repo_url%.git}/compare/main...$branch_name"
+  $OPENER "${repo_url%.git}/compare/main...$branch_name"
 else
   echo "Push cancelled. You can manually inspect the repository at: $github_repo_dir"
 fi

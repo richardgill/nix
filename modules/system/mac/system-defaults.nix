@@ -26,9 +26,11 @@
         # Only show open apps in the drawer
         static-only = false;
         tilesize = 48;
+        # Hot Corners: 1 = disabled, 2 = Mission Control, 3 = Show Application Windows, 4 = Desktop, 5 = Start Screen Saver, 6 = Disable Screen Saver, 10 = Put Display to Sleep, 11 = Launchpad, 12 = Notification Center
+        wvous-tl-corner = 1;
+        wvous-tr-corner = 1;
+        wvous-bl-corner = 1;
         wvous-br-corner = 1;
-        wvous-bl-corner = 11;
-        wvous-tr-corner = 5;
       };
 
       finder = {

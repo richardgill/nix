@@ -6,12 +6,13 @@
     ../headless
     ../../shared/graphical
     ./hyprland
+    ./mako.nix
     ./mimetypes.nix
     ./packages.nix
     ./rofi/rofi.nix
     ./satty.nix
     ./swayosd.nix
-    ./walker/walker.nix
+    # ./walker/walker.nix
     ./waybar/waybar.nix
     ./webapps.nix
   ];

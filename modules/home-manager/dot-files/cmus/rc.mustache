@@ -1,0 +1,17 @@
+source ~/.config/cmus/tokyo-night.theme
+colorscheme tokyo-night
+
+# some of these needed to live in wezterm config
+bind -f library left win-next
+bind -f library right win-next
+
+bind -f common p player-pause
+
+bind -f library space win-toggle
+
+unbind -f common D
+unbind -f common delete
+
+cd {{musicDir}}
+add .
+

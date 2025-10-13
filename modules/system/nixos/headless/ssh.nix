@@ -21,6 +21,7 @@
   # SSH key management for users
   users.users.${vars.userName}.openssh.authorizedKeys.keys = [
     vars.sshPublicKeyPersonal
+    vars.sshPublicKeyPhone
     vars.sshPublicKeyWork
   ];
 

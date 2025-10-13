@@ -4,9 +4,9 @@
   ...
 }:
 let
-  utils = import ../../../../utils { inherit pkgs; };
+  template = import ../../../../utils/template.nix { inherit pkgs; };
 
-  zshrcFile = utils.renderMustache "zshrc" ../../dot-files/zsh/zshrc.mustache {
+  zshrcFile = template.renderMustache "zshrc" ../../dot-files/zsh/zshrc.mustache {
     inherit (pkgs.stdenv) isDarwin;
   };
 in

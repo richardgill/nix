@@ -155,11 +155,12 @@ alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
 {{#isDarwin}}
 alias sed="gsed"
 {{/isDarwin}}
-{{#isNixOS}}
+{{#isLinux}}
 alias sound="wiremix"
 alias bluetooth="blueberry"
 alias wifi="nmtui"
-{{/isNixOS}}
+alias open="xdg-open"
+{{/isLinux}}
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then
   alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions --all"

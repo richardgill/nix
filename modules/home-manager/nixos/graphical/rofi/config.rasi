@@ -15,7 +15,7 @@ configuration{
     display-window: " Window ";
     sidebar-mode: true;
     sorting-method: "fzf";
-    run-command: "hyprctl dispatch exec '[workspace 1] uwsm app -- {cmd}'";
+    run-command: "sh -c '$HOME/Scripts/rofiLaunch \"{cmd}\"'";
 }
 
 @theme "custom"

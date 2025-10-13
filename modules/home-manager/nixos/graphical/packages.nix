@@ -21,6 +21,7 @@ in
       cliphist
       evince
       glib
+      hyprpaper
       hyprshot
       firefox
       imv
@@ -45,6 +46,7 @@ in
       spotify
       discord
       google-chrome
+      todoist-electron
       unstable._1password-gui
       unstable.code-cursor
     ];
