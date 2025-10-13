@@ -1,5 +1,4 @@
 {
-  config,
   vars,
   ...
 }:
@@ -9,16 +8,22 @@
   # Find the name using sudo lspci -v | grep -iA8 'network\\|ethernet'
 
   # Enables ssh access in initrd very early in book process so luks can be unlocked
-  # You must ssh as root@<machine> to unlock
+  # You must ssh as root@<machine>:2222 to unlock luks
   boot.initrd.network = {
     enable = true;
+    flushBeforeStage2 = true;
     udhcpc = {
       enable = true;
     };
     ssh = {
       enable = true;
+      port = 2222;
       shell = "/bin/cryptsetup-askpass";
-      authorizedKeys = [ vars.sshPublicKeyPersonal vars.sshPublicKeyWork ];
+      authorizedKeys = [
+        vars.sshPublicKeyPersonal
+        vars.sshPublicKeyPhone
+        vars.sshPublicKeyWork
+      ];
       hostKeys = [ "/nix/secret/initrd/ssh_host_ed25519_key" ];
     };
   };

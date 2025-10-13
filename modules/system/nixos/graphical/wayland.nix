@@ -44,6 +44,7 @@
       ];
     };
 
+    # For issues with screen sharing dialogs on chromium: https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/11
     extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
   };
 }
