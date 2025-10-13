@@ -14,7 +14,8 @@ fi
 
 github_repo_dir=$(mktemp -d)
 
-branch_name="update-$(date +%Y%m%d-%H%M%S)"
+short_sha=$(git rev-parse --short HEAD)
+branch_name="update-$(date +%Y%m%d-%H%M%S)-${short_sha}"
 
 git clone "$repo_url" "$github_repo_dir"
 
