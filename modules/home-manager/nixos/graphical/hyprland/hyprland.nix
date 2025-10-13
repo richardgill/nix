@@ -1,18 +1,18 @@
-{ pkgs, ... }:
+{ ... }:
 {
   systemd.user.targets.hyprland-session.Unit.Wants = [
     "xdg-desktop-autostart.target"
   ];
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = false;
     package = null;
     portalPackage = null;
 
     xwayland = {
       enable = true;
-      # hidpi = true;
     };
-    # enableNvidiaPatches = false;
     systemd.enable = false;
   };
+
+  home.file.".config/hypr/hyprland.conf".source = ./hyprland.conf;
 }

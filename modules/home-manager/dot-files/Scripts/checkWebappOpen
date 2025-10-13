@@ -1,0 +1,14 @@
+#!/bin/bash
+
+APP_NAME="$1"
+
+if [[ -z "$APP_NAME" ]]; then
+  echo "Usage: checkWebappClosed <app-name>"
+  exit 1
+fi
+
+if hyprctl clients -j | jq -e ".[] | select(.class | test(\"chrome-app.$APP_NAME\"))" > /dev/null; then
+  exit 0
+else
+  exit 1
+fi

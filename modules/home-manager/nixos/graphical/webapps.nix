@@ -6,6 +6,10 @@
 }:
 # Web app configuration using chromium in app mode
 # To login to services, launch chromium directly and sign in there first
+#
+# Note: Zoom web keeps logging out when browser closes due to session cookies.
+# To fix: Enable "Continue where I left off" in chrome://settings/onStartup
+# This will persist session cookies across browser restarts (affects all sites).
 let
   launchWebappScript = pkgs.writeShellScriptBin "omarchy-launch-webapp" (
     builtins.readFile ./webapps/omarchy-launch-webapp.sh

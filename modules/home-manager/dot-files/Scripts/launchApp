@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+workspace="$1"
+
+hyprctl dispatch workspace "$workspace"
+
+if [[ "$workspace" == "10" ]]; then
+  if ! pgrep -f '^[^ ]*ghostty$' > /dev/null; then
+    uwsm app -- "ghostty" &
+  fi
+elif [[ "$workspace" == "11" ]]; then
+  if ! pgrep nautilus > /dev/null; then
+    uwsm app -- nautilus --new-window &
+  fi
+elif [[ "$workspace" == "12" ]]; then
+  if ! pgrep "firefox" > /dev/null; then
+    uwsm app -- firefox &
+  fi
+elif [[ "$workspace" == "13" ]]; then
+  if ! pgrep -f 'ghostty.*btop' > /dev/null; then
+    ~/Scripts/launchTerminalApp btop &
+  fi
+elif [[ "$workspace" == "14" ]]; then
+  if ! pgrep -x discord > /dev/null; then
+    uwsm app -- discord &
+  fi
+elif [[ "$workspace" == "15" ]]; then
+  if ! pgrep -x 1password > /dev/null; then
+    uwsm app -- 1password &
+  fi
+elif [[ "$workspace" == "16" ]]; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class == "Slack")' > /dev/null; then
+    uwsm app -- slack &
+  fi
+elif [[ "$workspace" == "17" ]]; then
+  if ! pgrep -x beeper > /dev/null; then
+    uwsm app -- beeper &
+  fi
+elif [[ "$workspace" == "18" ]]; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class == "spotify" or .title == "cmus")' > /dev/null; then
+    ~/Scripts/launchTerminalApp cmus &
+  fi
+elif [[ "$workspace" == "19" ]]; then
+  if ! checkWebappOpen zoom; then
+    omarchy-launch-webapp "https://app.zoom.us/wc/home" &
+  fi
+elif [[ "$workspace" == "20" ]]; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class == "todoist")' > /dev/null; then
+    uwsm app -- todoist-electron &
+  fi
+fi
