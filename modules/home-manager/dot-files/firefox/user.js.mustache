@@ -12,11 +12,18 @@ user_pref("privacy.clearOnShutdown.history", false);
 
 user_pref("security.tls.version.min", 3);
 user_pref("dom.security.https_only_mode", true);
+// Allow HTTP for localhost and local IP addresses
+user_pref("dom.security.https_only_mode.upgrade_local", false);
 
 user_pref("browser.toolbars.bookmarks.visibility", "never");
 user_pref("browser.tabs.warnOnClose", false);
 user_pref("browser.download.useDownloadDir", true);
 user_pref("browser.download.dir", "{{homeDirectory}}/Downloads");
+
+{{#isLinux}}
+// 220% zoom for UI and content
+user_pref("layout.css.devPixelsPerPx", "2.2");
+{{/isLinux}}
 
 user_pref("browser.cache.disk.enable", false);
 user_pref("browser.sessionstore.privacy_level", 2);

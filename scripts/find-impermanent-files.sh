@@ -1,123 +1,70 @@
 #!/usr/bin/env bash
-# fs-diff.sh
 set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+hostname=$(hostname)
+user=$(whoami)
+
+persistence_data=$(nix eval --json "$PROJECT_ROOT#nixosConfigurations.$hostname.config.environment.persistence.\"/persistent\"" 2>/dev/null || echo "{}")
+
+# Extract system-level and user-level persisted directory paths from nix configuration
+persist_dirs=$(echo "$persistence_data" | jq -r --arg user "$user" '
+  (.directories[]? | if type == "object" then .dirPath else . end),
+  (.users[$user].directories[]? |
+    if type == "object" then
+      .dirPath
+    elif startswith("/") then
+      .
+    else
+      ("/home/" + $user + "/" + .)
+    end)
+')
+
+# Extract system-level and user-level persisted file paths from nix configuration
+persist_files=$(echo "$persistence_data" | jq -r --arg user "$user" '
+  (.files[]? | if type == "object" then .filePath else . end),
+  (.users[$user].files[]? |
+    if type == "object" then
+      .filePath
+    elif startswith("/") then
+      .
+    else
+      ("/home/" + $user + "/" + .)
+    end)
+')
+
+additional_excludes=(
+  "/persistent"
+  "/nix"
+  "/tmp"
+  "/home/$user/.cache"
+  "/home/$user/.bun/install/cache"
+  "/home/$user/.npm"
+  "/root/.cache/nix"
+)
 
 sudo btrfs subvolume find-new / 0 |
 sed '$d' |
 cut -f17- -d' ' |
 sort |
 uniq |
-while read path; do
-  path="/$path"
+while read -r file; do
+  path="/$file"
 
-  # Skip if symbolic link
-  if [ -L "$path" ]; then
-    continue
-  fi
+  [ -L "$path" ] && continue
+  [ -d "$path" ] && continue
 
-  # Skip if directory
-  if [ -d "$path" ]; then
-    continue
-  fi
+  skip=false
+  for dir in $persist_dirs "${additional_excludes[@]}"; do
+    [[ "$path" == $dir/* || "$path" == "$dir" ]] && skip=true && break
+  done
+  $skip && continue
 
-  # Skip persisted system directories and files
-  case "$path" in
-    /var/log/* | \
-    /var/lib/bluetooth/* | \
-    /var/lib/boltd/* | \
-    /var/lib/nixos/* | \
-    /var/lib/systemd/coredump/* | \
-    /var/lib/fprint/* | \
-    /var/lib/NetworkManager/* | \
-    /var/lib/iwd/* | \
-    /etc/NetworkManager/system-connections/* | \
-    /var/lib/colord/* | \
-    /etc/machine-id | \
-    /etc/ssh/ssh_host_ed25519_key.pub | \
-    /etc/ssh/ssh_host_ed25519_key | \
-    /etc/ssh/ssh_host_rsa_key.pub | \
-    /etc/ssh/ssh_host_rsa_key | \
-    /persistent/* | \
-    /nix/* )
-      continue
-      ;;
-  esac
-
-  # Skip persisted user directories and files
-  case "$path" in
-    /home/*/code/* | \
-    /home/*/Documents/* | \
-    /home/*/Downloads/* | \
-    /home/*/Screenshots/* | \
-    /home/*/go/* | \
-    /home/*/.cargo/* | \
-    /home/*/.config/chromium/* | \
-    /home/*/.config/gtk-3.0/* | \
-    /home/*/.config/discord/* | \
-    /home/*/.config/1Password/* | \
-    /home/*/.config/Slack/* | \
-    /home/*/.config/BeeperTexts/* | \
-    /home/*/.config/spotify/* | \
-    /home/*/.zoom/* | \
-    /home/*/.config/alacritty/* | \
-    /home/*/.config/cmus/* | \
-    /home/*/.config/ghostty/* | \
-    /home/*/.config/git/* | \
-    /home/*/.config/gh/* | \
-    /home/*/.config/hypr/* | \
-    /home/*/.config/bat/* | \
-    /home/*/.config/delta/* | \
-    /home/*/.config/yazi/* | \
-    /home/*/.config/waybar/* | \
-    /home/*/.config/wallpapers/* | \
-    /home/*/.config/nvim/* | \
-    /home/*/.config/walker/* | \
-    /home/*/.config/tmux/* | \
-    /home/*/.config/mako/* | \
-    /home/*/.config/mise/* | \
-    /home/*/.config/oh-my-posh/* | \
-    /home/*/.config/op/* | \
-    /home/*/.config/opencode/* | \
-    /home/*/.config/pulse/* | \
-    /home/*/.config/ripgrep/* | \
-    /home/*/.config/rofi/* | \
-    /home/*/.config/satty/* | \
-    /home/*/.config/sesh/* | \
-    /home/*/.config/swayosd/* | \
-    /home/*/.codex/* | \
-    /home/*/.local/share/zoxide/* | \
-    /home/*/.local/share/mise/* | \
-    /home/*/.local/share/nvim/* | \
-    /home/*/.local/share/nautilus/* | \
-    /home/*/.local/share/cliphist/* | \
-    /home/*/.local/state/nvim/* | \
-    /home/*/.local/state/wireplumber/* | \
-    /home/*/.ssh/* | \
-    /home/*/.mozilla/* | \
-    /home/*/.tmux/resurrect/* | \
-    /home/*/Scripts/* | \
-    /home/*/.config/monitors.xml | \
-    /home/*/.zsh_history | \
-    /home/*/.zshenv | \
-    /home/*/.zshrc | \
-    /home/*/.lesskey | \
-    /home/*/.gitconfig | \
-    /home/*/.claude.json | \
-    /home/*/.claude/.credentials.json | \
-    /home/*/.claude/history.jsonl | \
-    /home/*/.claude/file-history/* )
-      continue
-      ;;
-  esac
-
-  # Skip ephemeral files (cache, temp, etc.)
-  case "$path" in
-    /home/*/.cache/* | \
-    /tmp/node-compile-cache/* | \
-    /tmp/mise/* )
-      continue
-      ;;
-  esac
+  for file in $persist_files; do
+    [[ "$path" == "$file" ]] && skip=true && break
+  done
+  $skip && continue
 
   echo "$path"
 done

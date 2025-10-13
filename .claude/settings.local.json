@@ -1,0 +1,20 @@
+{
+	"permissions": {
+		"allow": [
+			"Read(//home/rich/.local/share/chezmoi/**)",
+			"Read(//home/rich/.config/tmux/**)",
+			"Bash(tmux list-keys:*)",
+			"Bash(just build)",
+			"Bash(home-manager build:*)",
+			"Bash(journalctl:*)",
+			"Bash(systemctl status:*)",
+			"Bash(systemctl list-units:*)",
+			"Read(//tmp/**)",
+			"Bash(plutil:*)"
+		],
+		"deny": [],
+		"ask": [],
+		"additionalDirectories": []
+	}
+}
+
