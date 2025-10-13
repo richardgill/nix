@@ -27,8 +27,9 @@ set -ag terminal-overrides ",$TERM:Tc"
 set-option -sa terminal-features ',$TERM:RGB'
 set-option -ga terminal-features ",$TERM:usstyle"
 
-# OS-specific prefix
-set-option -g prefix {{prefix}}
+# Dual prefix configuration: both § and F12 work everywhere
+set-option -g prefix §
+set-option -g prefix2 F12
 unbind-key C-b
 
 # Shell configuration
@@ -133,6 +134,7 @@ set-option -g automatic-rename off
 set-option -g allow-rename off
 
 # Catppuccin theme configuration
+# Inspo: https://github.com/omerxx/catppuccin-tmux?tab=readme-ov-file#config-1
 set -g @catppuccin_status_left_separator "█"
 set -g @catppuccin_status_right_separator "█"
 set -g @catppuccin_window_status_style "basic"
@@ -146,7 +148,11 @@ set -g @catppuccin_window_current_number "#I"
 set -g status-right-length 100
 set -g status-left-length 100
 set -g status-left ""
-set -g status-right "#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
+
+set -g @catppuccin_host_icon "󰒋 "
+set -g @catppuccin_host_text " #H"
+
+set -g status-right "#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
 
 # Initialize plugins (after all configuration is set)
 run-shell {{catppuccinPlugin}}

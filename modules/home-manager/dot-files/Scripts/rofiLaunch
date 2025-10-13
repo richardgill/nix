@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+
+cmd="$1"
+
+get_workspace_for_app() {
+  local app="$1"
+  local app_lower=$(echo "$app" | tr '[:upper:]' '[:lower:]')
+
+  case "$app_lower" in
+    *ghostty*) echo "10" ;;
+    *nautilus*) echo "11" ;;
+    *firefox*) echo "12" ;;
+    *btop*) echo "13" ;;
+    *discord*) echo "14" ;;
+    *1password*) echo "15" ;;
+    *slack*) echo "16" ;;
+    *beeper*) echo "17" ;;
+    *cmus*|*spotify*) echo "18" ;;
+    *zoom*) echo "19" ;;
+    *) echo "" ;;
+  esac
+}
+
+workspace=$(get_workspace_for_app "$cmd")
+
+if pgrep -f "$cmd" > /dev/null; then
+  is_running=true
+else
+  is_running=false
+fi
+
+if [[ -n "$workspace" ]] && [[ "$is_running" == "false" ]]; then
+  hyprctl dispatch workspace "$workspace" && hyprctl dispatch exec "uwsm app -- $cmd"
+else
+  hyprctl dispatch workspace 1 && hyprctl dispatch exec "uwsm app -- $cmd"
+fi

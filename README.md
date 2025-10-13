@@ -63,6 +63,28 @@ Go to System Settings > Keyboard > Keyboard Shortcuts and aggressively turn off 
 
 If Homebrew casks are blocked as malicious, go to System Settings → Privacy & Security and click "Open Anyway"
 
+### Note on mac-app-util (Trampolines)
+
+We previously used [mac-app-util](https://github.com/hraban/mac-app-util) to make Nix-installed apps available in Spotlight via trampolines. However, we've removed this in favor of using Homebrew casks exclusively for GUI apps. The trampoline approach creates symlinked wrapper apps which move and don't play well for permissions. 
+
+## Temporarily Edit Configs Without Rebuilding
+
+To quickly test nvim config changes without rebuilding:
+
+```bash
+rm ~/.config/nvim
+ln -s ~/code/nix-private/modules/home-manager/dot-files/nvim ~/.config/nvim
+```
+
+Now edits go directly to your source files. When done testing, restore the managed version:
+
+```bash
+rm ~/.config/nvim
+sudo nixos-rebuild switch
+```
+
+This works for any home-manager managed config file.
+
 ## Impermanence Conflicts
 
 If build fails with "Path X already exists", move conflicting files to persistence:

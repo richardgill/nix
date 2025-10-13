@@ -16,6 +16,8 @@
     ../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../modules/system/nixos/graphical/optional/wifi.nix
     ../../modules/system/nixos/headless/optional/btrbk.nix
+    ../../modules/system/nixos/headless/optional/syncthing.nix
+    ../../modules/system/nixos/headless/optional/tailscale.nix
     ../../modules/system/nixos/headless/optional/thunderbolt.nix
   ];
 
@@ -62,6 +64,7 @@
     };
   };
 
+  networking.interfaces.enp195s0.useDHCP = lib.mkForce false;
 
   # networking.firewall.allowedUDPPorts = [ ... ];
 
