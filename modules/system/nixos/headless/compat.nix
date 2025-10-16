@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   # Pragmatic compatibility layer for non-Nix binaries
   # https://fzakaria.com/2025/02/26/nix-pragmatism-nix-ld-and-envfs

@@ -1,4 +1,4 @@
-{ ... }:
+_:
 {
   # Configuration is stored in .config/syncthing which is persisted via impermanence
   services.syncthing = {

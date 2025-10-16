@@ -1,4 +1,9 @@
-{ vars, lib, config, ... }:
+{
+  vars,
+  lib,
+  config,
+  ...
+}:
 {
   config = {
     users.users.${vars.userName}.home = "/Users/${vars.userName}";
