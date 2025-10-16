@@ -63,10 +63,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    mac-app-util = {
-      url = "github:hraban/mac-app-util";
-    };
-
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";

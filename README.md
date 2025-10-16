@@ -33,7 +33,7 @@ Configuration is split onto folders:
 - `optional/` - Opt-in features requiring explicit import the machine's `configuration.nix`.
 
 ```
-├── flake.nix                 # Entry point
+├── flake.nix                 # Entry point - defines all machines in nixosConfigurations
 ├── vars.nix                  # Shared variables (username, etc.)
 ├── .justfile                 # Run `just --list` to see the commands
 │
@@ -162,6 +162,20 @@ Commit `machines/<machine>/disko.nix` and push it to git.
 
 3. **Add optional features** as needed:
    - Example: `modules/system/nixos/headless/optional/thunderbolt.nix`
+
+#### Add machine to `flake.nix`
+
+After creating your machine configuration files, add the machine to the `nixosConfigurations` section in `flake.nix`:
+
+```nix
+nixosConfigurations = {
+  ...
+  your-machine-name = mkNixOSConfig "your-machine-name" ./machines/your-machine-name/configuration.nix;
+  ...
+};
+```
+
+The machine name should match your hostname. Commit and push this change to git.
 
 ### Install
 
