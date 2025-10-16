@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  qmkKeyboardSetupScript,
   ...
 }:
 {
@@ -10,6 +11,7 @@
   # Restart: systemctl --user restart xremap
   imports = [
     inputs.xremap-flake.nixosModules.default
+    ../../shared/qmk-keyboard-setup.nix
   ];
 
   services.xremap = {
@@ -17,7 +19,7 @@
     withWlroots = true;
     # This didn't work and needed to use wlroots
     # withHypr = true;
-    enable = true; # Enable the systemd service
+    enable = true;
     userName = "rich";
     serviceMode = "user";
     debug = false;
@@ -68,13 +70,18 @@
           );
         }
         {
+          name = "Universal bindings exact match";
+          exact_match = true;
+          remap = {
+            "KEY_102ND" = "F12";
+          };
+        }
+        {
           name = "Universal bindings";
-          exact_match = true; # Only trigger when modifiers match exactly (prevents Super-Shift-v from triggering Super-v)
+          exact_match = false; # We want home + shift to work still
           remap = {
             "Super-Left" = "Home";
             "Super-Right" = "End";
-            # tmux prefix for split keyboard
-            "KEY_102ND" = "F12";
           };
         }
         {
@@ -103,6 +110,9 @@
             "Super-a" = "C-a";
             "Super-c" = "C-c";
             "Super-v" = "C-v";
+            "Super-x" = "C-x";
+            "Super-z" = "C-z";
+            "Super-Shift-z" = "C-Shift-z";
           };
         }
         {
@@ -115,14 +125,13 @@
             ];
           };
           remap = {
-            "Super-x" = "C-x";
-            "Super-z" = "C-z";
             "Super-s" = "C-s";
             "Super-f" = "C-f";
             "Super-w" = "C-w";
             "Super-t" = "C-t";
             "Super-r" = "C-r";
             "Super-Shift-r" = "C-Shift-r";
+            "Super-Shift-p" = "C-Shift-p";
             "Super-l" = "C-l";
             "Super-Alt-i" = "C-Shift-i";
             "Super-BTN_LEFT" = "C-BTN_LEFT";
@@ -158,10 +167,12 @@
     };
   };
 
-  # Auto-restart xremap when keyboards are connected/disconnected
-  # This prevents xremap crashes when keyboards are unplugged while xremap is running
   services.udev.extraRules = ''
-    # Watch for keyboard device events in the input subsystem
+    # QMK keyboard setup: Set Unicode mode to Linux when keyboard is connected
+    SUBSYSTEM=="usb", ATTR{idVendor}=="4359", ATTR{idProduct}=="0000", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="qmk-keyboard-setup.service", MODE="0666"
+
+    # Auto-restart xremap when keyboards are connected/disconnected
+    # This prevents xremap crashes when keyboards are unplugged while xremap is running
     # SUBSYSTEM=="input" - only input devices (keyboards, mice, etc)
     # KERNEL=="event*" - only event interface devices (/dev/input/eventX)
     # ATTRS{name}=="*[Kk]eyboard*" - device name contains "keyboard" or "Keyboard"
@@ -172,11 +183,20 @@
     SUBSYSTEM=="input", KERNEL=="event*", ATTRS{name}=="*[Kk]eyboard*", ACTION=="remove", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="xremap-restart.service"
   '';
 
-  # Service that restarts xremap when triggered by udev events
+  systemd.user.services.qmk-keyboard-setup = {
+    description = "Configure QMK keyboard Unicode mode on connection";
+    path = config.environment.systemPackages;
+    serviceConfig = {
+      Type = "oneshot";
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 5";
+      ExecStart = "${qmkKeyboardSetupScript}/bin/qmk-keyboard-setup 0x02";
+    };
+  };
+
   systemd.user.services.xremap-restart = {
     description = "Restart xremap after keyboard plug/unplug events";
     serviceConfig = {
-      Type = "oneshot"; # Run once and exit (not a daemon)
+      Type = "oneshot";
       ExecStart = "${pkgs.systemd}/bin/systemctl --user restart xremap.service";
     };
   };

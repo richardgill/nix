@@ -18,4 +18,12 @@ if [[ $url =~ ^zoom(mtg|us):// ]]; then
   fi
 fi
 
+hyprctl dispatch workspace 19
+
+existing_zoom=$(hyprctl clients -j | jq -r '.[] | select(.class | test("chrome-app.zoom")) | .pid')
+
+if [[ -n "$existing_zoom" ]]; then
+  kill "$existing_zoom"
+fi
+
 exec omarchy-launch-webapp "$web_url"

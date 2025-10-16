@@ -1,8 +1,11 @@
 {
   imports = [
-    ../shared
+    ../shared/headless
+    ../shared/graphical
+    ../shared/qmk-keyboard-setup.nix
     ./dock.nix
     ./home-manager.nix
+    ./keyboard.nix
     ./networking.nix
     ./nix.nix
     ./packages.nix

@@ -8,6 +8,7 @@ let
   apiKeySecrets = [
     "anthropic-api-key"
     "kagi-api-key"
+    "kagi-search-token"
     "tavily-api-key"
     "openai-api-key"
     "joist-api-key"
@@ -26,7 +27,7 @@ in
 {
   # Common sops configuration
   sops = {
-    defaultSopsFile = ../../../secrets/secrets.yaml;
+    defaultSopsFile = ../../../../secrets/secrets.yaml;
 
     # Set appropriate age key path based on platform
     age =

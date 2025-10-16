@@ -2,7 +2,7 @@
 {
   imports = [
     inputs.home-manager.nixosModules.home-manager
-    ../../shared
+    ../../shared/headless
     ./1password.nix
     ./avahi.nix
     ./compat.nix

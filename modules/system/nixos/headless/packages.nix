@@ -5,7 +5,7 @@
   ...
 }:
 let
-  sharedPackages = import ../../shared/packages.nix { inherit pkgs; };
+  sharedPackages = import ../../shared/headless/packages.nix { inherit pkgs; };
 in
 {
   environment.systemPackages =

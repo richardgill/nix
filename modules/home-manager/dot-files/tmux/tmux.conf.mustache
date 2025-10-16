@@ -19,6 +19,13 @@ set-option -g focus-events on
 # Reindexes windows when one is deleted
 set-option -g renumber-windows on
 
+# Update environment variables when attaching to session
+set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY KRB5CCNAME SSH_CLIENT SSH_TTY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE"
+
+# Refresh environment for remaining clients when a client detaches
+# This ensures SSH variables stay current after reconnections (used in status line)
+set-hook -g client-detached 'run-shell "{{homeDir}}/Scripts/tmuxRefresh"'
+
 # https://www.reddit.com/r/neovim/comments/11usepy/comment/jcpp596
 set -g default-terminal 'tmux-256color'
 set -ag terminal-overrides ",$TERM:Tc"

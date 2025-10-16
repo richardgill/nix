@@ -1,75 +1,189 @@
-Based on [Misterio77/nix-starter-configs](https://github.com/Misterio77/nix-starter-configs) and https://github.com/dbeley/nixos-config and https://github.com/eh8/chenglab
 
-# Setup
+[![nixos 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
 
-## First time setup
+Opinionated Nix config inspired by [Omarchy](https://omarchy.org/), [chenglab](https://github.com/eh8/chenglab) and [others](#acknowledgments).
 
-### Linux
-(reference: https://github.com/nix-community/nixos-anywhere/blob/main/docs/howtos/no-os.md#installing-on-a-machine-with-no-operating-system)
+## Highlights
 
-Download the minimal ISO for your platform from the official NixOS website: https://nixos.org/download/ (also works in graphical, just run the steps below in a terminal)
+This repo contains the Nix configurations for my NixOS machines, Macs and VMs.
 
-Set a password to enable ssh: `passwd`
+- ❄️ Modern Nix flakes setup (currently 25.05)
+- 🏠 [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
+  - Dot files are kept in plain `.conf` or `.json` where possible. Mustache for templating.
+- 🍎 [nix-darwin](https://github.com/LnL7/nix-darwin) for Macs
+- 🔑 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
+- 💾 [disko](https://github.com/nix-community/disko) handles declarative disk partitioning with btrfs
+- 🌬️ [impermanence](https://github.com/nix-community/impermanence) with btrfs root on ephemeral storage
+  - Find files that are changing with `just find-impermanent`
+- 📸 Btrfs snapshots for backup and recovery
+- 💿 Full installation happens entirely inside the NixOS ISO
+- ⚡️ `.justfile` contains useful aliases for frequent `nix` commands
 
-find the ip address with: `ip addr show`
+## Folder structure
 
-On your local machine set `ISO_IP="1.2.3.4"`
+Configuration is modular - just import what you need:
 
-Confirm you can ssh in: `ssh -t nixos@$ISO_IP`
+- `optional/` - Opt-in features requiring explicit import
+- `headless/` - CLI-only, server environments
+- `graphical/` - Desktop with GUI
 
-#### (optional) Update disks
-Find disk name and update relevant machine `machines/<machine>/disko.nix` if necessary and commit and push it.
 ```
-ssh nixos@$ISO_IP "sudo fdisk -l"
+├── flake.nix                 # Entry point
+├── vars.nix                  # Shared variables (username, etc.)
+├── .justfile                 # Run `just --list` to see the commands
+│
+├── machines/                 # Per-machine configurations
+│   ├── nixos-machine-1/
+│   │   ├── configuration.nix
+│   │   ├── disko.nix                   # Disk partitioning (NixOS only)
+│   │   └── hardware-configuration.nix
+│   └── mac-1/
+│       ├── configuration.nix
+│       └── hardware-configuration.nix  
+│
+├── modules/
+│   ├── system/               # System-level configurations
+│   │   ├── shared/           # Cross-platform system configs
+│   │   │   ├── headless/     
+│   │   │   └── graphical/   
+│   │   ├── nixos/            # NixOS-specific system configs
+│   │   │   ├── headless/
+│   │   │   │   └── optional/ 
+│   │   │   └── graphical/
+│   │   │       └── optional/ 
+│   │   └── mac/              # Mac-specific system configs
+│   │
+│   └── home-manager/         # User-level configurations
+│       ├── dot-files/        # Raw config files (nvim, tmux, etc.)
+│       ├── shared/           
+│       │   ├── headless/     
+│       │   └── graphical/    
+│       ├── nixos/            # NixOS-specific home-manager configs
+│       │   ├── headless/
+│       │   └── graphical/
+│       └── mac/              # Mac-specific home-manager configs
+│
+├── .sops.yaml                # sops-nix secrets configuration 
+├── secrets/                  # Encrypted secrets (via sops-nix)
+└── utils/                    # Utilities
 ```
 
-#### (optional) Update hardware configuration
-Generate hardware configuration for the target machine. Copy output to machines/<machine>/hardware-configuration.nix if necessary and commit and push it.
+## Getting started
+
+
+### NixOS (Linux)
+
+> [!IMPORTANT]
+Installation happens entirely within the ISO environment.
+
+Download the minimal ISO for your platform from the official NixOS website: https://nixos.org/download/
+
+Boot from the ISO, then set a password to enable SSH:
+
+```bash
+passwd
 ```
+
+Find the IP address:
+
+```bash
+ip addr show
+```
+
+On your local machine where you've checked out this repo, set the ISO IP and confirm SSH access:
+
+```bash
+export ISO_IP="1.2.3.4"
+ssh -t nixos@$ISO_IP
+```
+
+#### (Optional) Update hardware configuration
+
+Generate hardware configuration for the target machine:
+
+```bash
 ssh nixos@$ISO_IP "sudo nixos-generate-config --no-filesystems && cat /etc/nixos/hardware-configuration.nix"
+```
+
+Copy output to `machines/<machine>/hardware-configuration.nix` if necessary and commit and push it.
+
+#### (Optional) Update disks
+
+Find disk name and update relevant machine `machines/<machine>/disko.nix` if necessary:
+
+```bash
+ssh nixos@$ISO_IP "sudo fdisk -l"
 ```
 
 #### Install
 
-The install happens on the machine running the iso over ssh, so you don't need another machine with nix to do it.
+The install happens on the machine running the ISO over SSH. You'll be prompted to set a password for your user and for LUKS encryption:
 
-Note: You'll be prompted to set a password for your user and for LUKS.
-
-```
+```bash
 scp scripts/clone-and-install.sh nixos@$ISO_IP:/tmp/ && \
- ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh $(gh auth token)"
+  ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh $(gh auth token)"
 ```
 
-### Mac
+### macOS
 
-- Install a fresh copy of MacOS
-- Install the [Determinate Systems Nix installer](https://docs.determinate.systems/) for Mac
-- nix-shell -p git gh just
+On macOS, first install the [Determinate Systems Nix installer](https://docs.determinate.systems/):
 
-Then:
+Then install the configuration:
 
-```
-gh auth login  # use web browser option and do it on another machine where you're logged into github
+```bash
+nix-shell -p git gh just
+gh auth login
 gh repo clone nix-private
 cd nix-private
 just mac-install
 ```
 
-sops will fail, you need to place you sops key in ~/.config/sops/age/keys.txt (login to 1password to find it)
+Place your sops key in `~/.config/sops/age/keys.txt` (retrieve from 1Password).
 
-rebuild with `just switch`
+Rebuild with `just switch`.
 
-Go to System Settings > Keyboard > Keyboard Shortcuts and aggressively turn off all shortcuts to prevent conflicts
+**Additional macOS setup:**
+- Go to System Settings → Keyboard → Keyboard Shortcuts and disable conflicting shortcuts
+- If Homebrew casks are blocked, go to System Settings → Privacy & Security and click "Open Anyway"
 
-If Homebrew casks are blocked as malicious, go to System Settings → Privacy & Security and click "Open Anyway"
+## Useful commands 🛠️
 
-### Note on mac-app-util (Trampolines)
+Install `just` to access the simple aliases below.
 
-We previously used [mac-app-util](https://github.com/hraban/mac-app-util) to make Nix-installed apps available in Spotlight via trampolines. However, we've removed this in favor of using Homebrew casks exclusively for GUI apps. The trampoline approach creates symlinked wrapper apps which move and don't play well for permissions. 
+### Locally deploy changes
+
+```bash
+just switch
+```
+
+
+## Impermanence
+
+This configuration uses btrfs with impermanence, where the root filesystem is reset on every boot. Only explicitly declared files and directories in `/persistent` survive reboots.
+
+When adding new persistence directories/files, they need to be added in `modules/system/nixos/headless/impermanence.nix` (for actual persistence)
+
+### Find impermanent files
+
+Find files that exist in ephemeral storage but aren't persisted:
+
+```bash
+just find-impermanent
+```
+### Switching fails
+
+If switching to latest version fails with "Path X already exists", move conflicting files to persistence first:
+
+```bash
+sudo mkdir -p /persistent/home/$USER/<folder>
+sudo mv /home/$USER/<file> /persistent/home/$USER/<folder>/
+sudo chown -R $USER:users /persistent/home/$USER/<folder>
+just build
+```
 
 ## Temporarily Edit Configs Without Rebuilding
 
-To quickly test nvim config changes without rebuilding:
+To quickly test config changes (e.g., nvim) without rebuilding:
 
 ```bash
 rm ~/.config/nvim
@@ -85,13 +199,11 @@ sudo nixos-rebuild switch
 
 This works for any home-manager managed config file.
 
-## Impermanence Conflicts
+## Acknowledgments
 
-If build fails with "Path X already exists", move conflicting files to persistence:
-```bash
-sudo mkdir -p /persistent/home/rich/<folder or file>
-sudo mv /home/rich/.claude.json /persistent/home/rich/<folder or file>
-sudo chown -R rich:users /persistent/home/rich/<folder or file>
-just build
-```
+- [eh8/chenglab](https://github.com/eh8/chenglab) - Primary inspiration for this configuration structure
+- [Omarchy](https://omarchy.org/) - Opinionated Linux setup inspiration
+- [dbeley/nixos-config](https://github.com/dbeley/nixos-config) - Btrfs impermanence implementation
+- [Misterio77/nix-starter-configs](https://github.com/Misterio77/nix-starter-configs) - Initial starter configuration
+- [An outstanding beginner friendly introduction to NixOS and flakes](https://nixos-and-flakes.thiscute.world/)
 

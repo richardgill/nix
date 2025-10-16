@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  osConfig,
   ...
 }:
 let
@@ -76,7 +77,13 @@ in
       mkdir -p "${firefoxProfilePath}"
       echo '${userJs}' > "${firefoxProfilePath}/user.js"
       rm -f "${firefoxProfilePath}/search.json.mozlz4"
-      cp -f "${searchJsonMozlz4}" "${firefoxProfilePath}/search.json.mozlz4"
+
+      # Get Kagi search token from: https://kagi.com/settings/user_details
+      KAGI_TOKEN=$(cat "${osConfig.sops.secrets."kagi-search-token".path}")
+      TEMP_JSON=$(mktemp)
+      echo '${searchJson}' | ${pkgs.gnused}/bin/sed "s/KAGI_TOKEN_PLACEHOLDER/$KAGI_TOKEN/g" > "$TEMP_JSON"
+      ${pkgs.mozlz4a}/bin/mozlz4a "$TEMP_JSON" "${firefoxProfilePath}/search.json.mozlz4"
+      rm -f "$TEMP_JSON"
     '';
   };
 }

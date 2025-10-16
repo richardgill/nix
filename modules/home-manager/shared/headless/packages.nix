@@ -10,6 +10,7 @@
     btop
     delta
     eza
+    fd
     fzf
     gh
     nixfmt-rfc-style
