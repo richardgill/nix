@@ -17,7 +17,11 @@
     oh-my-posh
     ripgrep
     sesh
+    xdg-utils
     yazi
     zoxide
+    (pkgs.writeShellScriptBin "open" ''
+      exec ${pkgs.xdg-utils}/bin/xdg-open "$@"
+    '')
   ];
 }

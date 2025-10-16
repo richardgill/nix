@@ -19,11 +19,7 @@
   };
 
   # SSH key management for users
-  users.users.${vars.userName}.openssh.authorizedKeys.keys = [
-    vars.sshPublicKeyPersonal
-    vars.sshPublicKeyPhone
-    vars.sshPublicKeyWork
-  ];
+  users.users.${vars.userName}.openssh.authorizedKeys.keys = vars.sshAllPublicKeys;
 
   # Optional: Install useful SSH-related packages
   environment.systemPackages = with pkgs; [

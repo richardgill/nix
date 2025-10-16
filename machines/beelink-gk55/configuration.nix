@@ -11,6 +11,7 @@
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
+    ../../modules/system/nixos/common
     ../../modules/system/nixos/graphical
     ../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../modules/system/nixos/graphical/optional/fingerprint.nix
@@ -34,8 +35,7 @@
     ];
   };
 
-  # WiFi/Bluetooth firmware support
-  # Reference: https://wiki.nixos.org/wiki/NixOS_system_configuration
+  # WiFi/Bluetooth firmware support for gk55
   hardware.firmware = with pkgs; [
     linux-firmware
   ];
@@ -44,32 +44,11 @@
   # Reference: https://github.com/MatthiasBenaets/nix-config/blob/master/hosts/beelink/hardware-configuration.nix
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
 
-  users.users.${vars.userName} = {
-    isNormalUser = true;
-    description = vars.fullName;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
+  home-manager.users.${vars.userName} = {
+    imports = [
+      ./../../modules/home-manager/nixos/graphical
     ];
-    packages = with pkgs; [ ];
   };
-
-  home-manager = {
-    extraSpecialArgs = {
-      inherit inputs outputs vars;
-      inherit (inputs) nixpkgs-unstable;
-    };
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users = {
-      ${vars.userName} = {
-        imports = [
-          ./../../modules/home-manager/nixos/graphical
-        ];
-      };
-    };
-  };
-
 
   # networking.firewall.allowedUDPPorts = [ ... ];
 

@@ -3,12 +3,13 @@
 
 set -e
 
-if [ $# -ne 1 ]; then
-    echo "Usage: $0 <GH_TOKEN>"
+if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+    echo "Usage: $0 <REPO> [GH_TOKEN]"
     exit 1
 fi
 
-GH_TOKEN="$1"
+REPO="$1"
+GH_TOKEN="$2"
 
 echo "Setting up user password..."
 while true; do
@@ -28,14 +29,18 @@ sudo swapoff /mnt/swapfile 2>/dev/null || true
 
 echo "Setting up repository clone and authentication..."
 
-# Authenticate with GitHub CLI first
-echo "Authenticating with GitHub CLI..."
-echo "$GH_TOKEN" | gh auth login --with-token
+# Authenticate with GitHub CLI if token provided
+if [ -n "$GH_TOKEN" ]; then
+    echo "Authenticating with GitHub CLI..."
+    echo "$GH_TOKEN" | gh auth login --with-token
+else
+    echo "No token provided, using existing gh auth..."
+fi
 
 # Clone the repository
 echo "Cloning NixOS configuration..."
 [ -d /tmp/nixos-config ] && rm -rf /tmp/nixos-config
-gh repo clone nix-private /tmp/nixos-config
+gh repo clone "$REPO" /tmp/nixos-config
 cd /tmp/nixos-config
 
 echo ""
