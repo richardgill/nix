@@ -6,7 +6,7 @@
   ...
 }:
 let
-  sharedPackages = import ../shared/packages.nix { inherit pkgs; };
+  sharedPackages = import ../shared/headless/packages.nix { inherit pkgs; };
 in
 {
   imports = [
@@ -58,7 +58,8 @@ in
       "sol"
       "spotify"
       "stats"
-      "todoist"
+      "tailscale-app"
+      "todoist-app"
       "visual-studio-code"
       "zoom"
     ];

@@ -16,6 +16,7 @@
     ../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../modules/system/nixos/graphical/optional/wifi.nix
     ../../modules/system/nixos/headless/optional/btrbk.nix
+    ../../modules/system/nixos/headless/optional/dev-ports.nix
     ../../modules/system/nixos/headless/optional/syncthing.nix
     ../../modules/system/nixos/headless/optional/tailscale.nix
     ../../modules/system/nixos/headless/optional/thunderbolt.nix

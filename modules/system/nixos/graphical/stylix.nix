@@ -6,7 +6,7 @@
 {
   imports = [
     inputs.stylix.nixosModules.stylix
-    ../../shared/stylix.nix
+    ../../shared/graphical/stylix.nix
   ];
 
   stylix = {

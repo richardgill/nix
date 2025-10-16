@@ -2,7 +2,7 @@
 {
   imports = [
     inputs.sops-nix.nixosModules.sops
-    ../../shared/secrets-common.nix
+    ../../shared/headless/secrets-common.nix
   ];
 
   sops = {

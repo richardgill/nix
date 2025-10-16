@@ -13,8 +13,9 @@ final_space = true
   newline = true
 
   [[blocks.segments]]
-    template = '{{ if .SSHSession }}{{ .HostName }}:{{ end }}'
-    foreground = 'green'
+    # Show hostname only when in SSH session AND NOT inside tmux
+    template = '{{ if and .SSHSession (not (env "TMUX")) }}{{ .HostName }}:{{ end }}'
+    foreground = '#BB86FC'
     background = 'transparent'
     type = 'session'
     style = 'plain'

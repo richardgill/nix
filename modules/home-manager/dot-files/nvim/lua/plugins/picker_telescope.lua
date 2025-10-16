@@ -37,6 +37,11 @@ return {
           n = { ['<C-Down>'] = actions.results_scrolling_down, ['<C-Up>'] = actions.results_scrolling_up },
         },
       },
+      pickers = {
+        find_files = {
+          find_command = {"rg", "--files", "--hidden", "--follow"}
+        }
+      },
       extensions = {
         ['ui-select'] = {
           require('telescope.themes').get_dropdown(),
@@ -55,7 +60,6 @@ return {
     vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = '[F]ind [F]iles' })
     vim.keymap.set('n', '<leader>ft', builtin.builtin, { desc = '[F]ind [S]elect Telescope' })
     vim.keymap.set('n', '<leader>fw', builtin.grep_string, { desc = '[F]ind current [W]ord' })
-    vim.keymap.set('n', '<leader>fr', builtin.live_grep, { desc = '[F]ind by grep [R]egex' })
     vim.keymap.set('n', '<leader>fs', function()
       builtin.live_grep {
         additional_args = {

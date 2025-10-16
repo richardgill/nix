@@ -67,6 +67,7 @@
         ".config/Slack"
         ".config/BeeperTexts"
         ".config/spotify"
+        ".config/Todoist"
         ".zoom"
         ".local/share/zoxide"
         ".local/share/mise"

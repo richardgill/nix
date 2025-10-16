@@ -11,7 +11,7 @@
 
     polarity = "dark";
 
-    image = ../../../assets/wallpapers/tokyo-night-abstract.jpg;
+    image = ../../../../assets/wallpapers/tokyo-night-abstract.jpg;
 
     fonts = {
       monospace = {

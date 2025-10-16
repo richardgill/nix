@@ -4,7 +4,7 @@
 }:
 {
   imports = [
-    ../shared/stylix.nix
+    ../shared/graphical/stylix.nix
   ];
 
   stylix = {

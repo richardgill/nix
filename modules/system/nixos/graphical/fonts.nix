@@ -3,7 +3,7 @@
   ...
 }:
 {
-  imports = [ ../../shared/fonts.nix ];
+  imports = [ ../../shared/graphical/fonts.nix ];
 
   # list fonts: fc-list : family | sort -u
   fonts = {
@@ -36,6 +36,18 @@
           "JetBrains Mono Nerd Font"
         ];
       };
+
+      localConf = ''
+        <?xml version="1.0"?>
+        <!DOCTYPE fontconfig SYSTEM "urn:fontconfig:fonts.dtd">
+        <fontconfig>
+          <!-- Map ui-monospace (CSS keyword used by GitHub) to Hack Nerd Font since fontconfig doesn't recognize it by default -->
+          <match target="pattern">
+            <test qual="any" name="family"><string>ui-monospace</string></test>
+            <edit name="family" mode="prepend" binding="same"><string>Hack Nerd Font</string></edit>
+          </match>
+        </fontconfig>
+      '';
 
       # Enable embedded bitmaps for better emoji support
       useEmbeddedBitmaps = true;

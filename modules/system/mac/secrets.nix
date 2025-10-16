@@ -5,7 +5,7 @@
 {
   imports = [
     inputs.sops-nix.darwinModules.sops
-    ../shared/secrets-common.nix
+    ../shared/headless/secrets-common.nix
   ];
 
   # Any Darwin-specific secrets configuration can go here
