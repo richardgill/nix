@@ -12,7 +12,7 @@
   # Restart: systemctl --user restart xremap
   imports = [
     inputs.xremap-flake.nixosModules.default
-    ../../shared/qmk-keyboard-setup.nix
+    ../../shared/graphical/qmk-keyboard-setup.nix
   ];
 
   services.xremap = {

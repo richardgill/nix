@@ -2,7 +2,7 @@
   imports = [
     ../shared/headless
     ../shared/graphical
-    ../shared/qmk-keyboard-setup.nix
+    ../shared/graphical/qmk-keyboard-setup.nix
     ./dock.nix
     ./home-manager.nix
     ./keyboard.nix
