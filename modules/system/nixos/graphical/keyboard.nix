@@ -4,6 +4,7 @@
   pkgs,
   inputs,
   qmkKeyboardSetupScript,
+  vars,
   ...
 }:
 {
@@ -20,7 +21,7 @@
     # This didn't work and needed to use wlroots
     # withHypr = true;
     enable = true;
-    userName = "rich";
+    userName = vars.userName;
     serviceMode = "user";
     debug = false;
     config = {
