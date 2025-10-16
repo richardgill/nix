@@ -1,5 +1,5 @@
 
-[![nixos 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
+[![NixOS 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
 
 Nix config inspired by [Omarchy](https://omarchy.org/)'s system choices and [chenglab](https://github.com/eh8/chenglab)'s configuration structure.
 
@@ -104,7 +104,7 @@ ssh -t nixos@$ISO_IP
 
 ### Create a new Machine
 
-Each nixos machine has the following structure:
+Each NixOS machine has the following structure:
 
 ```
 machines/<machine-name>/
@@ -128,7 +128,7 @@ Commit and push it to git.
 
 #### Create disk partition configuration: `disko.nix`
 
-Every nixos machine needs a `machines/<machine>/disko.nix` which defines its disk partitions.
+Every NixOS machine needs a `machines/<machine>/disko.nix` which defines its disk partitions.
 
 You can copy an existing `disko.nix` from another machine, such as [um790/disko.nix](machines/um790/disko.nix).
 
@@ -165,12 +165,15 @@ Commit `machines/<machine>/disko.nix` and push it to git.
 
 #### Add machine to `flake.nix`
 
-After creating your machine configuration files, add the machine to the `nixosConfigurations` section in `flake.nix`:
+After creating your machine configuration files, add the machine to the `nixosHosts` section in `flake.nix`:
 
 ```nix
-nixosConfigurations = {
+nixosHosts = {
   ...
-  your-machine-name = mkNixOSConfig "your-machine-name" ./machines/your-machine-name/configuration.nix;
+  your-machine-name = {
+    system = "x86_64-linux";  # or "aarch64-linux" for ARM
+    path = ./machines/your-machine-name/configuration.nix;
+  };
   ...
 };
 ```
@@ -226,7 +229,6 @@ Install `just` to access the simple aliases below.
 ```bash
 just switch
 ```
-
 
 ## Remote LUKS unlock
 

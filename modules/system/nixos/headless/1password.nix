@@ -1,4 +1,3 @@
-_:
-{
+_: {
   programs._1password.enable = true;
 }

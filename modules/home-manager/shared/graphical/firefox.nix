@@ -29,15 +29,17 @@ let
 
   salt = "default" + "Kagi" + disclaimer;
 
-  defaultEngineIdHash = pkgs.lib.removeSuffix "\n" (builtins.readFile (
-    pkgs.runCommand "firefox-search-hash" { } ''
-      echo -n "${salt}" | ${pkgs.openssl}/bin/openssl dgst -sha256 -binary | ${pkgs.coreutils}/bin/base64 > "$out"
-    ''
-  ));
+  defaultEngineIdHash = pkgs.lib.removeSuffix "\n" (
+    builtins.readFile (
+      pkgs.runCommand "firefox-search-hash" { } ''
+        echo -n "${salt}" | ${pkgs.openssl}/bin/openssl dgst -sha256 -binary | ${pkgs.coreutils}/bin/base64 > "$out"
+      ''
+    )
+  );
 
   userJs = builtins.readFile (
     template.renderMustache "firefox-user-js" ../../dot-files/firefox/user.js.mustache {
-      homeDirectory = config.home.homeDirectory;
+      inherit (config.home) homeDirectory;
       isLinux = !pkgs.stdenv.isDarwin;
     }
   );

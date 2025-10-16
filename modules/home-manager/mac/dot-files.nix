@@ -1,6 +1,4 @@
-{
-  ...
-}:
+_:
 {
   home.file = {
     ".config/karabiner".source = ./dot-files/karabiner;

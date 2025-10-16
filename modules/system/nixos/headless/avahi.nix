@@ -1,6 +1,4 @@
-{
-  ...
-}:
+_:
 {
   # Enable Avahi for .local hostname resolution
   services.avahi = {

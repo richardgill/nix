@@ -92,7 +92,8 @@ in
         );
       };
       ".claude/CLAUDE.md".source = ../../dot-files/claude/CLAUDE.md;
-      ".claude/settings.json".source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/claude/settings.json";
+      ".claude/settings.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/claude/settings.json";
       ".claude/agents".source = ../../dot-files/claude/agents;
       ".claude/commands".source = ../../dot-files/claude/commands;
       ".codex".source = ../../dot-files/codex;

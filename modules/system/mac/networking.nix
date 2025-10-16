@@ -1,7 +1,7 @@
 { hostName, ... }:
 {
   networking = {
-    hostName = hostName;
+    inherit hostName;
     computerName = hostName;
     localHostName = hostName;
   };

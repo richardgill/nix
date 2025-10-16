@@ -1,7 +1,7 @@
 { pkgs, hostName, ... }:
 {
   networking = {
-    hostName = hostName;
+    inherit hostName;
     hostFiles = [ ];
     networkmanager.enable = true;
     firewall.enable = true;

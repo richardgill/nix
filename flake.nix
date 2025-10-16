@@ -91,6 +91,32 @@
         system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
       );
 
+      nixosHosts = {
+        beelink-gk55 = {
+          system = "x86_64-linux";
+          path = ./machines/beelink-gk55/configuration.nix;
+        };
+        um790 = {
+          system = "x86_64-linux";
+          path = ./machines/um790/configuration.nix;
+        };
+        arm-vm = {
+          system = "aarch64-linux";
+          path = ./machines/arm-vm/configuration.nix;
+        };
+        x86-vm = {
+          system = "x86_64-linux";
+          path = ./machines/x86-vm/configuration.nix;
+        };
+      };
+
+      darwinHosts = {
+        macbookair-work = {
+          system = "aarch64-darwin";
+          path = ./machines/macbookair-work/configuration.nix;
+        };
+      };
+
       mkNixOSConfig =
         hostName: path:
         nixpkgs.lib.nixosSystem {
@@ -112,26 +138,35 @@
           };
           modules = [ path ];
         };
+
     in
     {
       # Enables `nix fmt` at root of repo to format all nix files
       formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 
       # for `nix flake check`
-      checks = forAllSystems (system: {
-        formatting = treefmtEval.${system}.config.build.check self;
-      });
+      checks = forAllSystems (
+        system:
+        {
+          formatting = treefmtEval.${system}.config.build.check self;
+        }
+        // nixpkgs.lib.mapAttrs' (
+          name: config:
+          nixpkgs.lib.nameValuePair "nixos-${name}" (mkNixOSConfig name config.path)
+          .config.system.build.toplevel
+        ) (nixpkgs.lib.filterAttrs (name: config: config.system == system) nixosHosts)
+        // nixpkgs.lib.mapAttrs' (
+          name: config: nixpkgs.lib.nameValuePair "darwin-${name}" (mkDarwinConfig name config.path).system
+        ) (nixpkgs.lib.filterAttrs (name: config: config.system == system) darwinHosts)
+      );
 
-      darwinConfigurations = {
-        macbookair-work = mkDarwinConfig "macbookair-work" ./machines/macbookair-work/configuration.nix;
-      };
+      darwinConfigurations = nixpkgs.lib.mapAttrs (
+        name: config: mkDarwinConfig name config.path
+      ) darwinHosts;
 
-      nixosConfigurations = {
-        beelink-gk55 = mkNixOSConfig "beelink-gk55" ./machines/beelink-gk55/configuration.nix;
-        um790 = mkNixOSConfig "um790" ./machines/um790/configuration.nix;
-        arm-vm = mkNixOSConfig "arm-vm" ./machines/arm-vm/configuration.nix;
-        x86-vm = mkNixOSConfig "x86-vm" ./machines/x86-vm/configuration.nix;
-      };
+      nixosConfigurations = nixpkgs.lib.mapAttrs (
+        name: config: mkNixOSConfig name config.path
+      ) nixosHosts;
 
       # Export vars for scripts to access
       inherit vars;
