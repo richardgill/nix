@@ -4,5 +4,6 @@
     "allow": [
       "Bash(just:*)"
     ]
-  }
+  },
+  "outputStyle": "Explanatory"
 }

@@ -2,3 +2,4 @@
 Brewfile
 result
 plans/
+.claude/settings.local.json
