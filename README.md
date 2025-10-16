@@ -241,7 +241,7 @@ ssh root@<machine-ip> -p 2222
 You'll be prompted to enter the LUKS passphrase. The machine will continue booting and you can SSH normally: 
 
 ```bash
-ssh rich@<machine-ip> 
+ssh username@<machine-ip> 
 ```
 
 Configuration: [remote-unlock.nix](modules/system/nixos/headless/remote-unlock.nix)
