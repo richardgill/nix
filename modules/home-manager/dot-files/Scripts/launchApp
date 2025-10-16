@@ -42,7 +42,7 @@ elif [[ "$workspace" == "18" ]]; then
     ~/Scripts/launchTerminalApp cmus &
   fi
 elif [[ "$workspace" == "19" ]]; then
-  if ! checkWebappOpen zoom; then
+  if ! ~/Scripts/checkWebappOpen zoom; then
     omarchy-launch-webapp "https://app.zoom.us/wc/home" &
   fi
 elif [[ "$workspace" == "20" ]]; then

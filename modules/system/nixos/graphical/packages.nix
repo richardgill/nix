@@ -17,6 +17,4 @@
     beeper
     playerctl
   ];
-
-  programs.ydotool.enable = true;
 }

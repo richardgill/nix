@@ -6,6 +6,7 @@
     coreutils
     claude-code
     curl
+    datamash
     docker
     git
     git-lfs

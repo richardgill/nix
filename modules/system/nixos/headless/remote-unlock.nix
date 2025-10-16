@@ -19,11 +19,7 @@
       enable = true;
       port = 2222;
       shell = "/bin/cryptsetup-askpass";
-      authorizedKeys = [
-        vars.sshPublicKeyPersonal
-        vars.sshPublicKeyPhone
-        vars.sshPublicKeyWork
-      ];
+      authorizedKeys = vars.sshAllPublicKeys;
       hostKeys = [ "/nix/secret/initrd/ssh_host_ed25519_key" ];
     };
   };

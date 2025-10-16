@@ -1,16 +1,14 @@
 {
   pkgs,
   lib,
-  inputs,
-  outputs,
   vars,
-  hostName,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
     ./disko.nix
+    ../../modules/system/nixos/common
     ../../modules/system/nixos/graphical
     ../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../modules/system/nixos/graphical/optional/fingerprint.nix
@@ -32,42 +30,19 @@
     "idle=nowait"
   ];
 
-  # WiFi/Bluetooth firmware support
-  # Reference: https://wiki.nixos.org/wiki/NixOS_system_configuration
+  # WiFi/Bluetooth firmware support for UM790
   hardware.firmware = with pkgs; [
     linux-firmware
   ];
 
-  users.users.${vars.userName} = {
-    isNormalUser = true;
-    description = vars.fullName;
-    extraGroups = [
-      "networkmanager"
-      "wheel"
-      "ydotool"
+  home-manager.users.${vars.userName} = {
+    imports = [
+      ./../../modules/home-manager/nixos/graphical
     ];
-    packages = with pkgs; [ ];
   };
 
-  home-manager = {
-    extraSpecialArgs = {
-      inherit inputs outputs vars;
-      inherit (inputs) nixpkgs-unstable;
-    };
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users = {
-      ${vars.userName} = {
-        imports = [
-          ./../../modules/home-manager/nixos/graphical
-        ];
-      };
-    };
-  };
-
-  networking.interfaces.enp195s0.useDHCP = lib.mkForce false;
-
-  # networking.firewall.allowedUDPPorts = [ ... ];
+  # Don't use thunderbolt ethernet
+  networking.networkmanager.unmanaged = [ "enp195s0" ];
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
