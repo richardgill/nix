@@ -152,7 +152,6 @@ resetTo() {
 alias c="cursor"
 alias v="nvim"
 alias t="tmux attach -t root || tmux new -s root"
-alias zed="open -a /Applications/Zed.app -n"
 alias pnx="pnpm exec nx"
 alias lso="{{coreUtilsPath}}/bin/ls"
 alias tree="ls --tree"
@@ -160,9 +159,6 @@ alias cato="{{coreUtilsPath}}/bin/cat"
 alias as="open -a \"Android Studio\""
 alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
 
-{{#isDarwin}}
-alias sed="gsed"
-{{/isDarwin}}
 {{#isLinux}}
 alias sound="wiremix"
 alias bluetooth="blueberry"

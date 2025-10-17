@@ -43,7 +43,7 @@
               content = {
                 type = "luks";
                 name = "root_vg_${hostName}";
-                askPassword = true; # Prompt for password during installation
+                askPassword = true;
                 settings = {
                   bypassWorkqueues = true; # Only recommended for NVME SSDs
                   allowDiscards = true; # Important for SSD lifespan if no hardcore security requirement
@@ -76,12 +76,12 @@
                         "subvol=nix"
                       ];
                     };
-                    "/snapshots" = {
-                      mountpoint = "/snapshots";
+                    "/btrbk" = {
+                      mountpoint = "/btrbk";
                       mountOptions = [
                         "compress=zstd"
                         "noatime"
-                        "subvol=snapshots"
+                        "subvol=btrbk"
                       ];
                     };
                     "/swap" = {
@@ -92,7 +92,8 @@
                         "nodatacow"
                         "nodatasum"
                       ];
-                      swap.swapfile.size = "12G";
+                      # If you use hibernate make sure to allocate enough swap. See table https://itsfoss.com/swap-size
+                      swap.swapfile.size = "10G";
                     };
                   };
                 };
