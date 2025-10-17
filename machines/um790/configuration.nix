@@ -12,6 +12,7 @@
     ../../modules/system/nixos/graphical
     ../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../modules/system/nixos/graphical/optional/fingerprint.nix
+    ../../modules/system/nixos/graphical/optional/virt-manager.nix
     ../../modules/system/nixos/graphical/optional/wifi.nix
     ../../modules/system/nixos/headless/optional/btrbk.nix
     ../../modules/system/nixos/headless/optional/dev-ports.nix

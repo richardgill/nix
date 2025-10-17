@@ -11,7 +11,10 @@
   # You must ssh as root@<machine>:2222 to unlock luks
   boot.initrd.network = {
     enable = true;
-    flushBeforeStage2 = true;
+    # Disabled due to bug where $ifaces variable gets populated with leading spaces
+    # causing "can't find device ' enp2s0'" errors. See manual fix in postMountCommands below.
+    # https://github.com/NixOS/nixpkgs/issues/285190
+    flushBeforeStage2 = false;
     udhcpc = {
       enable = true;
     };
@@ -23,4 +26,20 @@
       hostKeys = [ "/nix/secret/initrd/ssh_host_ed25519_key" ];
     };
   };
+
+  # Manual flush before stage 2 to work around bug in flushBeforeStage2
+  # This mirrors the original code from nixpkgs but fixes the $ifaces variable population
+  # Original: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/boot/initrd-network.nix
+  # Bug: https://github.com/NixOS/nixpkgs/issues/285190
+  #
+  # To verify the flush is working after boot, check for errors in early boot logs:
+  #   journalctl -b 0 --no-pager | head -300
+  #   nmcli connection show
+  boot.initrd.postMountCommands = ''
+    ifaces=$(ip -o link show | awk -F': ' '$3 ~ /UP/ && $2 !~ /^lo$/ {print $2}')
+    for iface in $ifaces; do
+      ip address flush dev "$iface"
+      ip link set dev "$iface" down
+    done
+  '';
 }

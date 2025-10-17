@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -p git gh jq gum
+#! nix-shell -i bash -p git jq gum
 
 set -e
 
@@ -10,6 +10,7 @@ fi
 
 REPO="$1"
 GH_TOKEN="$2"
+GITHUB_REPO_URL="https://${GH_TOKEN:+$GH_TOKEN@}github.com/$REPO.git"
 
 echo "Setting up user password..."
 while true; do
@@ -29,18 +30,10 @@ sudo swapoff /mnt/swapfile 2>/dev/null || true
 
 echo "Setting up repository clone and authentication..."
 
-# Authenticate with GitHub CLI if token provided
-if [ -n "$GH_TOKEN" ]; then
-    echo "Authenticating with GitHub CLI..."
-    echo "$GH_TOKEN" | gh auth login --with-token
-else
-    echo "No token provided, using existing gh auth..."
-fi
-
 # Clone the repository
 echo "Cloning NixOS configuration..."
 [ -d /tmp/nixos-config ] && rm -rf /tmp/nixos-config
-gh repo clone "$REPO" /tmp/nixos-config
+git clone "$GITHUB_REPO_URL" /tmp/nixos-config
 cd /tmp/nixos-config
 
 echo ""
@@ -48,7 +41,7 @@ echo "Repository cloned successfully to /tmp/nixos-config"
 echo ""
 
 echo "Getting available machine configurations..."
-AVAILABLE_MACHINES=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes flake show --json | jq -r '.nixosConfigurations | keys[]')
+AVAILABLE_MACHINES=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./.); in builtins.concatStringsSep "\n" (builtins.attrNames flake.nixosConfigurations)')
 
 if [ -z "$AVAILABLE_MACHINES" ]; then
     echo "ERROR: No machine configurations found in flake!"
@@ -67,7 +60,7 @@ echo "Selected machine: $MACHINE ✓"
 echo ""
 
 echo "Getting username from flake..."
-USERNAME=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --raw .#vars.userName)
+USERNAME=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./.); in flake.vars.userName')
 echo "Username: $USERNAME"
 echo ""
 
@@ -130,7 +123,7 @@ echo "Press Enter when you have completed these steps..."
 read -r
 
 echo "git pull'ing repository to get latest changes..."
-gh repo sync
+git pull "$GITHUB_REPO_URL"
 echo "Repository sync complete."
 
 echo "Running NixOS installation for machine '$MACHINE'..."

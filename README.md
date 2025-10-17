@@ -189,7 +189,7 @@ During the install you'll be prompted to set a password for your user and for LU
 ```bash
 # Using public repository without token (if already authenticated)
 scp scripts/clone-and-install.sh nixos@$ISO_IP:/tmp/ && \
-  ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix-private"
+  ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix"
 ```
 
 ```bash
