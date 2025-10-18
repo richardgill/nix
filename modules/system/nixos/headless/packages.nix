@@ -14,5 +14,6 @@ in
       psmisc
       pciutils # needed for lspci
       lm_sensors # fan sensors
+      sbctl # secure boot utils
     ]);
 }

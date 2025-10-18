@@ -39,8 +39,7 @@ Configuration is split onto folders:
 │
 ├── machines/                 # Per-machine configurations
 │   ├── nixos-machine-1/
-│   │   ├── configuration.nix
-│   │   ├── disko.nix                   # Disk partitioning (NixOS only)
+│   │   ├── configuration.nix           # Imports shared disko module
 │   │   └── hardware-configuration.nix
 │   └── mac-1/
 │       ├── configuration.nix
@@ -49,13 +48,13 @@ Configuration is split onto folders:
 ├── modules/
 │   ├── system/               # System-level configurations
 │   │   ├── shared/           # Cross-platform system configs
-│   │   │   ├── headless/     
-│   │   │   └── graphical/   
+│   │   │   ├── headless/
+│   │   │   └── graphical/
 │   │   ├── nixos/            # NixOS-specific system configs
 │   │   │   ├── headless/
-│   │   │   │   └── optional/ 
+│   │   │   │   └── optional/
 │   │   │   └── graphical/
-│   │   │       └── optional/ 
+│   │   │       └── optional/
 │   │   └── mac/              # Mac-specific system configs
 │   │
 │   └── home-manager/         # User-level configurations
@@ -108,9 +107,8 @@ Each NixOS machine has the following structure:
 
 ```
 machines/<machine-name>/
-├── configuration.nix
-├── disko.nix # disk partitions
-└── hardware-configuration.nix # auto generated
+├── configuration.nix           # Machine config (imports shared disko module)
+└── hardware-configuration.nix  # Auto-generated hardware config
 ```
 
 #### Create `hardware-configuration.nix`
@@ -126,59 +124,33 @@ Copy the configuration to: `machines/<machine-name>/hardware-configuration.nix` 
 
 Commit and push it to git.
 
-#### Create disk partition configuration: `disko.nix`
-
-Every NixOS machine needs a `machines/<machine>/disko.nix` which defines its disk partitions.
-
-You can copy an existing `disko.nix` from another machine, such as [um790/disko.nix](machines/um790/disko.nix).
-
-```
-# disko.nix
-...
-  disko.devices = {
-    disk = {
-      main = {
-        type = "disk";
-        device = "/dev/nvme0n1"; <<< you need to update this
-...
-```
-
-You need to update your device to match the disk device path of the new machine. You can find the disk device path for your machine directly from the live ISO by running:
-
-```bash
-ssh nixos@$ISO_IP "sudo fdisk -l"
-```
-
-Commit `machines/<machine>/disko.nix` and push it to git.
-
 #### Create `configuration.nix`
 
 1. **Copy an existing configuration** as a starting point:
-   - Example: [um790/configuration.nix](machines/um790/configuration.nix)
+   - Example: [um790/configuration.nix](machines/nixos/x86_64/um790/configuration.nix)
 
-2. **Import a base module** depending on your machine type:
+2. **Import the disko module** with your disk configuration:
+   ```nix
+   (import ../../../../modules/system/nixos/headless/disko.nix {
+     device = "/dev/nvme0n1";        # Your primary disk device (find with: lsblk)
+     resumeOffset = "533760";        # For hibernate support (get with: btrfs inspect-internal map-swapfile -r /.swapvol/swapfile)
+     swapSize = "16G";               # Swap file size (see https://itsfoss.com/swap-size)
+     isSsd = true;                   # Enable SSD optimizations
+   })
+   ```
+
+   **Finding your device name:**
+   ```bash
+   ssh nixos@$ISO_IP "lsblk"  # List all block devices from the NixOS ISO
+   # Common device names: /dev/nvme0n1 (NVMe SSD), /dev/sda (SATA/SCSI), /dev/vda (VM)
+   ```
+
+3. **Import a base module** depending on your machine type:
    - [`modules/system/nixos/headless`](modules/system/nixos/headless/default.nix) — for server machines
    - [`modules/system/nixos/graphical`](modules/system/nixos/graphical/default.nix) — for GUI machines (includes headless features)
 
-3. **Add optional features** as needed:
+4. **Add optional features** as needed:
    - Example: `modules/system/nixos/headless/optional/thunderbolt.nix`
-
-#### Add machine to `flake.nix`
-
-After creating your machine configuration files, add the machine to the `nixosHosts` section in `flake.nix`:
-
-```nix
-nixosHosts = {
-  ...
-  your-machine-name = {
-    system = "x86_64-linux";  # or "aarch64-linux" for ARM
-    path = ./machines/your-machine-name/configuration.nix;
-  };
-  ...
-};
-```
-
-The machine name should match your hostname. Commit and push this change to git.
 
 ### Install
 

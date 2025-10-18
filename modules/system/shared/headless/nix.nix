@@ -12,7 +12,7 @@
     (lib.mkIf (config.nix.enable or true) {
       gc = {
         automatic = true;
-        options = "--delete-older-than 7d";
+        options = "--delete-older-than 14d";
       }
       // lib.optionalAttrs pkgs.stdenv.isDarwin {
         interval = "weekly";

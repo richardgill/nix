@@ -10,13 +10,18 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ./disko.nix
-    ../../modules/system/nixos/common
-    ../../modules/system/nixos/graphical
-    ../../modules/system/nixos/graphical/optional/bluetooth.nix
-    ../../modules/system/nixos/graphical/optional/fingerprint.nix
-    ../../modules/system/nixos/graphical/optional/wifi.nix
-    ../../modules/system/nixos/headless/optional/btrbk.nix
+    (import ../../../../modules/system/nixos/headless/disko.nix {
+      device = "/dev/sda";
+      resumeOffset = "533760";
+      swapSize = "12G";
+      isSsd = true;
+    })
+    ../../../../modules/system/nixos/common
+    ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
+    ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
+    ../../../../modules/system/nixos/graphical/optional/wifi.nix
+    ../../../../modules/system/nixos/headless/optional/btrbk.nix
   ];
 
   # Faster boot for mini PC
@@ -46,7 +51,7 @@
 
   home-manager.users.${vars.userName} = {
     imports = [
-      ./../../modules/home-manager/nixos/graphical
+      ../../../../modules/home-manager/nixos/graphical
     ];
   };
 

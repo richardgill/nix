@@ -1,5 +1,8 @@
 { pkgs, vars, ... }:
 {
+  # needed for graphics in VMs, which hyprland guests need.
+  hardware.graphics.enable = true;
+
   virtualisation.libvirtd = {
     enable = true;
     onBoot = "ignore";
@@ -19,6 +22,16 @@
       swtpm.enable = true;
       runAsRoot = false;
       vhostUserPackages = with pkgs; [ virtiofsd ];
+      verbatimConfig = ''
+        user = "${vars.userName}"
+        cgroup_device_acl = [
+          "/dev/null", "/dev/full", "/dev/zero",
+          "/dev/random", "/dev/urandom",
+          "/dev/ptmx", "/dev/kvm",
+          "/dev/rtc", "/dev/hpet",
+          "/dev/dri/renderD128"
+        ]
+      '';
     };
   };
 
