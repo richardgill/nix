@@ -11,7 +11,6 @@
     ./networking.nix
     ./packages.nix
     ./power-management.nix
-    ./remote-unlock.nix
     ./secrets.nix
     ./ssh.nix
     ./system.nix

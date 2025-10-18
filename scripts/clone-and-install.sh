@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i bash -p git jq gum
+#! nix-shell -i bash -p git jq gum sbctl
 
 set -e
 
@@ -89,6 +89,13 @@ sudo ssh-keygen -t ed25519 -N "" -C "" -f /mnt/nix/secret/initrd/ssh_host_ed2551
 echo "SSH host key generated successfully"
 
 echo ""
+echo "Generating Secure Boot keys..."
+sudo sbctl create-keys
+sudo mkdir -p /mnt/persistent/var/lib
+sudo cp -r /var/lib/sbctl /mnt/persistent/var/lib/
+echo "Secure Boot keys generated successfully"
+
+echo ""
 echo "Converting SSH key to age format..."
 AGE_KEY=$(sudo nix-shell --extra-experimental-features flakes -p ssh-to-age --run 'cat /mnt/nix/secret/initrd/ssh_host_ed25519_key.pub | ssh-to-age')
 echo "Age public key: $AGE_KEY"
@@ -128,11 +135,18 @@ echo "Repository sync complete."
 
 echo "Running NixOS installation for machine '$MACHINE'..."
 echo ""
-# TMPDIR being inside the mount prevents device out of space in live ISO
-TMPDIR=/mnt/tmp sudo nixos-install --no-root-passwd --root /mnt --flake ".#$MACHINE"
+echo "Initial install with systemd-boot, secure-boot is disabled..."
+sudo mkdir -p /mnt/tmp
+sudo env INITIAL_INSTALL=1 TMPDIR=/mnt/tmp nixos-install --impure --no-root-passwd --root /mnt --flake ".#$MACHINE"
 
 echo ""
 echo "Installation complete!"
+echo ""
+echo "If you're using Secure Boot"
+echo "1. Reboot into the new system"
+echo "2. Run 'just switch' to enable Lanzaboote (requires a working boot to install)"
+echo "3. Follow the instructions in modules/system/nixos/headless/optional/secure-boot.nix to complete setup"
+echo ""
 read -p "Reboot now? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then

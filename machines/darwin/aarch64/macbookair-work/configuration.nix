@@ -11,7 +11,7 @@
 
     ./hardware-configuration.nix
 
-    ./../../modules/system/mac/default.nix
+    ../../../../modules/system/mac/default.nix
   ];
   # needed with nix determinate package
   nix.enable = false;
@@ -25,7 +25,7 @@
     users = {
       ${vars.userName} = {
         imports = [
-          ./../../modules/home-manager/mac
+          ../../../../modules/home-manager/mac
         ];
       };
     };

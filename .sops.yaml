@@ -2,9 +2,9 @@ keys:
   # This master public/private key is in 1password
   - &master age1hjyxqwv0nkwf59ascp7qvgvvtck0mdenv9p2f23w44k9fqv7lu0qc5kqth
   # Machine keys (generated from the ssh public key, which is generated on first install) 
-  - &x86-vm age13fgkzjf5d869c6adzrzs4jlewhd0q8c5jqfdkhwfn3tlw6744s5svk4umf
+  - &x86-vm age1ms928nfm6emkm66kc6n453sedaen39sclemj6sxcdcu2us7dspuq3lcrgm
   - &beelink-gk55 age1tuu4d5w4h9ewls78vur6v8kqxccr643wraegrlpquwahch884ywsmwjn6v
-  - &um790 age16t9pm2nq3mxz334wfd9nq3jy4aynqu7ccvd9xj9l6zq3s632kqtq0fz53q
+  - &um790 age1n438j5dvvduk7why6mzh9artkv5auylhkmyg4ghvr79a3l5elygsgxg8h7
 
 creation_rules:
   - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$

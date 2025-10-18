@@ -63,6 +63,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote/v0.4.2";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -91,31 +96,32 @@
         system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
       );
 
-      nixosHosts = {
-        beelink-gk55 = {
-          system = "x86_64-linux";
-          path = ./machines/beelink-gk55/configuration.nix;
-        };
-        um790 = {
-          system = "x86_64-linux";
-          path = ./machines/um790/configuration.nix;
-        };
-        arm-vm = {
-          system = "aarch64-linux";
-          path = ./machines/arm-vm/configuration.nix;
-        };
-        x86-vm = {
-          system = "x86_64-linux";
-          path = ./machines/x86-vm/configuration.nix;
-        };
-      };
+      # Auto-discover machine configurations in the ./machines/ directory
+      discoverHosts =
+        platform:
+        let
+          osType = if platform == "darwin" then "darwin" else "linux";
+          archDirs = builtins.readDir (./machines + "/${platform}");
+          getHostsForArch =
+            arch:
+            let
+              archPath = ./machines + "/${platform}/${arch}";
+              hostDirs = builtins.readDir archPath;
+              toHostConfig =
+                name: _:
+                nixpkgs.lib.nameValuePair name {
+                  system = "${arch}-${osType}";
+                  path = archPath + "/${name}/configuration.nix";
+                };
+            in
+            nixpkgs.lib.mapAttrs' toHostConfig (
+              nixpkgs.lib.filterAttrs (name: type: type == "directory") hostDirs
+            );
+        in
+        nixpkgs.lib.foldl' (acc: arch: acc // (getHostsForArch arch)) { } (builtins.attrNames archDirs);
 
-      darwinHosts = {
-        macbookair-work = {
-          system = "aarch64-darwin";
-          path = ./machines/macbookair-work/configuration.nix;
-        };
-      };
+      nixosHosts = discoverHosts "nixos";
+      darwinHosts = discoverHosts "darwin";
 
       mkNixOSConfig =
         hostName: path:
