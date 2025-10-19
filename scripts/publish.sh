@@ -32,6 +32,14 @@ find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 # Copy everything from current repo except .git
 rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/finalCutPro.swift' --exclude='todo.md' "$source_dir/" .
 
+echo "Removing private blocks from files..."
+find . -type f -not -path "./.git/*" | while read -r file; do
+  if grep -q "PRIVATE-START" "$file" 2>/dev/null; then
+    "$source_dir/scripts/remove-private.sh" "$file" > "$file.tmp"
+    mv "$file.tmp" "$file"
+  fi
+done
+
 git add -A
 
 if git diff --staged --quiet; then
