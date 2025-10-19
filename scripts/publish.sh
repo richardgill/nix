@@ -32,29 +32,5 @@ find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 # Copy everything from current repo except .git
 rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/finalCutPro.swift' --exclude='todo.md' "$source_dir/" .
 
-git add -A
-
-if git diff --staged --quiet; then
-  echo "No changes to commit"
-  exit 0
-fi
-
-echo "=== Changes to be published ==="
-git diff --cached
-
-echo ""
-echo "Repository prepared at: $github_repo_dir"
-echo ""
-read -p "Push these changes to GitHub? (y/n): " -n 1 -r
-echo ""
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  short_sha=$(cd "$source_dir" && git rev-parse --short HEAD)
-  git commit -m "nix-private sha: $short_sha"
-  git push origin "$branch_name"
-  echo ""
-  echo "Changes pushed successfully!"
-  $OPENER "${repo_url%.git}/compare/main...$branch_name"
-else
-  echo "Push cancelled. You can manually inspect the repository at: $github_repo_dir"
-fi
+echo "Removing private blocks from files..."
+find . -type f -not -path "./.git/*" | while read -r file; do

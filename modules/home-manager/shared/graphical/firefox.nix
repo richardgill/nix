@@ -57,6 +57,8 @@ let
 
   policiesJson = ../../dot-files/firefox/policies.json;
 
+  pacFile = ../../dot-files/firefox/proxy.pac;
+
   profilePath = if pkgs.stdenv.isDarwin then "Profiles/default" else "default";
 
   profilesIni = builtins.readFile (
@@ -78,6 +80,8 @@ in
       echo '${profilesIni}' > "${config.home.homeDirectory}/.mozilla/firefox/profiles.ini"
       mkdir -p "${firefoxProfilePath}"
       echo '${userJs}' > "${firefoxProfilePath}/user.js"
+      rm -f "${firefoxProfilePath}/proxy.pac"
+      cp "${pacFile}" "${firefoxProfilePath}/proxy.pac"
       rm -f "${firefoxProfilePath}/search.json.mozlz4"
 
       # Get Kagi search token from: https://kagi.com/settings/user_details
