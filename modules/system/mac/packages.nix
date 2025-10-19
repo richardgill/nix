@@ -48,6 +48,7 @@ in
       "beeper"
       "cursor"
       "discord"
+      "docker"
       "firefox"
       "flameshot"
       "ghostty"

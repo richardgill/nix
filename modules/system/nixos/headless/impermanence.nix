@@ -106,6 +106,7 @@
           ".local/share/nvim"
           ".local/share/nautilus"
           ".local/share/Steam"
+          ".local/share/Rocket League"
           ".local/share/syncthing"
           ".steam"
           ".cache/cliphist"

@@ -7,11 +7,23 @@
 let
   template = import ../../../../utils/template.nix { inherit pkgs; };
 
+  firefoxConfigDir =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Library/Application Support/Firefox"
+    else
+      "${config.home.homeDirectory}/.mozilla/firefox";
+
   firefoxProfilePath =
     if pkgs.stdenv.isDarwin then
-      "${config.home.homeDirectory}/Library/Application Support/Firefox/Profiles/default"
+      "${firefoxConfigDir}/Profiles/default"
     else
-      "${config.home.homeDirectory}/.mozilla/firefox/default";
+      "${firefoxConfigDir}/default";
+
+  firefoxProfilePathUrlEncoded =
+    if pkgs.stdenv.isDarwin then
+      "${config.home.homeDirectory}/Library/Application%20Support/Firefox/Profiles/default"
+    else
+      "${firefoxConfigDir}/default";
 
   policyFolder =
     if pkgs.stdenv.isDarwin then
@@ -40,6 +52,7 @@ let
   userJs = builtins.readFile (
     template.renderMustache "firefox-user-js" ../../dot-files/firefox/user.js.mustache {
       inherit (config.home) homeDirectory;
+      inherit firefoxProfilePathUrlEncoded;
       isLinux = !pkgs.stdenv.isDarwin;
     }
   );
@@ -76,8 +89,8 @@ in
     after = [ "writeBoundary" ];
     before = [ ];
     data = ''
-      mkdir -p "${config.home.homeDirectory}/.mozilla/firefox"
-      echo '${profilesIni}' > "${config.home.homeDirectory}/.mozilla/firefox/profiles.ini"
+      mkdir -p "${firefoxConfigDir}"
+      echo '${profilesIni}' > "${firefoxConfigDir}/profiles.ini"
       mkdir -p "${firefoxProfilePath}"
       echo '${userJs}' > "${firefoxProfilePath}/user.js"
       rm -f "${firefoxProfilePath}/proxy.pac"

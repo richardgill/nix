@@ -19,6 +19,7 @@ let
     "screenRecord"
     "launchApp"
     "launchTerminalApp"
+    "launchGhostty"
   ];
   scriptsEntries =
     lib.mapAttrs'

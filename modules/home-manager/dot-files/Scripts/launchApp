@@ -7,7 +7,7 @@ hyprctl dispatch workspace "$workspace"
 
 if [[ "$workspace" == "10" ]]; then
   if ! pgrep -f '^[^ ]*ghostty$' > /dev/null; then
-    uwsm app -- "ghostty" &
+    uwsm app -- ~/Scripts/launchGhostty
   fi
 elif [[ "$workspace" == "11" ]]; then
   if ! pgrep nautilus > /dev/null; then

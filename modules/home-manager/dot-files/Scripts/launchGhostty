@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ghostty "$@" &
+PID=$!
+
+sleep 0.15
+
+# Workaround for Ghostty not receiving focus on Hyprland
+# https://github.com/ghostty-org/ghostty/discussions/5812
+# Remove when XDG activation protocol is implemented
+hyprctl dispatch focuswindow pid:$PID
