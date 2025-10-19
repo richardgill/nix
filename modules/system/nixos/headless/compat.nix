@@ -17,10 +17,10 @@
   # Based on https://github.com/linyinfeng/dotfiles/blob/master/nixos/profiles/services/envfs/default.nix
   # systemd requires /usr being properly populated before switching root
   # envfs disables the population of /usr/bin/env, so we pre-create the directory
-  fileSystems."/usr/bin".options = lib.mkIf config.boot.initrd.systemd.enable [
-    "x-systemd.requires=modprobe@fuse.service"
-    "x-systemd.after=modprobe@fuse.service"
-  ];
+  # fileSystems."/usr/bin".options = lib.mkIf config.boot.initrd.systemd.enable [
+  #   "x-systemd.requires=modprobe@fuse.service"
+  #   "x-systemd.after=modprobe@fuse.service"
+  # ];
 
   boot.initrd.systemd.tmpfiles.settings = lib.mkIf config.boot.initrd.systemd.enable {
     "50-usr-bin" = {
@@ -36,5 +36,5 @@
 
   # Disable /bin mount to avoid duplicate mount errors
   # systemd-fstab-generator canonicalizes /bin to /usr/bin
-  fileSystems."/bin".enable = lib.mkIf config.boot.initrd.systemd.enable false;
+  # fileSystems."/bin".enable = lib.mkIf config.boot.initrd.systemd.enable false;
 }

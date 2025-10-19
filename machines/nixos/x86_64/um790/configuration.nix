@@ -17,6 +17,7 @@
     ../../../../modules/system/nixos/graphical
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
+    ../../../../modules/system/nixos/graphical/optional/steam.nix
     ../../../../modules/system/nixos/graphical/optional/virt-manager.nix
     ../../../../modules/system/nixos/graphical/optional/wifi.nix
     ../../../../modules/system/nixos/headless/optional/btrbk.nix
@@ -27,7 +28,7 @@
     ../../../../modules/system/nixos/headless/optional/thunderbolt.nix
   ];
 
-  # To get to secure-boot setup mode in bios: Security -> Custom -> Clear. You need to exit the bios without the machine restarting. Do not 'exit and reset', quit the bios without saving, which contiues boot.
+  # To get to secure-boot setup mode in bios: Security -> Custom -> Clear. You need to exit the bios without the machine restarting. Do not 'exit and reset', quit the bios without saving (back on far right hand side), which contiues boot.
 
   # Faster boot loader
   boot.loader.timeout = lib.mkForce 3;
