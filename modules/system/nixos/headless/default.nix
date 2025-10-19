@@ -6,6 +6,7 @@
     ./1password.nix
     ./avahi.nix
     ./compat.nix
+    ./docker.nix
     ./impermanence.nix
     ./mise.nix
     ./networking.nix

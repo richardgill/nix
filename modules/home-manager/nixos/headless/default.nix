@@ -9,5 +9,6 @@
   imports = [
     ../../shared/headless
     ./home.nix
+    ./aliases.nix
   ];
 }

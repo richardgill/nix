@@ -5,8 +5,7 @@ local hyper = { "cmd", "alt", "ctrl", "shift" }
 
 -- Requires Hammerspoon to have Privacy -> Screen Recording permissions
 hs.hotkey.bind({ "cmd", "shift" }, "4", function()
-	hs.task.new("/Applications/flameshot.app/Contents/MacOS/flameshot", function()
-	end, { "gui" }):start()
+	hs.task.new("/Applications/flameshot.app/Contents/MacOS/flameshot", function() end, { "gui" }):start()
 end)
 
 -- Application bindings
@@ -28,7 +27,18 @@ hs.hotkey.bind(hyper, "d", function()
 end)
 
 hs.hotkey.bind(hyper, "f", function()
-	hs.application.launchOrFocus("Firefox.app")
+	-- Opening firefox whilst holding hyper is holding shift, which launches firefox in safe mode.
+	local app = hs.application.get("org.mozilla.firefox")
+	if app then
+		app:activate()
+	else
+		hs.task
+			.new("/usr/bin/open", nil, function(exitCode, stdOut, stdErr)
+				return true
+			end, { "-a", "Firefox" })
+			:setEnvironment({ MOZ_DISABLE_SAFE_MODE_KEY = "1" })
+			:start()
+	end
 end)
 
 hs.hotkey.bind(hyper, "g", function()
