@@ -13,13 +13,14 @@ This repo contains the Nix configurations for my NixOS machines, Macs and VMs.
 - 🏠 [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
   - Dot files are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
 - 🔑 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
-- 🔐 LUKS disk encryption with [remote unlock via SSH](#remote-luks-unlock)l
-- 🔒 [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
+- 🔐 LUKS disk encryption:
+  - [remote unlock via SSH](#remote-luks-unlock)l
+  - [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
 - 💾 [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
 - 🌬️ [impermanence](https://github.com/nix-community/impermanence) with btrfs
   - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix)
   - Detect files which need persistence with `just find-impermanent`
-- 📸 Btrfs snapshots for backup and recovery
+- 📸 Btrfs snapshots for backup and recovery of user data
 - 💿 Full installation happens entirely inside the NixOS ISO (works on machines with small memory)
 - ⚡️ `.justfile` contains useful aliases for frequent `nix` commands
 
