@@ -11,9 +11,10 @@ This repo contains the Nix configurations for my NixOS machines, Macs and VMs.
 
 - ❄️ Modern Nix flakes setup (currently 25.05)
 - 🏠 [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
-  - Dot files are kept in plain `.conf` or `.json` where possible. [Mustache](https://mustache.github.io) for templating.
+  - Dot files are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
 - 🔑 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
-- 🔐 LUKS disk encryption with [remote unlock via SSH](#remote-luks-unlock)
+- 🔐 LUKS disk encryption with [remote unlock via SSH](#remote-luks-unlock)l
+- 🔒 [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
 - 💾 [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
 - 🌬️ [impermanence](https://github.com/nix-community/impermanence) with btrfs
   - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix)
@@ -202,9 +203,11 @@ Install `just` to access the simple aliases below.
 just switch
 ```
 
-## Remote LUKS unlock
+## Setup LUKS
 
-You can unlock LUKS locally, or via SSH:
+By default you can unlock LUKS locally
+
+### Remote unlock over SSH
 
 ```bash
 ssh root@<machine-ip> -p 2222
@@ -218,6 +221,10 @@ ssh username@<machine-ip>
 
 Configuration: [remote-unlock.nix](modules/system/nixos/headless/remote-unlock.nix)
 
+## LUKS auto unlock with Secure Boot + TPM2
+
+Import [modules/system/nixos/headless/optional/secure-boot.nix](modules/system/nixos/headless/optional/secure-boot.nix) in your machine's `configuration.nix`, then follow the setup instructions in that file.
+
 ## Impermanence
 
 This configuration uses btrfs with impermanence, where the root filesystem is reset on every boot. Only explicitly declared files and directories in `/persistent` survive reboots.
@@ -226,11 +233,12 @@ When adding new persistence directories/files, they need to be added in `modules
 
 ### Find impermanent files
 
-Find files that exist in ephemeral storage but aren't persisted:
+Find files that have been written in ephemeral storage but aren't in your impermanence config:
 
 ```bash
 just find-impermanent
 ```
+
 ### Switching fails
 
 If switching to latest version fails with "Path X already exists", move conflicting files to persistence first:

@@ -16,6 +16,7 @@
     just
     less
     home-manager
+    mise
     nixfmt-rfc-style
     nixd
     sops
