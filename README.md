@@ -14,7 +14,7 @@ This repo contains the Nix configurations for my NixOS machines, Macs and VMs.
   - Dot files are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
 - 🔑 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
 - 🔐 LUKS disk encryption:
-  - [remote unlock via SSH](#remote-luks-unlock)l
+  - [remote unlock via SSH](#remote-luks-unlock)
   - [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
 - 💾 [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
 - 🌬️ [impermanence](https://github.com/nix-community/impermanence) with btrfs
@@ -109,7 +109,7 @@ Each NixOS machine has the following structure:
 
 ```
 machines/<machine-name>/
-├── configuration.nix           # Machine config (imports shared disko module)
+├── configuration.nix           # Machine config
 └── hardware-configuration.nix  # Auto-generated hardware config
 ```
 
