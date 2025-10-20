@@ -98,7 +98,8 @@ in
       ".claude/agents".source = ../../dot-files/claude/agents;
       ".claude/commands".source = ../../dot-files/claude/commands;
       ".codex".source = ../../dot-files/codex;
-      ".gitconfig".source = ../../dot-files/git/gitconfig;
+      ".config/git/config".source = ../../dot-files/git/config;
+      ".config/git/ignore".source = ../../dot-files/git/ignore;
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;

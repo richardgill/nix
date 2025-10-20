@@ -29,6 +29,7 @@ in
   #        Find device: lsblk -f | grep -i luks (usually /dev/nvme0n1p2)
   #        Run: sudo systemd-cryptenroll --tpm2-device=auto --tpm2-pcrs=0+2+7+12+13+14+15:sha256=0000000000000000000000000000000000000000000000000000000000000000 --wipe-slot=tpm2 /dev/<your-device>
   #        After enrollment, reboot - LUKS should unlock automatically via TPM2!
+  #        If you dual boot windows in the future, you may need to rerun this step
 
   imports = [
     inputs.lanzaboote.nixosModules.lanzaboote

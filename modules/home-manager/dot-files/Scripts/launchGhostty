@@ -1,12 +1,37 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ghostty "$@" &
-PID=$!
-
-sleep 0.15
-
-# Workaround for Ghostty not receiving focus on Hyprland
+# Workaround for Ghostty not receiving focus on Hyprland if mouse is not moved
 # https://github.com/ghostty-org/ghostty/discussions/5812
 # Remove when XDG activation protocol is implemented
+
+echo "Launching ghostty with args: $@"
+ghostty "$@" &
+PID=$!
+echo "Ghostty PID: $PID"
+
+MAX_WAIT_TIME_SECS=1
+POLL_INTERVAL_MS=10
+POLL_INTERVAL_SECS=$(awk "BEGIN {print $POLL_INTERVAL_MS/1000}")
+MAX_ATTEMPTS=$((MAX_WAIT_TIME_SECS * 1000 / POLL_INTERVAL_MS))
+ATTEMPT=0
+
+echo "Waiting for window with PID $PID (max ${MAX_WAIT_TIME_SECS} seconds)..."
+
+while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+  if hyprctl clients | grep -q "pid: $PID"; then
+    WAIT_MS=$((ATTEMPT * POLL_INTERVAL_MS))
+    echo "Window found after ${WAIT_MS}ms"
+    hyprctl clients | grep -A 10 "pid: $PID"
+    break
+  fi
+  ATTEMPT=$((ATTEMPT + 1))
+  sleep $POLL_INTERVAL_SECS
+done
+
+if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then
+  echo "Warning: Window not found after ${MAX_WAIT_TIME_SECS} seconds"
+fi
+
+echo "Focusing window with: hyprctl dispatch focuswindow pid:$PID"
 hyprctl dispatch focuswindow pid:$PID

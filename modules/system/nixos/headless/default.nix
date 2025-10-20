@@ -8,7 +8,6 @@
     ./compat.nix
     ./docker.nix
     ./impermanence.nix
-    ./mise.nix
     ./networking.nix
     ./packages.nix
     ./power-management.nix
