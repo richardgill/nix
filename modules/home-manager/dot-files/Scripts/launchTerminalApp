@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-command="$1"
-title="${2:-$command}"
-
-uwsm app -- ~/Scripts/launchGhostty --title="$title" --confirm-close-surface=false -e "$command"

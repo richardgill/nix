@@ -1,7 +1,7 @@
 -- Highlight when yanking (copying) text
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup('highlight-yank', { clear = true }),
   callback = function()
     vim.highlight.on_yank()
   end,
@@ -13,7 +13,7 @@ vim.api.nvim_create_autocmd({ 'FocusGained', 'BufEnter', 'CursorHold', 'CursorHo
   group = vim.api.nvim_create_augroup('auto_checktime', { clear = true }),
   callback = function()
     local mode = vim.api.nvim_get_mode().mode
-    if mode:match '[cR!s]' or vim.fn.getcmdwintype() ~= '' or vim.o.buftype ~= 'nofile' then
+    if mode:match '[cR!s]' or vim.fn.getcmdwintype() ~= '' or vim.o.buftype ~= '' then
       return
     end
     vim.cmd 'checktime'

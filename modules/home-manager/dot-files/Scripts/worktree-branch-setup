@@ -1,19 +1,33 @@
 #!/usr/bin/env bash
 
+START_TIME=$SECONDS
+
 SOURCE="$1"
 TARGET="$2"
 SOCKET_FILE="$3"
+
+# Platform specific copy-on-write flag
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  CP_FLAGS="-c"
+else
+  CP_FLAGS="--reflink=auto"
+fi
 
 echo "copying gitignored files"
 
 (cd "$SOURCE" && git status --ignored -s | grep '^!! ' | awk '{print $2}') | while read filename; do
   if [[ "$filename" != *"node_modules"* ]]; then
     echo "copying: $filename"
-    cp -Rc "$SOURCE/$filename" "$TARGET/$filename"
+    cp -R $CP_FLAGS "$SOURCE/$filename" "$TARGET/$filename"
   else
     echo "skipping: $filename (node_modules)"
   fi
 done
+
+if [ ! -d "$TARGET/scratch" ]; then
+  echo "creating scratch/ folder"
+  mkdir "$TARGET/scratch"
+fi
 
 if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
   echo "running pnpm i"
@@ -26,3 +40,6 @@ if [ -n "$SOCKET_FILE" ]; then
   echo "restarting nvim LSP"
   nvim --server "$SOCKET_FILE" --remote-expr "v:lua.require'utils'.restart_lsp()"
 fi
+
+ELAPSED=$((SECONDS - START_TIME))
+echo "Worktree setup took $ELAPSED seconds"

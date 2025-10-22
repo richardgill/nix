@@ -17,7 +17,14 @@ in
     with pkgs;
     [
       alacritty
-      chromium
+
+      # Fix Chromium crash on Wayland/Hyprland with color management
+      # https://github.com/hyprwm/Hyprland/discussions/11843
+      (chromium.override {
+        commandLineArgs = [
+          "--disable-features=WaylandWpColorManagerV1"
+        ];
+      })
       cliphist
       evince
       glib

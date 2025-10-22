@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ -z "${TMUX:-}" ]]; then
+  echo "Not in a tmux session" >&2
+  exit 1
+fi
+
+tmux display-popup -E -w 98% -h 98% \
+  'tmux capture-pane -pS - | nvim + -c '"'"'set buftype=nofile'"'"' -c '"'"'set statuscolumn=%{line(\"$\")-v:lnum}\ '"'"' -'

@@ -49,7 +49,7 @@ Full diff:
 $(git diff origin/main...HEAD)"
     fi
     
-    PR_CONTENT=$(claude --model claude-3-5-haiku-20241022 -p "$PROMPT")
+    PR_CONTENT=$(claude --model haiku -p "$PROMPT")
     # PR_CONTENT=$(bunx opencode-ai run --model "openrouter/gpt-oss-120b" "$PROMPT")
     
     # Save to temp file and open in editor for manual editing

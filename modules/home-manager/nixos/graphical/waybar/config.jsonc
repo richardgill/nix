@@ -58,7 +58,7 @@
   "custom/screenrecord": {
     "exec": "pgrep -x wl-screenrec >/dev/null && echo '{\"text\":\"󰻂\",\"class\":\"recording\"}' || echo ''",
     "return-type": "json",
-    "on-click": "$HOME/Scripts/screenRecord",
+    "on-click": "$HOME/Scripts/screen-record",
     "interval": 1
   },
   "custom/power": {

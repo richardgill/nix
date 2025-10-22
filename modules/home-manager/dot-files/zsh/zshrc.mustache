@@ -6,11 +6,18 @@ eval "$(mise activate zsh)"
 HISTFILE="$HOME/.zsh_history"
 HISTSIZE=10000000
 SAVEHIST=10000000
-setopt EXTENDED_HISTORY          # Write the history file in the ":start:elapsed;command" format.
-setopt INC_APPEND_HISTORY        # Write to the history file immediately, not when the shell exits.
-setopt SHARE_HISTORY             # Share history between all sessions.
-setopt HIST_IGNORE_ALL_DUPS      # Delete old recorded entry if new entry is a duplicate.
-setopt HIST_VERIFY               # Don't execute immediately upon history expansion.
+
+# Save timestamp (when command started) and duration (how long it took) for each command
+setopt EXTENDED_HISTORY
+
+# Write to history file AFTER command finishes (so duration is accurate, not always 0)
+setopt INC_APPEND_HISTORY_TIME
+
+# When you run a duplicate command, remove the old one and keep only the newest
+setopt HIST_IGNORE_ALL_DUPS
+
+# Remove extra spaces between arguments (e.g., "git  commit" → "git commit", but preserves spaces in quotes)
+setopt HIST_REDUCE_BLANKS
 
 export EDITOR='nvim'
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
@@ -98,32 +105,32 @@ select-word-style bash
 
 # Git aliases
 alias s="git status"
-alias d="gitDiffAll"
+alias d="git-diff-all"
 alias hard="git reset --hard"
 alias soft="git reset --soft HEAD~1"
 alias co="git checkout"
 
 # Sourced because it needs to change directory
-alias wtb="source ~/Scripts/worktreeBranch"
-alias wto="~/Scripts/worktreeOpen"
-alias wtd="~/Scripts/worktreePurge"
-alias wtc="~/Scripts/worktreeClose"
+alias wtb="source ~/Scripts/worktree-branch"
+alias wto="~/Scripts/worktree-open"
+alias wtd="~/Scripts/worktree-purge"
+alias wtc="~/Scripts/worktree-close"
 alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
 alias log="git log --graph --decorate --pretty=format:'%h - %an, %ar : %s'"
-alias ghdiff="~/Scripts/ghDiff"
+alias ghdiff="~/Scripts/gh-diff"
 alias prChecks='gh pr checks --watch'
 alias bbdiff='open "$(git config remote.origin.url)/pull-requests/new#diff"'
-alias autoCommit="~/Scripts/autoCommit"
-alias autoPr="~/Scripts/autoPr"
-alias autoCommitPr="~/Scripts/autoCommitPr"
-alias ci='autoCommit'
-alias pr='autoPr'
-alias prdiff='~/Scripts/gitPrDiff'
-alias cipr='autoCommitPr'
-alias cip='~/Scripts/autoCommitPush'
-alias pull="source ~/Scripts/gitPull"
-alias push="source ~/Scripts/gitPush"
-alias fetch="source ~/Scripts/gitFetch"
+alias auto-commit="~/Scripts/auto-commit"
+alias auto-pr="~/Scripts/auto-pr"
+alias auto-commit-pr="~/Scripts/auto-commit-pr"
+alias ci='auto-commit'
+alias pr='auto-pr'
+alias pr-diff='~/Scripts/git-pr-diff'
+alias cipr='auto-commit-pr'
+alias cip='~/Scripts/auto-commit-push'
+alias pull="source ~/Scripts/git-pull"
+alias push="source ~/Scripts/git-push"
+alias fetch="source ~/Scripts/git-fetch"
 
 add() {
   if [ $# -eq 0 ]; then
@@ -197,8 +204,8 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
   --color=separator:#ff9e64 \
   --color=spinner:#ff007c \
 "
-export FZF_CTRL_T_OPTS="--preview '~/Scripts/fzfPreview {}'"
-export FZF_ALT_C_OPTS="--preview '~/Scripts/fzfPreview {}'"
+export FZF_CTRL_T_OPTS="--preview '~/Scripts/fzf-preview {}'"
+export FZF_ALT_C_OPTS="--preview '~/Scripts/fzf-preview {}'"
 
 
 # Advanced customization of fzf options via _fzf_comprun function
@@ -266,3 +273,5 @@ alias terry="bunx @terragon-labs/cli"
 alias opencode="bunx opencode-ai"
 alias cmus="$HOME/.config/cmus/start"
 alias oc="opencode"
+
+source <(argc --argc-completions zsh git-browse)

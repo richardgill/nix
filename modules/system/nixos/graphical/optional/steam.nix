@@ -6,6 +6,7 @@
 
   programs.steam = {
     enable = true;
+    # You can select "steam" in the gdm login screen to open steam in big picture mode
     gamescopeSession = {
       enable = true;
       args = [
@@ -18,6 +19,9 @@
         "-H"
         "2160"
       ];
+      env = {
+        MANGOHUD = "1";
+      };
     };
     remotePlay.openFirewall = false;
     dedicatedServer.openFirewall = false;

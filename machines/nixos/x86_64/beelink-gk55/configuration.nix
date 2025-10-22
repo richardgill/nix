@@ -24,6 +24,12 @@
     ../../../../modules/system/nixos/headless/optional/btrbk.nix
   ];
 
+  home-manager.users.${vars.userName} = {
+    imports = [
+      ../../../../modules/home-manager/nixos/graphical
+    ];
+  };
+
   # Faster boot for mini PC
   boot.loader.timeout = lib.mkForce 3;
 
@@ -48,12 +54,6 @@
   # Power management for efficient J4125 operation
   # Reference: https://github.com/MatthiasBenaets/nix-config/blob/master/hosts/beelink/hardware-configuration.nix
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
-
-  home-manager.users.${vars.userName} = {
-    imports = [
-      ../../../../modules/home-manager/nixos/graphical
-    ];
-  };
 
   # networking.firewall.allowedUDPPorts = [ ... ];
 

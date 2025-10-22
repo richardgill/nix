@@ -30,7 +30,7 @@ git checkout -b "$branch_name"
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git
-rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/finalCutPro.swift' --exclude='todo.md' "$source_dir/" .
+rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
 
 echo "Removing private blocks from files..."
 find . -type f -not -path "./.git/*" | while read -r file; do

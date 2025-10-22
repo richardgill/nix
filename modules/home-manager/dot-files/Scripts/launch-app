@@ -7,7 +7,7 @@ hyprctl dispatch workspace "$workspace"
 
 if [[ "$workspace" == "10" ]]; then
   if ! pgrep -f '^[^ ]*ghostty$' > /dev/null; then
-    uwsm app -- ~/Scripts/launchGhostty
+    uwsm app -- ~/Scripts/launch-ghostty
   fi
 elif [[ "$workspace" == "11" ]]; then
   if ! pgrep nautilus > /dev/null; then
@@ -19,7 +19,7 @@ elif [[ "$workspace" == "12" ]]; then
   fi
 elif [[ "$workspace" == "13" ]]; then
   if ! pgrep -f 'ghostty.*btop' > /dev/null; then
-    ~/Scripts/launchTerminalApp btop &
+    ~/Scripts/launch-terminal-app btop &
   fi
 elif [[ "$workspace" == "14" ]]; then
   if ! pgrep -x discord > /dev/null; then
@@ -39,10 +39,10 @@ elif [[ "$workspace" == "17" ]]; then
   fi
 elif [[ "$workspace" == "18" ]]; then
   if ! hyprctl clients -j | jq -e '.[] | select(.class == "spotify" or .title == "cmus")' > /dev/null; then
-    ~/Scripts/launchTerminalApp cmus &
+    ~/Scripts/launch-terminal-app cmus &
   fi
 elif [[ "$workspace" == "19" ]]; then
-  if ! ~/Scripts/checkWebappOpen zoom; then
+  if ! ~/Scripts/check-webapp-open zoom; then
     omarchy-launch-webapp "https://app.zoom.us/wc/home" &
   fi
 elif [[ "$workspace" == "20" ]]; then

@@ -1,14 +1,14 @@
 -- This requires that vtsls is installed globally on your system. You can install it with npm.
 return {
   'yioneko/nvim-vtsls',
-  dependencies = { 'neovim/nvim-lspconfig' },
   opts = {},
   ft = { 'js', 'ts', 'jsx', 'tsx', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact' },
   config = function()
-    require('lspconfig.configs').vtsls = require('vtsls').lspconfig
-    require('lspconfig').vtsls.setup {
-      cmd = { 'bunx', '@vtsls/language-server@0.2.8', '--stdio' },
-    }
+    vim.lsp.config('vtsls', {
+      cmd = { 'bunx', '@vtsls/language-server@0.2.9', '--stdio' },
+    })
+
+    vim.lsp.enable('vtsls')
 
     require('vtsls').config {
       -- customize handlers for commands

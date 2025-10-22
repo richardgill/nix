@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-# Usage: gitCheckoutTo [remote/branch] -- file1 file2 ...
+# Usage: git-checkout-to [remote/branch] -- file1 file2 ...
 # Examples:
-#   gitCheckoutTo upstream/main -- Tiltfile kustomize/Makefile
-#   gitCheckoutTo -- Tiltfile kustomize/Makefile  (uses default {origin,upstream}/main)
+#   git-checkout-to upstream/main -- Tiltfile kustomize/Makefile
+#   git-checkout-to -- Tiltfile kustomize/Makefile  (uses default {origin,upstream}/main)
 
 current_branch=$(git symbolic-ref --short HEAD)
 
@@ -18,10 +18,10 @@ get_default_remote() {
 
 # no arguments → show help
 if [[ $# -eq 0 ]]; then
-  echo "Usage: gitCheckoutTo [remote/branch] -- file1 file2 ..."
+  echo "Usage: git-checkout-to [remote/branch] -- file1 file2 ..."
   echo "Examples:"
-  echo "  gitCheckoutTo upstream/main -- Tiltfile kustomize/Makefile"
-  echo "  gitCheckoutTo -- Tiltfile kustomize/Makefile" # uses upstream (forks) or origin
+  echo "  git-checkout-to upstream/main -- Tiltfile kustomize/Makefile"
+  echo "  git-checkout-to -- Tiltfile kustomize/Makefile" # uses upstream (forks) or origin
   exit 0
 fi
 
@@ -36,18 +36,18 @@ done
 
 if [[ $separator_index -eq -1 ]]; then
   echo "Error: Missing '--' separator"
-  echo "Usage: gitCheckoutTo [remote/branch] -- file1 file2 ..."
+  echo "Usage: git-checkout-to [remote/branch] -- file1 file2 ..."
   exit 1
 fi
 
 # parse arguments before --
 if [[ $separator_index -eq 1 ]]; then
-  # format: gitCheckoutTo -- files...
+  # format: git-checkout-to -- files...
   remote=$(get_default_remote "main")
   branch="main"
   ref="$remote/$branch"
 else
-  # format: gitCheckoutTo remote/branch -- files...
+  # format: git-checkout-to remote/branch -- files...
   ref="$1"
 fi
 

@@ -28,6 +28,12 @@
     ../../../../modules/system/nixos/headless/optional/thunderbolt.nix
   ];
 
+  home-manager.users.${vars.userName} = {
+    imports = [
+      ../../../../modules/home-manager/nixos/graphical
+    ];
+  };
+
   # To get to secure-boot setup mode in bios: Security -> Custom -> Clear. You need to exit the bios without the machine restarting. Do not 'exit and reset', quit the bios without saving (back on far right hand side), which contiues boot.
 
   # Faster boot loader
@@ -46,12 +52,6 @@
   hardware.firmware = with pkgs; [
     linux-firmware
   ];
-
-  home-manager.users.${vars.userName} = {
-    imports = [
-      ../../../../modules/home-manager/nixos/graphical
-    ];
-  };
 
   # Don't use thunderbolt ethernet
   networking.networkmanager.unmanaged = [ "enp195s0" ];

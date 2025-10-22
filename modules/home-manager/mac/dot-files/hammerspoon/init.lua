@@ -68,17 +68,17 @@ end)
 local menu = hs.menubar.new()
 
 function startFocus()
-	hs.task.new("/Users/rich/Scripts/coldTurkeyFocusStart", nil):start()
+	hs.task.new("/Users/rich/Scripts/cold-turkey-focus-start", nil):start()
 	menu:setTitle("🔒")
 end
 
 function stopFocus()
-	hs.task.new("/Users/rich/Scripts/coldTurkeyFocusStop", nil):start()
+	hs.task.new("/Users/rich/Scripts/cold-turkey-focus-stop", nil):start()
 	menu:setTitle("🔓")
 end
 
 function stopLinkedIn()
-	hs.task.new("/Users/rich/Scripts/coldTurkeyLinkedInStop", nil):start()
+	hs.task.new("/Users/rich/Scripts/cold-turkey-linked-in-stop", nil):start()
 end
 
 menu:setMenu({
@@ -136,7 +136,7 @@ watcher = hs.caffeinate.watcher.new(function(event)
 		or event == hs.caffeinate.watcher.systemDidWake
 		or event == hs.caffeinate.watcher.screensDidUnlock
 	then
-		hs.execute("/Users/rich/Scripts/coldTurkeyOn", true)
+		hs.execute("/Users/rich/Scripts/cold-turkey-on", true)
 	end
 end)
 
