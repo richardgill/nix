@@ -12,6 +12,7 @@
     git-lfs
     gnugrep
     gnused
+    gnumake
     jq
     just
     less
@@ -19,6 +20,7 @@
     mise
     nixfmt-rfc-style
     nixd
+    openssl
     sops
     tmux
     unzip

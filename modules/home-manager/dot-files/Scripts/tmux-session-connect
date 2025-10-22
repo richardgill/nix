@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$0")/tmuxSetupWindows"
+source "$(dirname "$0")/tmux-setup-windows"
 # Strip the first two chars which are icons, but only if arg doesn't contain a space
 if [[ "$1" == *" "* ]]; then
   arg="${1:2}"

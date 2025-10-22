@@ -1,12 +1,11 @@
 return {
   'luckasRanarison/tailwind-tools.nvim',
-  commit = '999d314444073095494f5a36b90fdba3c432a457',
+  commit = 'abe7368392345c53174979c2cf033e832de80ef8',
   name = 'tailwind-tools',
   build = ':UpdateRemotePlugins',
   dependencies = {
     'nvim-treesitter/nvim-treesitter',
     'nvim-telescope/telescope.nvim',
-    'neovim/nvim-lspconfig',
   },
   opts = {
     smart_increment = {

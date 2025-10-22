@@ -6,7 +6,7 @@ set -e
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-"$SCRIPT_DIR/autoCommit"
+"$SCRIPT_DIR/auto-commit"
 git push
-"$SCRIPT_DIR/autoPr"
+"$SCRIPT_DIR/auto-pr"
 

@@ -88,7 +88,7 @@ if [[ -d "../main" ]]; then
   echo "In a worktree, updating main in parent dir..."
   (cd ../main && git pull origin main)
   echo "Killing tmux session..."
-  ~/Scripts/tmuxKillSession --yes
+  ~/Scripts/tmux-kill-session --yes
 else
   echo "Not a worktree, updating main..."
   git checkout main

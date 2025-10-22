@@ -24,7 +24,7 @@ set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PI
 
 # Refresh environment for remaining clients when a client detaches
 # This ensures SSH variables stay current after reconnections (used in status line)
-set-hook -g client-detached 'run-shell "{{homeDir}}/Scripts/tmuxRefresh"'
+set-hook -g client-detached 'run-shell "{{homeDir}}/Scripts/tmux-refresh"'
 
 # https://www.reddit.com/r/neovim/comments/11usepy/comment/jcpp596
 set -g default-terminal 'tmux-256color'
@@ -69,13 +69,16 @@ unbind %
 
 # Kill session
 unbind q
-bind-key q confirm-before -p "Kill session? (y/n)" "run-shell '{{homeDir}}/Scripts/tmuxKillSession --yes'"
+bind-key q confirm-before -p "Kill session? (y/n)" "run-shell '{{homeDir}}/Scripts/tmux-kill-session --yes'"
 
 # Rebind x to kill pane without asking for confirmation
 bind-key x kill-pane
 
 unbind-key n
 bind-key n command-prompt "rename-window '%%'"
+
+# Open scrollback in neovim popup with reverse line numbers (prefix + b)
+bind-key b run-shell "{{homeDir}}/Scripts/tmux-view-scrollback"
 
 # Smart pane switching with awareness of Vim splits (and fzf).
 # See: https://github.com/christoomey/vim-tmux-navigator
@@ -120,7 +123,7 @@ set -g status on
 set -g detach-on-destroy off
 
 unbind f
-bind-key f run-shell "{{homeDir}}/Scripts/tmuxSessionConnect \"$(
+bind-key f run-shell "{{homeDir}}/Scripts/tmux-session-connect \"$(
   sesh list --icons | fzf --tmux 95%,95% \
     --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
     --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
@@ -129,8 +132,8 @@ bind-key f run-shell "{{homeDir}}/Scripts/tmuxSessionConnect \"$(
     --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
     --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
     --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
-    --bind 'ctrl-f:change-prompt(🔎  )+reload({{homeDir}}/Scripts/findDirs)' \
-    --bind 'ctrl-d:execute({{homeDir}}/Scripts/tmuxKillSession --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
+    --bind 'ctrl-f:change-prompt(🔎  )+reload({{homeDir}}/Scripts/find-dirs)' \
+    --bind 'ctrl-d:execute({{homeDir}}/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
     --preview-window 'right:55%' \
     --preview 'sesh preview {}'
 )\""

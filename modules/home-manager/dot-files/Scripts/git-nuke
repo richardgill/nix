@@ -9,7 +9,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Usage: gitNuke [-f|--force]"
+            echo "Usage: git-nuke [-f|--force]"
             echo "  -f, --force    Skip confirmation prompt"
             exit 1
             ;;

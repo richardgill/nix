@@ -7,11 +7,11 @@
   "permissions": {
     "allow": [
       "Task",
-      "Bash(~/Scripts/mergePr:*)",
-      "Bash(~/Scripts/autoCommit)",
-      "Bash(~/Scripts/autoCommitPr)",
-      "Bash(~/Scripts/autoPr)",
-      "Bash(~/Scripts/gitPrDiff)",
+      "Bash(~/Scripts/merge-pr:*)",
+      "Bash(~/Scripts/auto-commit)",
+      "Bash(~/Scripts/auto-commit-pr)",
+      "Bash(~/Scripts/auto-pr)",
+      "Bash(~/Scripts/git-pr-diff)",
       "Bash(git:*)",
       "Bash(gh:*)",
       "Bash(pnpm:*)",

@@ -37,13 +37,16 @@
     xdgOpenUsePortal = true;
     config = {
       common.default = [ "gtk" ];
-      hyprland.default = [
-        "gtk"
-        "hyprland"
-      ];
+      hyprland = {
+        default = [ "hyprland" "gtk" ];
+        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
+      };
     };
 
-    # For issues with screen sharing dialogs on chromium: https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/11
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    # note: screen sharing dialogs on chromium: https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/11
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-hyprland
+      xdg-desktop-portal-gtk
+    ];
   };
 }

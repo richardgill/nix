@@ -5,6 +5,8 @@ Nix config inspired by [Omarchy](https://omarchy.org/)'s system choices and [che
 
 **Uses Pragmatic Nix**: Simple config with plain `.conf` and `.json` files. Uses `.nix` features when they provide clear benefits.
 
+You can find my dot files here: [modules/home-manager/dot-files](modules/home-manager/dot-files)
+
 ## Features
 
 This repo contains the Nix configurations for my NixOS machines, Macs and VMs.

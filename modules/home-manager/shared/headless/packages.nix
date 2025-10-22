@@ -6,6 +6,7 @@
 }:
 {
   home.packages = with pkgs; [
+    argc
     bat
     btop
     delta

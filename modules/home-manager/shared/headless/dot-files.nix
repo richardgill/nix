@@ -16,10 +16,10 @@ let
   scriptFiles = builtins.readDir ../../dot-files/Scripts;
   linuxOnlyScripts = [
     "paste"
-    "screenRecord"
-    "launchApp"
-    "launchTerminalApp"
-    "launchGhostty"
+    "screen-record"
+    "launch-app"
+    "launch-terminal-app"
+    "launch-ghostty"
   ];
   scriptsEntries =
     lib.mapAttrs'
@@ -101,6 +101,7 @@ in
       ".config/git/config".source = ../../dot-files/git/config;
       ".config/git/ignore".source = ../../dot-files/git/ignore;
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
+      ".config/git/templates/hooks/post-checkout".source = ../../dot-files/git/hooks/post-checkout;
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;
       "code/.rgignore".source = ../../dot-files/code/rgignore;
@@ -128,7 +129,7 @@ in
         }
       );
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
-      ".config/ripgrep/config".text = builtins.readFile (
+      ".config/ripgrep/.ripgreprc".text = builtins.readFile (
         renderMustache "ripgreprc" ../../dot-files/ripgrep/ripgreprc.mustache {
           inherit homeDir;
         }

@@ -105,6 +105,7 @@
           ".local/share/mise"
           ".local/share/nvim"
           ".local/share/nautilus"
+          ".local/share/opencode"
           ".local/share/Steam"
           ".local/share/Rocket League"
           ".local/share/syncthing"

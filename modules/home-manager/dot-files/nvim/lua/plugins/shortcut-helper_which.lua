@@ -14,11 +14,13 @@ return {
       { '<leader>r', group = '[R]eplace' },
       { '<leader>t', group = '[T]oggle' },
       { '<leader>w', group = '[W]indows' },
+      { '<leader>y', group = '[Y]ank' },
       {
         -- visual mode
         mode = { 'v' },
         { '<leader>h', desc = 'Git [H]unk' },
         { '<leader>r', group = '[R]eplace' },
+        { '<leader>y', group = '[Y]ank' },
       },
     }
   end,

@@ -3,5 +3,5 @@
 # Exit on any error
 set -e
 
-~/Scripts/autoCommit
+~/Scripts/auto-commit
 git push

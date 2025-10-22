@@ -1,3 +1,5 @@
+local utils = require 'utils'
+
 vim.api.nvim_create_autocmd('User', {
   pattern = 'DiffviewViewLeave',
   callback = function()
@@ -10,40 +12,59 @@ local watcher
 local debounce_timer
 local debounce_delay = 100 -- milliseconds
 
-local function get_git_root()
-  local handle = io.popen 'git rev-parse --show-toplevel 2>/dev/null'
-  if handle then
-    local result = handle:read '*l'
-    handle:close()
-    return result
-  end
-  return vim.fn.getcwd()
-end
-
 local function is_diffview_open()
   local ok, lib = pcall(require, 'diffview.lib')
-  if ok and lib and lib.views then
-    return next(lib.views) ~= nil
+  return ok and lib and lib.views and next(lib.views) ~= nil
+end
+
+local function get_diffview_buffers_to_reload()
+  local focused_bufnr = vim.api.nvim_get_current_buf()
+  local buffers_to_reload = {}
+
+  for _, winid in ipairs(vim.api.nvim_list_wins()) do
+    local bufnr = vim.api.nvim_win_get_buf(winid)
+    local buftype = vim.bo[bufnr].buftype
+    local bufname = vim.api.nvim_buf_get_name(bufnr)
+
+    local is_real_file = buftype == '' and bufname ~= '' and not bufname:match '^diffview://'
+    local is_focused = bufnr == focused_bufnr
+
+    if is_real_file and not is_focused then
+      buffers_to_reload[bufnr] = true
+    end
   end
-  return false
+
+  return buffers_to_reload
 end
 
 local function refresh_diffview()
-  if is_diffview_open() then
-    vim.schedule(function()
+  if not is_diffview_open() then
+    return
+  end
+
+  vim.schedule(function()
+    pcall(function()
+      local buffers = get_diffview_buffers_to_reload()
+
+      for bufnr, _ in pairs(buffers) do
+        vim.cmd('checktime ' .. bufnr)
+      end
+
       vim.cmd 'DiffviewRefresh'
     end)
-  end
+  end)
 end
 
-local function on_fs_event()
-  -- Cancel existing timer if any
+local function on_fs_event(err, filename, events)
+  if err then
+    return
+  end
+
   if debounce_timer then
     debounce_timer:stop()
     debounce_timer:close()
   end
 
-  -- Create new timer for debouncing
   debounce_timer = vim.loop.new_timer()
   debounce_timer:start(debounce_delay, 0, vim.schedule_wrap(refresh_diffview))
 end
@@ -60,7 +81,7 @@ return {
 
     -- Set up file watcher
     vim.schedule(function()
-      local git_root = get_git_root()
+      local git_root = utils.get_git_root()
       if git_root then
         watcher = vim.loop.new_fs_event()
         watcher:start(git_root, { recursive = true }, on_fs_event)

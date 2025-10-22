@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# @describe Open repo or file in GitHub web UI
+# @option --branch=main Branch to open (use 'current' for current branch)
+# @flag --no-browser Print URL instead of opening
+# @arg file Path to file with optional :line or :line1-line2
+
+eval "$(argc --argc-eval "$0" "$@")"
+
+if [[ "$argc_branch" == "current" ]]; then
+  argc_branch=$(git symbolic-ref --short HEAD)
+fi
+
+gh browse ${argc_file:+"$argc_file"} --branch="$argc_branch" ${argc_no_browser:+--no-browser}

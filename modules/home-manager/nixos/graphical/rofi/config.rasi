@@ -15,7 +15,7 @@ configuration{
     display-window: " Window ";
     sidebar-mode: true;
     sorting-method: "fzf";
-    run-command: "sh -c '$HOME/Scripts/rofiLaunch \"{cmd}\"'";
+    run-command: "sh -c '$HOME/Scripts/rofi-launch \"{cmd}\"'";
 }
 
 @theme "custom"
