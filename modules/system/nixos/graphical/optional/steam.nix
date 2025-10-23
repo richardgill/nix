@@ -6,7 +6,12 @@
 
   programs.steam = {
     enable = true;
-    # You can select "steam" in the gdm login screen to open steam in big picture mode
+    # Steam needs linux file system to look like normal linux, so nix runs it in a 'container', and only packages which are listed here are available in the container
+    extraPackages = with pkgs; [
+      gamemode
+      mangohud
+    ];
+    # login to steam from gdm (cog in bottow right)
     gamescopeSession = {
       enable = true;
       args = [
@@ -30,7 +35,10 @@
     ];
   };
 
-  programs.gamescope.enable = true;
+  programs.gamescope = {
+    enable = true;
+    capSysNice = true;
+  };
 
   programs.gamemode.enable = true;
 
