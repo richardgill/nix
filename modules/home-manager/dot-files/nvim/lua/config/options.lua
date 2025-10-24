@@ -130,7 +130,6 @@ vim.diagnostic.config {
   severity_sort = false,
 }
 
--- from kickstart
 vim.diagnostic.config {
   severity_sort = true,
   float = { border = 'rounded', source = 'if_many' },

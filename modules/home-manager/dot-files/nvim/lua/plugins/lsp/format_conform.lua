@@ -13,6 +13,7 @@ return {
           stop_after_first = true,
         }
       end,
+      -- LSP and Formatters installed in lsp-formatters.nix
       formatters_by_ft = {
         lua = { 'stylua' },
         go = { lsp_format = 'prefer' },

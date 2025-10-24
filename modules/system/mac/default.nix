@@ -11,6 +11,7 @@
     ./packages.nix
     ./secrets.nix
     ./security.nix
+    ./ssh.nix
     ./stylix.nix
     ./system-defaults.nix
     ./users.nix

@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Helper script for reverse SSH tunnel with local-open script (https://github.com/suan/local-open)
+
+REMOTE_HOST="${1:-}"
+REMOTE_USER="${2:-$USER}"
+LOCAL_SSH_PORT="${3:-22}"
+TUNNEL_PORT="${4:-1999}"
+
+if [ -z "$REMOTE_HOST" ]; then
+  echo "Usage: local-open-tunnel <remote-host> [remote-user] [local-ssh-port] [tunnel-port]"
+  echo ""
+  echo "Creates a reverse SSH tunnel for local-open to work from a remote host."
+  echo ""
+  echo "Arguments:"
+  echo "  remote-host      Remote hostname or IP (required)"
+  echo "  remote-user      SSH username on remote (default: $USER)"
+  echo "  local-ssh-port   Local SSH port (default: 22)"
+  echo "  tunnel-port      Tunnel port on remote (default: 1999)"
+  echo ""
+  echo "Examples:"
+  echo "  local-open-tunnel myserver.com"
+  echo "  local-open-tunnel 192.168.1.100 myuser 22 1999"
+  echo ""
+  echo "On the remote host, set: export LOCAL_OPEN_PORT=$TUNNEL_PORT"
+  exit 1
+fi
+
+# autossh is more robust at keeping the session open
+# -f fork into background
+# -N tunneling
+# -R reverse tunnel
+if command -v autossh &> /dev/null; then
+  echo "Starting reverse SSH tunnel with autossh..."
+  echo "Remote: $REMOTE_USER@$REMOTE_HOST"
+  echo "Tunnel: $TUNNEL_PORT:localhost:$LOCAL_SSH_PORT"
+  autossh -M $((TUNNEL_PORT - 1)) -f -N -R "$TUNNEL_PORT:localhost:$LOCAL_SSH_PORT" "$REMOTE_USER@$REMOTE_HOST"
+else
+  echo "autossh not found, using plain ssh..."
+  echo "Remote: $REMOTE_USER@$REMOTE_HOST"
+  echo "Tunnel: $TUNNEL_PORT:localhost:$LOCAL_SSH_PORT"
+  ssh -f -N -R "$TUNNEL_PORT:localhost:$LOCAL_SSH_PORT" "$REMOTE_USER@$REMOTE_HOST"
+fi
+
+echo ""
+echo "Tunnel established! On the remote host, add to ~/.localopenrc:"
+echo "export LOCAL_OPEN_PORT=$TUNNEL_PORT"
+

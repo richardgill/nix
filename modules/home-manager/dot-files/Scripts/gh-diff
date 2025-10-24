@@ -10,4 +10,4 @@ else
     branch_ref="$current_branch"
 fi
 
-open "$(gh browse --no-browser)/compare/main...$branch_ref?expand=1"
+${BROWSER:-open} "$(gh browse --no-browser)/compare/main...$branch_ref?expand=1"

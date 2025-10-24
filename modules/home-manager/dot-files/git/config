@@ -45,3 +45,8 @@
 
 [include]
 	path = ~/.config/delta/themes.gitconfig
+
+[web]
+	browser = local-open
+[browser "local-open"]
+	cmd = local-open
