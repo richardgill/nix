@@ -12,6 +12,9 @@
       mangohud
     ];
     # login to steam from gdm (cog in bottow right)
+    # Alternative: If running Steam normally in Hyprland instead of gamescopeSession,
+    # use these per-game launch options in Steam:
+    #   gamescope -w 3840 -h 2160 -W 3840 -H 2160 --mangoapp -f -- %command% -dx11
     gamescopeSession = {
       enable = true;
       args = [
@@ -23,10 +26,8 @@
         "3840"
         "-H"
         "2160"
+        "--mangoapp"
       ];
-      env = {
-        MANGOHUD = "1";
-      };
     };
     remotePlay.openFirewall = false;
     dedicatedServer.openFirewall = false;
@@ -37,7 +38,7 @@
 
   programs.gamescope = {
     enable = true;
-    capSysNice = true;
+    capSysNice = false;
   };
 
   programs.gamemode.enable = true;

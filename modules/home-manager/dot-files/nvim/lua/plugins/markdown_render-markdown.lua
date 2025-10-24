@@ -4,7 +4,7 @@ return {
   config = function()
     require('render-markdown').setup {
       enabled = true,
-      file_types = { 'markdown', 'codecompanion' },
+      file_types = { 'markdown' },
       render_modes = {}, -- Empty list to disable automatic rendering in all modes
       code = {
         inline = false, -- Disable inline code rendering to remove background styling
@@ -22,5 +22,5 @@ return {
       end,
     })
   end,
-  ft = { 'markdown', 'codecompanion' },
+  ft = { 'markdown' },
 }

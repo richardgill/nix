@@ -1,6 +1,5 @@
 return {
   'saghen/blink.cmp',
-
   -- use a release tag to download pre-built binaries
   version = '1.*',
   config = function()
@@ -19,9 +18,13 @@ return {
       snippets = { preset = 'default' },
       -- Remove 'buffer' if you don't want text completions, by default it's only enabled when LSP returns no items
       sources = {
-        default = { 'lsp', 'path', 'snippets', 'buffer' },
-        per_filetype = {
-          codecompanion = { 'codecompanion' },
+        default = { 'lazydev', 'lsp', 'path', 'snippets', 'buffer' },
+        providers = {
+          lazydev = {
+            name = 'LazyDev',
+            module = 'lazydev.integrations.blink',
+            score_offset = 100,
+          },
         },
       },
 

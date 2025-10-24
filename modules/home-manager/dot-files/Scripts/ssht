@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+HOST="${1:?Usage: ssht <remote-host> [remote-user]}"
+USER="${2:-$USER}"
+
+local-open-tunnel "$@"
+ssh "$USER@$HOST"

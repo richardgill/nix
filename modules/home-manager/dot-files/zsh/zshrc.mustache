@@ -21,11 +21,13 @@ setopt HIST_REDUCE_BLANKS
 
 export EDITOR='nvim'
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+export BROWSER='local-open'
 
 # EDITOR=vim sets zsh -o vim implicitly :|
 bindkey -e
 
-if [[ -z "$IS_CLAUDE" ]]; then
+# If interactive shell (needed to claude code)
+if [[ $- == *i* ]]; then
   eval "$(zoxide init zsh --cmd cd)"
   source <(fzf --zsh)
 
@@ -169,6 +171,7 @@ alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
 alias sound="wiremix"
 alias bluetooth="blueberry"
 alias wifi="nmtui"
+alias open='local-open'
 {{/isLinux}}
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then
@@ -258,12 +261,6 @@ export PATH="$HOME/.mozbuild/git-cinnabar:$PATH"
 export PATH="$PATH:$HOME/.local/bin"
 export PATH="$HOME/.config/xata/bin:$PATH"
 
-
-# globally installed npm packages with versions
-alias twls="bunx tailwindcss-language-server@0.14.18"
-alias vtsls="bunx @vtsls/language-server@0.2.8"
-alias prettierd="bunx @fsouza/prettierd@0.26.1"
-alias biome="bunx @biomejs/biome@2.1.3"
 
 alias claudet="npx -y @mariozechner/claude-trace@latest"
 alias cl="bunx @anthropic-ai/claude-code@latest"

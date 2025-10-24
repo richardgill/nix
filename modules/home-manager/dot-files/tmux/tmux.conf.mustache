@@ -8,8 +8,9 @@ setw -g pane-base-index 1
 # https://superuser.com/a/252717
 set -s escape-time 1
 
-# Allow images
+# Allow images and OSC 52 clipboard sequences
 set -gq allow-passthrough on
+set -s set-clipboard on
 set -g visual-activity off
 
 set-option -g history-limit 50000

@@ -2,3 +2,5 @@
 !.env.*
 !.dev.vars
 !plans/
+!scratch/
+!mise.local.toml

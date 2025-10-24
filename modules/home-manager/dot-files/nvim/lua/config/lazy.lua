@@ -8,7 +8,12 @@ vim.opt.rtp:prepend(lazypath)
 
 -- To check the current status of your plugins, run :Lazy
 require('lazy').setup({
-  import = 'plugins',
+  spec = {
+    -- load my config's folders
+    { import = 'plugins' },
+    { import = 'plugins.lsp' },
+    { import = 'plugins.lsp.langs' },
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the

@@ -2,15 +2,34 @@
 bun = "1.2.13"
 deno = "2.3.3"
 go = "latest"
-neovim = ['0.11.1']
+neovim = ['0.11.4']
 node = ['23.11.0']
 pkl = "0.28.2"
+python = "latest"
+pipx = "latest"
+
+# LSP servers (see also: modules/home-manager/shared/headless/lsp-formatters.nix)
+"go:golang.org/x/tools/gopls" = "latest"
+"npm:@astrojs/language-server" = "latest"
+"npm:@vtsls/language-server" = "latest"
+"npm:@biomejs/biome" = "latest"
+"npm:vscode-langservers-extracted" = "latest"
+ruff = "latest"
+"npm:@tailwindcss/language-server" = "latest"
+"pipx:jedi-language-server" = "latest"
+lua-language-server = "latest"
+
+# Formatters
+stylua = "latest"
+gofumpt = "latest"
+"npm:@fsouza/prettierd" = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]
+experimental = true
 
 {{#isLinux}}
-# Mise on NixOS sets this to true by default https://mise.jdx.dev/configuration/settings.html#all_compile 
+# Mise on NixOS sets this to true by default https://mise.jdx.dev/configuration/settings.html#all_compile
 # We have programs.nix-ld.enable = true; so we don't need to compile everything
 all_compile = false
 {{/isLinux}}

@@ -2,12 +2,14 @@
 {
   packages = with pkgs; [
     _1password-cli
+    autossh
     cargo
     coreutils
     claude-code
     curl
     datamash
     docker
+    gcc
     git
     git-lfs
     gnugrep
