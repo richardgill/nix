@@ -97,6 +97,8 @@ in
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/claude/settings.json";
       ".claude/agents".source = ../../dot-files/claude/agents;
       ".claude/commands".source = ../../dot-files/claude/commands;
+      ".config/obs-studio".source =
+        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/obs-studio";
       ".codex".source = ../../dot-files/codex;
       ".config/git/config".source = ../../dot-files/git/config;
       ".config/git/ignore".source = ../../dot-files/git/ignore;
@@ -123,11 +125,10 @@ in
           zshPath = "${pkgs.zsh}/bin/zsh";
         }
       );
-      ".config/opencode/AGENTS.md".text = builtins.readFile (
-        renderMustache "opencode-agents" ../../dot-files/opencode/AGENTS.md.mustache {
-          inherit homeDir;
-        }
-      );
+      ".config/opencode/AGENTS.md".source = ../../dot-files/claude/CLAUDE.md;
+      ".config/opencode/opencode.json".source = ../../dot-files/opencode/opencode.json;
+      ".config/opencode/agent".source = ../../dot-files/opencode/agent;
+      ".config/opencode/prompts".source = ../../dot-files/opencode/prompts;
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
       ".config/ripgrep/.ripgreprc".text = builtins.readFile (
         renderMustache "ripgreprc" ../../dot-files/ripgrep/ripgreprc.mustache {

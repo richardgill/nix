@@ -4,8 +4,12 @@ theme = tokyonight
 shell-integration-features = no-cursor
 cursor-style = block
 title = ""
-window-padding-y = 10,0 
+window-padding-y = 10,0
 resize-overlay = never
+
+# Allow OSC52 clipboard operations without prompts for seamless copy/paste over SSH with tmux
+clipboard-read = allow
+clipboard-write = allow
 
 {{#isDarwin}}
 font-size = 18
