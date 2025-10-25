@@ -18,6 +18,22 @@ Prefer not to use npx or bunx for anything where package.json has it. Rely on pn
 
 Never use: `while`, `switch`, `continue`, `break` keywords except if there is good reason to do so
 
-If your solution came from a url online, please include cite your sources and include links.
+If your solution or decisions came from a url online, please cite your sources and include links.
+
+<example>
+user: How do I send JSON data with curl?
+assistant: According to the [curl documentation](https://curl.se/docs/manual.html), you can send JSON data using the `-d` flag with a Content-Type header.
+
+[curl documentation](https://curl.se/docs/manual.html) states: 
+````
+With -d, @file, curl will send the data using the content-type application/x-www-form-urlencoded... If you start the data with the letter @, the rest should be a file name to read the data from, or - if you want curl to read the data from stdin.
+
+```bash
+curl -X POST https://api.example.com/data \
+  -H "Content-Type: application/json" \
+  -d '{"name": "example", "value": 123}'
+```
+````
+</example>
 
 There is a gitignored `scratch/` folder in all repos - you can use it for temporary work and experimentation.

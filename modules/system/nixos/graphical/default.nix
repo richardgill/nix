@@ -9,6 +9,7 @@
     ./gnome-desktop-manager.nix
     ./hyprland.nix
     ./keyboard.nix
+    ./obs.nix
     ./packages.nix
     ./stylix.nix
     ./swayosd.nix

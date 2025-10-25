@@ -2,9 +2,11 @@
 	"$schema": "https://opencode.ai/config.json",
 	"theme": "tokyonight",
 	"instructions": ["AGENTS.md", "**/CLAUDE.md"],
-	"mode": {
+	"model": "anthropic/claude-sonnet-4-5",
+	"small_model": "anthropic/claude-haiku-4-5",
+	"agent": {
 		"build": {
-			"model": "anthropic/claude-sonnet-4-20250514",
+			"model": "claude-sonnet-4-5",
 			"tools": {
 				"write": true,
 				"edit": true,
@@ -12,23 +14,11 @@
 			}
 		},
 		"plan": {
-			"model": "anthropic/claude-opus-4-20250514",
+			"model": "anthropic/claude-opus-4-1",
 			"tools": {
 				"write": false,
 				"edit": false,
-				"bash": false
-			}
-		},
-		"readonly": {
-			"model": "anthropic/claude-opus-4-20250514",
-			"prompt": "{file:./prompts/readonly.md}",
-			"tools": {
-				"write": false,
-				"edit": false,
-				"bash": true,
-				"read": true,
-				"grep": true,
-				"glob": true
+				"bash": true
 			}
 		}
 	},
@@ -36,6 +26,14 @@
 		"tavily": {
 			"type": "remote",
 			"url": "https://mcp.tavily.com/mcp/?tavilyApiKey={env:TAVILY_API_KEY}",
+			"enabled": false
+		},
+		"kagi": {
+			"type": "local",
+			"command": ["uvx", "kagimcp"],
+			"environment": {
+				"KAGI_API_KEY": "{env:KAGI_API_KEY}"
+			},
 			"enabled": true
 		}
 	},

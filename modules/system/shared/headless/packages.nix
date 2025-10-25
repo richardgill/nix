@@ -10,6 +10,7 @@
     datamash
     docker
     gcc
+    gawk
     git
     git-lfs
     gnugrep
