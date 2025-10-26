@@ -1,40 +1,36 @@
+My opinionated Nix config inspired by [Omarchy](https://omarchy.org/)'s system choices and [chenglab](https://github.com/eh8/chenglab)'s configuration structure.
 
-[![NixOS 25.05](https://img.shields.io/badge/NixOS-25.05-blue.svg?&logo=NixOS&logoColor=white)](https://nixos.org)
+Pragmatic Nix: Simple config with plain `.conf` and `.json` files. Uses `.nix` features when they provide clear benefits.
 
-Nix config inspired by [Omarchy](https://omarchy.org/)'s system choices and [chenglab](https://github.com/eh8/chenglab)'s configuration structure.
-
-**Uses Pragmatic Nix**: Simple config with plain `.conf` and `.json` files. Uses `.nix` features when they provide clear benefits.
-
-You can find my dot files here: [modules/home-manager/dot-files](modules/home-manager/dot-files)
+Dotfiles: [modules/home-manager/dot-files](modules/home-manager/dot-files)
 
 ## Features
 
-This repo contains the Nix configurations for my NixOS machines, Macs and VMs.
-
-- ❄️ Modern Nix flakes setup (currently 25.05)
-- 🏠 [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
-  - Dot files are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
-- 🔑 [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
-- 🔐 LUKS disk encryption:
+- Modern Nix flakes
+- [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
+  - Dotfiles are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
+- LUKS disk encryption:
   - [remote unlock via SSH](#remote-luks-unlock)
   - [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
-- 💾 [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
-- 🌬️ [impermanence](https://github.com/nix-community/impermanence) with btrfs
-  - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix)
+- [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
+- [impermanence](https://github.com/nix-community/impermanence) with btrfs
+  - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix#L84)
   - Detect files which need persistence with `just find-impermanent`
-- 📸 Btrfs snapshots for backup and recovery of user data
-- 💿 Full installation happens entirely inside the NixOS ISO (works on machines with small memory)
-- ⚡️ `.justfile` contains useful aliases for frequent `nix` commands
+- Full installation happens entirely inside the NixOS ISO (works on machines with small memory)
+- [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
+- Btrfs snapshots for backup and recovery of user data
+- `.justfile` contains useful aliases for frequent `nix` commands
 
 ## Folder structure
 
-Configuration works simply by importing `.nix` files. There are no nix conditionals / logic - just import files with features you want on your machine.
+Configuration works simply by importing `.nix` files. There is minimal Nix conditionals / logic - just import files with features you want on your machine.
 
 Configuration is split onto folders:
 
 - `headless/` - CLI-only, server environments
 - `graphical/` - Desktop with GUI
 - `optional/` - Opt-in features requiring explicit import the machine's `configuration.nix`.
+- `shared/` - Cross-platform configs (works on both NixOS and macOS)
 
 ```
 ├── flake.nix                 # Entry point - defines all machines in nixosConfigurations
@@ -82,7 +78,7 @@ Check [vars.nix](./vars.nix) and update your username, public keys etc.
 
 ## Installation - NixOS (Linux)
 
-🎥 **[Video walkthrough of the installation process](https://www.youtube.com/watch?v=Iyz4PolCPPY)**
+▶️ **[Video walkthrough of the installation process](https://www.youtube.com/watch?v=Iyz4PolCPPY)**
 
 ### Boot Nix ISO and enable SSH
 
@@ -160,7 +156,7 @@ Commit and push it to git.
 
 ### Install
 
-The install happens directly from the live ISO. It does not require a large amount of ram to work. 
+The install happens directly from the live ISO. It does not require a large amount of RAM to work. 
 
 During the install you'll be prompted to set a password for your user and for LUKS encryption:
 
@@ -198,7 +194,7 @@ Rebuild with `just switch`.
 - Go to System Settings → Keyboard → Keyboard Shortcuts and disable conflicting shortcuts
 - If Homebrew casks are blocked, go to System Settings → Privacy & Security and click "Open Anyway"
 
-## Useful commands 🛠️
+## Useful commands
 
 Install `just` to access the simple aliases below.
 
@@ -279,5 +275,5 @@ This works for any home-manager managed config file.
 - [Omarchy](https://omarchy.org/) - Opinionated Linux setup inspiration
 - [dbeley/nixos-config](https://github.com/dbeley/nixos-config) - Btrfs impermanence implementation
 - [Misterio77/nix-starter-configs](https://github.com/Misterio77/nix-starter-configs) - Initial starter configuration
-- [An outstanding beginner friendly introduction to NixOS and flakes](https://nixos-and-flakes.thiscute.world/)
+- [Great beginner friendly introduction to NixOS and flakes](https://nixos-and-flakes.thiscute.world/)
 
