@@ -8,10 +8,10 @@ Dotfiles: [modules/home-manager/dot-files](modules/home-manager/dot-files)
 
 - Modern Nix flakes
 - [home-manager](https://github.com/nix-community/home-manager) manages dotfiles
-  - Dotfiles are kept in plain `.conf` or `.json` where possible [Mustache](https://mustache.github.io) for templating.
+  - Dotfiles are kept in plain `.conf` or `.json` where possible. [Mustache](https://mustache.github.io) for templating.
 - LUKS disk encryption:
-  - [remote unlock via SSH](#remote-luks-unlock)
-  - [Lanzaboote](https://github.com/nix-community/lanzaboote) Secure Boot with TPM2 auto-unlock of LUKS
+  - [remote unlock via SSH](#remote-unlock-over-ssh)
+  - [Secure Boot](#luks-auto-unlock-with-secure-boot--tpm2) with TPM2 auto-unlock of LUKS
 - [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
 - [impermanence](https://github.com/nix-community/impermanence) with btrfs
   - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix#L84)
