@@ -55,6 +55,7 @@ in
       "hammerspoon"
       "karabiner-elements"
       "rectangle"
+      "screen-studio"
       "slack"
       "sol"
       "spotify"

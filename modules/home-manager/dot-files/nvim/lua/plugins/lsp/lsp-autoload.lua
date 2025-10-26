@@ -1,7 +1,7 @@
 local lsp_path = vim.fn.stdpath 'config' .. '/after/lsp'
 
 -- Finds all lsps in after/lsp/*.lua and enables the lsp.
--- Grab default configs: https://github.com/neovim/nvim-lspconfig/tree/master/lsp and copy them into nvim/lsp/
+-- Grab default configs: https://github.com/neovim/nvim-lspconfig/tree/master/lsp and copy them into after/lsp/<new-lsp>.lua
 -- LSP and Formatters installed in lsp-formatters.nix
 -- Health check with:  :checkhealth vim.lsp
 -- LSP logs for current buffer:  :lua vim.cmd.edit(vim.lsp.log.get_filename())
