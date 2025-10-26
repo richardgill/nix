@@ -82,6 +82,8 @@ Check [vars.nix](./vars.nix) and update your username, public keys etc.
 
 ## Installation - NixOS (Linux)
 
+🎥 **[Video walkthrough of the installation process](https://www.youtube.com/watch?v=Iyz4PolCPPY)**
+
 ### Boot Nix ISO and enable SSH
 
 Download the minimal (or graphical) ISO for your platform from the official [NixOS website](https://nixos.org/download/#nixos-iso). 

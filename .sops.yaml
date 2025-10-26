@@ -2,7 +2,7 @@ keys:
   # This master public/private key is in 1password
   - &master age1hjyxqwv0nkwf59ascp7qvgvvtck0mdenv9p2f23w44k9fqv7lu0qc5kqth
   # Machine keys (generated from the ssh public key, which is generated on first install) 
-  - &x86-vm age1ms928nfm6emkm66kc6n453sedaen39sclemj6sxcdcu2us7dspuq3lcrgm
+  - &x86-vm age1y9nk69ahn9g3fwe5agtq867ngv30z9a8anum5zjxxlu3eds9cv2q4alwrf
   - &beelink-gk55 age1tuu4d5w4h9ewls78vur6v8kqxccr643wraegrlpquwahch884ywsmwjn6v
   - &um790 age1n438j5dvvduk7why6mzh9artkv5auylhkmyg4ghvr79a3l5elygsgxg8h7
 
