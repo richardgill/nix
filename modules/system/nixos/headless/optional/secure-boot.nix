@@ -14,6 +14,9 @@ in
   # https://github.com/nix-community/lanzaboote/blob/master/docs/QUICK_START.md
   # https://laniakita.com/blog/nixos-fde-tpm-hm-guide#part-25-unlocking-luks-with-tpm2-using-systemd-cryptenroll
   #
+  # ***WARNING***: This setup is not secure if an attacker knows what they're doing.
+  # https://oddlama.org/blog/bypassing-disk-encryption-with-tpm2-unlock/
+  #
   # Setup steps:
   # 1. clone-and-install.sh will run sbctl create-keys for you. So you should already have keys, but if not rerun: sudo sbctl create-keys
   # 2. Import this module in your machine configuration
