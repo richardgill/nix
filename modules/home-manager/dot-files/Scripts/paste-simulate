@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+active_window=$(hyprctl activewindow -j)
+window_class=$(echo "$active_window" | jq -r '.class')
+
+terminal_apps=(
+ "com.mitchellh.ghostty"
+ "ghostty"
+ "alacritty"
+)
+
+if [[ " ${terminal_apps[*]} " =~ " ${window_class} " ]]; then
+  hyprctl dispatch sendshortcut "SHIFT CTRL, V,"
+else
+  hyprctl dispatch sendshortcut "CTRL, V,"
+fi

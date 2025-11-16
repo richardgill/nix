@@ -1,3 +1,3 @@
-Read the files changed in this PR with: !`~/Scripts/git-pr-diff`
+Run ~/Scripts/git-pr-diff to get the files changed in this PR and read them.
 
 $ARGUMENTS

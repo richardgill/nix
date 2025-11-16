@@ -8,5 +8,6 @@ end
 require 'config.keymap'
 require 'config.options'
 require 'config.autocommand'
+require 'config.hotreload'
 require 'config.lazy'
 require 'config.spelling'

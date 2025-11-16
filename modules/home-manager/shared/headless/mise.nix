@@ -11,6 +11,10 @@ in
     mise
   ];
 
+  home.sessionVariables = {
+    MISE_NODE_COREPACK = "true";
+  };
+
   # Mise configuration file
   home.file.".config/mise/config.toml" = {
     text = builtins.readFile (

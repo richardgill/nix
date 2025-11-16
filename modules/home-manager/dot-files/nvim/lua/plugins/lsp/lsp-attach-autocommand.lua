@@ -7,25 +7,37 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
     end
 
-    map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
+    map('gd', function()
+      require('snacks').picker.lsp_definitions()
+    end, '[G]oto [D]efinition')
 
-    map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
+    map('gr', function()
+      require('snacks').picker.lsp_references()
+    end, '[G]oto [R]eferences')
 
     --  Useful when your language has ways of declaring types without an actual implementation.
-    map('gI', require('telescope.builtin').lsp_implementations, '[G]oto [I]mplementation')
+    map('gI', function()
+      require('snacks').picker.lsp_implementations()
+    end, '[G]oto [I]mplementation')
 
     -- Jump to the type of the word under your cursor.
     --  Useful when you're not sure what type a variable is and you want to see
     --  the definition of its *type*, not where it was *defined*.
-    map('<leader>D', require('telescope.builtin').lsp_type_definitions, 'Type [D]efinition')
+    map('<leader>D', function()
+      require('snacks').picker.lsp_type_definitions()
+    end, 'Type [D]efinition')
 
     -- Fuzzy find all the symbols in your current document.
     --  Symbols are things like variables, functions, types, etc.
-    map('<leader>ds', require('telescope.builtin').lsp_document_symbols, '[D]ocument [S]ymbols')
+    map('<leader>ds', function()
+      require('snacks').picker.lsp_symbols()
+    end, '[D]ocument [S]ymbols')
 
     -- Fuzzy find all the symbols in your current workspace.
     --  Similar to document symbols, except searches over your entire project.
-    map('<leader>cw', require('telescope.builtin').lsp_dynamic_workspace_symbols, '[Code] [W]orkspace Symbols')
+    map('<leader>cw', function()
+      require('snacks').picker.lsp_workspace_symbols()
+    end, '[Code] [W]orkspace Symbols')
 
     -- Rename the variable under your cursor.
     --  Most Language Servers support renaming across files, etc.

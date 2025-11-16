@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# SSH with automatic reverse tunnel setup
+# Usage: ssh-with-tunnel <remote-host> [remote-user]
+#        ssht <remote-host> [remote-user]  (alias)
+#
+# Establishes a reverse SSH tunnel, then connects to the remote host.
+# On the remote, you can use 'tunnel-open' and 'beep' to interact with your local machine.
+
+HOST="${1:?Usage: ssh-with-tunnel <remote-host> [remote-user]}"
+USER="${2:-$USER}"
+
+tunnel-setup "$@"
+ssh "$USER@$HOST"

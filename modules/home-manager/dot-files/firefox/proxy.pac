@@ -5,7 +5,7 @@ function FindProxyForURL(url, host) {
   ];
 
   for (var i = 0; i < vpnDomains.length; i++) {
-    if (shExpMatch(host, vpnDomains[i])) {
+    if (dnsDomainIs(host, "." + vpnDomains[i]) || host === vpnDomains[i]) {
       // return "PROXY your-proxy-server:1234";
     }
   }

@@ -1,19 +1,22 @@
 local M = {}
 
 M.restart_lsp = function()
-  vim.cmd 'LspRestart'
+  local client_names = vim.tbl_map(function(client)
+    return client.name
+  end, vim.lsp.get_clients())
+
+  vim.lsp.enable(client_names, false)
+  vim.lsp.enable(client_names, true)
+
   if vim.fn.exists ':VtsExec' == 2 then
     vim.cmd 'VtsExec restart_tsserver'
   end
   vim.diagnostic.reset(nil, 0)
+  vim.notify('LSP servers restarted', vim.log.levels.INFO)
 end
 
 M.get_git_root = function()
-  local git_root = vim.fn.systemlist("git rev-parse --show-toplevel 2>/dev/null")[1]
-  if vim.v.shell_error == 0 and git_root and git_root ~= "" then
-    return git_root
-  end
-  return vim.fn.getcwd()
+  return require('snacks').git.get_root() or vim.fn.getcwd()
 end
 
 M.get_buffer_absolute = function()
@@ -67,6 +70,30 @@ end
 
 M.exit_visual_mode = function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes('<Esc>', true, false, true), 'n', false)
+end
+
+M.yank_path = function(path, label)
+  vim.fn.setreg('+', path) -- Copy to system clipboard
+  print('Yanked ' .. label .. ' path: ' .. path)
+end
+
+M.yank_visual_with_path = function(path, label)
+  local bounds = M.get_visual_bounds()
+
+  local selected_lines = vim.fn.getregion(bounds.start_pos, bounds.end_pos, { type = bounds.mode })
+  local selected_text = table.concat(selected_lines, '\n')
+
+  local line_range = M.format_line_range(bounds.start_line, bounds.end_line)
+  local path_with_lines = path .. ':' .. line_range
+
+  local result = path_with_lines .. '\n\n' .. selected_text
+  vim.fn.setreg('+', result)
+
+  M.simulate_yank_highlight()
+
+  M.exit_visual_mode()
+
+  print('Yanked ' .. label .. ' with lines ' .. line_range)
 end
 
 return M

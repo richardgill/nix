@@ -72,15 +72,7 @@ in
       outOfStoreSymlinks = [ "lazy-lock.json" ];
     })
     // {
-      "Scripts/beep" = {
-        text = builtins.readFile (
-          renderMustache "beep-script" ../../dot-files/Scripts/beep.mustache {
-            inherit (pkgs.stdenv) isDarwin;
-            inherit (pkgs.stdenv) isLinux;
-          }
-        );
-        executable = true;
-      };
+      "Scripts/lib/ssh".source = ../../dot-files/Scripts/lib/ssh;
       ".zshenv" = {
         text = builtins.readFile (
           renderMustache "zshenv" ../../dot-files/zshenv.mustache {

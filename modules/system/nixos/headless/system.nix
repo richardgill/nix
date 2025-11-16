@@ -29,7 +29,6 @@
   };
 
   security.sudo.wheelNeedsPassword = false;
-  zramSwap.enable = true;
 
   # Allow 10 sudo attempts
   security.sudo.extraConfig = ''

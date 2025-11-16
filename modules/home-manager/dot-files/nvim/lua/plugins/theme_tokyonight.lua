@@ -36,6 +36,10 @@ return {
 
         -- Better inline code highlighting
         hl['@markup.raw.markdown_inline'] = { bg = util.darken(colors.bg_highlight, 0.3), fg = colors.blue }
+
+        -- Snacks picker directories - use same color as files
+        hl['SnacksPickerDirectory'] = { fg = colors.fg }
+        hl['SnacksPickerDir'] = { fg = colors.fg }
       end,
       plugins = {
         -- enable all plugins when not using lazy.nvim

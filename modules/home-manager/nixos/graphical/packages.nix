@@ -33,10 +33,8 @@ in
       firefox
       imv
       mpv
-      nautilus
       satty
       slurp
-      sushi
       swayosd
       vscode
       walker
@@ -46,6 +44,7 @@ in
       wl-clipboard
       unstable.wl-screenrec
       unstable.wiremix
+      xournalpp
     ]
     ++ lib.optionals (!isAarch64Linux) [
       ghostty

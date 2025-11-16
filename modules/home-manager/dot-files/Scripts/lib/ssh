@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+
+# Detects if the current shell is running in an SSH session.
+# Uses SSH_CONNECTION environment variable which contains:
+# client_ip client_port server_ip server_port
+#
+# When inside tmux, queries the session environment to get the current
+# SSH_CONNECTION (which updates on reattach), not the stale shell value
+#
+# Excludes tunnel-back connections (where both client and server are localhost)
+is_ssh_session() {
+  if [[ -n "${TMUX:-}" ]]; then
+    # Inside tmux: check tmux's session environment (always up to date)
+    local ssh_env=$(tmux show-environment SSH_CONNECTION 2>/dev/null)
+    # Check if variable exists and is not unset (starts with -)
+    [[ -n "$ssh_env" && "$ssh_env" != -* && "$ssh_env" == *=* ]]
+  else
+    # Not in tmux: check shell environment
+    [[ -z "$SSH_CONNECTION" ]] && return 1
+
+    # Parse SSH_CONNECTION: client_ip client_port server_ip server_port
+    local client_ip=$(echo "$SSH_CONNECTION" | awk '{print $1}')
+    local server_ip=$(echo "$SSH_CONNECTION" | awk '{print $3}')
+
+    # Exclude tunnel-back: both client and server are localhost
+    if [[ "$client_ip" == "127.0.0.1" || "$client_ip" == "::1" ]]; then
+      if [[ "$server_ip" == "127.0.0.1" || "$server_ip" == "::1" ]]; then
+        return 1
+      fi
+    fi
+
+    return 0
+  fi
+}

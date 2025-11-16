@@ -47,6 +47,6 @@
 	path = ~/.config/delta/themes.gitconfig
 
 [web]
-	browser = local-open
-[browser "local-open"]
-	cmd = local-open
+	browser = tunnel-open
+[browser "tunnel-open"]
+	cmd = tunnel-open

@@ -60,7 +60,7 @@ vim.opt.smartcase = true
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
 
--- Decrease update time
+-- Reduce updatetime to 250ms for responsive LSP hover, git gutter, and file change detection
 vim.opt.updatetime = 250
 
 -- Decrease mapped sequence wait time
@@ -122,7 +122,6 @@ vim.opt.foldtext = ''
 -- Max level to allow folds to.
 vim.opt.foldnestmax = 4
 
-vim.o.updatetime = 250
 vim.diagnostic.config {
   virtual_text = false,
   signs = true,
