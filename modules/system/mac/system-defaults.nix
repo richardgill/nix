@@ -78,7 +78,7 @@
         };
         # speed up mouse
         "com.apple.mouse" = {
-          scaling = 2;
+          scaling = 2.4;
         };
         # Remote widgets
         "com.apple.chronod" = {

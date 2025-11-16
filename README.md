@@ -100,7 +100,7 @@ On your local machine where you've checked out this repo, set the ISO IP and con
 
 ```bash
 export ISO_IP="192.168.1.XXX"
-ssh -t nixos@$ISO_IP
+ssh nixos@$ISO_IP
 ```
 
 ### Create a new Machine
@@ -163,13 +163,13 @@ During the install you'll be prompted to set a password for your user and for LU
 ```bash
 # Using public repository without token (if already authenticated)
 scp scripts/clone-and-install.sh nixos@$ISO_IP:/tmp/ && \
-  ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix"
+  ssh nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix"
 ```
 
 ```bash
 # Using private repository with github token
 scp scripts/clone-and-install.sh nixos@$ISO_IP:/tmp/ && \
-  ssh -t nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix-private $(gh auth token)"
+  ssh nixos@$ISO_IP "/tmp/clone-and-install.sh richardgill/nix-private $(gh auth token)"
 ```
 
 ### macOS

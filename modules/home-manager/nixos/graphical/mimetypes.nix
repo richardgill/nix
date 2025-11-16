@@ -1,7 +1,4 @@
 {
-  config,
-  lib,
-  pkgs,
   ...
 }:
 {
@@ -53,6 +50,9 @@
       "x-scheme-handler/http" = "firefox.desktop";
       "x-scheme-handler/https" = "firefox.desktop";
       "text/html" = "firefox.desktop";
+
+      # Directories → nautilus
+      "inode/directory" = "org.gnome.Nautilus.desktop";
     };
   };
 }

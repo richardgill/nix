@@ -34,7 +34,9 @@
 
   xdg.portal = {
     enable = true;
-    xdgOpenUsePortal = true;
+    # Disable portal for xdg-open: the portal's OpenURI implementation ignores mimeapps.list
+    # and tries to launch Chrome with X11 settings instead of respecting Firefox as the default browser
+    xdgOpenUsePortal = false;
     config = {
       common.default = [ "gtk" ];
       hyprland = {

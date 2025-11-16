@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+tmux list-sessions -F '#{session_name}' | while read -r session; do
+  tmux kill-window -a -t "${session}:1" 2>/dev/null
+  tmux kill-pane -a -t "${session}:1.1" 2>/dev/null
+done

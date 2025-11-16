@@ -1,20 +1,8 @@
 local utils = require 'utils'
 
--- This is needed to allow using space as the leader whist in visual mode.
-vim.api.nvim_set_keymap('', '<Space>', '<Nop>', { noremap = true, silent = true })
-
--- Stop replace mode in visual mode. This is a workaround for some visual leader issues.
-vim.api.nvim_set_keymap('v', 'r', '<Nop>', { noremap = true, silent = true })
-
 -- Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
-
--- LEARNING - Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
@@ -79,55 +67,22 @@ vim.keymap.set('n', '<leader>lr', function()
   utils.restart_lsp()
 end, { desc = '[L]SP [R]estart' })
 
-local function yank_path(path, label)
-  vim.fn.setreg('+', path) -- Copy to system clipboard
-  print('Yanked ' .. label .. ' path: ' .. path)
-end
-
-local function yank_visual_with_path(path, label)
-  local bounds = utils.get_visual_bounds()
-
-  local selected_lines = vim.fn.getregion(bounds.start_pos, bounds.end_pos, { type = bounds.mode })
-  local selected_text = table.concat(selected_lines, '\n')
-
-  local line_range = utils.format_line_range(bounds.start_line, bounds.end_line)
-  local path_with_lines = path .. ':' .. line_range
-
-  local result = path_with_lines .. '\n\n' .. selected_text
-  vim.fn.setreg('+', result)
-
-  utils.simulate_yank_highlight()
-
-  utils.exit_visual_mode()
-
-  print('Yanked ' .. label .. ' with lines ' .. line_range)
-end
-
 vim.keymap.set('n', '<leader>ya', function()
-  yank_path(utils.get_buffer_absolute(), 'absolute')
+  utils.yank_path(utils.get_buffer_absolute(), 'absolute')
 end, { desc = '[Y]ank [A]bsolute path to clipboard' })
 
 vim.keymap.set('n', '<leader>yr', function()
-  yank_path(utils.get_buffer_cwd_relative(), 'relative')
+  utils.yank_path(utils.get_buffer_cwd_relative(), 'relative')
 end, { desc = '[Y]ank [R]elative path to clipboard' })
 
 vim.keymap.set('v', '<leader>ya', function()
-  yank_visual_with_path(utils.get_buffer_absolute(), 'absolute')
+  utils.yank_visual_with_path(utils.get_buffer_absolute(), 'absolute')
 end, { desc = '[Y]ank selection with [A]bsolute path' })
 
 vim.keymap.set('v', '<leader>yr', function()
-  yank_visual_with_path(utils.get_buffer_cwd_relative(), 'relative')
+  utils.yank_visual_with_path(utils.get_buffer_cwd_relative(), 'relative')
 end, { desc = '[Y]ank selection with [R]elative path' })
 
-vim.keymap.set('n', '<leader>go', function()
-  local file = utils.get_buffer_git_root_relative()
-  vim.fn.system('git-browse ' .. file)
+vim.keymap.set({ 'n', 'v' }, '<leader>go', function()
+  require('snacks').gitbrowse.open()
 end, { desc = '[G]ithub [O]pen file (main)' })
-
-vim.keymap.set('v', '<leader>go', function()
-  local bounds = utils.get_visual_bounds()
-  local file = utils.get_buffer_git_root_relative()
-  local line_range = utils.format_line_range(bounds.start_line, bounds.end_line)
-  vim.fn.system('git-browse ' .. file .. ':' .. line_range)
-  utils.exit_visual_mode()
-end, { desc = '[G]ithub [O]pen file at selection (main)' })

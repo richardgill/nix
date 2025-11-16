@@ -1,4 +1,4 @@
-When adding / modifying code in my code base do NOT add comments unless it's a truly exceptional case, never remove comments that are already there.
+Do NOT add new comments unless it's a truly exceptional case / noteworthy.
 When writing TypeScript / JavaScript:
   - Always use `const myFunc = () => ...` in typescript.
   - Use `export const` and only use `export default` if it's needed by a library or framework

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Execute a command on the local machine via reverse SSH tunnel
+# Usage: tunnel-exec "command to run"
+#
+# Configuration (environment variables):
+#   TUNNEL_USER - SSH user on local machine (default: $USER)
+#   TUNNEL_HOST - Local hostname (default: localhost)
+#   TUNNEL_PORT - Tunnel port (default: 1999, set by tunnel-setup)
+
+user=${TUNNEL_USER-$USER}
+host=${TUNNEL_HOST-"localhost"}
+port=${TUNNEL_PORT-1999}
+
+ssh -t -o LogLevel=ERROR -l $user -p $port $host "$@"

@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Cross-platform beep script
+# Usage: beep
+#
+# Uses Ping.aiff on macOS, system bell on Linux
+# If an SSH session is active, beeps on the local machine via reverse tunnel
+
+source ~/Scripts/lib/ssh
+
+if ! is_ssh_session; then
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - play the classic Ping.aiff sound
+    afplay /System/Library/Sounds/Ping.aiff
+  else
+    # Linux - use freedesktop sound theme, fallback to terminal bell
+    if ! pw-play /run/current-system/sw/share/sounds/freedesktop/stereo/window-attention.oga 2>/dev/null; then
+      printf '\a'
+    fi
+  fi
+else
+  ~/Scripts/tunnel-exec '$HOME/Scripts/beep'
+fi

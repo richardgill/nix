@@ -1,6 +1,7 @@
 default:
     just --list
 
+# path:. uses the path protocol to include untracked files (git protocol would require files to be staged)
 _rebuild action machine='':
     @if [ "$(uname)" = "Darwin" ]; then \
       command="nix run nix-darwin --"; \
@@ -10,13 +11,13 @@ _rebuild action machine='':
       sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
     fi; \
     if [ -z "{{ machine }}" ]; then \
-      full_command="$sudo_prefix $command {{ action }} --flake ."; \
+      full_command="$sudo_prefix $command {{ action }} --flake path:."; \
       echo "Running: $full_command"; \
-      $sudo_prefix $command {{ action }} --flake .; \
+      $sudo_prefix $command {{ action }} --flake path:.; \
     else \
-      full_command="$sudo_prefix $command {{ action }} --flake \".#{{ machine }}\""; \
+      full_command="$sudo_prefix $command {{ action }} --flake \"path:.#{{ machine }}\""; \
       echo "Running: $full_command"; \
-      $sudo_prefix $command {{ action }} --flake ".#{{ machine }}"; \
+      $sudo_prefix $command {{ action }} --flake "path:.#{{ machine }}"; \
     fi
 
 build machine='':
@@ -45,11 +46,11 @@ check all="false":
       echo "Building configurations for $sys..."
 
       # Build all checks for this system in one go to leverage Nix's deduplication
-      checks=$(nix eval --json .#checks.$sys --apply builtins.attrNames | jq -r '.[]' | grep -v formatting || true)
+      checks=$(nix eval --json path:.#checks.$sys --apply builtins.attrNames | jq -r '.[]' | grep -v formatting || true)
 
       for check in $checks; do
         echo "  Checking: $check"
-        nix build --no-link --print-out-paths .#checks.$sys.$check
+        nix build --no-link --print-out-paths path:.#checks.$sys.$check
       done
 
       echo "  ✓ All checks passed for $sys"
@@ -59,7 +60,7 @@ check all="false":
     echo "✓ All checks completed successfully"
 
 fmt:
-    nix fmt .
+    nix fmt path:.
 
 gc:
     sudo nix-collect-garbage -d && nix-collect-garbage -d

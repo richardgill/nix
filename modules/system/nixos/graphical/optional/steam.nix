@@ -29,11 +29,14 @@
         "--mangoapp"
       ];
     };
-    remotePlay.openFirewall = false;
+    remotePlay.openFirewall = true;
+    localNetworkGameTransfers.openFirewall = true;
     dedicatedServer.openFirewall = false;
     extraCompatPackages = with pkgs; [
       proton-ge-bin
     ];
+    extest.enable = true;
+    protontricks.enable = true;
   };
 
   programs.gamescope = {

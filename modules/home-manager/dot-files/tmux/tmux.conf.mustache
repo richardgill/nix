@@ -140,6 +140,10 @@ bind-key f run-shell "{{homeDir}}/Scripts/tmux-session-connect \"$(
 )\""
 
 set -g @continuum-restore 'on'
+# otherwise nvim and some other processes are resumed
+set -g @resurrect-processes 'false'
+# leave just the first empty window in each session
+set -g @resurrect-hook-pre-restore-pane-processes '{{homeDir}}/Scripts/tmux-kill-windows-and-panes'
 
 set-option -g automatic-rename off
 set-option -g allow-rename off

@@ -21,7 +21,7 @@ setopt HIST_REDUCE_BLANKS
 
 export EDITOR='nvim'
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-export BROWSER='local-open'
+export BROWSER='tunnel-open'
 
 # EDITOR=vim sets zsh -o vim implicitly :|
 bindkey -e
@@ -166,12 +166,13 @@ alias tree="ls --tree"
 alias cato="{{coreUtilsPath}}/bin/cat"
 alias as="open -a \"Android Studio\""
 alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
+alias ssht="ssh-with-tunnel"
 
 {{#isLinux}}
 alias sound="wiremix"
 alias bluetooth="blueberry"
 alias wifi="nmtui"
-alias open='local-open'
+alias open='tunnel-open'
 {{/isLinux}}
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then

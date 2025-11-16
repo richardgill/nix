@@ -4,6 +4,7 @@ local lsp_path = vim.fn.stdpath 'config' .. '/after/lsp'
 -- Installing a new lsp:
 --   Grab a default config https://github.com/neovim/nvim-lspconfig/tree/master/lsp
 --   Copy it into after/lsp/<new-lsp>.lua
+--   The after/ directory loads last in Neovim's runtimepath, allowing our configs to override plugin defaults
 
 -- Finds all lsps in after/lsp/*.lua and enables each lsp.
 for name, type in vim.fs.dir(lsp_path) do
