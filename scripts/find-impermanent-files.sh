@@ -41,6 +41,7 @@ additional_excludes=(
   "/home/$user/.cache"
   "/home/$user/.bun/install/cache"
   "/home/$user/.npm"
+  "/home/$user/.rustup/toolchains"
   "/root/.cache/nix"
 )
 

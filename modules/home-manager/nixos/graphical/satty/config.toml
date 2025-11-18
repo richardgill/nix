@@ -11,3 +11,7 @@ output-filename = "~/Screenshots/screenshot-%Y-%m-%d_%H-%M-%S.png"
 family = "Roboto"
 # Set the style of the font to be used in the text tool
 style = "Bold"
+
+[color-palette]
+# First color in the palette is the default (mauve purple)
+palette = ["#B384C6", "#00ffff", "#a52a2a", "#dc143c", "#ff1493", "#ffd700", "#008000"]

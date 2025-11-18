@@ -53,6 +53,19 @@
 
       # Directories → nautilus
       "inode/directory" = "org.gnome.Nautilus.desktop";
+
+      # Archives → file-roller (extract to folder)
+      "application/zip" = "file-roller-extract-here.desktop";
+      "application/x-tar" = "file-roller-extract-here.desktop";
+      "application/x-compressed-tar" = "file-roller-extract-here.desktop";
+      "application/x-bzip-compressed-tar" = "file-roller-extract-here.desktop";
+      "application/x-xz-compressed-tar" = "file-roller-extract-here.desktop";
+      "application/x-7z-compressed" = "file-roller-extract-here.desktop";
+      "application/x-rar" = "file-roller-extract-here.desktop";
+      "application/gzip" = "file-roller-extract-here.desktop";
+      "application/x-gzip" = "file-roller-extract-here.desktop";
+      "application/bzip2" = "file-roller-extract-here.desktop";
+      "application/x-bzip" = "file-roller-extract-here.desktop";
     };
   };
 }

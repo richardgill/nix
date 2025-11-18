@@ -12,6 +12,7 @@
     ./hardware-configuration.nix
 
     ../../../../modules/system/mac/default.nix
+    ../../../../modules/system/mac/optional/bambu-studio.nix
   ];
   # needed with nix determinate package
   nix.enable = false;

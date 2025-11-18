@@ -97,6 +97,7 @@
           ".config/syncthing"
           ".config/1Password"
           ".config/Slack"
+          ".config/BambuStudio"
           ".config/BeeperTexts"
           ".config/spotify"
           ".config/Todoist"
@@ -107,6 +108,7 @@
           ".local/state/mise"
           ".local/share/mise"
           ".local/share/nvim"
+          ".local/share/bambu-studio"
           ".local/share/nautilus"
           ".local/share/gvfs-metadata" # Nautilus per-folder sorting and view preferences
           ".local/share/opencode"

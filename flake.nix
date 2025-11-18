@@ -131,7 +131,14 @@
             inherit (inputs) nixpkgs-unstable;
             inherit hostName;
           };
-          modules = [ path ];
+          modules = [
+            path
+            {
+              nixpkgs.overlays = [
+                (import ./overlays/bambu-studio.nix)
+              ];
+            }
+          ];
         };
 
       mkDarwinConfig =

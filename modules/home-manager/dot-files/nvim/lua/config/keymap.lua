@@ -1,4 +1,5 @@
-local utils = require 'utils'
+local utils = require 'custom.utils'
+local yank = require 'custom.yank'
 
 -- Must happen before plugins are loaded (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
@@ -68,19 +69,19 @@ vim.keymap.set('n', '<leader>lr', function()
 end, { desc = '[L]SP [R]estart' })
 
 vim.keymap.set('n', '<leader>ya', function()
-  utils.yank_path(utils.get_buffer_absolute(), 'absolute')
+  yank.yank_path(yank.get_buffer_absolute(), 'absolute')
 end, { desc = '[Y]ank [A]bsolute path to clipboard' })
 
 vim.keymap.set('n', '<leader>yr', function()
-  utils.yank_path(utils.get_buffer_cwd_relative(), 'relative')
+  yank.yank_path(yank.get_buffer_cwd_relative(), 'relative')
 end, { desc = '[Y]ank [R]elative path to clipboard' })
 
 vim.keymap.set('v', '<leader>ya', function()
-  utils.yank_visual_with_path(utils.get_buffer_absolute(), 'absolute')
+  yank.yank_visual_with_path(yank.get_buffer_absolute(), 'absolute')
 end, { desc = '[Y]ank selection with [A]bsolute path' })
 
 vim.keymap.set('v', '<leader>yr', function()
-  utils.yank_visual_with_path(utils.get_buffer_cwd_relative(), 'relative')
+  yank.yank_visual_with_path(yank.get_buffer_cwd_relative(), 'relative')
 end, { desc = '[Y]ank selection with [R]elative path' })
 
 vim.keymap.set({ 'n', 'v' }, '<leader>go', function()

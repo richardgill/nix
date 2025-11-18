@@ -5,6 +5,7 @@
   imports = [
     ../headless
     ../../shared/graphical
+    ./file-roller.nix
     ./hyprland
     ./mako.nix
     ./mimetypes.nix
