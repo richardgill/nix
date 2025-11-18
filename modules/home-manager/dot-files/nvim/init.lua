@@ -8,6 +8,6 @@ end
 require 'config.keymap'
 require 'config.options'
 require 'config.autocommand'
-require 'config.hotreload'
+require('custom.hotreload').setup({ interval = 500 })
 require 'config.lazy'
 require 'config.spelling'

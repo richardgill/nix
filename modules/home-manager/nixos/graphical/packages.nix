@@ -27,12 +27,14 @@ in
       })
       cliphist
       evince
+      file-roller
       glib
       hyprpaper
       hyprshot
       firefox
       imv
       mpv
+      p7zip
       satty
       slurp
       swayosd

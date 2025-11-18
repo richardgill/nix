@@ -15,6 +15,7 @@
     })
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/optional/bambu-studio.nix
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../../../modules/system/nixos/graphical/optional/steam.nix

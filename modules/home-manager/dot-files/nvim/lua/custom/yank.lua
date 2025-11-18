@@ -1,36 +1,11 @@
 local M = {}
 
-M.restart_lsp = function()
-  local client_names = vim.tbl_map(function(client)
-    return client.name
-  end, vim.lsp.get_clients())
-
-  vim.lsp.enable(client_names, false)
-  vim.lsp.enable(client_names, true)
-
-  if vim.fn.exists ':VtsExec' == 2 then
-    vim.cmd 'VtsExec restart_tsserver'
-  end
-  vim.diagnostic.reset(nil, 0)
-  vim.notify('LSP servers restarted', vim.log.levels.INFO)
-end
-
-M.get_git_root = function()
-  return require('snacks').git.get_root() or vim.fn.getcwd()
-end
-
 M.get_buffer_absolute = function()
   return vim.fn.expand '%:p'
 end
 
 M.get_buffer_cwd_relative = function()
   return vim.fn.expand '%:.'
-end
-
-M.get_buffer_git_root_relative = function()
-  local git_root = M.get_git_root()
-  local abs_path = vim.fn.expand '%:p'
-  return abs_path:sub(#git_root + 2)
 end
 
 M.get_visual_bounds = function()
@@ -53,7 +28,6 @@ M.get_visual_bounds = function()
   }
 end
 
--- Format line numbers for display (e.g., 42 -> "42", 10 to 15 -> "10-15")
 M.format_line_range = function(start_line, end_line)
   return start_line == end_line and tostring(start_line) or start_line .. '-' .. end_line
 end
@@ -73,7 +47,7 @@ M.exit_visual_mode = function()
 end
 
 M.yank_path = function(path, label)
-  vim.fn.setreg('+', path) -- Copy to system clipboard
+  vim.fn.setreg('+', path)
   print('Yanked ' .. label .. ' path: ' .. path)
 end
 

@@ -115,6 +115,7 @@ alias co="git checkout"
 # Sourced because it needs to change directory
 alias wtb="source ~/Scripts/worktree-branch"
 alias wto="~/Scripts/worktree-open"
+alias wtor="~/Scripts/worktree-open --reset"
 alias wtd="~/Scripts/worktree-purge"
 alias wtc="~/Scripts/worktree-close"
 alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
@@ -266,3 +267,4 @@ alias oc="opencode"
 alias cl="claude"
 
 source <(argc --argc-completions zsh git-browse)
+source <(argc --argc-completions zsh worktree-open)

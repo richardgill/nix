@@ -1,5 +1,56 @@
 #!/usr/bin/env bash
+# @describe Setup tmux windows for worktree development
+# @flag --reset Reset by closing all windows and restarting with fresh setup
+
+eval "$(argc --argc-eval "$0" "$@")"
 
 source "$(dirname "$0")/tmux-setup-windows"
 
-setup_tmux_windows
+# Kill the current window's panes except the active one, then recreate worktree-open setup
+reset_windows() {
+  session_name=$(tmux display-message -p "#{session_name}")
+  current_window=$(tmux display-message -p "#{window_id}")
+
+  # Get all window IDs in the session except the current one
+  tmux list-windows -t "$session_name" -F "#{window_id}" | while read -r window_id; do
+    if [ "$window_id" != "$current_window" ]; then
+      tmux kill-window -t "$window_id"
+    fi
+  done
+
+  setup_tmux_windows
+}
+
+# Check if we're in tmux and if multiple windows already exist
+if [ -n "$TMUX" ]; then
+  session_name=$(tmux display-message -p "#{session_name}")
+  # Count total windows in the session
+  existing_windows=$(tmux list-windows -t "$session_name" | wc -l)
+
+  if [ "$existing_windows" -gt 1 ]; then
+    # Windows exist - check if reset was explicitly requested
+    if [ -n "$argc_reset" ]; then
+      reset_windows
+    else
+      # Auto-detect and prompt for reset
+      read -p "Worktree windows already exist. Reset? (y/n) " -n 1 -r
+      echo
+      if [[ $REPLY =~ ^[Yy]$ ]]; then
+        reset_windows
+      else
+        echo "Keeping existing setup"
+        exit 0
+      fi
+    fi
+  else
+    # No existing windows, just setup
+    setup_tmux_windows
+  fi
+else
+  # Not in tmux
+  if [ -n "$argc_reset" ]; then
+    echo "Error: --reset requires running inside a tmux session"
+    exit 1
+  fi
+  setup_tmux_windows
+fi

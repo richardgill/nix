@@ -29,7 +29,7 @@ setup_tmux_windows() {
 
     AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai1" -P -F "#{window_id}")
     tmux send-keys -t "$AI_WINDOW_1" "cl" Enter
-    
+
     AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai2" -P -F "#{window_id}")
     tmux send-keys -t "$AI_WINDOW_2" "cl" Enter
 

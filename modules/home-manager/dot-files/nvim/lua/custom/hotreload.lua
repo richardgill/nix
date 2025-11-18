@@ -1,6 +1,6 @@
--- Auto-reload visible buffers when files change on disk
--- This is very helpful when using agentic coding
--- Timer-based (500ms) + event-based checking
+local M = {}
+
+local timer = nil
 
 local function should_check()
   local mode = vim.api.nvim_get_mode().mode
@@ -39,16 +39,33 @@ local function reload_visible_buffers()
   end
 end
 
--- Timer: check visible buffers every 500ms
-local timer = vim.uv.new_timer()
-vim.uv.timer_start(timer, 500, 500, vim.schedule_wrap(reload_visible_buffers))
+M.setup = function(opts)
+  opts = opts or {}
+  local interval = opts.interval or 500
 
--- Events: immediate reload on focus/buffer switch
-vim.api.nvim_create_autocmd({ 'FocusGained', 'TermLeave', 'BufEnter', 'WinEnter', 'CursorHold', 'CursorHoldI' }, {
-  group = vim.api.nvim_create_augroup('hotreload', { clear = true }),
-  callback = function()
-    if should_check() then
-      vim.cmd 'checktime'
-    end
-  end,
-})
+  if timer then
+    M.stop()
+  end
+
+  timer = vim.uv.new_timer()
+  vim.uv.timer_start(timer, interval, interval, vim.schedule_wrap(reload_visible_buffers))
+
+  vim.api.nvim_create_autocmd({ 'FocusGained', 'TermLeave', 'BufEnter', 'WinEnter', 'CursorHold', 'CursorHoldI' }, {
+    group = vim.api.nvim_create_augroup('hotreload', { clear = true }),
+    callback = function()
+      if should_check() then
+        vim.cmd 'checktime'
+      end
+    end,
+  })
+end
+
+M.stop = function()
+  if timer then
+    vim.uv.timer_stop(timer)
+    vim.uv.close(timer)
+    timer = nil
+  end
+end
+
+return M
