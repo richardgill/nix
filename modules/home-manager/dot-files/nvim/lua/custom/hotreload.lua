@@ -1,7 +1,5 @@
 local M = {}
 
-local timer = nil
-
 local function should_check()
   local mode = vim.api.nvim_get_mode().mode
   return not (
@@ -27,29 +25,30 @@ local function get_visible_buffers()
   return visible
 end
 
-local function reload_visible_buffers()
+local find_buffer_by_filepath = function(filepath)
+  local visible_buffers = get_visible_buffers()
+  for buf, _ in pairs(visible_buffers) do
+    if vim.api.nvim_buf_get_name(buf) == filepath then
+      return buf
+    end
+  end
+  return nil
+end
+
+-- Register handler for file changes in watched directory
+require('custom.directory-watcher').registerOnChangeHandler('hotreload', function(filepath, events)
   if not should_check() then
     return
   end
 
-  for buf, _ in pairs(get_visible_buffers()) do
-    if should_reload_buffer(buf) then
-      vim.cmd('checktime ' .. buf)
-    end
+  local buf = find_buffer_by_filepath(filepath)
+  if buf and should_reload_buffer(buf) then
+    vim.cmd('checktime ' .. buf)
+    vim.notify('[hotreload] Reloaded: ' .. vim.fn.fnamemodify(filepath, ':t'), vim.log.levels.INFO)
   end
-end
+end)
 
 M.setup = function(opts)
-  opts = opts or {}
-  local interval = opts.interval or 500
-
-  if timer then
-    M.stop()
-  end
-
-  timer = vim.uv.new_timer()
-  vim.uv.timer_start(timer, interval, interval, vim.schedule_wrap(reload_visible_buffers))
-
   vim.api.nvim_create_autocmd({ 'FocusGained', 'TermLeave', 'BufEnter', 'WinEnter', 'CursorHold', 'CursorHoldI' }, {
     group = vim.api.nvim_create_augroup('hotreload', { clear = true }),
     callback = function()
@@ -58,14 +57,6 @@ M.setup = function(opts)
       end
     end,
   })
-end
-
-M.stop = function()
-  if timer then
-    vim.uv.timer_stop(timer)
-    vim.uv.close(timer)
-    timer = nil
-  end
 end
 
 return M

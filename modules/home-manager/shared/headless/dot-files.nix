@@ -110,6 +110,7 @@ in
         }
       );
       ".config/alacritty/themes".source = ../../dot-files/alacritty/themes;
+      ".config/btop/btop.conf".source = ../../dot-files/btop/btop.conf;
       ".config/ghostty/config".text = builtins.readFile (
         renderMustache "ghostty-config" ../../dot-files/ghostty/config.mustache {
           inherit (pkgs.stdenv) isDarwin;

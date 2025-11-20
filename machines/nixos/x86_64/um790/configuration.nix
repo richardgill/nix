@@ -55,7 +55,8 @@
   ];
 
   # Don't use thunderbolt ethernet
-  networking.networkmanager.unmanaged = [ "enp195s0" ];
+  networking.networkmanager.unmanaged = [ "enp100s0" ];
+  networking.interfaces.enp100s0.useDHCP = lib.mkForce false;
 
   # This value determines the NixOS release from which the default
   # settings for stateful data, like file locations and database versions
