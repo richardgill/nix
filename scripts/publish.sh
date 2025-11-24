@@ -2,7 +2,6 @@
 
 source_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 repo_url="https://github.com/richardgill/nix.git"
-OPENER=$(command -v xdg-open || command -v open)
 
 cd "$source_dir"
 
@@ -62,7 +61,9 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   git push origin "$branch_name"
   echo ""
   echo "Changes pushed successfully!"
-  $OPENER "${repo_url%.git}/compare/main...$branch_name"
+
+  pr_url=$(gh pr create --title "nix-private sha: $short_sha" --body "" --head "$branch_name" --base main)
+  open "$pr_url/files"
 else
   echo "Push cancelled. You can manually inspect the repository at: $github_repo_dir"
 fi
