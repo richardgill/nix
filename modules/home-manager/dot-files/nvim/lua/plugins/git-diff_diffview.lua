@@ -14,13 +14,11 @@ local update_left_pane = function()
   end)
 end
 
-vim.notify '[diffview] init'
 -- Register handler for file changes in watched directory
 require('custom.directory-watcher').registerOnChangeHandler('diffview', function(filepath, events)
   local is_in_dot_git_dir = filepath:match '/%.git/' or filepath:match '^%.git/'
 
   if is_in_dot_git_dir or not is_git_ignored(filepath) then
-    vim.notify('[diffview] File changed: ' .. vim.fn.fnamemodify(filepath, ':t'), vim.log.levels.INFO)
     update_left_pane()
   end
 end)
