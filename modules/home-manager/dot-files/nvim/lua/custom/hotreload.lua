@@ -45,7 +45,6 @@ require('custom.directory-watcher').registerOnChangeHandler('hotreload', functio
   local buf = find_buffer_by_filepath(filepath)
   if buf and should_reload_buffer(buf) then
     vim.cmd('checktime ' .. buf)
-    vim.notify('[hotreload] Reloaded: ' .. vim.fn.fnamemodify(filepath, ':t'), vim.log.levels.INFO)
   end
 end)
 
