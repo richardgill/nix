@@ -1,3 +1,4 @@
+# Test with: nix-shell -p stress-ng --run "stress-ng --vm 1 --vm-bytes 5G --timeout 60s"
 { lib, ... }:
 {
   systemd.oomd.enable = lib.mkForce false;
@@ -8,6 +9,7 @@
     freeMemThreshold = 5;
     freeSwapThreshold = 10;
     enableNotifications = true;
+    reportInterval = 60;
     extraArgs = [
       "--avoid"
       "'^(Hyprland|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|firefox|kitty)$'"

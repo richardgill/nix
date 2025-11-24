@@ -48,6 +48,7 @@ in
       "cursor"
       "discord"
       "docker-desktop"
+      "figma"
       "firefox"
       "flameshot"
       "ghostty"
