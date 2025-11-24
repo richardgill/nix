@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Smart URL opener that works both locally and over SSH
+# Inspiration: https://github.com/suan/local-open
+# Usage: tunnel-browser-open <url>
+#
+# If running locally: uses open (xdg-open or open on mac)
+# If in SSH session: opens on local machine via reverse tunnel
+# Automatically converts localhost/127.0.0.1/0.0.0.0 to remote hostname
+#
+# Configuration (environment variables):
+#   REMOTE_HOSTNAME - Hostname to replace localhost with (default: `hostname`)
+#
+# Setup: Start a tunnel with `tunnel-setup` or `ssh-with-tunnel`
+# Remember: the local machine also needs to have SSH server enabled
+
+source ~/Scripts/lib/ssh
+
+remote_hostname=${REMOTE_HOSTNAME-`hostname`}
+
+if ! is_ssh_session; then
+  firefox "$1" &
+else
+  if [[ "$1" =~ ^https?:// ]]; then
+    url="$1"
+    if [[ "$url" == *localhost* ]]; then
+      url=${url/localhost/$remote_hostname}
+    elif [[ "$url" == *"127.0.0.1"* ]]; then
+      url=${url/127\.0\.0\.1/$remote_hostname}
+    elif [[ "$url" == *"0.0.0.0"* ]]; then
+      url=${url/0\.0\.0\.0/$remote_hostname}
+    fi
+    tunnel-exec "firefox \"$url\" &"
+  else
+    echo "Error: '$1' is not a valid URL" >&2
+    exit 1
+  fi
+fi

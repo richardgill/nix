@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# open command so that linux open works like macOS `open`
+# on macOS /usr/bin/open takes priority on the $PATH, so this is never used
+
+xdg-open $1 &>/dev/null

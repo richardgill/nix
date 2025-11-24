@@ -1,3 +1,4 @@
+-- inspiration: https://github.com/diogo464/hotreload.nvim
 local M = {}
 
 local function should_check()

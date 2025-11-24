@@ -21,7 +21,7 @@ setopt HIST_REDUCE_BLANKS
 
 export EDITOR='nvim'
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
-export BROWSER='tunnel-open'
+export BROWSER='tunnel-browser-open'
 
 # EDITOR=vim sets zsh -o vim implicitly :|
 bindkey -e
@@ -76,6 +76,13 @@ if [ -n "$TMUX" ]; then
   bindkey  "^[OH"   beginning-of-line
   bindkey  "^[OF"   end-of-line
   bindkey  "^[[3~"  delete-char
+
+  # Keep environment variables in sync when switching between local/SSH tmux sessions
+  # Runs every new command in the terminal
+  precmd_update_tmux_env() {
+    eval $(tmux show-environment -s 2>/dev/null)
+  }
+  precmd_functions+=(precmd_update_tmux_env)
 fi
 
 # Oh my posh prompt
@@ -173,7 +180,6 @@ alias ssht="ssh-with-tunnel"
 alias sound="wiremix"
 alias bluetooth="blueberry"
 alias wifi="nmtui"
-alias open='tunnel-open'
 {{/isLinux}}
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then

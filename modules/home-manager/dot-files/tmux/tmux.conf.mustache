@@ -88,6 +88,9 @@ is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
     | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
 is_fzf="ps -o state= -o comm= -t '#{pane_tty}' \
   | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?fzf$'"
+# True when at zsh prompt (no other program running in the pane)
+# Checks that no process OTHER than zsh/ps exists on this tty
+is_zsh_fg="! ps -o comm= -t '#{pane_tty}' | grep -qvE '^(zsh|ps)$'"
 
 bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
 bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-j' { if-shell "$is_fzf" 'send-keys C-j' 'select-pane -D' }
@@ -115,8 +118,8 @@ set -g pane-border-style bg=default,fg=#333333
 bind-key -n Home send Escape "OH"
 bind-key -n End send Escape "OF"
 
-# ctrl-g types git commit -m "" left
-bind-key -n C-g send-keys 'git commit -m ""' \; send-keys Left
+# ctrl-g types git commit -m "" when at zsh prompt, otherwise pass through
+bind-key -n C-g if-shell "$is_zsh_fg" "send-keys 'git commit -m \"\"' ; send-keys Left" 'send-keys C-g'
 
 set -g status on
 
