@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Returns the default remote for git operations
+# Uses 'upstream' for main branch when upstream remote exists, otherwise 'origin'
+get_default_remote() {
+  local resolved_branch="$1"
+  if git remote | grep -q upstream && [[ "$resolved_branch" == "main" ]]; then
+    echo "upstream"
+  else
+    echo "origin"
+  fi
+}

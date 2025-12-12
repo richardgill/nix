@@ -5,7 +5,6 @@
     autossh
     cargo
     coreutils
-    claude-code
     curl
     datamash
     docker

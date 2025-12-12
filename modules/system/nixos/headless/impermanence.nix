@@ -129,6 +129,7 @@
         ];
         files = [
           ".config/monitors.xml"
+          ".config/adventofcode.session"
           ".zsh_history"
           ".claude.json"
           ".claude/.credentials.json"
@@ -139,6 +140,9 @@
       fileSystems."/persistent".neededForBoot = true;
       fileSystems."/nix".neededForBoot = true;
       fileSystems."/var/log".neededForBoot = true;
+
+      # Trash needs x-gvfs-trash mount option for Nautilus delete to work.
+      # PR here: https://github.com/nix-community/impermanence/pull/243 when it's merged we can get this working
 
       boot.initrd = {
         supportedFilesystems = [ "btrfs" ];

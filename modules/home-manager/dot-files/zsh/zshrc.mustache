@@ -126,6 +126,7 @@ alias wtor="~/Scripts/worktree-open --reset"
 alias wtd="~/Scripts/worktree-purge"
 alias wtc="~/Scripts/worktree-close"
 alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
+alias bdi="~/Scripts/bd-interactive"
 alias log="git log --graph --decorate --pretty=format:'%h - %an, %ar : %s'"
 alias ghdiff="~/Scripts/gh-diff"
 alias prChecks='gh pr checks --watch'
@@ -134,7 +135,8 @@ alias auto-commit="~/Scripts/auto-commit"
 alias auto-pr="~/Scripts/auto-pr"
 alias auto-commit-pr="~/Scripts/auto-commit-pr"
 alias ci='auto-commit'
-alias pr='auto-pr'
+alias pr='gh pr create --draft'
+alias pr-ai='auto-pr'
 alias pr-diff='~/Scripts/git-pr-diff'
 alias cipr='auto-commit-pr'
 alias cip='~/Scripts/auto-commit-push'

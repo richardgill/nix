@@ -1,36 +1,33 @@
 #!/usr/bin/env bash
+# @describe Create git worktree with tmux session
+# @option -c --cmd Command to run in ai1 window instead of default 'cl' (e.g. wtb -c 'claude "fix bug"' my-branch)
+# @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
+# @arg dest_name Destination name (defaults to source_branch name)
+
+eval "$(argc --argc-eval "$0" "$@")"
 
 source "$(dirname "$0")/tmux-setup-windows"
+source ~/Scripts/lib/git
 
-if [ "$#" -eq 0 ]; then
-  cato << EOF
-Usage examples:
-
-  wtb new-branch-and-dirname
-    # Creates a new branch with the given name
-
-  wtb local-branch new-branch-and-dirname
-    # Creates a new branch from another local branch
-
-  wtb origin/my-branch
-    # Creates a worktree for 'my-branch' from the remote branch
-
-  wtb origin/feature-branch feature-branch
-    # Creates a worktree from a remote branch with the same name
-
-  wtb origin/remote-branch new-branch-and-dirname
-    # Creates a new branch from a remote branch
-EOF
-  return 1
+# Check if main is behind origin/upstream and offer to pull
+if [[ "$(git symbolic-ref --short HEAD 2>/dev/null)" == "main" ]]; then
+  remote=$(get_default_remote "main")
+  git fetch "$remote" main --quiet 2>/dev/null
+  behind=$(git rev-list --count HEAD.."$remote/main" 2>/dev/null || echo 0)
+  if [[ "$behind" -gt 0 ]]; then
+    printf "main is %d commit(s) behind %s/main. Pull? (y/n) " "$behind" "$remote"
+    read -r -k 1 REPLY
+    echo
+    [[ $REPLY =~ ^[Yy]$ ]] && git pull "$remote" main
+  fi
 fi
 
-
 SOURCE=$(realpath .)
-SOURCE_BRANCH="$1"
-DEST_NAME="$2"
+SOURCE_BRANCH="$argc_source_branch"
+DEST_NAME="$argc_dest_name"
 
 # Handle single argument that is a remote branch (e.g., origin/branch-name)
-if [ "$#" -eq 1 ] && [[ "$SOURCE_BRANCH" == */* ]]; then
+if [ -z "$DEST_NAME" ] && [[ "$SOURCE_BRANCH" == */* ]]; then
   # For single remote branch argument, extract branch name and use it as both directory and branch name
   DEST_NAME=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
 fi
@@ -43,7 +40,7 @@ fi
 TARGET="$SOURCE/../$DEST_NAME"
 
 # Determine if we have a source branch to create from
-if [ "$#" -eq 2 ]; then
+if [ -n "$argc_dest_name" ]; then
   if [[ "$SOURCE_BRANCH" == */* ]]; then
     REMOTE=$(echo "$SOURCE_BRANCH" | cut -d'/' -f1)
     BRANCH=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
@@ -73,7 +70,7 @@ fi
 
 
 TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET"))
-SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION")
+SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd")
 
 
 tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktree-branch-setup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

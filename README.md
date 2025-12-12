@@ -251,23 +251,26 @@ sudo chown -R $USER:users /persistent/home/$USER/<folder>
 just build
 ```
 
-## Temporarily Edit Configs Without Rebuilding
+## Directly Editable Configs (Out-of-Store Symlinks)
 
-To quickly test config changes (e.g., nvim) without rebuilding:
+Some configs (like nvim) are symlinked directly to the repo rather than the Nix store, so edits take effect immediately without rebuilding.
 
-```bash
-rm ~/.config/nvim
-ln -s ~/code/nix-private/modules/home-manager/dot-files/nvim ~/.config/nvim
+To make a config directly editable, use `mkOutOfStoreSymlink` in `modules/home-manager/shared/headless/dot-files.nix`:
+
+```nix
+".config/nvim".source =
+  config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/nvim";
 ```
 
-Now edits go directly to your source files. When done testing, restore the managed version:
+For directories where only some files need to be mutable, use the `sourceDirectory` helper with `outOfStoreSymlinks`:
 
-```bash
-rm ~/.config/nvim
-sudo nixos-rebuild switch
+```nix
+(sourceDirectory {
+  target = ".config/example";
+  source = ../../dot-files/example;
+  outOfStoreSymlinks = [ "mutable-file.json" ];
+})
 ```
-
-This works for any home-manager managed config file.
 
 ## Acknowledgments
 

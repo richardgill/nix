@@ -26,6 +26,36 @@
 # 4. Feel free to include a comment line indicating who is the author of the
 #    theme. E.g. a link to your github user page.
 
+[delta "richard"]
+    # GitHub-style diff colors matched to tokyonight-night nvim theme
+    # Colors computed from nvim highlight groups using:
+    #   nvim --headless -c "colorscheme tokyonight-night" \
+    #     -c 'lua local hl = vim.api.nvim_get_hl(0, {name="DiffAdd"}); print("DiffAdd bg: " .. (hl.bg and string.format("#%06x", hl.bg) or "none"))' \
+    #     -c 'qa'
+    # Repeat for: DiffDelete, DiffChange, DiffText, LeftPaneAdd, LeftPaneChange, LeftPaneText
+    # Source highlights defined in: nvim/lua/plugins/theme_tokyonight.lua
+    dark = true
+    line-numbers = true
+    side-by-side = true
+    keep-plus-minus-markers = false
+    syntax-theme = Nord
+    # Line backgrounds (from nvim DiffAdd/LeftPaneAdd)
+    minus-style = syntax "#35212a"
+    plus-style = syntax "#213b2e"
+    # Word-level emphasis (from nvim DiffText/LeftPaneText)
+    minus-emph-style = "#c0caf5" "#773235"
+    plus-emph-style = "#c0caf5" "#2d6a3b"
+    # Line numbers
+    line-numbers-left-style = "#f85149"
+    line-numbers-right-style = "#3fb950"
+    line-numbers-minus-style = "#f85149"
+    line-numbers-plus-style = "#3fb950"
+    line-numbers-zero-style = "#545474"
+    # File header styling
+    file-style = "#7aa2f7" bold
+    file-decoration-style = "#7aa2f7" ul
+    hunk-header-style = omit
+
 [delta "colibri"]
     # author: https://github.com/pablospe
     # Based on woolly-mammoth: https://github.com/Kr1ss-XD.

@@ -10,15 +10,16 @@ create_worktree_session() {
 
 setup_tmux_windows() {
   local session_name="$1"
+  local ai1_cmd="$2"
   if [ -z "$session_name" ] && [ -n "$TMUX" ]; then
     session_name=$(tmux display-message -p "#{session_name}")
   fi
-  
+
   if [ -n "$session_name" ]; then
     ORIGINAL_WINDOW=$(tmux display-message -t "$session_name" -p "#{window_id}")
     ORIGINAL_PANE=$(tmux display-message -t "$session_name" -p "#{pane_id}")
     ORIGINAL_PATH=$(tmux display-message -t "$session_name" -p "#{pane_current_path}")
-    
+
     tmux rename-window -t "$ORIGINAL_WINDOW" "nvim"
 
     SOCKET_FILE="/tmp/nvim-socket-$(uuidgen)"
@@ -28,13 +29,13 @@ setup_tmux_windows() {
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"
 
     AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai1" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_1" "cl" Enter
+    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
 
     AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai2" -P -F "#{window_id}")
     tmux send-keys -t "$AI_WINDOW_2" "cl" Enter
 
     tmux select-window -t "$AI_WINDOW_1"
-    
+
     echo "$SOCKET_FILE"
   fi
 }

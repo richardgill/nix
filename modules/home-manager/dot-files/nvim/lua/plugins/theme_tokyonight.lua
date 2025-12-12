@@ -26,9 +26,22 @@ return {
         hl['DiagnosticUnnecessary'].fg = util.lighten(hl['DiagnosticUnnecessary'].fg, 0.7)
         -- tsx tags <WasRed>
         hl['@tag.tsx'] = { fg = colors.blue1 }
-        -- Diff brighter
-        hl['DiffAdd'].bg = util.darken('#9ece6a', 0.3)
-        hl['DiffDelete'].bg = util.darken(colors.red, 0.5)
+
+        -- GitHub-style diff colors (carefully matched to GitHub's diff UI)
+        local gh_green = '#3fb950'
+        local gh_red = '#f85149'
+        local gh_blue = '#58a6ff'
+        -- Line backgrounds
+        hl['DiffAdd'] = { bg = util.blend(gh_green, 0.20, colors.bg) }
+        hl['DiffDelete'] = { bg = util.blend(colors.fg_gutter, 0.08, colors.bg) }
+        hl['DiffChange'] = { bg = util.blend(gh_blue, 0.12, colors.bg) }
+        -- Word-level changes (fg + nocombine disables syntax highlighting)
+        hl['DiffText'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
+        -- Left pane remaps (in side-by-side diff, left shows old state so colors are inverted)
+        -- See diffview config
+        hl['LeftPaneAdd'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
+        hl['LeftPaneChange'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
+        hl['LeftPaneText'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
 
         -- highlighting for multi cursor plugin
         hl['MultiCursor'] = hl['IncSearch']

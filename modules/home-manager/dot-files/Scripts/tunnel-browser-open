@@ -29,7 +29,7 @@ else
     elif [[ "$url" == *"0.0.0.0"* ]]; then
       url=${url/0\.0\.0\.0/$remote_hostname}
     fi
-    tunnel-exec "firefox \"$url\" &"
+    tunnel-exec "open \"$url\""
   else
     echo "Error: '$1' is not a valid URL" >&2
     exit 1

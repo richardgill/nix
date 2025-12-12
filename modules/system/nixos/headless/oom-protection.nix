@@ -1,4 +1,4 @@
-# Test with: nix-shell -p stress-ng --run "stress-ng --vm 1 --vm-bytes 5G --timeout 60s"
+# Test by creating memory heavy processes with: nix-shell -p stress-ng --run "stress-ng --vm 1 --vm-bytes 5G --timeout 60s"
 { lib, ... }:
 {
   systemd.oomd.enable = lib.mkForce false;
@@ -6,19 +6,19 @@
   # More aggressively kill processes when getting close to no memory
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 5;
-    freeSwapThreshold = 10;
+    freeMemThreshold = 5; # Start killing when less than 10% RAM left
+    freeSwapThreshold = 100; # Ignore swap - kill based on RAM (which includes zram?!) alone
     enableNotifications = true;
     reportInterval = 60;
     extraArgs = [
       "--avoid"
       "'^(Hyprland|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|firefox|kitty)$'"
       "--prefer"
-      "'^(Web Content|Isolated Web Co|electron|chromium|slack|discord|teams)$'"
+      "'^(Web Content|Isolated Web Co|electron|chromium|slack|discord|teams|node|nvim)$'"
     ];
   };
 
-  # Kernel tuning for zram optimization
+  # Kernel tuning for zram optimization, zram is a way of storing swap in ram itself with compression. Trades off CPU (compression) for memory.
   # https://wiki.archlinux.org/title/Zram#Optimizing_swap_on_zram
   # https://github.com/NixOS/nixpkgs/pull/268121
   boot.kernel.sysctl = {

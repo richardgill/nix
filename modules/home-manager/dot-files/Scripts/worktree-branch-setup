@@ -16,11 +16,13 @@ fi
 echo "copying gitignored files"
 
 (cd "$SOURCE" && git status --ignored -s | grep '^!! ' | awk '{print $2}') | while read filename; do
-  if [[ "$filename" != *"node_modules"* ]]; then
+  if [[ "$filename" == *"node_modules"* ]] || \
+     [[ "$filename" == ".next/"* ]] || \
+     [[ "$filename" == ".turbo/"* ]]; then
+    echo "skipping: $filename"
+  else
     echo "copying: $filename"
     cp -R $CP_FLAGS "$SOURCE/$filename" "$TARGET/$filename"
-  else
-    echo "skipping: $filename (node_modules)"
   fi
 done
 
@@ -30,15 +32,18 @@ if [ ! -d "$TARGET/scratch" ]; then
 fi
 
 if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
-  echo "running pnpm i"
-  cd "$TARGET" && pnpm i
+  echo "running: pnpm install"
+  cd "$TARGET" && pnpm install
+elif [ -f "$SOURCE/bun.lockb" ] || [ -f "$SOURCE/bun.lock" ]; then
+  echo "running bun install"
+  cd "$TARGET" && bun install
 fi
 
 (cd "$TARGET" && mise trust)
 
 if [ -n "$SOCKET_FILE" ]; then
   echo "restarting nvim LSP"
-  nvim --server "$SOCKET_FILE" --remote-expr "v:lua.require'utils'.restart_lsp()"
+  nvim --server "$SOCKET_FILE" --remote-expr "v:lua.require'custom.utils'.restart_lsp()"
 fi
 
 ELAPSED=$((SECONDS - START_TIME))

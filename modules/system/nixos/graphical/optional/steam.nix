@@ -50,4 +50,6 @@
     enable = true;
     enable32Bit = true;
   };
+  # xbox wireless dongle adapter
+  hardware.xone.enable = true;
 }

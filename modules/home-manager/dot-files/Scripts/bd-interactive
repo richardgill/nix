@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# @describe Interactive bd issue picker
+# @alias bdi
+
+eval "$(argc --argc-eval "$0" "$@")"
+
+SCRIPT_DIR="$(dirname "$0")"
+
+branch_name() {
+  local id="$1"
+  bd show "$id" --json | jq -r '.[0] | "\(.id)-\(.title | ascii_downcase | gsub("[^a-z0-9]+"; "-") | gsub("^-|-$"; ""))" | if length > 45 then .[0:45] | gsub("-[^-]*$"; "") else . end'
+}
+
+is_issue_synced() {
+  local id="$1"
+  local jsonl=".beads/issues.jsonl"
+
+  local current=$(jq -c "select(.id == \"$id\")" "$jsonl" 2>/dev/null | head -1)
+  local committed=$(git show HEAD:"$jsonl" 2>/dev/null | jq -c "select(.id == \"$id\")" | head -1)
+
+  if [ -z "$committed" ]; then
+    echo "Issue $id not found in committed jsonl"
+    return 1
+  fi
+
+  if [ "$current" != "$committed" ]; then
+    echo "Issue $id has uncommitted changes"
+    return 1
+  fi
+
+  return 0
+}
+
+LIST_CMD='bd list --json | jq -r ".[] | select(.parent == null and .dependent_count == 0 and (.status == \"open\" or .status == \"in_progress\")) | \"\(.id)\t[P\(.priority // 2)] \(.title)\""'
+
+selection=$(eval "$LIST_CMD" | fzf \
+  --delimiter '\t' \
+  --with-nth '2' \
+  --preview 'bd show {1}' \
+  --preview-window 'right:60%:wrap' \
+  --header 'enter: edit | ctrl-d: close | ctrl-w: worktree + claude' \
+  --bind "enter:execute(bd edit {1})+reload($LIST_CMD)" \
+  --bind "ctrl-d:execute(bd close {1})+reload($LIST_CMD)" \
+  --expect 'ctrl-w')
+
+key=$(echo "$selection" | head -1)
+line=$(echo "$selection" | tail -1)
+
+if [ -z "$line" ]; then
+  exit 0
+fi
+
+id=$(echo "$line" | cut -f1)
+
+if [ "$key" = "ctrl-w" ]; then
+  if ! is_issue_synced "$id"; then
+    echo "Commit the issue changes first before creating worktree"
+    exit 1
+  fi
+  branch=$(branch_name "$id")
+  "$SCRIPT_DIR/worktree-branch" "$branch" --cmd "claude \"solve $id\""
+fi
