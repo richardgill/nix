@@ -41,7 +41,7 @@
 [delta]
 	navigate = true    # use n and N to move between diff sections
 	side-by-side = true
-	features = chameleon
+	features = richard
 
 [include]
 	path = ~/.config/delta/themes.gitconfig

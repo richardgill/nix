@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 
 current_branch=$(git symbolic-ref --short HEAD)

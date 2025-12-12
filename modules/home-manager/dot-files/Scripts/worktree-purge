@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
-cd "$(pwd)"
+
+# If we're inside a worktree (one level down), go up to the parent
+if git rev-parse --is-inside-work-tree &>/dev/null; then
+  worktree_root=$(git rev-parse --show-toplevel)
+  parent_dir=$(dirname "$worktree_root")
+  if [[ -d "$parent_dir/main/.git" ]] || [[ -d "$parent_dir/master/.git" ]]; then
+    cd "$parent_dir"
+  fi
+fi
 all_folders=$(eza --sort=modified --reverse --time=modified --long --no-user --no-permissions --only-dirs \
   | awk '{print $NF}')
 

@@ -48,7 +48,7 @@ vim.api.nvim_set_keymap('v', '<', '<gv', { noremap = true, silent = true })
 -- Always use P instead of p in visual mode. P doesn't mess with registers.
 vim.api.nvim_set_keymap('v', 'p', 'P', { noremap = true, silent = true })
 
--- Git diff
+-- Git diff (diffview)
 vim.keymap.set('n', '<leader>dd', '<cmd>:DiffviewOpen<cr>', { desc = 'Git [d]iff' })
 vim.keymap.set('n', '<leader>do', function()
   local remotes_output = vim.fn.system 'git remote'
@@ -56,6 +56,16 @@ vim.keymap.set('n', '<leader>do', function()
   local remote = upstream_exists and 'upstream' or 'origin'
   vim.cmd(':DiffviewOpen ' .. remote .. '/main...HEAD')
 end, { desc = 'Git [d]iff against upstream/main or origin/main' })
+
+--[[ Git diff (vscode-diff)
+vim.keymap.set('n', '<leader>dd', '<cmd>:CodeDiff<cr>', { desc = 'Git [d]iff' })
+vim.keymap.set('n', '<leader>do', function()
+  local remotes_output = vim.fn.system 'git remote'
+  local upstream_exists = remotes_output:find 'upstream' ~= nil
+  local remote = upstream_exists and 'upstream' or 'origin'
+  vim.cmd(':CodeDiff ' .. remote .. '/main HEAD')
+end, { desc = 'Git [d]iff against upstream/main or origin/main' })
+--]]
 
 -- stop ctrl-z from suspending
 vim.api.nvim_set_keymap('n', '<c-z>', '<nop>', { noremap = true, silent = true })

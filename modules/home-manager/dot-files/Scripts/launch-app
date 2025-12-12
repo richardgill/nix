@@ -32,7 +32,10 @@ elif [[ "$workspace" == "15" ]]; then
 elif [[ "$workspace" == "16" ]]; then
   if ! hyprctl clients -j | jq -e '.[] | select(.class == "Slack")' > /dev/null; then
     uwsm app -- slack &
+    sleep 3
   fi
+  address=$(hyprctl activewindow -j | jq -r '.address')
+  ~/Scripts/delay-app 15 "$address" $((60 * 3)) &
 elif [[ "$workspace" == "17" ]]; then
   if ! pgrep -x beeper > /dev/null; then
     uwsm app -- beeper &

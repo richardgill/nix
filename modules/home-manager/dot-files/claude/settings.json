@@ -58,13 +58,14 @@
       "Grep",
       "Read",
       "Edit",
-      "MultiEdit",
       "Write",
       "TodoWrite",
       "WebFetch",
       "WebSearch",
       "Bash(chezmoi:*)",
-      "Bash(mise:*)"
+      "Bash(mise:*)",
+      "Bash(bd:*)",
+      "Read(~/code/reference-repos/**)"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -75,12 +76,22 @@
       "Write(/usr/**)",
       "Write(/bin/**)",
       "Write(/sbin/**)"
-    ]
+    ],
+    "defaultMode": "default"
   },
   "hooks": {
     "Notification": [
       {
-        "matcher": "",
+        "matcher": "elicitation_dialog",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/Scripts/beep"
+          }
+        ]
+      },
+      {
+        "matcher": "permission_prompt",
         "hooks": [
           {
             "type": "command",

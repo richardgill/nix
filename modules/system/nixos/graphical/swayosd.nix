@@ -1,6 +1,4 @@
 {
-  config,
-  lib,
   pkgs,
   ...
 }:
@@ -12,7 +10,8 @@
     serviceConfig = {
       Type = "simple";
       ExecStart = "${pkgs.swayosd}/bin/swayosd-server";
-      Restart = "on-failure";
+      Restart = "always";
+      RestartSec = 1;
     };
   };
 }

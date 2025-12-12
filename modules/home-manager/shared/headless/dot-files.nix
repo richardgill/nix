@@ -66,13 +66,15 @@ in
 
   home.file =
     scriptsEntries
-    // (sourceDirectory {
-      target = ".config/nvim";
-      source = ../../dot-files/nvim;
-      outOfStoreSymlinks = [ "lazy-lock.json" ];
-    })
     // {
-      "Scripts/lib/ssh".source = ../../dot-files/Scripts/lib/ssh;
+      ".config/nvim".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/nvim";
+    }
+    // sourceDirectory {
+      target = "Scripts/lib";
+      source = ../../dot-files/Scripts/lib;
+    }
+    // {
       ".zshenv" = {
         text = builtins.readFile (
           renderMustache "zshenv" ../../dot-files/zshenv.mustache {
@@ -85,10 +87,11 @@ in
         );
       };
       ".claude/CLAUDE.md".source = ../../dot-files/claude/CLAUDE.md;
+      ".claude/lib".source = ../../dot-files/claude/lib;
       ".claude/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/claude/settings.json";
-      ".claude/agents".source = ../../dot-files/claude/agents;
       ".claude/commands".source = ../../dot-files/claude/commands;
+      ".claude/skills".source = ../../dot-files/claude/skills;
       ".config/obs-studio".source =
         config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/obs-studio";
       ".codex".source = ../../dot-files/codex;

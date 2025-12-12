@@ -42,6 +42,20 @@ return {
       default_args = {
         DiffviewOpen = { '--imply-local' },
       },
+      hooks = {
+        diff_buf_win_enter = function(bufnr, winid, ctx)
+          -- Hide dashed filler lines (make them invisible)
+          vim.opt_local.fillchars:append { diff = ' ' }
+          -- Left diff panel 'additions' are actually deletions, so remap them here
+          if ctx.symbol == 'a' then
+            vim.opt_local.winhl = table.concat({
+              'DiffAdd:LeftPaneAdd',
+              'DiffChange:LeftPaneChange',
+              'DiffText:LeftPaneText',
+            }, ',')
+          end
+        end,
+      },
       keymaps = {
         view = {
           { 'n', 'q', '<cmd>DiffviewClose<cr>', { desc = 'Close diffview' } },

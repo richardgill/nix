@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+
+delay="$1"
+addr="$2"
+cooldown_secs="${3:-180}"
+
+if [[ -z "$delay" || -z "$addr" ]]; then
+  echo "Usage: delay-app <delay_seconds> <window_address> [cooldown_seconds]"
+  exit 1
+fi
+
+workspace=$(hyprctl activeworkspace -j | jq -r '.id')
+
+lockfile="/tmp/delay-app-ws-${workspace}.lock"
+# open the lock file and auto-allocate a file descriptor
+exec {lock_fd}>>"$lockfile"
+# acquire exclusive lock
+if ! flock -n "$lock_fd"; then
+  # lock held by another instance - avoids race conditions, we just exit
+  notify-send "delay-app" "lock held, exiting" -t 2000
+  exit 0
+fi
+
+end_time=$(cat "$lockfile" 2>/dev/null || echo 0)
+now=$(date +%s)
+notify-send "delay-app" "$lockfile end_time=$end_time now=$now" -t 2000
+
+if (( now < end_time )); then
+  # in cooldown - reset cooldown and exit
+  notify-send "delay-app" "in cooldown, resetting ($((end_time - now))s left)" -t 2000
+  echo "$((now + cooldown_secs))" > "$lockfile"
+  exit 0
+fi
+
+
+# do the delay
+notify-send "delay-app" "delaying ws $workspace for ${delay}s" -t 2000
+hyprctl dispatch movetoworkspacesilent 99,address:$addr
+sleep "$delay"
+hyprctl dispatch movetoworkspacesilent $workspace,address:$addr
+
+current_workspace=$(hyprctl activeworkspace -j | jq -r '.id')
+if [[ "$current_workspace" != "$workspace" ]]; then
+  notify-send "delay-app" "workspace changed ($workspace -> $current_workspace), exiting" -t 2000
+  exit 0
+fi
+notify-send "delay-app" "writing $lockfile after delay"
+now=$(date +%s)
+echo "$((now + cooldown_secs))" > "$lockfile"
+
+

@@ -1,20 +1,13 @@
 #!/usr/bin/env bash
 
+source ~/Scripts/lib/git
+
 # Usage: git-checkout-to [remote/branch] -- file1 file2 ...
 # Examples:
 #   git-checkout-to upstream/main -- Tiltfile kustomize/Makefile
 #   git-checkout-to -- Tiltfile kustomize/Makefile  (uses default {origin,upstream}/main)
 
 current_branch=$(git symbolic-ref --short HEAD)
-
-get_default_remote() {
-  local resolved_branch="$1"
-  if git remote | grep -q upstream && [[ "$resolved_branch" == "main" ]]; then
-    echo "upstream"
-  else
-    echo "origin"
-  fi
-}
 
 # no arguments → show help
 if [[ $# -eq 0 ]]; then
