@@ -2,7 +2,9 @@
 
 {{> what-not-how }}
 {{> one-screen }}
+{{> short-functions }}
 {{> guards }}
+{{> pure-edges }}
 
 ## Comments
 

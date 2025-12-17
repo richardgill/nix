@@ -9,7 +9,11 @@
       "Bash(nix search:*)",
       "Edit(~/.local/state/yazi/**)",
       "Write(~/.local/state/yazi/**)",
-      "WebFetch(domain:channels.nixos.org)"
+      "WebFetch(domain:channels.nixos.org)",
+      "WebFetch(domain:google.com)",
+      "WebFetch(domain:www.google.com)",
+      "WebFetch(domain:reddit.com)",
+      "WebFetch(domain:www.reddit.com)"
     ]
   }
 }
