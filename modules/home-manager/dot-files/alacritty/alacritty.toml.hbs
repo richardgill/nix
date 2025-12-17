@@ -1,0 +1,108 @@
+
+[terminal.shell]
+program = "{{ zshPath }}"
+args = ["-l"]
+
+[bell]
+animation = "EaseOutExpo"
+duration = 0
+
+[colors]
+draw_bold_text_with_bright_colors = true
+
+[cursor]
+blink_interval = 500
+blink_timeout = 5
+unfocused_hollow = false
+
+[cursor.style]
+blinking = "Off"
+shape = "Block"
+
+[env]
+TERM = "xterm-256color"
+
+[font]
+size = 18
+
+[font.bold]
+family = "Hack Nerd Font"
+style = "Bold"
+
+[font.glyph_offset]
+x = 0
+y = 5
+
+[font.italic]
+family = "Hack Nerd Font"
+
+[font.normal]
+family = "Hack Nerd Font"
+style = "Regular"
+
+[font.offset]
+x = 1  # letter spacing
+y = 10 # line spacing
+
+[mouse]
+hide_when_typing = false
+
+[[mouse.bindings]]
+action = "PasteSelection"
+mouse = "Middle"
+
+[selection]
+semantic_escape_chars = ",│`|:\"' ()[]{}<>"
+
+[window]
+decorations = "buttonless"
+dynamic_title = true
+option_as_alt = "Both"
+
+[window.dimensions]
+columns = 160
+lines = 80
+
+[window.padding]
+x = 6
+y = 6
+
+[keyboard]
+bindings = [
+  { key = "Right", mods = "Alt", chars = "\u001BF" },
+  { key = "Left", mods = "Alt", chars = "\u001BB" },
+
+  { key = "Right", mods = "Command", chars = "\u001bOF" },  # End
+  { key = "Left", mods = "Command", chars = "\u001bOH" },   # Home
+  { key = "Back", mods = "Command", chars = "\u0015" },     # Delete line backwards
+
+  { key = "Back", mods = "Alt", chars = "\u001b\u007f" },   # Delete word backwards
+  { key = "Back", mods = "Control", chars = "\u001b\u007f" },   # Delete word backwards windows
+
+ #  { key = "Delete", mods = "Command", chars = "\u000B" },   # Delete to beginning of line (fires ^U which is bound in .zshrc)
+ #
+ #  { key = "Delete", mods = "Alt", chars = "\u001b\u0064" }, # Delete word
+ #  { key = "Delete", mods = "Control", chars = "\u001b\u0064" }, # Delete word
+
+  # Prevent accidentally closing things
+  { key = "W", mods = "Command", action = "None" },
+  { key = "Q", mods = "Command", action = "None" },
+  # fixes issue where hash doesn't work on GB keyboards https://github.com/alacritty/alacritty/issues/1073#issuecomment-1296239926
+  # { key = "Key3", mods = "Alt", chars = "#" },
+
+
+  # \x1b[ is a CSI (control sequence introducer), meaning ESC+[;
+  # 74 is the decimal value of char J (see above); https://en.wikipedia.org/wiki/List_of_Unicode_characters
+  # 5 is the sum of bits for the ctrl and shift modifiers (1 is shift, 2 is alt, 4 is ctrl); (this seems be off by 1?)
+  # u stands for unicode.
+
+  # { key = "Tab", mods = "Control", chars = "\u001b[9;5u" },       # Forward ctrl + tab
+  # { key = "Tab", mods = "Control|Shift", chars = "\u001b[9;6u" }, # Forward ctrl + shift + tab
+]
+
+[general]
+
+live_config_reload = true
+import = ["~/.config/alacritty/themes/tokyo-night.toml"]
+
+[terminal]

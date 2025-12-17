@@ -89,3 +89,32 @@ mac-install:
 # Publish dotfiles to public repository
 publish:
   ./scripts/publish.sh
+
+# Build templates manually (useful for testing/debugging)
+# Usage: just template [machine]
+# Defaults to current hostname
+template machine='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+    
+    if [ -z "{{ machine }}" ]; then
+      machine=$(hostname)
+    else
+      machine="{{ machine }}"
+    fi
+    
+    echo "Building templates for: $machine"
+    
+    # Get template config from Nix
+    data_file=$(mktemp)
+    nix eval --json "path:.#templateConfig.$machine" > "$data_file"
+    
+    echo "data_file written to: $data_file"
+    
+    # Run the template builder
+    cd ts-utils
+    bun install --frozen-lockfile
+    bun run build-templates.ts --data-file "$data_file" --outDir ../built
+    
+    rm -f "$data_file"
+    echo "Templates built to: built/"

@@ -18,7 +18,7 @@
       sound-theme-freedesktop
       playerctl
     ]
-    ++ lib.optionals (pkgs.stdenv.system == "x86_64-linux") [
+    ++ lib.optionals (pkgs.stdenv.hostPlatform.system == "x86_64-linux") [
       beeper
     ];
 }

@@ -46,6 +46,18 @@ if git diff --staged --quiet; then
   exit 0
 fi
 
+echo "=== AI Agent is checking for secrets/sensitive data ==="
+claude -p /check-secrets
+
+echo ""
+read -p "Continue to diff? (y/n): " -n 1 -r
+echo ""
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+  echo "Publish cancelled. Repository at: $github_repo_dir"
+  exit 0
+fi
+
+echo ""
 echo "=== Changes to be published ==="
 git diff --cached
 

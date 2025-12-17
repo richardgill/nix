@@ -2,7 +2,7 @@
   description = "nix-config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     impermanence.url = "github:nix-community/impermanence";
@@ -13,12 +13,12 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.05";
+      url = "github:nix-community/home-manager/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.05";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -59,12 +59,12 @@
     };
 
     stylix = {
-      url = "github:danth/stylix/release-25.05";
+      url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v0.4.2";
+      url = "github:nix-community/lanzaboote/v0.4.3";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -183,5 +183,17 @@
 
       # Export vars for scripts to access
       inherit vars;
+
+      # Export template config for manual template building
+      # Usage: nix eval --json .#templateConfig.<machine> > config.json
+      templateConfig = nixpkgs.lib.mapAttrs (
+        name: nixosConfig:
+        import ./utils/template-config.nix {
+          lib = nixpkgs.lib;
+          pkgs = nixosConfig.pkgs;
+          config = nixosConfig.config;
+          userName = vars.userName;
+        }
+      ) self.nixosConfigurations;
     };
 }

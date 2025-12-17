@@ -10,4 +10,10 @@ HOST="${1:?Usage: ssh-with-tunnel <remote-host> [remote-user]}"
 USER="${2:-$USER}"
 
 tunnel-setup "$@"
-ssh "$USER@$HOST"
+
+# Use caffeinate on macOS to prevent sleep during SSH session
+if command -v caffeinate &>/dev/null; then
+  caffeinate -i ssh "$USER@$HOST"
+else
+  ssh "$USER@$HOST"
+fi

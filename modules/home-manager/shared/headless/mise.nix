@@ -2,14 +2,20 @@
   lib,
   pkgs,
   nixpkgs-unstable,
+  config,
+  osConfig,
+  vars,
   ...
 }:
 let
-  template = import ../../../../utils/template.nix { inherit pkgs; };
   unstable = import nixpkgs-unstable {
-    inherit (pkgs) system;
+    inherit (pkgs.stdenv.hostPlatform) system;
     config.allowUnfree = true;
   };
+
+  # Import shared templates
+  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  inherit (templates) builtTemplates;
 in
 {
   # we use unstable to get slightly more up-to-date deps
@@ -21,14 +27,8 @@ in
     MISE_NODE_COREPACK = "true";
   };
 
-  # Mise configuration file
-  home.file.".config/mise/config.toml" = {
-    text = builtins.readFile (
-      template.renderMustache "mise-config" ../../dot-files/mise/config.toml.mustache {
-        inherit (pkgs.stdenv) isLinux;
-      }
-    );
-  };
+  # Mise configuration file (from built templates in Nix store)
+  home.file.".config/mise/config.toml".source = "${builtTemplates}/mise/config.toml";
 
   # Install mise tools after config is written
   # Node is very slow, so disable for now
