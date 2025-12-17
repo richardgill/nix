@@ -1,3 +1,5 @@
+# NixOS-specific packages
+# Shared packages: modules/home-manager/shared/
 {
   config,
   lib,
@@ -7,16 +9,17 @@
 }:
 let
   unstable = import nixpkgs-unstable {
-    inherit (pkgs) system;
+    system = pkgs.stdenv.hostPlatform.system;
     config.allowUnfree = true;
   };
-  isAarch64Linux = pkgs.system == "aarch64-linux";
+  isAarch64Linux = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
 in
 {
   home.packages =
     with pkgs;
     [
       alacritty
+      bubblewrap
 
       # Fix Chromium crash on Wayland/Hyprland with color management
       # https://github.com/hyprwm/Hyprland/discussions/11843

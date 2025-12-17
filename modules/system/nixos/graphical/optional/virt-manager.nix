@@ -10,15 +10,6 @@
 
     qemu = {
       package = pkgs.qemu_kvm;
-      ovmf = {
-        enable = true;
-        packages = [
-          (pkgs.OVMFFull.override {
-            secureBoot = true;
-            tpmSupport = true;
-          }).fd
-        ];
-      };
       swtpm.enable = true;
       runAsRoot = false;
       vhostUserPackages = with pkgs; [ virtiofsd ];
@@ -56,7 +47,7 @@
     spice
     spice-gtk
     virt-viewer
-    win-virtio
+    virtio-win
     win-spice
   ];
 }

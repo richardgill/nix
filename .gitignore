@@ -5,3 +5,7 @@ plans/
 .claude/settings.local.json
 modules/home-manager/dot-files/obs-studio/logs/
 modules/home-manager/dot-files/obs-studio/profiler_data/
+
+# Template build output
+built/
+node_modules/

@@ -1,0 +1,178 @@
+# Most https://github.com/tmux-plugins/tmux-sensible suggestions implemented manually
+
+# Start windows and panes at 1, not 0
+set -g base-index 1
+setw -g pane-base-index 1
+
+# Set the delay between prefix and command
+# https://superuser.com/a/252717
+set -s escape-time 1
+
+# Allow images and OSC 52 clipboard sequences
+set -gq allow-passthrough on
+set -s set-clipboard on
+set -g visual-activity off
+
+set-option -g history-limit 50000
+set-option -g display-time 2500
+set-option -g status-interval 5
+set-option -g focus-events on
+# Reindexes windows when one is deleted
+set-option -g renumber-windows on
+
+# Update environment variables when attaching to session
+set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY KRB5CCNAME SSH_CLIENT SSH_TTY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE"
+
+# Refresh environment for remaining clients when a client detaches
+# This ensures SSH variables stay current after reconnections (used in status line)
+set-hook -g client-detached 'run-shell "{{ homeDir }}/Scripts/tmux-refresh"'
+
+# https://www.reddit.com/r/neovim/comments/11usepy/comment/jcpp596
+set -g default-terminal 'tmux-256color'
+set -ag terminal-overrides ",$TERM:Tc"
+
+# Fixes curly underline: https://www.reddit.com/r/neovim/comments/1933cgg/how_can_i_fix_the_tmux_color_issue_once_and_for
+set-option -sa terminal-features ',$TERM:RGB'
+set-option -ga terminal-features ",$TERM:usstyle"
+
+# Dual prefix configuration: both § and F12 work everywhere
+set-option -g prefix §
+set-option -g prefix2 F12
+unbind-key C-b
+
+# Shell configuration
+set-option -g default-shell {{ defaultShell }}
+
+# Reload this config file with prefix r
+bind R source-file ~/.config/tmux/tmux.conf\; display "Reloaded!"
+
+# open things in the current directory
+bind c new-window -c "#{pane_current_path}"
+
+bind 'h' split-window -h -c '#{pane_current_path}'
+bind 'v' split-window -v -c '#{pane_current_path}'
+
+# bind colemak-dh to switch windows
+unbind a
+unbind r
+unbind s
+unbind t
+unbind g
+
+bind-key a select-window -t 1
+bind-key r select-window -t 2
+bind-key s select-window -t 3
+bind-key t select-window -t 4
+bind-key g select-window -t 5
+
+unbind '"'
+unbind %
+
+# Kill session
+unbind q
+bind-key q confirm-before -p "Kill session? (y/n)" "run-shell '{{ homeDir }}/Scripts/tmux-kill-session --yes'"
+
+# Rebind x to kill pane without asking for confirmation
+bind-key x kill-pane
+
+unbind-key n
+bind-key n command-prompt "rename-window '%%'"
+
+# Open scrollback in neovim popup with reverse line numbers (prefix + b)
+bind-key b run-shell "{{ homeDir }}/Scripts/tmux-view-scrollback"
+
+# Smart pane switching with awareness of Vim splits (and fzf).
+# See: https://github.com/christoomey/vim-tmux-navigator
+# See: https://www.bugsnag.com/blog/tmux-and-vim for the additon for fzf.
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
+    | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
+is_fzf="ps -o state= -o comm= -t '#{pane_tty}' \
+  | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?fzf$'"
+# True when at zsh prompt (no other program running in the pane)
+# Checks that no process OTHER than zsh/ps exists on this tty
+is_zsh_fg="! ps -o comm= -t '#{pane_tty}' | grep -qvE '^(zsh|ps)$'"
+
+bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
+bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-j' { if-shell "$is_fzf" 'send-keys C-j' 'select-pane -D' }
+bind-key -n 'C-S-Up' if-shell "$is_vim" 'send-keys C-k' { if-shell "$is_fzf" 'send-keys C-k' 'select-pane -U' }
+bind-key -n 'C-S-Right' if-shell "$is_vim" 'send-keys C-l' 'select-pane -R'
+
+# Switch to previous or next window with Alt + Shift + Arrow keys
+bind -n M-S-Left  previous-window
+bind -n M-S-Right next-window
+
+# Move current window right and left in the ordering
+bind-key -r [ swap-window -t -1\; select-window -t -1
+bind-key -r ] swap-window -t +1\; select-window -t +1
+
+bind-key -r Left swap-window -t -1\; select-window -t -1
+bind-key -r Right swap-window -t +1\; select-window -t +1
+
+set -g mouse on
+
+set -g pane-active-border-style bg=default,fg=#333333
+set -g pane-border-style bg=default,fg=#333333
+
+# Map Home and End (which are triggered by cmd + left and cmd + right) to the correct codes.
+# Explanation https://stackoverflow.com/a/55616731
+bind-key -n Home send Escape "OH"
+bind-key -n End send Escape "OF"
+
+# ctrl-g types git commit -m "" when at zsh prompt, otherwise pass through
+bind-key -n C-g if-shell "$is_zsh_fg" "send-keys 'git commit -m \"\"' ; send-keys Left" 'send-keys C-g'
+
+set -g status on
+
+# don't exit from tmux when closing a session
+set -g detach-on-destroy off
+
+unbind f
+bind-key f run-shell "{{ homeDir }}/Scripts/tmux-session-connect \"$(
+  sesh list --icons | fzf --tmux 95%,95% \
+    --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
+    --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
+    --bind 'tab:down,btab:up' \
+    --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
+    --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
+    --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
+    --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
+    --bind 'ctrl-f:change-prompt(🔎  )+reload({{ homeDir }}/Scripts/find-dirs)' \
+    --bind 'ctrl-d:execute({{ homeDir }}/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
+    --preview-window 'right:55%' \
+    --preview 'sesh preview {}'
+)\""
+
+set -g @continuum-restore 'on'
+# otherwise nvim and some other processes are resumed
+set -g @resurrect-processes 'false'
+# leave just the first empty window in each session
+set -g @resurrect-hook-pre-restore-pane-processes '{{ homeDir }}/Scripts/tmux-kill-windows-and-panes'
+
+set-option -g automatic-rename off
+set-option -g allow-rename off
+
+# Catppuccin theme configuration
+# Inspo: https://github.com/omerxx/catppuccin-tmux?tab=readme-ov-file#config-1
+set -g @catppuccin_status_left_separator "█"
+set -g @catppuccin_status_right_separator "█"
+set -g @catppuccin_window_status_style "basic"
+set -g @catppuccin_window_number_color "#7aa2f7"
+set -g @catppuccin_window_text ' #{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}'
+set -g @catppuccin_window_number "#I"
+set -g @catppuccin_window_current_number_color "#ff9e64"
+set -g @catppuccin_window_current_text ' #{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}'
+set -g @catppuccin_window_current_number "#I"
+
+set -g status-right-length 100
+set -g status-left-length 100
+set -g status-left ""
+
+set -g @catppuccin_host_icon "󰒋 "
+set -g @catppuccin_host_text " #H"
+
+set -g status-right "#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
+
+# Initialize plugins (after all configuration is set)
+run-shell {{ catppuccinPlugin }}
+run-shell {{ resurrectPlugin }}
+run-shell {{ continuumPlugin }}

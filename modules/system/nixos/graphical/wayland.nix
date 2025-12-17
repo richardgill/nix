@@ -24,12 +24,10 @@
     portalPackage = pkgs.xdg-desktop-portal-hyprland;
   };
 
-  services.xserver = {
+  services.xserver.enable = true;
+  services.displayManager.gdm = {
     enable = true;
-    displayManager.gdm = {
-      enable = true;
-      autoSuspend = false;
-    };
+    autoSuspend = false;
   };
 
   xdg.portal = {

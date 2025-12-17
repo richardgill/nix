@@ -1,6 +1,15 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 current_branch=$(git symbolic-ref --short HEAD)
 remote=$(git remote | grep -q upstream && echo "upstream" || echo "origin")
-git fetch $remote
-git diff $remote/main...$current_branch
+
+echo "📡 Fetching $remote..." >&2
+git fetch "$remote"
+
+echo -e "\n── 📋 PR Diff (commits not in $remote/main) ──" >&2
+git diff "$remote/main...$current_branch"
+
+echo -e "\n── 📝 Working Directory (staged + unstaged + untracked) ──" >&2
+git-local-diff

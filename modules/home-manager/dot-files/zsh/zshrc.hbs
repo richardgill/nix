@@ -1,0 +1,278 @@
+export XDG_CONFIG_HOME="$HOME/.config"
+
+eval "$(mise activate zsh)"
+
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=10000000
+SAVEHIST=10000000
+
+# Save timestamp (when command started) and duration (how long it took) for each command
+setopt EXTENDED_HISTORY
+
+# Write to history file AFTER command finishes (so duration is accurate, not always 0)
+setopt INC_APPEND_HISTORY_TIME
+
+# When you run a duplicate command, remove the old one and keep only the newest
+setopt HIST_IGNORE_ALL_DUPS
+
+# Remove extra spaces between arguments (e.g., "git  commit" → "git commit", but preserves spaces in quotes)
+setopt HIST_REDUCE_BLANKS
+
+export EDITOR='nvim'
+export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+export BROWSER='tunnel-browser-open'
+
+# EDITOR=vim sets zsh -o vim implicitly :|
+bindkey -e
+
+# If interactive shell (needed to claude code)
+if [[ $- == *i* ]]; then
+  eval "$(zoxide init zsh --cmd cd)"
+  source <(fzf --zsh)
+
+  # Override default fzf-history-widget (ctrl-r) to accept query as command when no match
+  # To see default implementation: fzf --zsh 2>&1 | grep -A 30 "fzf-history-widget"
+  fzf-history-widget() {
+    local selected query
+    setopt localoptions noglobsubst noposixbuiltins pipefail no_aliases noglob nobash_rematch 2> /dev/null
+    # Ensure the module is loaded if not already, and the required features, such
+    # as the associative 'history' array, which maps event numbers to full history
+    # lines, are set. Also, make sure Perl is installed for multi-line output.
+    if zmodload -F zsh/parameter p:{commands,history} 2>/dev/null && (( ${+commands[perl]} )); then
+      local output="$(printf '%s\t%s\000' "${(kv)history[@]}" |
+        perl -0 -ne 'if (!$seen{(/^\s*[0-9]+\**\t(.*)/s, $1)}++) { s/\n/\n\t/g; print; }' |
+        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m --read0") \
+        FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --print-query)"
+      query="$(head -1 <<< "$output")"
+      selected="$(tail -n +2 <<< "$output")"
+    else
+      local output="$(fc -rl 1 | awk '{ cmd=$0; sub(/^[ \t]*[0-9]+\**[ \t]+/, "", cmd); if (!seen[cmd]++) print $0 }' |
+        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m") \
+        FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --print-query)"
+      query="$(head -1 <<< "$output")"
+      selected="$(tail -n +2 <<< "$output")"
+    fi
+    local ret=$?
+    if [ -n "$selected" ]; then
+      if [[ $(awk '{print $1; exit}' <<< "$selected") =~ ^[1-9][0-9]* ]]; then
+        zle vi-fetch-history -n $MATCH
+      else
+        LBUFFER="$selected"
+      fi
+    elif [ -n "$query" ]; then
+      LBUFFER="$query"
+    fi
+    zle reset-prompt
+    return $ret
+  }
+fi
+
+# Debug bindkey with `cato -v`
+
+# Auto-source tmux.conf if inside a tmux session
+if [ -n "$TMUX" ]; then
+  # EDITOR="nvim" and bindkey-e mess this up in tmux :|
+  bindkey  "^[OH"   beginning-of-line
+  bindkey  "^[OF"   end-of-line
+  bindkey  "^[[3~"  delete-char
+
+  # Keep environment variables in sync when switching between local/SSH tmux sessions
+  # Runs every new command in the terminal
+  precmd_update_tmux_env() {
+    eval $(tmux show-environment -s 2>/dev/null)
+  }
+  precmd_functions+=(precmd_update_tmux_env)
+fi
+
+# Oh my posh prompt
+if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
+  eval "$(oh-my-posh init zsh --config $HOME/.config/oh-my-posh/oh-my-posh.toml)"
+fi
+
+# Ctrl+Left and Ctrl+Right for moving word-by-word
+bindkey "^[[1;5D" backward-word   # Ctrl+Left
+bindkey "^[[1;5C" forward-word    # Ctrl+Right
+
+bindkey "^[[3;3~" kill-word # alt+Delete
+bindkey "^[[3;5~" kill-word # ctrl+Delete
+
+bindkey "^[[3;9~" kill-line # cmd+Delete
+
+bindkey '^[l' autosuggest-accept
+
+# ctrl + u only deletes from where the cursor is. (which is then bound to command + left elsewhere)
+# bindkey '^U' backward-kill-line
+
+# ctrl + backspace generates ^H
+bindkey "^H" backward-kill-word
+
+# alt + left and right in /paths/like/this
+autoload -U select-word-style
+select-word-style bash
+
+
+# Git aliases
+alias s="git status"
+alias d="git-local-diff"
+alias hard="git reset --hard"
+alias soft="git reset --soft HEAD~1"
+alias co="git checkout"
+
+# Sourced because it needs to change directory
+alias wtb="source ~/Scripts/worktree-branch"
+alias wto="~/Scripts/worktree-open"
+alias wtor="~/Scripts/worktree-open --reset"
+alias wtd="~/Scripts/worktree-purge"
+alias wtc="~/Scripts/worktree-close"
+alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
+alias bdi="~/Scripts/bd-interactive"
+alias log="git log --graph --decorate --pretty=format:'%h - %an, %ar : %s'"
+alias ghdiff="~/Scripts/gh-diff"
+alias prChecks='gh pr checks --watch'
+alias bbdiff='open "$(git config remote.origin.url)/pull-requests/new#diff"'
+alias auto-commit="~/Scripts/auto-commit"
+alias auto-pr="~/Scripts/auto-pr"
+alias auto-commit-pr="~/Scripts/auto-commit-pr"
+alias ci='auto-commit'
+alias pr='quick-pr'
+alias pr-ai='auto-pr'
+alias pr-diff='~/Scripts/git-pr-diff'
+alias cipr='auto-commit-pr'
+alias cip='~/Scripts/auto-commit-push'
+alias pull="source ~/Scripts/git-pull"
+alias push="source ~/Scripts/git-push"
+alias fetch="source ~/Scripts/git-fetch"
+
+add() {
+  if [ $# -eq 0 ]; then
+    git add .
+  else
+    git add "$@"
+  fi
+}
+
+branch() {
+  git checkout -b "$1"
+}
+
+branches() {
+  git branch -a
+}
+
+resetTo() {
+  target_branch="${1:-main}"
+  git reset $(git merge-base origin/"$target_branch" $(git rev-parse --abbrev-ref origin/HEAD))
+  git status
+}
+
+# app aliases
+alias c="cursor"
+alias v="nvim"
+alias t="tmux attach -t root || tmux new -s root"
+alias pnx="pnpm exec nx"
+alias lso="{{ coreUtilsPath }}/bin/ls"
+alias tree="ls --tree"
+alias cato="{{ coreUtilsPath }}/bin/cat"
+alias as="open -a \"Android Studio\""
+alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
+alias ssht="ssh-with-tunnel"
+
+{{#if isLinux}}
+alias sound="wiremix"
+alias bluetooth="blueberry"
+alias wifi="nmtui"
+{{/if}}
+alias y='yazi'
+if [[ -z "$IS_CLAUDE" ]]; then
+  alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions --all"
+  alias cat="bat"
+fi
+
+# -- Use fd instead of fzf --
+
+export FZF_DEFAULT_COMMAND="fd --hidden --strip-cwd-prefix --exclude .git"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type=d --hidden --strip-cwd-prefix --exclude .git"
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+  --highlight-line \
+  --info=inline-right \
+  --ansi \
+  --layout=reverse \
+  --border=none
+  --color=bg+:#283457 \
+  --color=bg:#16161e \
+  --color=border:#27a1b9 \
+  --color=fg:#c0caf5 \
+  --color=gutter:#16161e \
+  --color=header:#ff9e64 \
+  --color=hl+:#2ac3de \
+  --color=hl:#2ac3de \
+  --color=info:#545c7e \
+  --color=marker:#ff007c \
+  --color=pointer:#ff007c \
+  --color=prompt:#2ac3de \
+  --color=query:#c0caf5:regular \
+  --color=scrollbar:#27a1b9 \
+  --color=separator:#ff9e64 \
+  --color=spinner:#ff007c \
+"
+export FZF_CTRL_T_OPTS="--preview '~/Scripts/fzf-preview {}'"
+export FZF_ALT_C_OPTS="--preview '~/Scripts/fzf-preview {}'"
+
+
+# Advanced customization of fzf options via _fzf_comprun function
+# - The first argument to the function is the name of the command.
+# - You should make sure to pass the rest of the arguments to fzf.
+_fzf_comprun() {
+  local command=$1
+  shift
+
+  case "$command" in
+    cd)           fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
+    export|unset) fzf --preview "eval 'echo $'{}"         "$@" ;;
+    ssh)          fzf --preview 'dig {}'                   "$@" ;;
+    *)            fzf --preview "bat -n --color=always --line-range :500 {}" "$@" ;;
+  esac
+}
+
+# Use fd (https://github.com/sharkdp/fd) for listing path candidates.
+# - The first argument to the function ($1) is the base path to start traversal
+# - See the source code (completion.{bash,zsh}) for the details.
+_fzf_compgen_path() {
+  fd --hidden --exclude .git . "$1"
+}
+
+# Use fd to generate the list for directory completion
+_fzf_compgen_dir() {
+  fd --type=d --hidden --exclude .git . "$1"
+}
+
+# Puppeteer
+export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+export PUPPETEER_EXECUTABLE_PATH=`which chromium`
+
+export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
+
+# Path
+export PATH="$PATH:$HOME/Scripts"
+export PATH="$PATH:$HOME/Library/Android/sdk/platform-tools"
+export PATH="$PATH:$HOME/Library/Android/sdk/build-tools/34.0.0"
+
+# Android
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export PATH=$PATH:$ANDROID_HOME/emulator
+export PATH=$PATH:$ANDROID_HOME/platform-tools
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home
+
+# For building firefox
+export PATH="$HOME/.mozbuild/git-cinnabar:$PATH"
+
+export PATH="$PATH:$HOME/.local/bin"
+export PATH="$HOME/.config/xata/bin:$PATH"
+
+alias oc="opencode"
+alias cl="claude"
+
+source <(argc --argc-completions zsh git-browse)
+source <(argc --argc-completions zsh worktree-open)

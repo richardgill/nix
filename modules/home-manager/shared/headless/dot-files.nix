@@ -3,14 +3,17 @@
   pkgs,
   config,
   osConfig,
+  vars,
   ...
 }:
 let
-  template = import ../../../../utils/template.nix { inherit pkgs; };
   homeManager = import ../../../../utils/home-manager.nix { inherit lib config; };
   homeDir = config.home.homeDirectory;
-  inherit (template) renderMustache;
   inherit (homeManager) sourceDirectory;
+
+  # Import shared templates
+  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  inherit (templates) builtTemplates;
 
   # Programmatically generate Scripts entries
   scriptFiles = builtins.readDir ../../dot-files/Scripts;
@@ -33,35 +36,20 @@ let
         lib.filterAttrs (
           name: type:
           type == "regular"
-          && !(lib.hasSuffix ".mustache" name)
+          && !(lib.hasSuffix ".hbs" name)
           && (pkgs.stdenv.isLinux || !(builtins.elem name linuxOnlyScripts))
         ) scriptFiles
       );
 
-  cmusStartFile = pkgs.writeText "cmus-start" (
-    builtins.readFile (
-      renderMustache "cmus-start" ../../dot-files/cmus/start.mustache {
-        musicDir = osConfig.customDirs.music;
-      }
-    )
-  );
-
-  cmusRcFile = pkgs.writeText "cmus-rc" (
-    builtins.readFile (
-      renderMustache "cmus-rc" ../../dot-files/cmus/rc.mustache {
-        musicDir = osConfig.customDirs.music;
-      }
-    )
-  );
-
 in
 {
+  # Cmus files (from built templates)
   home.activation.copyCmusFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p ${config.home.homeDirectory}/.config/cmus
-    cp -f ${cmusStartFile} ${config.home.homeDirectory}/.config/cmus/start
-    chmod +x ${config.home.homeDirectory}/.config/cmus/start
-    cp -f ${cmusRcFile} ${config.home.homeDirectory}/.config/cmus/rc
-    cp -f ${../../dot-files/cmus/tokyo-night.theme} ${config.home.homeDirectory}/.config/cmus/tokyo-night.theme
+    mkdir -p ${homeDir}/.config/cmus
+    cp -f ${builtTemplates}/cmus/start ${homeDir}/.config/cmus/start
+    chmod +x ${homeDir}/.config/cmus/start
+    cp -f ${builtTemplates}/cmus/rc ${homeDir}/.config/cmus/rc
+    cp -f ${builtTemplates}/cmus/tokyo-night.theme ${homeDir}/.config/cmus/tokyo-night.theme
   '';
 
   home.file =
@@ -75,26 +63,49 @@ in
       source = ../../dot-files/Scripts/lib;
     }
     // {
-      ".zshenv" = {
-        text = builtins.readFile (
-          renderMustache "zshenv" ../../dot-files/zshenv.mustache {
-            anthropicApiKeyPath = osConfig.sops.secrets."anthropic-api-key".path;
-            kagiApiKeyPath = osConfig.sops.secrets."kagi-api-key".path;
-            tavilyApiKeyPath = osConfig.sops.secrets."tavily-api-key".path;
-            openaiApiKeyPath = osConfig.sops.secrets."openai-api-key".path;
-            joistApiKeyPath = osConfig.sops.secrets."joist-api-key".path;
-          }
-        );
-      };
-      ".claude/CLAUDE.md".source = ../../dot-files/claude/CLAUDE.md;
-      ".claude/lib".source = ../../dot-files/claude/lib;
+      # From built templates (in Nix store)
+      # Note: .zshenv is managed by programs.zsh.envExtra in zsh.nix
+      ".zprofile".source = "${builtTemplates}/zprofile/zprofile";
+      ".config/alacritty/alacritty.toml".source = "${builtTemplates}/alacritty/alacritty.toml";
+      ".config/alacritty/themes".source = "${builtTemplates}/alacritty/themes";
+      ".config/ghostty/config".source = "${builtTemplates}/ghostty/config";
+      ".config/ripgrep/.ripgreprc".source = "${builtTemplates}/ripgrep/ripgreprc";
+      ".config/ripgrep/.rgignore".source = "${builtTemplates}/ripgrep/rgignore";
+      # Note: .config/mise/config.toml is managed by mise.nix
+      # Note: .zshrc is managed by programs.zsh in zsh.nix
+
+      # Claude config (from built templates)
+      ".claude/CLAUDE.md".source = "${builtTemplates}/ai-agents/claude/CLAUDE.md";
       ".claude/settings.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/claude/settings.json";
-      ".claude/commands".source = ../../dot-files/claude/commands;
-      ".claude/skills".source = ../../dot-files/claude/skills;
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/claude/settings.json";
+      ".claude/commands".source = "${builtTemplates}/ai-agents/commands";
+      ".claude/skills".source = "${builtTemplates}/ai-agents/claude/skills";
+      ".claude/agents".source = "${builtTemplates}/ai-agents/claude/agents";
+      ".claude/rules".source = "${builtTemplates}/ai-agents/claude/rules";
+      ".claude/statusline.sh" = {
+        source = "${builtTemplates}/ai-agents/claude/statusline.sh";
+        executable = true;
+      };
+
+      # OpenCode uses same CLAUDE.md template
+      ".config/opencode/AGENTS.md".source = "${builtTemplates}/ai-agents/claude/CLAUDE.md";
+      ".config/opencode/opencode.json".source = "${builtTemplates}/ai-agents/opencode/opencode.json";
+      ".config/opencode/agent".source = "${builtTemplates}/ai-agents/opencode/agent";
+      ".config/opencode/prompts".source = "${builtTemplates}/ai-agents/opencode/prompts";
+      # OpenCode uses singular "command" directory (shared with claude/amp)
+      ".config/opencode/command".source = "${builtTemplates}/ai-agents/commands";
+
+      # Codex config
+      ".codex".source = "${builtTemplates}/ai-agents/codex";
+
+      # Ampcode config (~/.config/amp/)
+      ".config/amp/AGENTS.md".source = "${builtTemplates}/ai-agents/ampcode/AGENTS.md";
+      ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
+      ".config/amp/commands".source = "${builtTemplates}/ai-agents/commands";
+
+      # Static files (not templated)
       ".config/obs-studio".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/code/nix-private/modules/home-manager/dot-files/obs-studio";
-      ".codex".source = ../../dot-files/codex;
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/obs-studio";
       ".config/git/config".source = ../../dot-files/git/config;
       ".config/git/ignore".source = ../../dot-files/git/ignore;
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
@@ -102,45 +113,10 @@ in
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;
       "code/.rgignore".source = ../../dot-files/code/rgignore;
-      ".zprofile".text = builtins.readFile (
-        renderMustache "zprofile" ../../dot-files/zprofile.mustache {
-          inherit (pkgs.stdenv) isDarwin;
-        }
-      );
-      ".config/alacritty/alacritty.toml".text = builtins.readFile (
-        renderMustache "alacritty-config" ../../dot-files/alacritty/alacritty.toml.mustache {
-          zshPath = "${pkgs.zsh}/bin/zsh";
-        }
-      );
-      ".config/alacritty/themes".source = ../../dot-files/alacritty/themes;
       ".config/btop/btop.conf".source = ../../dot-files/btop/btop.conf;
-      ".config/ghostty/config".text = builtins.readFile (
-        renderMustache "ghostty-config" ../../dot-files/ghostty/config.mustache {
-          inherit (pkgs.stdenv) isDarwin;
-          inherit (pkgs.stdenv) isLinux;
-          zshPath = "${pkgs.zsh}/bin/zsh";
-        }
-      );
-      ".config/opencode/AGENTS.md".source = ../../dot-files/claude/CLAUDE.md;
-      ".config/opencode/opencode.json".source = ../../dot-files/opencode/opencode.json;
-      ".config/opencode/agent".source = ../../dot-files/opencode/agent;
-      ".config/opencode/prompts".source = ../../dot-files/opencode/prompts;
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
-      ".config/ripgrep/.ripgreprc".text = builtins.readFile (
-        renderMustache "ripgreprc" ../../dot-files/ripgrep/ripgreprc.mustache {
-          inherit homeDir;
-        }
-      );
-      ".config/ripgrep/.rgignore".source = ../../dot-files/ripgrep/rgignore;
       ".config/sesh".source = ../../dot-files/sesh;
+      ".ssh/config".source = ../../dot-files/ssh/config;
       ".config/yazi".source = ../../dot-files/yazi;
-      ".zshrc" = {
-        text = builtins.readFile (
-          renderMustache "zshrc" ../../dot-files/zsh/zshrc.mustache {
-            inherit (pkgs.stdenv) isDarwin isLinux;
-            coreUtilsPath = "${pkgs.coreutils}";
-          }
-        );
-      };
     };
 }

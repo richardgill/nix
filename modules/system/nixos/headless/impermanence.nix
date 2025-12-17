@@ -120,6 +120,7 @@
           ".cache/cmus"
           ".cache/thumbnails"
           ".local/state/nvim"
+          ".local/state/yazi"
           ".local/state/wireplumber"
           ".local/share/libvirt"
           ".config/libvirt"
@@ -136,6 +137,11 @@
           ".claude/history.jsonl"
         ];
       };
+
+      # Prevent file persistence services from restarting during switch.
+      # Without this, running processes (like Claude Code) can write to the
+      # file location between unmount and remount, causing "file already exists" errors.
+      systemd.services."persist-persistent-home-${vars.userName}-.claude.json".restartIfChanged = false;
 
       fileSystems."/persistent".neededForBoot = true;
       fileSystems."/nix".neededForBoot = true;

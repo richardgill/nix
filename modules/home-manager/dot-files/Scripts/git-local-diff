@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+cleanup() {
+  if [ ${#untracked_files[@]} -gt 0 ]; then
+    git reset -- "${untracked_files[@]}" 2>/dev/null || true
+  fi
+}
+
+trap cleanup EXIT INT TERM
+
+untracked_files=()
+while IFS= read -r file; do
+  untracked_files+=("$file")
+done < <(git ls-files --others --exclude-standard)
+
+if [ ${#untracked_files[@]} -gt 0 ]; then
+  git add -N -- "${untracked_files[@]}"
+fi
+
+git diff HEAD "$@"

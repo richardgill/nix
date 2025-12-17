@@ -1,14 +1,15 @@
 {
   pkgs,
   lib,
+  config,
+  osConfig,
+  vars,
   ...
 }:
 let
-  template = import ../../../../utils/template.nix { inherit pkgs; };
-
-  zshrcFile = template.renderMustache "zshrc" ../../dot-files/zsh/zshrc.mustache {
-    inherit (pkgs.stdenv) isDarwin;
-  };
+  # Import shared templates
+  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  inherit (templates) builtTemplates;
 in
 {
   programs.zsh = {
@@ -17,6 +18,10 @@ in
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
-    initContent = lib.mkBefore (builtins.readFile zshrcFile);
+    # Environment variables loaded from .zshenv (sourced on all shell invocations)
+    envExtra = builtins.readFile "${builtTemplates}/zshenv/zshenv";
+
+    # Source the built zshrc from Nix store
+    initContent = lib.mkBefore (builtins.readFile "${builtTemplates}/zsh/zshrc");
   };
 }

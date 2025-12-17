@@ -8,5 +8,5 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 "$SCRIPT_DIR/auto-commit"
 git push
-"$SCRIPT_DIR/auto-pr"
+"$SCRIPT_DIR/quick-pr"
 

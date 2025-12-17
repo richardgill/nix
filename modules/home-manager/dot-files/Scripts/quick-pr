@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Exit on any error
+set -e
+
+# Check for existing PR
+echo "Checking for existing pull request..."
+CURRENT_BRANCH=$(git branch --show-current)
+PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --json number --jq length)
+
+if [ "$PR_EXISTS" -eq 0 ]; then
+    echo "No existing PR found. Creating draft pull request..."
+
+    # Create draft PR with auto-filled title/body from commits
+    PR_URL=$(gh pr create --draft --fill-first)
+    echo "Draft pull request created: $PR_URL"
+
+    # Open in browser
+    gh pr view --web
+else
+    echo "Pull request already exists for branch '$CURRENT_BRANCH'"
+    gh pr view --web
+fi
