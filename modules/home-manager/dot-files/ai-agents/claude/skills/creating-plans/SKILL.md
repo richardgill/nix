@@ -36,7 +36,7 @@ Start by creating a planning todo list (TodoWrite):
 - Motivation: Why are we doing this.
 - It should include key decisions which may be preference and could have gone the other way. 
 - Which files will be affected and how.
-- Snippets of important code, focus on usages patterns of code rather than implementation details (function signatures, or example usages are great).
+- Code snippets showing usage patterns, signatures, and integration points.
 - Include your feedback loop / check you will run to confirm your implement is good / working
   -[pnpm|bun] run local-ci` is a good option,
   - Any other commands you can run to check your work? Curl? node -e? 
@@ -56,7 +56,7 @@ Start by creating a planning todo list (TodoWrite):
 - Stucture your plan as a check list using [ ]
 
 ## Remember
-- Show seams/signatures before implementation details
+- {{> usage-signature-flow }}
 - {{> sketch-first }}
 - Exact file paths always
 - Complete code in plan (not "add validation")
