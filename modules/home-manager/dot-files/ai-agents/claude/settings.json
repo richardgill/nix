@@ -13,6 +13,7 @@
       "Bash(~/Scripts/auto-pr)",
       "Bash(~/Scripts/git-pr-diff:*)",
       "Bash(~/Scripts/git-local-diff:*)",
+      "Bash(local-ci.sh)",
       "Bash(git:*)",
       "Bash(gh:*)",
       "Bash(pnpm:*)",
@@ -76,13 +77,16 @@
       "Skill(implementing-plans)",
       "Skill(creating-plans)",
       "SlashCommand(/brainstorm)",
-      "SlashCommand(/code-review)",
+      "SlashCommand(/review)",
+      "SlashCommand(/review-post)",
+      "SlashCommand(/review-pr)",
       "SlashCommand(/create-plan)",
       "SlashCommand(/implement-plan)",
       "SlashCommand(/merge-pr)",
       "SlashCommand(/pr-diff)",
       "SlashCommand(/pull-main)",
       "SlashCommand(/research)",
+      "SlashCommand(/post-review)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
@@ -102,8 +106,10 @@
       "Write(/bin/**)",
       "Write(/sbin/**)"
     ],
-    "defaultMode": "default",
-    "additionalDirectories": ["~/code/reference-repos"]
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "~/code/reference-repos"
+    ]
   },
   "hooks": {
     "Notification": [
@@ -150,7 +156,11 @@
     "network": {
       "allowLocalBinding": true
     },
-    "excludedCommands": ["docker", "git", "gh"]
+    "excludedCommands": [
+      "docker",
+      "git",
+      "gh"
+    ]
   },
   "alwaysThinkingEnabled": true,
   "feedbackSurveyState": {

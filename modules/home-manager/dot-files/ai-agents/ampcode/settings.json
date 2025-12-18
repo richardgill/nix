@@ -7,6 +7,7 @@
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-pr" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/git-pr-diff" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/git-local-diff" }, "action": "allow" },
+    { "tool": "Bash", "matches": { "cmd": "local-ci.sh" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "git *" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "gh *" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "pnpm *" }, "action": "allow" },
