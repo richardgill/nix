@@ -65,7 +65,15 @@ if [ "$context_size" -gt 0 ] 2>/dev/null; then
     # Format tokens as k
     total_k=$((total_tokens / 1000))
     size_k=$((context_size / 1000))
-    context_info="${PURPLE}${total_k}k/${size_k}k ${pct}%${RESET}"
+    # Color based on token usage: red at 100k+, amber at 70k+, purple otherwise
+    if [ "$total_tokens" -ge 100000 ]; then
+        context_color="$RED"
+    elif [ "$total_tokens" -ge 70000 ]; then
+        context_color="$YELLOW"
+    else
+        context_color="$PURPLE"
+    fi
+    context_info="${context_color}${total_k}k/${size_k}k ${pct}%${RESET}"
 fi
 
 # Model info
