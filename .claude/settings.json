@@ -15,6 +15,18 @@
       "WebFetch(domain:reddit.com)",
       "WebFetch(domain:www.reddit.com)"
     ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "local-ci.sh"
+          }
+        ]
+      }
+    ]
   }
 }
 
