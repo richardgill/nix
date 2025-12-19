@@ -1,12 +1,6 @@
 return {
   'folke/tokyonight.nvim',
   priority = 1000, -- Make sure to load this before all the other start plugins.
-  init = function()
-    vim.cmd.colorscheme 'tokyonight-night'
-
-    -- You can configure highlights by doing something like:
-    vim.cmd.hi 'Comment gui=none'
-  end,
   config = function()
     require('tokyonight').setup {
       -- Debugging:
@@ -37,11 +31,16 @@ return {
         hl['DiffChange'] = { bg = util.blend(gh_blue, 0.12, colors.bg) }
         -- Word-level changes (fg + nocombine disables syntax highlighting)
         hl['DiffText'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
-        -- Left pane remaps (in side-by-side diff, left shows old state so colors are inverted)
-        -- See diffview config
+        -- diffview.nvim highlight groups (left pane remaps - left shows old state so colors are inverted)
         hl['LeftPaneAdd'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
         hl['LeftPaneChange'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
         hl['LeftPaneText'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
+        -- vscode-diff.nvim highlight groups (left pane = deletions/red, right pane = insertions/green)
+        hl['CodeDiffLineInsert'] = { bg = util.blend(gh_green, 0.20, colors.bg) }
+        hl['CodeDiffLineDelete'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
+        hl['CodeDiffCharInsert'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
+        hl['CodeDiffCharDelete'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
+        hl['CodeDiffFiller'] = { fg = colors.bg, bg = util.blend(colors.fg_gutter, 0.08, colors.bg) }
 
         -- highlighting for multi cursor plugin
         hl['MultiCursor'] = hl['IncSearch']
@@ -68,5 +67,7 @@ return {
         copilot = false, -- suggestions were too dark
       },
     }
+    vim.cmd.colorscheme 'tokyonight-night'
+    vim.cmd.hi 'Comment gui=none'
   end,
 }

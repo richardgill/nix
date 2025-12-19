@@ -22,7 +22,10 @@ Start by creating a planning todo list (TodoWrite):
 - [ ] If you have questions or are unsure about anything please ask for clarification until everything is resolved
 - [ ] Write the plan to disk
 - [ ] Read the plan again and review it based on the plan criteria laid out here.
-- [ ] Reply to user with the plan summary 
+- [ ] Reply to user with the plan summary and the implement command
+
+**End with:** After presenting the plan summary, always tell the user the exact command to run:
+`/implement-plan scratch/plans/YYYY-MM-DD-<feature-name>.md`
 
 
 ## Plan Document Header
@@ -37,8 +40,8 @@ Start by creating a planning todo list (TodoWrite):
 - It should include key decisions which may be preference and could have gone the other way. 
 - Which files will be affected and how.
 - Code snippets showing usage patterns, signatures, and integration points.
-- Include your feedback loop / check you will run to confirm your implement is good / working
-  -[pnpm|bun] run local-ci` is a good option,
+- Include your feedback loop. 
+  - Always run `local-ci.sh` for all changes.
   - Any other commands you can run to check your work? Curl? node -e? 
 - If it needs manually testing include those commands here for me to review.
 

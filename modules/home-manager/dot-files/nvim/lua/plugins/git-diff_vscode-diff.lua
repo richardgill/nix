@@ -1,11 +1,14 @@
---[[
 return {
   'esmuellert/vscode-diff.nvim',
+  branch = 'next',
   dependencies = { 'MunifTanjim/nui.nvim' },
   config = function()
     require('vscode-diff').setup {
       diff = {
         disable_inlay_hints = true,
+      },
+      explorer = {
+        view_mode = 'tree',
       },
       keymaps = {
         view = {
@@ -24,6 +27,3 @@ return {
     }
   end,
 }
---]]
-
-return {}
