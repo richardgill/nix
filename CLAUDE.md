@@ -6,7 +6,9 @@ Use the `.justfile` for common tasks and commands.
 
 Run `just check` after making changes to validate the configuration.
 
-Dot files in `~/` are symlinked from `modules/home-manager/dot-files.nix` - we prefer keeping them as text files on disk with mustache templating when needed.
+To edit my dot files in `~/` they are actually symlinked from `modules/home-manager/dot-files.nix` so search there. 
+
+We prefer keeping them as text files on disk with handlebar templating when needed.
 
 When adding new persistence directories/files for impermanence, they need to be added in:
 - `modules/nixos/cli/impermanence.nix`

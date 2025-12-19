@@ -39,6 +39,7 @@ fi
 
 # Git status counts (only if in a git repo)
 git_info=""
+GIT_WIDTH=20
 if cd "$cwd" 2>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
     read staged modified untracked <<< $(git status --porcelain 2>/dev/null | awk '
         /^[MADRC]/ {s++}
@@ -57,23 +58,48 @@ if cd "$cwd" 2>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
     [ "$ahead" -gt 0 ] 2>/dev/null && git_info+="${CYAN}⇡${ahead}${RESET} "
 fi
 
-# Context window info (using current_usage for accurate calculation)
+# Pad git_info to fixed width
+git_visible=$(echo -e "$git_info" | sed 's/\x1b\[[0-9;]*m//g')
+git_len=${#git_visible}
+git_padding=$((GIT_WIDTH - git_len))
+[ "$git_padding" -lt 0 ] && git_padding=0
+git_info="${git_info}$(printf '%*s' "$git_padding" '')"
+
+# Context window info (progress bar spanning 200k with 100k midpoint marker)
 context_info=""
 if [ "$context_size" -gt 0 ] 2>/dev/null; then
     total_tokens=$((current_input + current_output + cache_creation + cache_read))
-    pct=$((total_tokens * 100 / context_size))
-    # Format tokens as k
     total_k=$((total_tokens / 1000))
-    size_k=$((context_size / 1000))
-    # Color based on token usage: red at 100k+, amber at 70k+, purple otherwise
+
+    # Progress bar: 20 chars total, midpoint │ at 100k, full bar = 200k
+    # Each char = 10k tokens
+    bar_width=20
+    filled=$((total_tokens / 10000))
+    [ "$filled" -gt "$bar_width" ] && filled=$bar_width
+
+    # Color based on token usage: red at 100k+, yellow at 70k+, purple otherwise
     if [ "$total_tokens" -ge 100000 ]; then
-        context_color="$RED"
+        bar_color="$RED"
     elif [ "$total_tokens" -ge 70000 ]; then
-        context_color="$YELLOW"
+        bar_color="$YELLOW"
     else
-        context_color="$PURPLE"
+        bar_color="$PURPLE"
     fi
-    context_info="${context_color}${total_k}k/${size_k}k ${pct}%${RESET}"
+
+    # Build the bar with midpoint marker at position 10
+    bar=""
+    for ((i=0; i<bar_width; i++)); do
+        if [ "$i" -eq 10 ]; then
+            bar+="${GRAY}│${bar_color}"
+        fi
+        if [ "$i" -lt "$filled" ]; then
+            bar+="█"
+        else
+            bar+="░"
+        fi
+    done
+
+    context_info="${total_k}k ${bar_color}[${bar}${bar_color}]${RESET} 200k"
 fi
 
 # Model info
@@ -96,5 +122,5 @@ if awk "BEGIN {exit !($cost_usd > 0)}" 2>/dev/null; then
     cost_info="${GRAY}\$${cost_fmt}${RESET}"
 fi
 
-# Output: git counts | context | Model
-echo -e "${git_info}${context_info} ${model_info}"
+# Output: context | git | model
+echo -e "${context_info} ${git_info}${model_info}"
