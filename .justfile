@@ -104,7 +104,9 @@ template machine='':
     fi
     
     echo "Building templates for: $machine"
-    
+
+    rm -rf built
+
     # Get template config from Nix
     data_file=$(mktemp)
     nix eval --json "path:.#templateConfig.$machine" > "$data_file"

@@ -1,27 +1,30 @@
-Present code changes outside-in:
-- Usage examples: reveal the API shape and ergonomics
-- Signatures: confirm types and options
-- Flow: show where it fits in calling code
+Present code changes outside-in, showing new code **in context** with surrounding existing code:
+
+1. **Usage & Signature** - reveal the API shape, types, and ergonomics
+2. **Flow** - show where new code lands relative to existing code
 
 Example - adding a `formatCurrency` utility:
 
 ```ts
-// 1. USAGE - how callers will use it
-const price = formatCurrency(1999, 'USD');  // "$19.99"
-const euro = formatCurrency(1999, 'EUR');   // "€19.99"
+// Usage
+function formatCurrency(cents: number, currency: 'USD' | 'EUR' | 'GBP'): string
 
-// 2. SIGNATURE - the contract
-function formatCurrency(cents: number, currency: CurrencyCode): string
+formatCurrency(1999, 'USD');  // "$19.99"
+formatCurrency(1999, 'EUR');  // "€19.99"
 
-type CurrencyCode = 'USD' | 'EUR' | 'GBP';
-
-// 3. FLOW - where it's called from
-// src/components/ProductCard.tsx:45-49
+// Flow - where it lands in existing code
+// src/components/ProductCard.tsx
 export function ProductCard({ product }: Props) {
-  const store = useStore();
+  const store = useStore();                          // existing
+  const price = formatCurrency(product.cents, ...);  // ← new
+
   return (
-    <span className="price">{formatCurrency(product.priceInCents, store.currency)}</span>
-    //                       ^^^^^^^^^^^^^^^ line 48: new call site
+    <div className="card">                           {/* existing */}
+      <span className="price">{price}</span>         {/* ← new */}
+      <span className="name">{product.name}</span>   {/* existing */}
+    </div>
   );
 }
 ```
+
+The reviewer should see what already exists around the new code, not just the new code in isolation.
