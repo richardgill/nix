@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Check if cmuscontrold is already running
+if ! pgrep -x "cmuscontrold" > /dev/null; then
+    # Start cmuscontrold in the background with all output suppressed
+    cmuscontrold > /dev/null 2>&1 &
+fi
+
+# Start cmus with the music folder
+exec cmus "/home/rich/Music"

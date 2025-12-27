@@ -11,6 +11,9 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
   exit 1
 fi
 
+echo "Building templates..."
+just template
+
 github_repo_dir=$(mktemp -d)
 
 short_sha=$(git rev-parse --short HEAD)
@@ -30,6 +33,9 @@ find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git
 rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
+
+# Remove built/ from .gitignore so built templates are tracked in public repo
+sed -i '/^built\/$/d' .gitignore
 
 echo "Removing private blocks from files..."
 find . -type f -not -path "./.git/*" | while read -r file; do
