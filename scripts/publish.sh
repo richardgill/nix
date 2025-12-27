@@ -46,6 +46,7 @@ find . -type f -not -path "./.git/*" | while read -r file; do
 done
 
 git add -A
+git add -f local-ci.sh 2>/dev/null || true
 
 if git diff --staged --quiet; then
   echo "No changes to commit"
