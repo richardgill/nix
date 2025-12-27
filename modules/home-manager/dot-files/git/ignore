@@ -1,5 +1,6 @@
 .DS_Store
 mise.local.toml
 .claude/settings.local.json
+.claude/prompts/
 scratch/
 local-ci.sh

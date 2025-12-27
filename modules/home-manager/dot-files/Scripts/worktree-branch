@@ -68,9 +68,10 @@ else
   git worktree add "$TARGET"
 fi
 
+# Trust mise configs before tmux session starts (shell hook runs on cd to TARGET)
+mise trust --all --cd "$TARGET"
 
 TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET"))
 SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd")
-
 
 tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktree-branch-setup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

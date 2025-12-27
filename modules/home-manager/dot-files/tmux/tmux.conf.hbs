@@ -90,7 +90,7 @@ is_fzf="ps -o state= -o comm= -t '#{pane_tty}' \
   | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?fzf$'"
 # True when at zsh prompt (no other program running in the pane)
 # Checks that no process OTHER than zsh/ps exists on this tty
-is_zsh_fg="! ps -o comm= -t '#{pane_tty}' | grep -qvE '^(zsh|ps)$'"
+is_zsh_fg="! ps -o comm= -t '#{pane_tty}' | grep -qvE '^(-?zsh|ps|grep)$'"
 
 bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
 bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-j' { if-shell "$is_fzf" 'send-keys C-j' 'select-pane -D' }

@@ -13,7 +13,9 @@
       "WebFetch(domain:google.com)",
       "WebFetch(domain:www.google.com)",
       "WebFetch(domain:reddit.com)",
-      "WebFetch(domain:www.reddit.com)"
+      "WebFetch(domain:www.reddit.com)",
+      "Edit(/tmp/**)",
+      "Write(/tmp/**)"
     ]
   },
   "hooks": {
