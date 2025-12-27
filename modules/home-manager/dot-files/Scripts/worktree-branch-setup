@@ -31,6 +31,10 @@ if [ ! -d "$TARGET/scratch" ]; then
   mkdir "$TARGET/scratch"
 fi
 
+# Trust mise configs after copy (may include gitignored .mise.local.toml etc)
+mise trust --all --cd "$TARGET"
+mise install --cd "$TARGET"
+
 if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
   echo "running: pnpm install"
   cd "$TARGET" && pnpm install
@@ -39,7 +43,6 @@ elif [ -f "$SOURCE/bun.lockb" ] || [ -f "$SOURCE/bun.lock" ]; then
   cd "$TARGET" && bun install
 fi
 
-(cd "$TARGET" && mise trust)
 
 if [ -n "$SOCKET_FILE" ]; then
   echo "restarting nvim LSP"

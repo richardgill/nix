@@ -19,6 +19,9 @@ setopt HIST_IGNORE_ALL_DUPS
 # Remove extra spaces between arguments (e.g., "git  commit" → "git commit", but preserves spaces in quotes)
 setopt HIST_REDUCE_BLANKS
 
+# Write directly to history file instead of copy-then-rename (avoids issues with some filesystems/sync tools)
+unsetopt HIST_SAVE_BY_COPY
+
 export EDITOR='nvim'
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 export BROWSER='tunnel-browser-open'
@@ -119,8 +122,7 @@ alias hard="git reset --hard"
 alias soft="git reset --soft HEAD~1"
 alias co="git checkout"
 
-# Sourced because it needs to change directory
-alias wtb="source ~/Scripts/worktree-branch"
+alias wtb="~/Scripts/worktree-branch"
 alias wto="~/Scripts/worktree-open"
 alias wtor="~/Scripts/worktree-open --reset"
 alias wtd="~/Scripts/worktree-purge"

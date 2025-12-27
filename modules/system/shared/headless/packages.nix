@@ -8,6 +8,7 @@
     curl
     datamash
     docker
+    ffmpeg
     gcc
     gawk
     git

@@ -9,7 +9,7 @@ get_workspace_for_app() {
   case "$app_lower" in
     *ghostty*) echo "10" ;;
     *nautilus*) echo "11" ;;
-    *firefox*) echo "12" ;;
+    *firefox*|*google-chrome*|*chrome*) echo "12" ;;
     *btop*) echo "13" ;;
     *discord*) echo "14" ;;
     *1password*) echo "15" ;;

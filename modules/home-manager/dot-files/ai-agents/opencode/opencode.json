@@ -61,8 +61,6 @@
 	},
 	"keybinds": {
 		"leader": "ctrl+x",
-		"app_help": "<leader>h",
-		"switch_mode": "tab",
 		"editor_open": "<leader>e",
 		"session_new": "<leader>n",
 		"session_list": "<leader>l",
@@ -73,7 +71,6 @@
 		"tool_details": "<leader>d",
 		"model_list": "<leader>m",
 		"theme_list": "<leader>t",
-		"project_init": "<leader>i",
 		"input_clear": "ctrl+c",
 		"input_paste": "ctrl+v",
 		"input_submit": "enter",
