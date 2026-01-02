@@ -28,7 +28,7 @@
 }
 
 window#waybar {
-    background: transparent;
+    background: @background;
 }
 
 window#waybar.hidden {
@@ -47,7 +47,7 @@ tooltip {
 /* Workspaces */
 #workspaces {
     background: @background;
-    margin: 5px;
+    margin: 4px;
     padding: 0px 1px;
     border-radius: 15px;
     border: 0px;
@@ -112,11 +112,11 @@ tooltip {
 #backlight,
 #custom-screenrecord,
 #clock {
-    background: @background;
+    background: transparent;
     color: @foreground;
-    margin: 5px 0px 5px 0px;
-    padding: 0px 15px;
-    border-radius: 12px;
+    margin: 0;
+    padding: 0 12px;
+    border-radius: 0;
 }
 
 /* Module specific colors */
@@ -180,8 +180,8 @@ tooltip {
 
 #custom-power {
     color: @red;
-    border-radius: 5px;
     margin-right: 10px;
+    margin-top: -2px;
 }
 
 #custom-power:hover {

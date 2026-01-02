@@ -81,6 +81,7 @@
       "Skill(executing-plans)",
       "Skill(implementing-plans)",
       "Skill(creating-plans)",
+      "Skill(oracle)",
       "SlashCommand(/brainstorm)",
       "SlashCommand(/review)",
       "SlashCommand(/review-post)",
@@ -93,11 +94,14 @@
       "SlashCommand(/research)",
       "SlashCommand(/diff)",
       "SlashCommand(/search-web)",
+      "SlashCommand(/tech-stack-choices)",
+      "SlashCommand(/oracle)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:api.github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:githubusercontent.com)",
       "WebFetch(domain:registry.npmjs.org)",
+      "WebFetch(domain:api.npmjs.org)",
       "WebFetch(domain:telemetry.vercel.com)",
       "WebFetch(domain:channels.nixos.org)",
       "WebFetch(domain:results-receiver.actions.githubusercontent.com)"
@@ -112,7 +116,7 @@
       "Write(/bin/**)",
       "Write(/sbin/**)"
     ],
-    "defaultMode": "acceptEdits",
+    "defaultMode": "bypassPermissions",
     "additionalDirectories": ["~/code/reference-repos"]
   },
   "hooks": {
@@ -162,20 +166,22 @@
     "command": "~/.claude/statusline.sh",
     "padding": 0
   },
+  "enabledPlugins": {
+    "typescript-lsp@claude-plugins-official": true,
+    "dev-browser@dev-browser-marketplace": true
+  },
   "sandbox": {
-    "enabled": true,
+    "enabled": false,
     "autoAllowBashIfSandboxed": true,
     "allowUnsandboxedCommands": true,
     "network": {
       "allowLocalBinding": true
     },
-    "excludedCommands": ["docker", "git", "gh"]
+    "excludedCommands": ["docker", "git", "gh", "bun", "pnpm"]
   },
   "alwaysThinkingEnabled": true,
+  "bypassPermissionsModeAccepted": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754325484811
-  },
-  "enabledPlugins": {
-    "typescript-lsp@claude-plugins-official": true
   }
 }

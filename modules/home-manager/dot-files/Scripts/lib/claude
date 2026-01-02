@@ -1,0 +1,251 @@
+#!/usr/bin/env bash
+# Shared Claude session utilities
+#
+# Usage: source lib/claude
+#
+# Provides list_claude_sessions which returns JSON array of all Claude sessions
+
+CLAUDE_PROJECTS_DIR="$HOME/.claude/projects"
+CLAUDE_HISTORY_FILE="$HOME/.claude/history.jsonl"
+CLAUDE_SESSIONS_STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/claude-sessions"
+CLAUDE_IGNORED_FILE="$CLAUDE_SESSIONS_STATE_DIR/ignored.tsv"
+
+# =============================================================================
+# Session File Access
+# =============================================================================
+
+_claude_find_session_file() {
+  local files=("$CLAUDE_PROJECTS_DIR"/*/"$1.jsonl")
+  [[ -f "${files[0]}" ]] && echo "${files[0]}"
+}
+
+_claude_get_topic_from_history() {
+  local sid="$1"
+  [[ ! -f "$CLAUDE_HISTORY_FILE" ]] && return
+  grep "$sid" "$CLAUDE_HISTORY_FILE" 2>/dev/null \
+    | jq -rs 'first | .display[0:60] // ""' 2>/dev/null
+}
+
+_claude_is_session_cleared() {
+  local sid="$1"
+  [[ ! -f "$CLAUDE_HISTORY_FILE" ]] && return 1
+  local last=$(grep "$sid" "$CLAUDE_HISTORY_FILE" 2>/dev/null \
+    | jq -rs 'last | .display // ""' 2>/dev/null)
+  [[ "$last" =~ ^/clear ]]
+}
+
+_claude_get_first_message() {
+  local session_file="$1"
+  jq -r '
+    select(.type == "user" and (.isMeta | not)) |
+    .message.content |
+    select(type == "string" and . != "" and (startswith("[") | not))
+  ' "$session_file" 2>/dev/null \
+    | head -1 \
+    | sed 's/<[^>]*>//g' \
+    | tr '\n' ' ' \
+    | sed 's/^[[:space:]]*//' \
+    | head -c 60
+}
+
+_claude_is_empty_session() {
+  local session_file="$1"
+  ! jq -e 'select(.type == "assistant")' "$session_file" >/dev/null 2>&1
+}
+
+_claude_get_summary() {
+  local session_id="$1"
+  local summary_file="$CLAUDE_SESSIONS_STATE_DIR/$session_id/summary.txt"
+  [[ -f "$summary_file" ]] && cat "$summary_file"
+}
+
+# =============================================================================
+# State Detection
+# =============================================================================
+
+# Detect state from tmux terminal content
+# Returns: running|permission|stopped|unknown
+# Debug logs: /tmp/claude-sessions-debug/<target>-<timestamp>.log
+_claude_get_terminal_state() {
+  local tmux_target="$1"
+  local pane_content state
+
+  pane_content=$(tmux capture-pane -t "$tmux_target" -p 2>/dev/null | tail -40)
+  if [[ -z "$pane_content" ]]; then
+    state="unknown"
+  elif echo "$pane_content" | grep -qF "Do you want to proceed?"; then
+    state="permission"
+  elif echo "$pane_content" | grep -qF "Esc to cancel"; then
+    state="permission"
+  elif echo "$pane_content" | grep -qF "esc to interrupt"; then
+    state="running"
+  elif echo "$pane_content" | grep -qE '^>.'; then
+    state="stopped"
+  else
+    state="unknown"
+  fi
+
+  {
+    local debug_dir="/tmp/claude-sessions-debug"
+    mkdir -p "$debug_dir"
+    local safe_target="${tmux_target//[:\/]/-}"
+    printf '%s\n%s\n\n' "=== $(date -Iseconds) === $state ===" "$pane_content" >> "$debug_dir/${safe_target}.log"
+  } &
+
+  echo "$state"
+}
+
+# Get idle seconds from session file's last timestamp
+_claude_get_idle_secs() {
+  local session_file="$1" now="$2"
+  local last_ts=$(tail -1 "$session_file" | jq -r '.timestamp // ""' 2>/dev/null)
+  [[ -z "$last_ts" ]] && { echo "0"; return; }
+  local ts_epoch=$(date -d "$last_ts" +%s 2>/dev/null) || { echo "0"; return; }
+  echo $((now - ts_epoch))
+}
+
+# Get session start epoch from first entry's timestamp
+_claude_get_session_start() {
+  local session_file="$1"
+  local first_ts=$(head -1 "$session_file" | jq -r '.snapshot.timestamp // .timestamp // ""' 2>/dev/null)
+  [[ -z "$first_ts" ]] && { echo "0"; return; }
+  date -d "$first_ts" +%s 2>/dev/null || echo "0"
+}
+
+# =============================================================================
+# Ignore Management
+# =============================================================================
+
+_claude_get_last_timestamp() {
+  local session_file="$1"
+  tail -1 "$session_file" | jq -r '.timestamp // ""' 2>/dev/null
+}
+
+# Returns ignored_at epoch if session is ignored (and msg timestamp still matches), empty otherwise
+_claude_get_ignored_at() {
+  local session_id="$1" current_ts="$2"
+  [[ ! -f "$CLAUDE_IGNORED_FILE" ]] && return
+  local line=$(awk -F'\t' -v sid="$session_id" '$1==sid {print $2"\t"$3}' "$CLAUDE_IGNORED_FILE")
+  [[ -z "$line" ]] && return
+  local stored_ts="${line%%	*}"
+  local ignored_at="${line##*	}"
+  [[ "$stored_ts" == "$current_ts" ]] && echo "$ignored_at"
+}
+
+claude_ignore_session() {
+  local session_id="$1"
+  local session_file=$(_claude_find_session_file "$session_id")
+  [[ -z "$session_file" ]] && return 1
+
+  mkdir -p "$CLAUDE_SESSIONS_STATE_DIR"
+  local msg_ts=$(_claude_get_last_timestamp "$session_file")
+  local now=$(date +%s)
+
+  [[ -f "$CLAUDE_IGNORED_FILE" ]] && sed -i "/^$session_id\t/d" "$CLAUDE_IGNORED_FILE"
+  printf '%s\t%s\t%s\n' "$session_id" "$msg_ts" "$now" >> "$CLAUDE_IGNORED_FILE"
+}
+
+# =============================================================================
+# Main API
+# =============================================================================
+
+# Returns JSON array of all Claude sessions with their state
+# Each object: {pid, tmux_target, tmux_session, window_index, session_id, state, idle_secs, ignored_at, topic, summary}
+# Args: [--include-new] - include sessions with state "new" (for finding fork targets)
+list_claude_sessions() {
+  local include_new=false
+  [[ "$1" == "--include-new" ]] && include_new=true
+
+  local now=$(date +%s)
+
+  # Build tty -> claude pid map
+  declare -A claude_by_tty
+  while read -r pid tty comm; do
+    [[ "$comm" == "claude" ]] && claude_by_tty["$tty"]="$pid"
+  done < <(ps -eo pid,tty,comm 2>/dev/null)
+
+  (( ${#claude_by_tty[@]} == 0 )) && { echo "[]"; return; }
+
+  # Build tmux target -> tty map
+  declare -A pane_tty
+  while IFS=$'\t' read -r target tty; do
+    pane_tty["$target"]="$tty"
+  done < <(tmux list-panes -a -F '#{session_name}:#{window_index}'$'\t''#{pane_tty}' 2>/dev/null)
+
+  # Build tmux session -> last_attached map
+  declare -A session_last_attached
+  while IFS=$'\t' read -r sess_name last_attached; do
+    session_last_attached["$sess_name"]="${last_attached:-0}"
+  done < <(tmux list-sessions -F '#{session_name}'$'\t''#{session_last_attached}' 2>/dev/null)
+
+  # Process each window
+  local first=true
+  echo "["
+
+  while IFS=$'\t' read -r tmux_session window_index _; do
+    local tmux_target="$tmux_session:$window_index"
+    local tty="${pane_tty[$tmux_target]:-}"
+    [[ -z "$tty" ]] && continue
+
+    local pts_num="${tty#/dev/pts/}"
+    local pid="${claude_by_tty[pts/$pts_num]:-}"
+    [[ -z "$pid" ]] && continue
+
+    local session_id=$(tmux display -t "$tmux_target" -p '#{@claude_session_id}' 2>/dev/null)
+    local state="unknown" idle_secs=0 ignored_at=0 topic="" summary=""
+    local tmux_last_attached="${session_last_attached[$tmux_session]:-0}"
+
+    local session_start=0
+
+    if [[ -n "$session_id" ]]; then
+      _claude_is_session_cleared "$session_id" && continue
+
+      local session_file=$(_claude_find_session_file "$session_id")
+      if [[ -n "$session_file" ]]; then
+        state=$(_claude_get_terminal_state "$tmux_target")
+        idle_secs=$(_claude_get_idle_secs "$session_file" "$now")
+        session_start=$(_claude_get_session_start "$session_file")
+
+        [[ "$state" == "unknown" ]] && _claude_is_empty_session "$session_file" && state="new"
+
+        if [[ "$state" == "stopped" ]]; then
+          local last_ts=$(_claude_get_last_timestamp "$session_file")
+          local maybe_ignored=$(_claude_get_ignored_at "$session_id" "$last_ts")
+          if [[ -n "$maybe_ignored" ]]; then
+            state="ignored"
+            ignored_at="$maybe_ignored"
+          fi
+        fi
+
+        topic=$(_claude_get_topic_from_history "$session_id")
+        [[ -z "$topic" ]] && topic=$(_claude_get_first_message "$session_file")
+
+        summary=$(_claude_get_summary "$session_id")
+      fi
+    fi
+
+    [[ "$state" == "new" && "$include_new" == "false" ]] && continue
+    [[ -z "$topic" && "$state" != "unknown" && "$state" != "new" ]] && continue
+
+    $first || echo ","
+    first=false
+
+    jq -n \
+      --argjson pid "$pid" \
+      --arg tmux_target "$tmux_target" \
+      --arg tmux_session "$tmux_session" \
+      --argjson window_index "$window_index" \
+      --arg session_id "$session_id" \
+      --arg state "$state" \
+      --argjson idle_secs "$idle_secs" \
+      --argjson ignored_at "$ignored_at" \
+      --argjson session_start "$session_start" \
+      --argjson tmux_last_attached "$tmux_last_attached" \
+      --arg topic "$topic" \
+      --arg summary "$summary" \
+      '{pid: $pid, tmux_target: $tmux_target, tmux_session: $tmux_session, window_index: $window_index, session_id: $session_id, state: $state, idle_secs: $idle_secs, ignored_at: $ignored_at, session_start: $session_start, tmux_last_attached: $tmux_last_attached, topic: $topic, summary: $summary}'
+
+  done < <(tmux list-windows -a -F '#{session_name}'$'\t''#{window_index}'$'\t''#{window_name}')
+
+  echo "]"
+}

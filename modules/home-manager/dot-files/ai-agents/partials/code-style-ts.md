@@ -10,5 +10,5 @@
 - Do not use: `while`, `switch`, `continue`, `break`, `in` keywords except if there is good reason to do so
 - New comments: Always single line // comments
 - Existing comments: Keep comment style that was there before
-- Prefer immutable, functional code where possible. (If it's neater to mutate, this is fine)
+- {{> prefer-immutable }}
 

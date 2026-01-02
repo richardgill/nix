@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Claude Code launcher with session tracking and summary generation
+#
+# Hooks:
+#   SessionStart - stores session ID in tmux pane for cc-test.sh
+#   Stop - generates debounced summaries via claude-summary-hook
+
+session_start_hook='sid=$(cat | jq -r ".session_id // empty"); [[ -n "$TMUX_PANE" && -n "$sid" ]] && tmux set-option -t "$TMUX_PANE" -p @claude_session_id "$sid"'
+
+settings=$(jq -nc \
+  --arg start "$session_start_hook" \
+  --arg stop "$HOME/Scripts/claude-summary-hook" \
+  '{
+    hooks: {
+      SessionStart: [{
+        hooks: [{type: "command", command: $start}]
+      }],
+      Stop: [{
+        hooks: [{type: "command", command: $stop}]
+      }]
+    }
+  }')
+
+exec claude --settings "$settings" "$@"

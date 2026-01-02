@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Claude Code Session Picker - fzf for tmux windows running Claude
+#
+# Indicators: ▶ running, ■ stopped (idle time), 󰂞 needs permission, ○ ignored, ? no session-id
+#
+# Usage: claude-sessions [list]
+#
+# For state detection, launch claude with: cl (wrapper that sets @claude_session_id)
+
+source ~/Scripts/lib/claude
+
+FZF_LISTEN_PORT=51777
+
+generate_list() {
+  list_claude_sessions | jq -r '
+    # Split into non-ignored and ignored
+    group_by(.state == "ignored") |
+    (.[0] // []) as $active |
+    (.[1] // []) as $ignored |
+
+    # Active sessions sorted by session_start (oldest first = stable order)
+    # Ignored sessions sorted by ignored_at (most recent first)
+    ($active | sort_by(.session_start)) + ($ignored | sort_by(-.ignored_at))
+
+    | .[] |
+
+    # Pick indicator with color
+    (if .state == "ignored" then "○"
+     elif .state == "permission" then "\u001b[33m󰂞\u001b[0m"
+     elif .state == "stopped" then "\u001b[34m■\u001b[0m"
+     elif .state == "running" then "\u001b[32m▶\u001b[0m"
+     else "?" end) as $indicator |
+
+    # Idle suffix for non-running states
+    (if .state == "permission" or .state == "stopped" or .state == "ignored" then " (\(.idle_secs |
+       if . < 60 then "\(.)s"
+       elif . < 3600 then "\(. / 60 | floor)m"
+       elif . < 86400 then "\(. / 3600 | floor)h"
+       else "\(. / 86400 | floor)d" end))"
+     else "" end) as $suffix |
+
+    # Use summary if available, otherwise topic
+    (if .summary != "" then .summary else .topic end | gsub("\n"; " ")) as $display |
+
+    # Dim styling for ignored sessions
+    (if .state == "ignored" then "\u001b[2m" else "" end) as $dim |
+    (if .state == "ignored" then "\u001b[0m" else "" end) as $reset |
+
+    "\(.pid)\t\(.tmux_target)\t\(.session_id)\t\($dim)\($indicator)  \(.tmux_target | . + (" " * (24 - length))[:24])  \($display)\($suffix)\($reset)"
+  '
+}
+
+case "${1:-run}" in
+  list)
+    generate_list
+    ;;
+  run)
+    script_path="$(realpath "$0")"
+    refresh_interval="${REFRESH_INTERVAL:-4}"
+
+    # Background process to send reload commands periodically
+    (
+      sleep "$refresh_interval"
+      while true; do
+        curl -s "localhost:$FZF_LISTEN_PORT" -d "reload($script_path list)" >/dev/null 2>&1 || break
+        sleep "$refresh_interval"
+      done
+    ) &
+    reload_pid=$!
+    trap "kill $reload_pid 2>/dev/null" EXIT
+
+    # Buffer output first to avoid streaming effect in fzf
+    list=$(generate_list)
+    selected=$(echo "$list" | fzf --ansi \
+      --disabled \
+      --no-sort \
+      --prompt '⚡  ' \
+      --listen "$FZF_LISTEN_PORT" \
+      --with-nth=4.. \
+      --header "enter=connect  f=fork  n=new  i=ignore  ctrl-r=refresh  (auto: ${refresh_interval}s)" \
+      --bind 'tab:down,btab:up' \
+      --bind 'focus:refresh-preview' \
+      --bind 'load:refresh-preview' \
+      --bind "ctrl-r:reload:$script_path list" \
+      --bind "f:execute($HOME/Scripts/claude-fork {2})+abort" \
+      --bind "n:execute($HOME/Scripts/claude-new)" \
+      --bind "i:execute-silent(bash -c 'source ~/Scripts/lib/claude && claude_ignore_session {3}')+reload:$script_path list" \
+      --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
+      --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
+      --bind 's:abort+execute-silent(tmux select-window -t :3)' \
+      --bind 't:abort+execute-silent(tmux select-window -t :4)' \
+      --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
+      --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
+      --bind 'alt-shift-left:abort' \
+      --bind 'alt-shift-right:abort' \
+      --bind 'start:first+unbind(a,r,s,t,g,m)' \
+      --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
+      --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
+      --preview-window 'right:55%' \
+      --preview 'tmux capture-pane -ep -t {2}')
+
+    if [[ -n "$selected" ]]; then
+      target=$(echo "$selected" | cut -f2)
+      tmux switch-client -t "$target"
+    fi
+    ;;
+esac

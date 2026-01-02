@@ -32,13 +32,29 @@ set -g default-terminal 'tmux-256color'
 set -ag terminal-overrides ",$TERM:Tc"
 
 # Fixes curly underline: https://www.reddit.com/r/neovim/comments/1933cgg/how_can_i_fix_the_tmux_color_issue_once_and_for
-set-option -sa terminal-features ',$TERM:RGB'
+set-option -sa terminal-features ",$TERM:RGB"
 set-option -ga terminal-features ",$TERM:usstyle"
 
 # Dual prefix configuration: both § and F12 work everywhere
 set-option -g prefix §
 set-option -g prefix2 F12
-unbind-key C-b
+
+# Remove all default bindings - we define everything explicitly below
+unbind-key -a
+
+# Defaults we want to keep
+bind-key :     command-prompt
+bind-key d     detach-client
+bind-key 1     select-window -t 1
+bind-key 2     select-window -t 2
+bind-key 3     select-window -t 3
+bind-key 4     select-window -t 4
+bind-key 5     select-window -t 5
+bind-key 6     select-window -t 6
+bind-key 7     select-window -t 7
+bind-key 8     select-window -t 8
+bind-key 9     select-window -t 9
+bind-key 0     select-window -t 10
 
 # Shell configuration
 set-option -g default-shell {{ defaultShell }}
@@ -52,34 +68,27 @@ bind c new-window -c "#{pane_current_path}"
 bind 'h' split-window -h -c '#{pane_current_path}'
 bind 'v' split-window -v -c '#{pane_current_path}'
 
-# bind colemak-dh to switch windows
-unbind a
-unbind r
-unbind s
-unbind t
-unbind g
-
+# Colemak-dh window switching
 bind-key a select-window -t 1
 bind-key r select-window -t 2
 bind-key s select-window -t 3
 bind-key t select-window -t 4
 bind-key g select-window -t 5
+bind-key b select-window -t 6
 
-unbind '"'
-unbind %
-
-# Kill session
-unbind q
 bind-key q confirm-before -p "Kill session? (y/n)" "run-shell '{{ homeDir }}/Scripts/tmux-kill-session --yes'"
 
 # Rebind x to kill pane without asking for confirmation
 bind-key x kill-pane
 
-unbind-key n
-bind-key n command-prompt "rename-window '%%'"
+# Open scrollback in neovim popup with reverse line numbers (prefix + B)
+bind-key B run-shell "{{ homeDir }}/Scripts/tmux-view-scrollback"
 
-# Open scrollback in neovim popup with reverse line numbers (prefix + b)
-bind-key b run-shell "{{ homeDir }}/Scripts/tmux-view-scrollback"
+# Claude Code session picker (prefix + w)
+bind-key w display-popup -E -w 98% -h 95% "{{ homeDir }}/Scripts/claude-sessions"
+
+# Start new Claude in recent tmux session (prefix + n)
+bind-key n display-popup -E -w 40% -h 40% "{{ homeDir }}/Scripts/claude-new"
 
 # Smart pane switching with awareness of Vim splits (and fzf).
 # See: https://github.com/christoomey/vim-tmux-navigator
@@ -91,6 +100,8 @@ is_fzf="ps -o state= -o comm= -t '#{pane_tty}' \
 # True when at zsh prompt (no other program running in the pane)
 # Checks that no process OTHER than zsh/ps exists on this tty
 is_zsh_fg="! ps -o comm= -t '#{pane_tty}' | grep -qvE '^(-?zsh|ps|grep)$'"
+# True when claude is running in the foreground
+is_claude="ps -o comm= -t '#{pane_tty}' | grep -q '^claude$'"
 
 bind-key -n 'C-S-Left' if-shell "$is_vim" 'send-keys C-h' 'select-pane -L'
 bind-key -n 'C-S-Down' if-shell "$is_vim" 'send-keys C-j' { if-shell "$is_fzf" 'send-keys C-j' 'select-pane -D' }
@@ -101,10 +112,7 @@ bind-key -n 'C-S-Right' if-shell "$is_vim" 'send-keys C-l' 'select-pane -R'
 bind -n M-S-Left  previous-window
 bind -n M-S-Right next-window
 
-# Move current window right and left in the ordering
-bind-key -r [ swap-window -t -1\; select-window -t -1
-bind-key -r ] swap-window -t +1\; select-window -t +1
-
+# Move current window left/right in the ordering
 bind-key -r Left swap-window -t -1\; select-window -t -1
 bind-key -r Right swap-window -t +1\; select-window -t +1
 
@@ -120,17 +128,18 @@ bind-key -n End send Escape "OF"
 
 # ctrl-g types git commit -m "" when at zsh prompt, otherwise pass through
 bind-key -n C-g if-shell "$is_zsh_fg" "send-keys 'git commit -m \"\"' ; send-keys Left" 'send-keys C-g'
+# ctrl-f forks claude session when in claude, otherwise pass through
+bind-key -n C-f if-shell "$is_claude" "run-shell '{{ homeDir }}/Scripts/claude-fork'" 'send-keys C-f'
 
 set -g status on
 
 # don't exit from tmux when closing a session
 set -g detach-on-destroy off
 
-unbind f
 bind-key f run-shell "{{ homeDir }}/Scripts/tmux-session-connect \"$(
   sesh list --icons | fzf --tmux 95%,95% \
     --no-sort --ansi --border-label ' sesh ' --prompt '⚡  ' \
-    --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find' \
+    --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find | F12/§ prefix' \
     --bind 'tab:down,btab:up' \
     --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
     --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
@@ -138,6 +147,16 @@ bind-key f run-shell "{{ homeDir }}/Scripts/tmux-session-connect \"$(
     --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
     --bind 'ctrl-f:change-prompt(🔎  )+reload({{ homeDir }}/Scripts/find-dirs)' \
     --bind 'ctrl-d:execute({{ homeDir }}/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)' \
+    --bind 'w:become({{ homeDir }}/Scripts/claude-sessions)' \
+    --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
+    --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
+    --bind 's:abort+execute-silent(tmux select-window -t :3)' \
+    --bind 't:abort+execute-silent(tmux select-window -t :4)' \
+    --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
+    --bind 'b:abort+execute-silent(tmux select-window -t :6)' \
+    --bind 'start:unbind(w,a,r,s,t,g,b)' \
+    --bind 'f12:transform:[[ \"\$FZF_PROMPT\" == \"§ \"* ]] && echo \"change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)\" || echo \"change-prompt(§ )+rebind(w,a,r,s,t,g,b)\"' \
+    --bind '§:transform:[[ \"\$FZF_PROMPT\" == \"§ \"* ]] && echo \"change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)\" || echo \"change-prompt(§ )+rebind(w,a,r,s,t,g,b)\"' \
     --preview-window 'right:55%' \
     --preview 'sesh preview {}'
 )\""

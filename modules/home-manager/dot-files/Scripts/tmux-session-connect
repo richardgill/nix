@@ -11,11 +11,8 @@ fi
 expanded_path="${arg/#\~/$HOME}"
 
 if [ -d "$expanded_path" ]; then
-  if [ -d "$(realpath "$expanded_path/../main")" ]; then
-    zoxide add "$expanded_path"
-    create_worktree_session "$expanded_path"
-    exit 0
-  fi
+  create_session_for_path "$expanded_path"
+  exit 0
 fi
 
 sesh connect "$arg"

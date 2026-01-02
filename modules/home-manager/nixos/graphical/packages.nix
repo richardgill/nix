@@ -15,6 +15,10 @@ let
   isAarch64Linux = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
 in
 {
+  home.sessionVariables = {
+    PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH = lib.getExe pkgs.chromium;
+  };
+
   home.packages =
     with pkgs;
     [

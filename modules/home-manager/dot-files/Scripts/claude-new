@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# Start a new Claude session in a recent tmux session
+#
+# Shows tmux sessions sorted by last attached, creates a new window, runs cl
+
+set -euo pipefail
+
+generate_list() {
+  tmux list-sessions -F '#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_name}' | sort -t$'\t' -k1 -rn | while IFS=$'\t' read -r ts name; do
+    [[ -z "$name" ]] && continue
+    printf '%s\t\033[34m\033[0m %s\n' "$name" "$name"
+  done
+}
+
+selected=$(generate_list | fzf --ansi \
+  --no-sort \
+  --prompt '⚡  ' \
+  --with-nth=2.. \
+  --header 'Start new Claude in session (esc to go back)' \
+  --bind 'tab:down,btab:up')
+
+if [[ -n "$selected" ]]; then
+  session_name=$(echo "$selected" | cut -f1)
+  target=$(tmux new-window -t "$session_name" -P -F '#{session_name}:#{window_index}')
+  tmux send-keys -t "$target" "cl" Enter
+  tmux switch-client -t "$target"
+fi

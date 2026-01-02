@@ -87,4 +87,4 @@ elif [[ -f "package.json" ]]; then
 else
   echo "  - package.json script \"local-ci\"" >&2
 fi
-exit 1
+exit 0

@@ -2,9 +2,13 @@
 
 This repo contains all machine setup and configuration since this is a NixOS system - system packages, services, dotfiles, and home-manager config are all declared here.
 
+Assume this config is the configuration for all machines we discuss, unless I say otherwise.
+
 Use the `.justfile` for common tasks and commands.
 
 Run `just check` after making changes to validate the configuration.
+
+Run `just switch` to deploy changes (builds and activates the new configuration).
 
 To edit my dot files in `~/` they are actually symlinked from `modules/home-manager/dot-files.nix` so search there. 
 
@@ -15,3 +19,5 @@ When adding new persistence directories/files for impermanence, they need to be 
 
 If build fails with "Path X already exists", move conflicting files to persistence first:
 `sudo mkdir -p /persistent/home/$USER/<folder>; sudo mv /home/$USER/<file> /persistent/home/$USER/<folder>/; sudo chown -R $USER:users /persistent/home/$USER/<folder>`
+
+To debug scripts in `modules/home-manager/dot-files/Scripts/`, run them directly from the repo rather than from `~/Scripts/`.

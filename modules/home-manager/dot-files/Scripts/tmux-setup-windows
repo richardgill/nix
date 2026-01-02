@@ -2,10 +2,28 @@
 
 create_worktree_session() {
   local expanded_path="$1"
-  session_name="$(basename "$(dirname "$expanded_path")")/$(basename "$expanded_path")"
+  local session_name="$(basename "$(dirname "$expanded_path")")/$(basename "$expanded_path")"
   tmux new-session -d -s "$session_name" -c "$expanded_path"
   tmux switch-client -t "$session_name"
   echo "$session_name"
+}
+
+create_repo_session() {
+  local expanded_path="$1"
+  local session_name="$(basename "$expanded_path")"
+  tmux new-session -d -s "$session_name" -c "$expanded_path"
+  tmux switch-client -t "$session_name"
+  echo "$session_name"
+}
+
+create_session_for_path() {
+  local expanded_path="$1"
+  zoxide add "$expanded_path"
+  if [ -d "$(realpath "$expanded_path/../main" 2>/dev/null)" ]; then
+    create_worktree_session "$expanded_path"
+  else
+    create_repo_session "$expanded_path"
+  fi
 }
 
 setup_tmux_windows() {
@@ -28,11 +46,15 @@ setup_tmux_windows() {
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "short"
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"
 
+    # Stagger Claude Code launches - concurrent starts cause issues
     AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai1" -P -F "#{window_id}")
     tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
 
     AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai2" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_2" "cl" Enter
+    (sleep 2 && tmux send-keys -t "$AI_WINDOW_2" "cl" Enter) &
+
+    AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "ai3" -P -F "#{window_id}")
+    (sleep 4 && tmux send-keys -t "$AI_WINDOW_3" "cl" Enter) &
 
     tmux select-window -t "$AI_WINDOW_1"
 
