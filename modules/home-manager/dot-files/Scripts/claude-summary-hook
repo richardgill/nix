@@ -1,0 +1,126 @@
+#!/usr/bin/env bash
+# Stop hook for Claude Code - generates debounced session summaries
+# Uses content-hash to avoid regenerating when transcript hasn't changed
+
+STATE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/claude-sessions"
+DEBUG_LOG="/tmp/claude/claude-summary-hook.log"
+DEBOUNCE_SECS=300  # 5 minutes
+
+mkdir -p "$(dirname "$DEBUG_LOG")"
+
+# Read hook JSON from stdin (must happen before backgrounding)
+hook_data=$(cat)
+
+echo "=== $(date) ===" >> "$DEBUG_LOG"
+echo "hook_data: $hook_data" >> "$DEBUG_LOG"
+
+session_id=$(echo "$hook_data" | jq -r '.session_id // empty')
+echo "session_id: $session_id" >> "$DEBUG_LOG"
+
+[[ -z "$session_id" ]] && { echo "no session_id, exiting" >> "$DEBUG_LOG"; exit 0; }
+
+session_dir="$STATE_DIR/$session_id"
+summary_file="$session_dir/summary.txt"
+hash_file="$session_dir/transcript.hash"
+
+# Time debounce: skip if we checked very recently (rapid stop events)
+if [[ -f "$hash_file" ]]; then
+  last_mod=$(stat -c %Y "$hash_file" 2>/dev/null || echo 0)
+  now=$(date +%s)
+  if (( now - last_mod < DEBOUNCE_SECS )); then
+    echo "time-debounced, exiting" >> "$DEBUG_LOG"
+    exit 0
+  fi
+fi
+
+echo "spawning background job" >> "$DEBUG_LOG"
+
+# Background everything else - transcript extraction + LLM call
+(
+  exec >> "$DEBUG_LOG" 2>&1
+  echo "background job started"
+
+  transcript_path=$(echo "$hook_data" | jq -r '.transcript_path // empty')
+  if [[ -z "$transcript_path" || ! -f "$transcript_path" ]]; then
+    echo "no transcript_path or file not found: $transcript_path"
+    exit 0
+  fi
+
+  transcript=$(jq -rs '
+    map(select(.type == "user" or .type == "assistant") |
+      if .type == "user" then
+        "USER: " + (if .message.content | type == "string" then .message.content else (.message.content | map(select(.type == "text")) | .[0].text // "") end)
+      else
+        "CLAUDE: " + (if .message.content | type == "string" then .message.content else (.message.content | map(select(.type == "text")) | .[0].text // "") end)
+      end
+    ) | .[0:10] | join("\n")' "$transcript_path" 2>&1)
+
+  echo "transcript: ${transcript:0:200}..."
+
+  [[ -z "$transcript" ]] && { echo "no transcript, exiting"; exit 0; }
+
+  # Content-hash debounce: only regenerate if transcript changed
+  current_hash=$(echo "$transcript" | md5sum | cut -d' ' -f1)
+  mkdir -p "$session_dir"
+
+  if [[ -f "$hash_file" ]]; then
+    stored_hash=$(cat "$hash_file")
+    if [[ "$current_hash" == "$stored_hash" ]]; then
+      # Touch hash file to reset time debounce
+      touch "$hash_file"
+      echo "content-hash unchanged ($current_hash), skipping"
+      exit 0
+    fi
+    echo "content-hash changed: $stored_hash -> $current_hash"
+  else
+    echo "no stored hash, first run for session"
+  fi
+
+  is_valid_summary() {
+    local s="$1"
+    [[ -z "$s" ]] && return 1
+    [[ "$s" =~ ^(I\'ll|I\ need|I\ |Let\ me|Let\'s|The\ user|Based\ on|To\ |It\ ) ]] && return 1
+    [[ "$s" =~ ^\*\* ]] && return 1
+    [[ "$s" =~ ^\# ]] && return 1
+    [[ ${#s} -gt 60 ]] && return 1
+    return 0
+  }
+
+  summary=""
+  for attempt in 1 2 3; do
+    echo "calling opencode (attempt $attempt)..."
+    summary=$(cat << EOF | timeout 30 opencode run \
+      "What is the user's main task? Reply with ONLY a 3-5 word task name (max 30 chars), nothing else." \
+      --model anthropic/claude-haiku-4-5 2>&1 | head -1 | tr -d '"' | cut -c1-50
+$transcript
+EOF
+)
+    echo "summary: $summary"
+
+    if is_valid_summary "$summary"; then
+      echo "valid summary on attempt $attempt"
+      break
+    fi
+    echo "invalid format, retrying..."
+    summary=""
+  done
+
+  if [[ -z "$summary" ]]; then
+    echo "all attempts failed, keeping existing"
+    touch "$hash_file"
+    exit 0
+  fi
+
+  if [[ -n "$summary" ]]; then
+    # Write summary and hash atomically
+    tmp=$(mktemp)
+    echo "$summary" > "$tmp"
+    mv "$tmp" "$summary_file"
+    echo "$current_hash" > "$hash_file"
+    echo "wrote summary to $summary_file (hash: $current_hash)"
+  else
+    echo "no summary generated"
+  fi
+) </dev/null &
+
+exit 0

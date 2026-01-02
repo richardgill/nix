@@ -24,6 +24,15 @@ reset_windows() {
 # Check if we're in tmux and if multiple windows already exist
 if [ -n "$TMUX" ]; then
   session_name=$(tmux display-message -p "#{session_name}")
+
+  # If in code session, create a new session for this directory
+  if [ "$session_name" = "code" ]; then
+    expanded_path="$(pwd)"
+    new_session=$(create_session_for_path "$expanded_path")
+    setup_tmux_windows "$new_session"
+    exit 0
+  fi
+
   # Count total windows in the session
   existing_windows=$(tmux list-windows -t "$session_name" | wc -l)
 

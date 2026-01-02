@@ -15,7 +15,9 @@
       "WebFetch(domain:reddit.com)",
       "WebFetch(domain:www.reddit.com)",
       "Edit(/tmp/**)",
-      "Write(/tmp/**)"
+      "Write(/tmp/**)",
+      "Skill(dev-browser:dev-browser)",
+      "Bash(npx tsx:*)"
     ]
   },
   "hooks": {

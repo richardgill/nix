@@ -169,9 +169,9 @@ resetTo() {
 }
 
 # app aliases
-alias c="cursor"
+alias c="~/Scripts/cl"
 alias v="nvim"
-alias t="tmux attach -t root || tmux new -s root"
+alias t="tmux attach -t code || tmux new -s code -c ~/code"
 alias pnx="pnpm exec nx"
 alias lso="/nix/store/imad8dvhp77h0pjbckp6wvmnyhp8dpgg-coreutils-9.8/bin/ls"
 alias tree="ls --tree"
@@ -272,7 +272,7 @@ export PATH="$PATH:$HOME/.local/bin"
 export PATH="$HOME/.config/xata/bin:$PATH"
 
 alias oc="opencode"
-alias cl="claude"
+alias claude="cl"  # cl script adds session tracking for tmux
 
 source <(argc --argc-completions zsh git-browse)
 source <(argc --argc-completions zsh worktree-open)

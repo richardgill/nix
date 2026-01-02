@@ -12,12 +12,21 @@ let
   inherit (homeManager) sourceDirectory;
 
   # Import shared templates
-  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  templates = import ./templates.nix {
+    inherit
+      lib
+      pkgs
+      config
+      osConfig
+      vars
+      ;
+  };
   inherit (templates) builtTemplates;
 
   # Programmatically generate Scripts entries
   scriptFiles = builtins.readDir ../../dot-files/Scripts;
   linuxOnlyScripts = [
+    "open"
     "paste"
     "screen-record"
     "launch-app"
@@ -95,8 +104,11 @@ in
       # OpenCode uses singular "command" directory (shared with claude/amp)
       ".config/opencode/command".source = "${builtTemplates}/ai-agents/commands";
 
-      # Codex config
-      ".codex".source = "${builtTemplates}/ai-agents/codex";
+      # Codex config (individual files so Codex can write to ~/.codex/)
+      ".codex/config.toml".source = "${builtTemplates}/ai-agents/codex/config.toml";
+      ".codex/AGENTS.md".source = "${builtTemplates}/ai-agents/codex/AGENTS.md";
+      ".codex/skills".source = "${builtTemplates}/ai-agents/codex/skills";
+      ".codex/prompts".source = "${builtTemplates}/ai-agents/codex/prompts";
 
       # Ampcode config (~/.config/amp/)
       ".config/amp/AGENTS.md".source = "${builtTemplates}/ai-agents/ampcode/AGENTS.md";

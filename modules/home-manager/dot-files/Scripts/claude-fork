@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Fork a Claude Code session into a new conversation
+#
+# Usage: claude-fork [source-target]
+#
+# Gets session ID from source-target (or current pane), finds a "new" status
+# claude window in the current session (or creates one), and launches the fork there.
+
+set -euo pipefail
+
+source ~/Scripts/lib/claude
+
+LOG_FILE="/tmp/claude-fork.log"
+
+log() {
+  local msg="[$(date +%H:%M:%S)] $*"
+  echo "$msg" >> "$LOG_FILE"
+  echo "[claude-fork] $*" >&2
+}
+
+: > "$LOG_FILE"
+
+source_target="${1:-}"
+log "Called with source_target='$source_target'"
+
+# Get session name and session_id from source target or current context
+if [[ -n "$source_target" ]]; then
+  current_session="${source_target%%:*}"
+  session_id=$(tmux display -t "$source_target" -p '#{@claude_session_id}' 2>/dev/null)
+else
+  current_session=$(tmux display -p '#{session_name}')
+  session_id=$(tmux display -p '#{@claude_session_id}' 2>/dev/null)
+fi
+
+log "Current session: $current_session, Session ID: $session_id"
+
+if [[ -z "$session_id" ]]; then
+  log "Error: No claude session ID found (use 'cl' wrapper to launch claude)"
+  exit 1
+fi
+
+# Find a "new" status window in the current tmux session using lib/claude
+target=$(list_claude_sessions --include-new | jq -r --arg session "$current_session" '
+  first(.[] | select(.tmux_session == $session and .state == "new")) |
+  "\(.tmux_target)\t\(.pid)"
+' 2>/dev/null)
+
+target_window=$(echo "$target" | cut -f1)
+target_pid=$(echo "$target" | cut -f2)
+
+if [[ -z "$target_window" || "$target_window" == "null" || -z "$target_pid" || "$target_pid" == "null" ]]; then
+  log "No new window found, creating one in $current_session"
+  target_window=$(tmux new-window -t "$current_session" -P -F '#{session_name}:#{window_index}')
+  [[ -z "$target_window" ]] && { log "Failed to create window"; exit 1; }
+  log "Created window: $target_window"
+  tmux send-keys -t "$target_window" "claude --resume $session_id --fork-session" Enter
+else
+  log "Killing pid $target_pid and launching fork in $target_window"
+  kill "$target_pid" 2>/dev/null || true
+  for _ in {1..10}; do kill -0 "$target_pid" 2>/dev/null || break; sleep 0.1; done
+  tmux send-keys -t "$target_window" "claude --resume $session_id --fork-session" Enter
+fi
+
+tmux select-window -t "$target_window"
+log "Switched to $target_window - Done"

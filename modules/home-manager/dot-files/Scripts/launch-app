@@ -49,7 +49,11 @@ elif [[ "$workspace" == "19" ]]; then
     omarchy-launch-webapp "https://app.zoom.us/wc/home" &
   fi
 elif [[ "$workspace" == "20" ]]; then
-  if ! hyprctl clients -j | jq -e '.[] | select(.class == "todoist")' > /dev/null; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class == "Todoist")' > /dev/null; then
     uwsm app -- todoist-electron &
+  fi
+elif [[ "$workspace" == "21" ]]; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class | test("google-chrome|chromium|Chromium"))' > /dev/null; then
+    uwsm app -- google-chrome-stable &
   fi
 fi
