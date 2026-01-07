@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+# @describe Query Beeper Desktop API for messages across chat networks
+# @meta combine-shorts
+
+# @cmd List or search chats
+# @option -q --query Search query
+# @flag --unread Only show unread chats
+chats() {
+  local url="http://localhost:23373/v1/chats"
+  local params=()
+  [[ -n "$argc_query" ]] && params+=("query=$(urlencode "$argc_query")")
+  [[ -n "$argc_unread" ]] && params+=("hasUnread=true")
+  [[ ${#params[@]} -gt 0 ]] && url+="?$(IFS='&'; echo "${params[*]}")"
+  fetch "$url"
+}
+
+# @cmd Get messages from a chat
+# @arg chat_id! Chat ID (will be URL-encoded automatically)
+# @option -c --cursor Pagination cursor
+# @option -d --direction=before Pagination direction (before/after)
+messages() {
+  local chat_id=$(urlencode "$argc_chat_id")
+  local url="http://localhost:23373/v1/chats/${chat_id}/messages"
+  local params=()
+  [[ -n "$argc_cursor" ]] && params+=("cursor=$argc_cursor")
+  [[ -n "$argc_direction" ]] && params+=("direction=$argc_direction")
+  [[ ${#params[@]} -gt 0 ]] && url+="?$(IFS='&'; echo "${params[*]}")"
+  fetch "$url"
+}
+
+# @cmd Search messages across all chats
+# @arg query! Search query
+search() {
+  local url="http://localhost:23373/v1/messages/search?query=$(urlencode "$argc_query")"
+  fetch "$url"
+}
+
+# @cmd Get a single chat by ID
+# @arg chat_id! Chat ID (will be URL-encoded automatically)
+chat() {
+  local chat_id=$(urlencode "$argc_chat_id")
+  fetch "http://localhost:23373/v1/chats/${chat_id}"
+}
+
+# @cmd Fetch raw URL (for advanced use)
+# @arg url! Full URL to fetch
+raw() {
+  fetch "$argc_url"
+}
+
+urlencode() {
+  local val="${1#\\}"  # strip leading backslash (bash tool escapes !)
+  printf '%s' "$val" | python3 -c "import sys, urllib.parse; print(urllib.parse.quote(sys.stdin.read(), safe=':@'))"
+}
+
+fetch() {
+  curl -s "$1" -H "Authorization: Bearer $BEEPER_API_TOKEN"
+}
+
+eval "$(argc --argc-eval "$0" "$@")"

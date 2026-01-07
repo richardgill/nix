@@ -1,0 +1,24 @@
+{
+  "thoughts": {
+    "thoughtsRepo": "~/code/thoughts-personal",
+    "reposDir": "repos",
+    "globalDir": "global",
+    "user": "rich",
+    "repoMappings": {
+      "~/code/ai-recipes/main": "ai-recipes",
+      "~/code/patchy/main": "patchy",
+      "~/code/xata/frontend/main": {
+        "repo": "frontend",
+        "profile": "xata"
+      },
+      "/home/rich/code/ai-recipes/main": "ai-recipes"
+    },
+    "profiles": {
+      "xata": {
+        "thoughtsRepo": "~/code/thoughts-xata",
+        "reposDir": "repos",
+        "globalDir": "global"
+      }
+    }
+  }
+}

@@ -7,7 +7,6 @@
   "permissions": {
     "allow": [
       "Task",
-      "Bash(~/Scripts/merge-pr:*)",
       "Bash(~/Scripts/auto-commit)",
       "Bash(~/Scripts/auto-commit-pr)",
       "Bash(~/Scripts/auto-pr)",
@@ -88,7 +87,6 @@
       "SlashCommand(/review-pr)",
       "SlashCommand(/create-plan)",
       "SlashCommand(/implement-plan)",
-      "SlashCommand(/merge-pr)",
       "SlashCommand(/pr-diff)",
       "SlashCommand(/pull-main)",
       "SlashCommand(/research)",
@@ -117,7 +115,9 @@
       "Write(/sbin/**)"
     ],
     "defaultMode": "bypassPermissions",
-    "additionalDirectories": ["~/code/reference-repos"]
+    "additionalDirectories": [
+      "~/code/reference-repos"
+    ]
   },
   "hooks": {
     "Notification": [
@@ -168,7 +168,9 @@
   },
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": true
+    "dev-browser@dev-browser-marketplace": true,
+    "ralph-wiggum@claude-plugins-official": true,
+    "plugin-dev@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false,
@@ -177,7 +179,13 @@
     "network": {
       "allowLocalBinding": true
     },
-    "excludedCommands": ["docker", "git", "gh", "bun", "pnpm"]
+    "excludedCommands": [
+      "docker",
+      "git",
+      "gh",
+      "bun",
+      "pnpm"
+    ]
   },
   "alwaysThinkingEnabled": true,
   "bypassPermissionsModeAccepted": true,

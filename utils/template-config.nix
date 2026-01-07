@@ -51,6 +51,7 @@ in
   tavilyApiKeyPath = config.sops.secrets."tavily-api-key".path;
   openaiApiKeyPath = config.sops.secrets."openai-api-key".path;
   joistApiKeyPath = config.sops.secrets."joist-api-key".path;
+  beeperApiTokenPath = config.sops.secrets."beeper-api-token".path;
   defaultShell = "${pkgs.zsh}/bin/zsh";
   catppuccinPlugin = "${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux";
   resurrectPlugin = "${pkgs.tmuxPlugins.resurrect}/share/tmux-plugins/resurrect/resurrect.tmux";

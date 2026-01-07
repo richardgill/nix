@@ -2,9 +2,10 @@
 
 create_worktree_session() {
   local expanded_path="$1"
+  local detached="$2"
   local session_name="$(basename "$(dirname "$expanded_path")")/$(basename "$expanded_path")"
   tmux new-session -d -s "$session_name" -c "$expanded_path"
-  tmux switch-client -t "$session_name"
+  [[ -z "$detached" ]] && tmux switch-client -t "$session_name"
   echo "$session_name"
 }
 

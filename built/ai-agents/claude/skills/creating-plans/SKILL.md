@@ -1,6 +1,11 @@
 ---
 name: creating-plans
-description: Creates summary for human review - and comprehensive implementation plan for LLM, complete code examples, and verification steps
+description: |
+  This skill creates structured implementation plans with human-readable summaries.
+  Triggers: "create a plan", "make a plan", "write a plan", "plan this feature",
+  "plan how to implement", "break this down", "spec this out", "design this change".
+  Creates plans with diagrams, code examples, and verification steps.
+  Not for executing plans (use implementing-plans) or brainstorming (use brainstorming).
 ---
 
 # Creating Plans
@@ -20,7 +25,37 @@ The summary tells a story the reviewer can follow in <150 lines. Not a file list
 **Structure:**
 1. **Requirements** - Brief restatement with enough precision to be clear
 2. **How it works today** - Diagram showing current flow (builds shared context)
-3. **The change** - Diagram showing new flow + code in context. {{> usage-signature-flow }}
+3. **The change** - Diagram showing new flow + code in context. Present code changes outside-in, showing new code **in context** with surrounding existing code:
+
+1. **Usage & Signature** - reveal the API shape, types, and ergonomics
+2. **Flow** - show where new code lands relative to existing code
+
+Example - adding a `formatCurrency` utility:
+
+```ts
+// Usage
+function formatCurrency(cents: number, currency: 'USD' | 'EUR' | 'GBP'): string
+
+formatCurrency(1999, 'USD');  // "$19.99"
+formatCurrency(1999, 'EUR');  // "€19.99"
+
+// Flow - where it lands in existing code
+// src/components/ProductCard.tsx
+export function ProductCard({ product }: Props) {
+  const store = useStore();                          // existing
+  const price = formatCurrency(product.cents, ...);  // ← new
+
+  return (
+    <div className="card">                           {/* existing */}
+      <span className="price">{price}</span>         {/* ← new */}
+      <span className="name">{product.name}</span>   {/* existing */}
+    </div>
+  );
+}
+```
+
+The reviewer should see what already exists around the new code, not just the new code in isolation.
+
 4. **Verification** - Always include `local-ci.sh` + manual testing steps
 5. **Testing** - Match existing test patterns. List test files to add/update, then key cases to cover (edge cases, error states, happy path). Give confidence the plan has testing covered.
 
@@ -112,16 +147,13 @@ Key cases: debounce resets on new keystroke, save triggers on blur, network erro
 - Structure your plan as a check list using [ ]
 - Complete code in plan (not "add validation")
 
-Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD. 
+Document everything they need to know: which files to touch for each task, code, testing, docs they might need to check, how to test it. Give them the whole plan as bite-sized tasks. DRY. YAGNI. TDD.
 
 ```
-
 
 ## Making your plan
 
 **Announce at start:** "I'm using the creating-plans skill to create the implementation plan."
-
-**Save plans to:** `scratch/plans/YYYY-MM-DD-plan-<feature-name>.md`  (separate from research or design docs)
 
 You must surface any genuine / important questions you have using multichoice questions.
 
@@ -133,22 +165,19 @@ Start by creating a planning todo list:
 Collect context information:
 
 - [ ] Read any provided documents / context & Explore the relevant code
-- [ ] Use the codebase-pattern-finder agent to identify similar code 
+- [ ] Use the codebase-pattern-finder agent to identify similar code
 - [ ] If you have questions or are unsure about anything please ask for clarification until everything is resolved
 
 Draft the plan and iterate:
 
-- [ ] Draft a full plan (summary + implementation) and write it to disk
+- [ ] Draft a full plan (summary + implementation) and write it to disk using the "issues skill" using the "issues skill"
 - [ ] Read the plan again and review it based on the plan criteria laid out here. Focus on how easy it is for human to digest and review the plan so they can give feedback on any potential issues early on. ultrathink on this step an iterate until you're happy with the plan.
 - [ ] Run the code-reviewer agent to review this plan and the code within it. Use the feedback to improve the plan. If necessary go back to the previous todo and continue iterating on the plan.
-
 - [ ] Run `sed -n '1,/^## Plan implementation/p' <plan-file> | head -n -1` to output the human-readable summary
 
 **End with by replying to user with:**
 ```
 ctrl-o to see human readable plan verbatim
-/implement-plan scratch/plans/YYYY-MM-DD-<feature-name>.md
+Would you like to create a worktree to start working on this issue?
+/implement-plan thoughts/shared/issues/<path-to-issue>/plan.md
 ```
-
-
-

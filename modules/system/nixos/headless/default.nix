@@ -14,6 +14,7 @@
     ./power-management.nix
     ./secrets.nix
     ./ssh.nix
+    ./systemd.nix
     ./system.nix
   ];
 

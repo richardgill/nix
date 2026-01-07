@@ -11,6 +11,7 @@ in
   environment.systemPackages =
     sharedPackages.packages
     ++ (with pkgs; [
+      lsof
       psmisc
       pciutils # needed for lspci
       lm_sensors # fan sensors

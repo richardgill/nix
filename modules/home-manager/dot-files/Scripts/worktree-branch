@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # @describe Create git worktree with tmux session
 # @option -c --cmd Command to run in ai1 window instead of default 'cl' (e.g. wtb -c 'claude "fix bug"' my-branch)
+# @flag -d --detached Don't switch to the new tmux session
+# @flag -p --pull Automatically pull main if behind (no prompt)
 # @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
 # @arg dest_name Destination name (defaults to source_branch name)
 
@@ -9,16 +11,25 @@ eval "$(argc --argc-eval "$0" "$@")"
 source "$(dirname "$0")/tmux-setup-windows"
 source ~/Scripts/lib/git
 
+if [[ ! -d .git || "$(basename "$(pwd)")" != "main" ]]; then
+  echo "Error: must be run from the main worktree directory named 'main'" >&2
+  exit 1
+fi
+
 # Check if main is behind origin/upstream and offer to pull
 if [[ "$(git symbolic-ref --short HEAD 2>/dev/null)" == "main" ]]; then
   remote=$(get_default_remote "main")
   git fetch "$remote" main --quiet 2>/dev/null
   behind=$(git rev-list --count HEAD.."$remote/main" 2>/dev/null || echo 0)
   if [[ "$behind" -gt 0 ]]; then
-    printf "main is %d commit(s) behind %s/main. Pull? (y/n) " "$behind" "$remote"
-    read -r -k 1 REPLY
-    echo
-    [[ $REPLY =~ ^[Yy]$ ]] && git pull "$remote" main
+    if [[ -n "$argc_pull" ]]; then
+      git pull "$remote" main
+    else
+      printf "main is %d commit(s) behind %s/main. Pull? (y/n) " "$behind" "$remote"
+      read -r -k 1 REPLY
+      echo
+      [[ $REPLY =~ ^[Yy]$ ]] && git pull "$remote" main
+    fi
   fi
 fi
 
@@ -71,7 +82,7 @@ fi
 # Trust mise configs before tmux session starts (shell hook runs on cd to TARGET)
 mise trust --all --cd "$TARGET"
 
-TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET"))
+TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET") "$argc_detached")
 SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd")
 
 tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktree-branch-setup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

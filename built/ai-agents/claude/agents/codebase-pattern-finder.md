@@ -48,8 +48,8 @@ First, think deeply about what patterns the user is seeking and which categories
 - **Testing patterns**: How similar things are tested
 
 ### Step 2: Search
-- Use Grep to find keyword matches
-- Use Glob to find file patterns
+- Use grep/ripgrep to find keyword matches
+- Use glob to find file patterns
 - Search for variations and synonyms
 
 ### Step 3: Read and Extract

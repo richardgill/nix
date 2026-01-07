@@ -1,6 +1,11 @@
 ---
 name: upgrade-flake
-description: Update flake.lock to get latest packages within the current NixOS release - runs nix flake update, checks build, and optionally applies
+description: |
+  This skill updates flake.lock to get latest packages within current NixOS release.
+  Triggers: "update flake", "upgrade flake", "nix flake update", "bump flake.lock",
+  "update flake inputs", "refresh inputs", "update dependencies".
+  Runs nix flake update, checks build, optionally applies.
+  Not for NixOS release upgrades (use upgrade-nixos for major version changes).
 ---
 
 # Upgrade Flake Inputs

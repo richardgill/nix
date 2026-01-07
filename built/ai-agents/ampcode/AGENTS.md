@@ -8,8 +8,9 @@ Push side effects to the edges: fetch, transform (pure), emit. Don't interleave 
 
 ## Comments
 
-- Pre-existing comments: Leave intact when editing code
-- New comments: Do NOT add new comments unless it's a truly exceptional case / noteworthy
+- Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
+
+- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy
 If your solution or decisions came from a url online, cite your sources and include links.
 
 <example>

@@ -130,5 +130,9 @@ in
       ".config/sesh".source = ../../dot-files/sesh;
       ".ssh/config".source = ../../dot-files/ssh/config;
       ".config/yazi".source = ../../dot-files/yazi;
+
+      # HumanLayer config (mutable)
+      ".config/humanlayer/humanlayer.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/humanlayer/humanlayer.json";
     };
 }

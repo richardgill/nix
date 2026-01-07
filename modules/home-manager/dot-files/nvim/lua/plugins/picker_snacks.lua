@@ -112,5 +112,12 @@ return {
     vim.keymap.set('n', '<leader>fns', function()
       picker.grep { cwd = notes_path }
     end, { desc = '[F]ind [N]otes [S]earch' })
+
+    vim.keymap.set('n', '<leader>fm', function()
+      picker.files {
+        cmd = 'fd',
+        args = { '-t', 'f', '--exec-batch', 'ls', '-t' },
+      }
+    end, { desc = '[F]ind [M]odified files (recent)' })
   end,
 }
