@@ -1,6 +1,7 @@
 !.env
 !.env.*
 !.dev.vars
-!plans/
 !scratch/
+!thoughts/
+!.claude/prompts/
 !mise.local.toml

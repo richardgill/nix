@@ -1,11 +1,7 @@
 ---
-description: Code review the current changes
+description: Code review the current changes using the code-review skill
 ---
 
-Review the code changes. Focus on:
-- Logic errors and bugs
-- Security issues
-- Performance concerns
-- Code style and readability
+Use $code-review to review the current changes.
 
 $1

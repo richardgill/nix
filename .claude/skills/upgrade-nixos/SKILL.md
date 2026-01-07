@@ -1,6 +1,11 @@
 ---
 name: upgrade-nixos
-description: Upgrade NixOS to a new release version (e.g., 25.05 → 25.11) - researches breaking changes, updates flake inputs, and guides through the upgrade process
+description: |
+  This skill upgrades NixOS to a new release version (e.g., 25.05 → 25.11).
+  Triggers: "upgrade nixos", "upgrade to new release", "update nixos version",
+  "move to nixos 25.11", "nixos release upgrade", "upgrade system version".
+  Researches breaking changes, updates flake inputs, guides through upgrade.
+  Not for flake.lock updates within same release (use upgrade-flake for that).
 ---
 
 # Upgrade NixOS Release
@@ -31,7 +36,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
    - Key areas: Hyprland, Docker, Steam, Secure Boot, impermanence
 
 5. **Create upgrade plan** (use creating-plans skill):
-   - Save to `scratch/plans/YYYY-MM-DD-nixos-<version>-upgrade.md`
+   - Save to `thoughts/shared/issues/NN-nixos-<version>-upgrade/plan.md`
    - Include exact file changes with line numbers
    - Include verification commands
    - Include rollback instructions

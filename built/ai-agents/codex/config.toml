@@ -5,6 +5,9 @@
 # model = "gpt-5.2-codex"
 model_reasoning_effort = "medium"
 
+# Recognize CLAUDE.md as fallback for projects without AGENTS.md
+project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", ".claude/CLAUDE.md"]
+
 # Approval and sandbox policies
 # Options: untrusted, on-failure, on-request, never
 approval_policy = "on-failure"

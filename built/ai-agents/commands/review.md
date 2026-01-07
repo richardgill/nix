@@ -2,4 +2,4 @@
 description: Code review
 ---
 
-Use code-reviewer skill $ARGUMENTS
+Use code-reviewer agent $ARGUMENTS

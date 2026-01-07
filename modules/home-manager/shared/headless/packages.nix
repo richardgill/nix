@@ -12,6 +12,7 @@
     bat
     btop
     delta
+    dnsutils # dig, nslookup
     eza
     fd
     file # yazi uses this for mime type detection (previews)

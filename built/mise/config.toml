@@ -15,6 +15,7 @@ rust = "latest"
 "npm:@anthropic-ai/claude-code" = "latest"
 "npm:@sourcegraph/amp" = "latest"
 "npm:@beads/bd" = "0.29.0"
+"npm:humanlayer" = "latest"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node"]

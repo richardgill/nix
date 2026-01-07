@@ -14,6 +14,8 @@ import Handlebars from "handlebars";
 import { z } from "zod";
 import { directories, rootTemplates, DOT_FILES_PATH } from "./template-config";
 
+Handlebars.registerHelper("eq", (a, b) => a === b);
+
 const templateDataSchema = z.object({
   isDarwin: z.boolean(),
   isLinux: z.boolean(),
@@ -27,6 +29,7 @@ const templateDataSchema = z.object({
   tavilyApiKeyPath: z.string(),
   openaiApiKeyPath: z.string(),
   joistApiKeyPath: z.string(),
+  beeperApiTokenPath: z.string(),
   defaultShell: z.string(),
   catppuccinPlugin: z.string(),
   resurrectPlugin: z.string(),
@@ -35,9 +38,10 @@ const templateDataSchema = z.object({
   firefoxProfilePathUrlEncoded: z.string(),
   defaultEngineIdHash: z.string(),
   profilePath: z.string(),
-});
+}).strict();
 
 type TemplateData = z.infer<typeof templateDataSchema>;
+type RenderContext = TemplateData & { agent?: string };
 
 const parseCliArgs = () => {
   const { values } = parseArgs({
@@ -72,7 +76,7 @@ const ensureDir = (path: string) => {
 const renderTemplate = (
   templatePath: string,
   outputPath: string,
-  data: TemplateData,
+  data: RenderContext,
 ) => {
   const templateContent = readFileSync(templatePath, "utf-8");
   const template = Handlebars.compile(templateContent);
@@ -101,6 +105,85 @@ const registerPartialsFromDir = (partialsPath: string) => {
   }
 };
 
+const processFileOrDir = (
+  sourcePath: string,
+  outputPath: string,
+  data: RenderContext,
+) => {
+  const stat = statSync(sourcePath);
+  if (stat.isDirectory()) {
+    const entries = readdirSync(sourcePath, { withFileTypes: true });
+    for (const entry of entries) {
+      processFileOrDir(
+        join(sourcePath, entry.name),
+        join(outputPath, entry.name),
+        data,
+      );
+    }
+  } else if (stat.isFile()) {
+    if (sourcePath.endsWith(".hbs")) {
+      const outputWithoutHbs = outputPath.replace(/\.hbs$/, "");
+      renderTemplate(sourcePath, outputWithoutHbs, data);
+    } else {
+      copyFile(sourcePath, outputPath);
+    }
+  }
+};
+
+const processSharedContent = (
+  rootDir: string,
+  outDir: string,
+  data: TemplateData,
+) => {
+  const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
+  if (!existsSync(sharedPath)) return;
+
+  const targetAgents = ["claude", "codex"];
+
+  for (const agent of targetAgents) {
+    const agentData: RenderContext = { ...data, agent };
+
+    // Process shared/skills/
+    const sharedSkillsPath = join(sharedPath, "skills");
+    if (existsSync(sharedSkillsPath)) {
+      const targetSkillsPath = join(outDir, "ai-agents", agent, "skills");
+      console.log(`\nProcessing shared/skills/ for ${agent}`);
+
+      const entries = readdirSync(sharedSkillsPath, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory()) {
+          const sourcePath = join(sharedSkillsPath, entry.name);
+          const destPath = join(targetSkillsPath, entry.name);
+          processFileOrDir(sourcePath, destPath, agentData);
+        }
+      }
+    }
+
+    // Process shared/agents/ (only for claude)
+    if (agent === "claude") {
+      const sharedAgentsPath = join(sharedPath, "agents");
+      if (existsSync(sharedAgentsPath)) {
+        const targetAgentsPath = join(outDir, "ai-agents", agent, "agents");
+        console.log(`\nProcessing shared/agents/ for ${agent}`);
+
+        const entries = readdirSync(sharedAgentsPath, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isFile()) {
+            const sourcePath = join(sharedAgentsPath, entry.name);
+            const outputName = entry.name.replace(/\.hbs$/, "");
+            const destPath = join(targetAgentsPath, outputName);
+            if (entry.name.endsWith(".hbs")) {
+              renderTemplate(sourcePath, destPath, agentData);
+            } else {
+              copyFile(sourcePath, destPath);
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 const processDirectory = (
   rootDir: string,
   outDir: string,
@@ -109,8 +192,13 @@ const processDirectory = (
 ) => {
   const sourceDir = join(rootDir, DOT_FILES_PATH, dirName);
   const outputDir = join(outDir, dirName);
+  const isAiAgents = dirName === "ai-agents";
 
-  const processRecursively = (currentPath: string, currentOutPath: string) => {
+  const processRecursively = (
+    currentPath: string,
+    currentOutPath: string,
+    context: RenderContext,
+  ) => {
     const entries = readdirSync(currentPath, { withFileTypes: true });
 
     for (const entry of entries) {
@@ -118,17 +206,23 @@ const processDirectory = (
       const relPath = relative(sourceDir, sourcePath);
 
       if (entry.isDirectory()) {
-        // Skip partials directory (already processed for Handlebars registration)
-        if (entry.name === "partials") continue;
+        // Skip partials and shared directories (processed separately)
+        if (entry.name === "partials" || entry.name === "shared") continue;
+
+        // Detect agent context for ai-agents subdirectories
+        let subContext = context;
+        if (isAiAgents && ["claude", "codex", "ampcode", "opencode"].includes(entry.name)) {
+          subContext = { ...context, agent: entry.name };
+        }
 
         // Recurse into subdirectory
-        processRecursively(sourcePath, join(currentOutPath, entry.name));
+        processRecursively(sourcePath, join(currentOutPath, entry.name), subContext);
       } else if (entry.isFile()) {
         if (entry.name.endsWith(".hbs")) {
           // Render template (remove .hbs extension)
           const outputName = entry.name.replace(/\.hbs$/, "");
           const outputPath = join(currentOutPath, outputName);
-          renderTemplate(sourcePath, outputPath, data);
+          renderTemplate(sourcePath, outputPath, context);
         } else {
           // Copy static file
           const outputPath = join(currentOutPath, entry.name);
@@ -139,7 +233,7 @@ const processDirectory = (
   };
 
   console.log(`\nProcessing: ${dirName}`);
-  processRecursively(sourceDir, outputDir);
+  processRecursively(sourceDir, outputDir, data);
 };
 
 const build = () => {
@@ -164,6 +258,9 @@ const build = () => {
   for (const dir of directories) {
     processDirectory(rootDir, outDir, dir, data);
   }
+
+  // Process shared content (skills, agents) for each target agent
+  processSharedContent(rootDir, outDir, data);
 
   // Process root-level templates
   console.log("\nProcessing root templates");

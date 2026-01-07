@@ -3,4 +3,5 @@ mise.local.toml
 .claude/settings.local.json
 .claude/prompts/
 scratch/
+thoughts/
 local-ci.sh

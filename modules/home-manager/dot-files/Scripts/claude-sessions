@@ -18,9 +18,9 @@ generate_list() {
     (.[0] // []) as $active |
     (.[1] // []) as $ignored |
 
-    # Active sessions sorted by session_start (oldest first = stable order)
+    # Active sessions sorted by tmux last attached (most recent first), then idle_secs as tiebreaker
     # Ignored sessions sorted by ignored_at (most recent first)
-    ($active | sort_by(.session_start)) + ($ignored | sort_by(-.ignored_at))
+    ($active | sort_by([-.tmux_last_attached, .idle_secs])) + ($ignored | sort_by(-.ignored_at))
 
     | .[] |
 
@@ -54,6 +54,15 @@ case "${1:-run}" in
   list)
     generate_list
     ;;
+  debug)
+    list_claude_sessions | jq -r '
+      group_by(.state == "ignored") |
+      (.[0] // []) as $active |
+      (.[1] // []) as $ignored |
+      ($active | sort_by([-.tmux_last_attached, .idle_secs])) + ($ignored | sort_by(-.ignored_at))
+      | .[] | "\(.tmux_target)\t\(.state)\ttmux_last_attached=\(.tmux_last_attached)\tidle=\(.idle_secs)s"
+    '
+    ;;
   run)
     script_path="$(realpath "$0")"
     refresh_interval="${REFRESH_INTERVAL:-4}"
@@ -84,7 +93,7 @@ case "${1:-run}" in
       --bind "ctrl-r:reload:$script_path list" \
       --bind "f:execute($HOME/Scripts/claude-fork {2})+abort" \
       --bind "n:execute($HOME/Scripts/claude-new)" \
-      --bind "i:execute-silent(bash -c 'source ~/Scripts/lib/claude && claude_ignore_session {3}')+reload:$script_path list" \
+      --bind "i:execute-silent(bash -c 'source ~/Scripts/lib/claude && claude_toggle_ignore_session {3}')+reload:$script_path list" \
       --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
       --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
       --bind 's:abort+execute-silent(tmux select-window -t :3)' \

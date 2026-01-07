@@ -1,7 +1,6 @@
 {
   "amp.git.commit.coauthor.enabled": false,
   "amp.permissions": [
-    { "tool": "Bash", "matches": { "cmd": "~/Scripts/merge-pr *" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-commit" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-commit-pr" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-pr" }, "action": "allow" },

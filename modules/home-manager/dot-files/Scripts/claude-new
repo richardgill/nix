@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 # Start a new Claude session in a recent tmux session
 #
-# Shows tmux sessions sorted by last attached, creates a new window, runs cl
+# Shows tmux sessions sorted by last attached. If a cleared Claude window exists
+# in that session, switches to it. Otherwise creates a new window and runs cl.
 
 set -euo pipefail
 
 generate_list() {
   tmux list-sessions -F '#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_name}' | sort -t$'\t' -k1 -rn | while IFS=$'\t' read -r ts name; do
     [[ -z "$name" ]] && continue
-    printf '%s\t\033[34m\033[0m %s\n' "$name" "$name"
+    printf '%s\t\033[34m\033[0m %s\n' "$name" "$name"
   done
 }
 
@@ -21,7 +22,19 @@ selected=$(generate_list | fzf --ansi \
 
 if [[ -n "$selected" ]]; then
   session_name=$(echo "$selected" | cut -f1)
-  target=$(tmux new-window -t "$session_name" -P -F '#{session_name}:#{window_index}')
-  tmux send-keys -t "$target" "cl" Enter
-  tmux switch-client -t "$target"
+
+  # Check for a reusable Claude session (cleared or new/empty) in this tmux session
+  source ~/Scripts/lib/claude
+  reusable_target=$(list_claude_sessions --include-new | jq -r --arg sess "$session_name" '
+    .[] | select((.state == "cleared" or .state == "new") and .tmux_session == $sess) | .tmux_target
+  ' | head -1)
+
+  if [[ -n "$reusable_target" ]]; then
+    tmux switch-client -t "$reusable_target"
+  else
+    start_dir=$(tmux display -t "${session_name}:0" -p '#{pane_current_path}')
+    target=$(tmux new-window -t "$session_name" -c "$start_dir" -P -F '#{session_name}:#{window_index}')
+    tmux send-keys -t "$target" "cl" Enter
+    tmux switch-client -t "$target"
+  fi
 fi

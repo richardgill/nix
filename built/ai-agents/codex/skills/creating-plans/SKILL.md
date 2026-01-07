@@ -77,12 +77,9 @@ Document everything they need to know: which files to touch for each task, code,
 
 ```
 
-
 ## Making your plan
 
 **Announce at start:** "I'm using the creating-plans skill to create the implementation plan."
-
-**Save plans to:** `scratch/plans/YYYY-MM-DD-plan-<feature-name>.md`  (separate from research or design docs)
 
 You must surface any genuine / important questions you have using multichoice questions.
 
@@ -99,11 +96,10 @@ Collect context information:
 
 Draft the plan and iterate:
 
-- [ ] Draft a full plan (summary + implementation) and write it to disk
+- [ ] Draft a full plan (summary + implementation) and write it to disk using the "issues skill" using the "issues skill"
 - [ ] Read the plan again and review it based on the plan criteria laid out here. Focus on how easy it is for human to digest and review the plan so they can give feedback on any potential issues early on.
 - [ ] Review this plan and the code within it. Use the feedback to improve the plan. If necessary go back to the previous todo and continue iterating on the plan.
-
 - [ ] Reply to user with the plan summary section and the implement command
 
 **End with:** The plan summary directly in the chat, always tell the user the exact command to run:
-`$implementing-plans scratch/plans/YYYY-MM-DD-<feature-name>.md`
+`$implementing-plans thoughts/shared/issues/<path-to-issue>/plan.md`

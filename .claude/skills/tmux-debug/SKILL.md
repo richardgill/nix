@@ -1,6 +1,10 @@
 ---
 name: tmux-debug
-description: Capture and analyze tmux pane content for debugging other sessions or background processes
+description: |
+  This skill captures and analyzes tmux pane content for debugging.
+  Triggers: "debug tmux", "capture tmux output", "check other session", "tmux pane content",
+  "what's in that terminal", "inspect background process", "tmux scrollback".
+  Captures screen content from tmux panes to debug sessions or monitor processes.
 ---
 
 # Tmux Debug

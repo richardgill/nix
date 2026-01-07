@@ -12,6 +12,7 @@ let
     "tavily-api-key"
     "openai-api-key"
     "joist-api-key"
+    "beeper-api-token"
   ];
 
   # Generate secret configurations with appropriate ownership
