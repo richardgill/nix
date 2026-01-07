@@ -34,42 +34,11 @@ Start by understanding the current project context, then ask questions one at a 
 
 ## After the Design
 
-## Issue & Plan Storage
-
-Issues and plans are tracked in `thoughts/shared/issues/` with numbered phases:
-
-```
-thoughts/shared/issues/
-├── 10-phase-name/           # Single issue = flat folder
-│   └── plan.md
-├── 20-another-phase/
-│   ├── plan.md
-│   └── design.md          # Optional
-├── 30-multi-issue-phase/    # Multiple parallel issues = nested
-│   ├── feature-a/
-│   │   ├── plan.md
-│   │   └── design.md
-│   └── feature-b/
-│       └── plan.md
-└── done/                    # Completed issues moved here
-```
-
-**Conventions:**
-- **Single issue phase** → `NN-phase-name/` (flat)
-- **Multi-issue phase** → `NN-phase/issue-name/` (nested, all parallel)
-- **Gaps in numbers** (10, 20...) = room to insert phases later
-- Each issue has `plan.md` + optional `design.md`
-- **Completed issues** → move to `done/`
-
-**Workflow:**
-1. Work through phases in order (10 → 20 → 30...)
-2. Within a phase folder, pick any issue - they're independent
-3. Read issue's `plan.md` for scope
-
 **Documentation:**
-- Use the "issues skill" to write the validated design to `thoughts/shared/issues/<path-to-issue>/design.md`
+- Use the Skill(issues) to write the validated design to `thoughts/shared/issues/<path-to-issue>/design.md`
 
 - Ask: "Want to create a plan or begin implementation?"
+- Create detailed implementation plan in the same issue folder
 
 ## Key Principles
 

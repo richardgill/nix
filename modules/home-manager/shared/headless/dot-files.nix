@@ -87,7 +87,7 @@ in
       ".claude/CLAUDE.md".source = "${builtTemplates}/ai-agents/claude/CLAUDE.md";
       ".claude/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/claude/settings.json";
-      ".claude/commands".source = "${builtTemplates}/ai-agents/commands";
+      ".claude/commands".source = "${builtTemplates}/ai-agents/claude/commands";
       ".claude/skills".source = "${builtTemplates}/ai-agents/claude/skills";
       ".claude/agents".source = "${builtTemplates}/ai-agents/claude/agents";
       ".claude/rules".source = "${builtTemplates}/ai-agents/claude/rules";
@@ -101,8 +101,7 @@ in
       ".config/opencode/opencode.json".source = "${builtTemplates}/ai-agents/opencode/opencode.json";
       ".config/opencode/agent".source = "${builtTemplates}/ai-agents/opencode/agent";
       ".config/opencode/prompts".source = "${builtTemplates}/ai-agents/opencode/prompts";
-      # OpenCode uses singular "command" directory (shared with claude/amp)
-      ".config/opencode/command".source = "${builtTemplates}/ai-agents/commands";
+      ".config/opencode/command".source = "${builtTemplates}/ai-agents/opencode/command";
 
       # Codex config (individual files so Codex can write to ~/.codex/)
       ".codex/config.toml".source = "${builtTemplates}/ai-agents/codex/config.toml";
@@ -113,7 +112,7 @@ in
       # Ampcode config (~/.config/amp/)
       ".config/amp/AGENTS.md".source = "${builtTemplates}/ai-agents/ampcode/AGENTS.md";
       ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
-      ".config/amp/commands".source = "${builtTemplates}/ai-agents/commands";
+      ".config/amp/commands".source = "${builtTemplates}/ai-agents/ampcode/commands";
 
       # Static files (not templated)
       ".config/obs-studio".source =

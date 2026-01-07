@@ -12,7 +12,7 @@ import {
 } from "fs";
 import Handlebars from "handlebars";
 import { z } from "zod";
-import { directories, rootTemplates, DOT_FILES_PATH } from "./template-config";
+import { directories, rootTemplates, DOT_FILES_PATH, agents, AgentName } from "./template-config";
 
 Handlebars.registerHelper("eq", (a, b) => a === b);
 
@@ -136,31 +136,31 @@ const processSharedContent = (
   data: TemplateData,
 ) => {
   const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
-  if (!existsSync(sharedPath)) return;
+  const commandsPath = join(rootDir, DOT_FILES_PATH, "ai-agents/commands");
 
-  const targetAgents = ["claude", "codex"];
-
-  for (const agent of targetAgents) {
+  for (const [agent, config] of Object.entries(agents) as [AgentName, typeof agents[AgentName]][]) {
     const agentData: RenderContext = { ...data, agent };
 
     // Process shared/skills/
-    const sharedSkillsPath = join(sharedPath, "skills");
-    if (existsSync(sharedSkillsPath)) {
-      const targetSkillsPath = join(outDir, "ai-agents", agent, "skills");
-      console.log(`\nProcessing shared/skills/ for ${agent}`);
+    if (config.sharedSkills && existsSync(sharedPath)) {
+      const sharedSkillsPath = join(sharedPath, "skills");
+      if (existsSync(sharedSkillsPath)) {
+        const targetSkillsPath = join(outDir, "ai-agents", agent, "skills");
+        console.log(`\nProcessing shared/skills/ for ${agent}`);
 
-      const entries = readdirSync(sharedSkillsPath, { withFileTypes: true });
-      for (const entry of entries) {
-        if (entry.isDirectory()) {
-          const sourcePath = join(sharedSkillsPath, entry.name);
-          const destPath = join(targetSkillsPath, entry.name);
-          processFileOrDir(sourcePath, destPath, agentData);
+        const entries = readdirSync(sharedSkillsPath, { withFileTypes: true });
+        for (const entry of entries) {
+          if (entry.isDirectory()) {
+            const sourcePath = join(sharedSkillsPath, entry.name);
+            const destPath = join(targetSkillsPath, entry.name);
+            processFileOrDir(sourcePath, destPath, agentData);
+          }
         }
       }
     }
 
-    // Process shared/agents/ (only for claude)
-    if (agent === "claude") {
+    // Process shared/agents/
+    if (config.sharedAgents && existsSync(sharedPath)) {
       const sharedAgentsPath = join(sharedPath, "agents");
       if (existsSync(sharedAgentsPath)) {
         const targetAgentsPath = join(outDir, "ai-agents", agent, "agents");
@@ -180,6 +180,13 @@ const processSharedContent = (
           }
         }
       }
+    }
+
+    // Process commands/
+    if (config.commands && existsSync(commandsPath)) {
+      const targetCommandsPath = join(outDir, "ai-agents", agent, config.commandsFolder);
+      console.log(`\nProcessing commands/ for ${agent}`);
+      processFileOrDir(commandsPath, targetCommandsPath, agentData);
     }
   }
 };
@@ -206,12 +213,12 @@ const processDirectory = (
       const relPath = relative(sourceDir, sourcePath);
 
       if (entry.isDirectory()) {
-        // Skip partials and shared directories (processed separately)
-        if (entry.name === "partials" || entry.name === "shared") continue;
+        // Skip partials, shared, and commands directories (processed separately)
+        if (entry.name === "partials" || entry.name === "shared" || entry.name === "commands") continue;
 
         // Detect agent context for ai-agents subdirectories
         let subContext = context;
-        if (isAiAgents && ["claude", "codex", "ampcode", "opencode"].includes(entry.name)) {
+        if (isAiAgents && entry.name in agents) {
           subContext = { ...context, agent: entry.name };
         }
 
