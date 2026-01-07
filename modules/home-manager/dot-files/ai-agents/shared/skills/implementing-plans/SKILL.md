@@ -29,7 +29,7 @@ For each phase in a sub task (sequential):
 1. Read the phase requirements carefully
 2. Implement the changes
 3. Run `local-ci.sh` + other verification steps in plan and fix: until they all succeed 
-4. Check off completed items in the plan file itself (use the "issue skill")
+4. Check off completed items in the plan file itself use the Skill(issues)
 
 
 ### 5. Completion
