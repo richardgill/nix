@@ -24,6 +24,12 @@ cp "$SCRIPT_DIR/termux.properties" ~/.termux/
 cp "$SCRIPT_DIR/colors.properties" ~/.termux/
 echo "  Copied termux.properties and colors.properties"
 
+# Install widget shortcuts (for Termux:Widget from F-Droid)
+mkdir -p ~/.shortcuts
+cp "$SCRIPT_DIR/um790" ~/.shortcuts/
+chmod +x ~/.shortcuts/um790
+echo "  Installed ~/.shortcuts/um790 (add Termux:Widget to home screen)"
+
 # Install nerd font via termux-nf
 if [[ ! -f ~/.termux/font.ttf ]]; then
     echo "  Installing termux-nf for nerd fonts..."
