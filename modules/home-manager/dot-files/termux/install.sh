@@ -10,7 +10,7 @@ echo "Installing Termux configuration..."
 
 if ! command -v et &> /dev/null; then
     echo "  Installing Eternal Terminal..."
-    pkg install -y eternalterminal
+    pkg install -y et
 else
     echo "  Eternal Terminal already installed"
 fi
