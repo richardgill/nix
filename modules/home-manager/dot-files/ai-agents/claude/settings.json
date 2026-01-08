@@ -115,9 +115,7 @@
       "Write(/sbin/**)"
     ],
     "defaultMode": "bypassPermissions",
-    "additionalDirectories": [
-      "~/code/reference-repos"
-    ]
+    "additionalDirectories": ["~/code/reference-repos"]
   },
   "hooks": {
     "Notification": [
@@ -169,8 +167,8 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "dev-browser@dev-browser-marketplace": true,
-    "ralph-wiggum@claude-plugins-official": true,
-    "plugin-dev@claude-plugins-official": true
+    "plugin-dev@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false,
@@ -179,13 +177,7 @@
     "network": {
       "allowLocalBinding": true
     },
-    "excludedCommands": [
-      "docker",
-      "git",
-      "gh",
-      "bun",
-      "pnpm"
-    ]
+    "excludedCommands": ["docker", "git", "gh", "bun", "pnpm"]
   },
   "alwaysThinkingEnabled": true,
   "bypassPermissionsModeAccepted": true,

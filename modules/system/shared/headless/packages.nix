@@ -3,6 +3,7 @@
   packages = with pkgs; [
     _1password-cli
     autossh
+    eternal-terminal
     cargo
     coreutils
     curl

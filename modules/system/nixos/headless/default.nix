@@ -7,6 +7,7 @@
     ./avahi.nix
     ./compat.nix
     ./docker.nix
+    ./eternal-terminal-server.nix
     ./impermanence.nix
     ./networking.nix
     ./oom-protection.nix
