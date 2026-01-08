@@ -13,6 +13,7 @@
     nixd
     nodePackages.vscode-langservers-extracted
     nodePackages."@tailwindcss/language-server"
+    nodePackages.typescript-language-server
     pyright
     ruff
     vtsls

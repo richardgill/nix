@@ -5,6 +5,13 @@
 #   SessionStart - stores session ID in tmux pane for cc-test.sh
 #   Stop - generates debounced summaries via claude-summary-hook
 
+# Isolate Claude's temp files to avoid ENXIO errors from socket files in /tmp
+# The native binary's file watcher crashes when it encounters Unix sockets
+# (nvim, vscode IPC, etc.) because fs.watch() can't watch socket files.
+# https://github.com/anthropics/claude-code/issues/15112
+export TMPDIR="${TMPDIR:-/tmp}/claude-tmp"
+mkdir -p "$TMPDIR"
+
 session_start_hook='sid=$(cat | jq -r ".session_id // empty"); [[ -n "$TMUX_PANE" && -n "$sid" ]] && tmux set-option -t "$TMUX_PANE" -p @claude_session_id "$sid"'
 
 settings=$(jq -nc \

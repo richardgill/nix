@@ -26,8 +26,8 @@
       } # Next.js, Create React App, Express, Node.js apps
       {
         from = 4000;
-        to = 4010;
-      } # GraphQL servers, Apollo, misc Node services
+        to = 4999;
+      }
       {
         from = 5000;
         to = 5200;

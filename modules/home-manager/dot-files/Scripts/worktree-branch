@@ -50,6 +50,21 @@ fi
 
 TARGET="$SOURCE/../$DEST_NAME"
 
+name_exists() {
+  local name="$1"
+  [ -d "$SOURCE/../$name" ] || git worktree list | grep -qE "\[$name\]$"
+}
+
+if name_exists "$DEST_NAME"; then
+  echo "Error: '$DEST_NAME' already exists" >&2
+  [ -d "$TARGET" ] && echo "  directory: $TARGET" >&2
+  git worktree list | grep -E "\[$DEST_NAME\]$" | awk '{print "  worktree: " $1}' >&2
+  n=1
+  while name_exists "$DEST_NAME-$n"; do ((n++)); done
+  echo "next available branch name: $DEST_NAME-$n" >&2
+  exit 1
+fi
+
 # Determine if we have a source branch to create from
 if [ -n "$argc_dest_name" ]; then
   if [[ "$SOURCE_BRANCH" == */* ]]; then

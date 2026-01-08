@@ -1,0 +1,5 @@
+# Mise shims for scripts, needed to pick up correct installed versions in bash scripts
+# This file is sourced by:
+#   - Bash login shells (directly)
+#   - Non-interactive bash scripts (via BASH_ENV, set in ~/.zprofile)
+export PATH="$HOME/.local/share/mise/shims:$PATH"

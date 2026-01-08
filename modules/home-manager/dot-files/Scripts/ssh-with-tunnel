@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# SSH with automatic reverse tunnel setup
+# Eternal Terminal with automatic reverse tunnel setup
 # Usage: ssh-with-tunnel <remote-host> [remote-user]
 #        ssht <remote-host> [remote-user]  (alias)
 #
-# Establishes a reverse SSH tunnel, then connects to the remote host.
+# Establishes a reverse SSH tunnel in background, then connects with ET.
 # On the remote, you can use 'tunnel-open' and 'beep' to interact with your local machine.
 
 HOST="${1:?Usage: ssh-with-tunnel <remote-host> [remote-user]}"
@@ -11,9 +11,14 @@ USER="${2:-$USER}"
 
 tunnel-setup "$@"
 
-# Use caffeinate on macOS to prevent sleep during SSH session
-if command -v caffeinate &>/dev/null; then
-  caffeinate -i ssh "$USER@$HOST"
+# Connect with Eternal Terminal (handles reconnection automatically)
+# Fall back to SSH if ET not available
+if command -v et &>/dev/null; then
+  et "$USER@$HOST"
 else
-  ssh "$USER@$HOST"
+  if command -v caffeinate &>/dev/null; then
+    caffeinate -i ssh "$USER@$HOST"
+  else
+    ssh "$USER@$HOST"
+  fi
 fi

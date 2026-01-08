@@ -7,6 +7,11 @@ fi
 eval "$(/opt/homebrew/bin/brew shellenv)"
 {{/if}}
 
-# Mise shims for non-interactive shells (Claude Code, scripts, CI)
+# Mise shims for non-interactive shells (scripts, CI)
+# Needed to pick up correct installed versions in bash scripts
 # Note: mise activate in .zshrc removes shims from PATH for interactive shells
 eval "$(mise activate zsh --shims)"
+
+# BASH_ENV is sourced by non-interactive bash scripts
+# https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html
+export BASH_ENV="$HOME/.bash_profile"

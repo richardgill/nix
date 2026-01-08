@@ -121,6 +121,7 @@ in
       ".config/git/ignore".source = ../../dot-files/git/ignore;
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
       ".config/git/templates/hooks/post-checkout".source = ../../dot-files/git/hooks/post-checkout;
+      ".bash_profile".source = ../../dot-files/bash_profile;
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;
       "code/.rgignore".source = ../../dot-files/code/rgignore;
