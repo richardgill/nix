@@ -178,7 +178,7 @@ alias tree="ls --tree"
 alias cato="/nix/store/imad8dvhp77h0pjbckp6wvmnyhp8dpgg-coreutils-9.8/bin/cat"
 alias as="open -a \"Android Studio\""
 alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
-alias ssht="ssh-with-tunnel"
+alias ett="et-with-tunnel"
 
 alias sound="wiremix"
 alias bluetooth="blueberry"

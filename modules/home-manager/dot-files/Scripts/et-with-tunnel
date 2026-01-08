@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Eternal Terminal with automatic reverse tunnel setup
-# Usage: ssh-with-tunnel <remote-host> [remote-user]
-#        ssht <remote-host> [remote-user]  (alias)
+# Usage: et-with-tunnel <remote-host> [remote-user]
+#        ett <remote-host> [remote-user]  (alias)
 #
 # Establishes a reverse SSH tunnel in background, then connects with ET.
 # On the remote, you can use 'tunnel-open' and 'beep' to interact with your local machine.
 
-HOST="${1:?Usage: ssh-with-tunnel <remote-host> [remote-user]}"
+HOST="${1:?Usage: et-with-tunnel <remote-host> [remote-user]}"
 USER="${2:-$USER}"
 
 tunnel-setup "$@"
