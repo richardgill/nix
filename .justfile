@@ -87,8 +87,9 @@ mac-install:
   @./scripts/darwin-install.sh
 
 # Publish dotfiles to public repository
-publish:
-  ./scripts/publish.sh
+# Use -f to skip checks and merge directly to main
+publish *flags:
+  ./scripts/publish.sh {{ flags }}
 
 # Build templates manually (useful for testing/debugging)
 # Usage: just template [machine]

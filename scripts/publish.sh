@@ -1,5 +1,12 @@
 #!/usr/bin/env bash
 
+force=false
+while getopts "f" opt; do
+  case $opt in
+    f) force=true ;;
+  esac
+done
+
 source_dir="$(dirname "$(dirname "$(realpath "$0")")")"
 repo_url="https://github.com/richardgill/nix.git"
 
@@ -54,6 +61,18 @@ if git diff --staged --quiet; then
   exit 0
 fi
 
+short_sha=$(cd "$source_dir" && git rev-parse --short HEAD)
+
+if [[ "$force" == "true" ]]; then
+  git commit -m "nix-private sha: $short_sha"
+  git checkout main
+  git merge "$branch_name"
+  git push origin main
+  echo "Changes pushed directly to main!"
+  rm -rf "$github_repo_dir"
+  exit 0
+fi
+
 echo "=== AI Agent is checking for secrets/sensitive data ==="
 claude -p /check-secrets
 
@@ -76,7 +95,6 @@ read -p "Push these changes to GitHub? (y/n): " -n 1 -r
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then
-  short_sha=$(cd "$source_dir" && git rev-parse --short HEAD)
   git commit -m "nix-private sha: $short_sha"
   git push origin "$branch_name"
   echo ""
