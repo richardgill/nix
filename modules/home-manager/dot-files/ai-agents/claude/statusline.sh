@@ -37,9 +37,13 @@ if [ -z "$cwd" ]; then
     cwd="$PWD"
 fi
 
+# Terminal width detection for responsive layout
+term_width=$(tput cols 2>/dev/null || echo 120)
+narrow_term=$([[ "$term_width" -lt 65 ]] && echo 1 || echo 0)
+
 # Git status counts (only if in a git repo)
 git_info=""
-GIT_WIDTH=20
+GIT_WIDTH=15
 if cd "$cwd" 2>/dev/null && git rev-parse --git-dir > /dev/null 2>&1; then
     read staged modified untracked <<< $(git status --porcelain 2>/dev/null | awk '
         /^[MADRC]/ {s++}
@@ -71,10 +75,18 @@ if [ "$context_size" -gt 0 ] 2>/dev/null; then
     total_tokens=$((current_input + current_output + cache_creation + cache_read))
     total_k=$((total_tokens / 1000))
 
-    # Progress bar: 20 chars total, midpoint │ at 100k, full bar = 200k
-    # Each char = 10k tokens
-    bar_width=20
-    filled=$((total_tokens / 10000))
+    # Progress bar: full=20 chars (10k/char), narrow=10 chars (20k/char)
+    # Midpoint │ at 100k (position 10 or 5)
+    if [ "$narrow_term" -eq 1 ]; then
+        bar_width=10
+        midpoint=5
+        tokens_per_char=20000
+    else
+        bar_width=20
+        midpoint=10
+        tokens_per_char=10000
+    fi
+    filled=$((total_tokens / tokens_per_char))
     [ "$filled" -gt "$bar_width" ] && filled=$bar_width
 
     # Color based on token usage: red at 100k+, yellow at 70k+, purple otherwise
@@ -86,10 +98,10 @@ if [ "$context_size" -gt 0 ] 2>/dev/null; then
         bar_color="$PURPLE"
     fi
 
-    # Build the bar with midpoint marker at position 10
+    # Build the bar with midpoint marker
     bar=""
     for ((i=0; i<bar_width; i++)); do
-        if [ "$i" -eq 10 ]; then
+        if [ "$i" -eq "$midpoint" ]; then
             bar+="${GRAY}│${bar_color}"
         fi
         if [ "$i" -lt "$filled" ]; then

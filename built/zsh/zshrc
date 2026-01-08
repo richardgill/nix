@@ -171,7 +171,7 @@ resetTo() {
 # app aliases
 alias c="~/Scripts/cl"
 alias v="nvim"
-alias t="tmux attach -t code || tmux new -s code -c ~/code"
+alias t="~/Scripts/tmux-last || tmux new -s code -c ~/code"
 alias pnx="pnpm exec nx"
 alias lso="/nix/store/imad8dvhp77h0pjbckp6wvmnyhp8dpgg-coreutils-9.8/bin/ls"
 alias tree="ls --tree"

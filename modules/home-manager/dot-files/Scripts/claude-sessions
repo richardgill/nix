@@ -105,7 +105,8 @@ case "${1:-run}" in
       --bind 'start:first+unbind(a,r,s,t,g,m)' \
       --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
       --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
-      --preview-window 'right:55%' \
+      --preview-window 'right:55%,<65(down,75%)' \
+      --layout=reverse \
       --preview 'tmux capture-pane -ep -t {2}')
 
     if [[ -n "$selected" ]]; then

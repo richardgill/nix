@@ -23,7 +23,8 @@ selected=$(sesh list --icons | fzf --ansi \
   --bind 'start:unbind(w,a,r,s,t,g,m)' \
   --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,m)"' \
   --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,m)"' \
-  --preview-window 'right:55%' \
+  --preview-window 'right:55%,<65(down,75%)' \
+  --layout=reverse \
   --preview 'sesh preview {}')
 
 [[ -n "$selected" ]] && "$HOME_DIR/Scripts/tmux-session-connect" "$selected"

@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+if ! tmux list-sessions &>/dev/null; then
+  tmux new -s code -c ~/code
+  exit 0
+fi
+
+last_session=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' | sort -rn | head -1 | cut -d' ' -f2-)
+
+if [[ -z "$last_session" ]]; then
+  tmux new -s code -c ~/code
+  exit 0
+fi
+
+last_window=$(tmux list-windows -t "$last_session" -F '#{window_activity} #{window_index}' | sort -rn | head -1 | cut -d' ' -f2)
+
+tmux attach -t "$last_session:$last_window"
