@@ -37,8 +37,8 @@ if [ -z "$cwd" ]; then
     cwd="$PWD"
 fi
 
-# Terminal width detection for responsive layout
-term_width=$(tput cols 2>/dev/null || echo 120)
+# Terminal width detection for responsive layout (try tmux first, then tput)
+term_width=$(tmux display-message -p '#{pane_width}' 2>/dev/null || tput cols 2>/dev/null || echo 120)
 narrow_term=$([[ "$term_width" -lt 65 ]] && echo 1 || echo 0)
 
 # Git status counts (only if in a git repo)
