@@ -1,6 +1,8 @@
 # Termux Setup
 
-Config for connecting to NixOS from Android via Eternal Terminal.
+Connecting to NixOS from Android Termux app via Eternal Terminal.
+
+Install Termux from f-droid, not play store.
 
 ## Install
 
@@ -12,9 +14,8 @@ pkg install git
 git clone https://github.com/richardgill/nix ~/nix
 
 # Run install script
-cd ~/nix/modules/home-manager/dot-files/termux
-chmod +x install.sh
-./install.sh
+cd nix
+./modules/home-manager/dot-files/termux/install.sh
 
 # Install a nerd font (run after install.sh)
 getnf -i JetBrainsMono
