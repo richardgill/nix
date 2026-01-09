@@ -40,8 +40,16 @@ else
     echo "  Font already installed"
 fi
 
-# Create update script in ~/bin
+# Add ~/bin to PATH in .bashrc
 mkdir -p ~/bin
+if ! grep -q 'PATH="$HOME/bin' ~/.bashrc 2>/dev/null; then
+    echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
+    echo "  Added ~/bin to PATH in .bashrc"
+else
+    echo "  ~/bin already in PATH"
+fi
+
+# Create update script in ~/bin
 cat > ~/bin/update-termux << 'EOF'
 #!/data/data/com.termux/files/usr/bin/bash
 set -e
