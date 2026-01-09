@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# tmux-resurrect pre-restore hook: clears all but one pane per session before restore
 
 tmux list-sessions -F '#{session_name}' | while read -r session; do
   tmux kill-window -a -t "${session}:1" 2>/dev/null

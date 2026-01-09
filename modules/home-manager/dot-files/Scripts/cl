@@ -5,6 +5,11 @@
 #   SessionStart - stores session ID in tmux pane for cc-test.sh
 #   Stop - generates debounced summaries via claude-summary-hook
 
+[[ -n "$TMUX_PANE" ]] && tmux rename-window -t "$TMUX_PANE" "cl"
+
+# Patch dev-browser plugin to use system Chromium (idempotent, runs in background)
+"$HOME/Scripts/patch-dev-browser" &>/dev/null &
+
 # Isolate Claude's temp files to avoid ENXIO errors from socket files in /tmp
 # The native binary's file watcher crashes when it encounters Unix sockets
 # (nvim, vscode IPC, etc.) because fs.watch() can't watch socket files.

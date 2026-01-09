@@ -11,8 +11,8 @@ fi
 expanded_path="${arg/#\~/$HOME}"
 
 if [ -d "$expanded_path" ]; then
-  create_session_for_path "$expanded_path"
+  create_session_for_path "$expanded_path" >/dev/null
   exit 0
 fi
 
-sesh connect "$arg"
+sesh connect "$arg" >/dev/null

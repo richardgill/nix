@@ -83,10 +83,13 @@ case "${1:-run}" in
     selected=$(echo "$list" | fzf --ansi \
       --disabled \
       --no-sort \
-      --prompt '⚡  ' \
+      --info=hidden \
+      --no-separator \
+      --pointer='' \
+      --no-input \
       --listen "$FZF_LISTEN_PORT" \
       --with-nth=4.. \
-      --header "enter=connect  f=fork  n=new  i=ignore  ctrl-r=refresh  (auto: ${refresh_interval}s)" \
+      --header "c=clear  ^q=quit  n=new  f=fork  i=ignore" \
       --bind 'tab:down,btab:up' \
       --bind 'focus:refresh-preview' \
       --bind 'load:refresh-preview' \
@@ -94,6 +97,8 @@ case "${1:-run}" in
       --bind "f:execute($HOME/Scripts/claude-fork {2})+abort" \
       --bind "n:execute($HOME/Scripts/claude-new)" \
       --bind "i:execute-silent(bash -c 'source ~/Scripts/lib/claude && claude_toggle_ignore_session {3}')+reload:$script_path list" \
+      --bind "c:execute(tmux respawn-pane -k -t {2} '$HOME/Scripts/cl')+reload:$script_path list" \
+      --bind "ctrl-q:execute-silent($HOME/Scripts/tmux-kill-session --yes {2})+reload:$script_path list" \
       --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
       --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
       --bind 's:abort+execute-silent(tmux select-window -t :3)' \
@@ -105,9 +110,9 @@ case "${1:-run}" in
       --bind 'start:first+unbind(a,r,s,t,g,m)' \
       --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
       --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
-      --preview-window 'right:55%,<65(down,75%)' \
+      --preview-window 'down,85%' \
       --layout=reverse \
-      --preview 'tmux capture-pane -ep -t {2}')
+      --preview 'tmux capture-pane -ep -t {2} -S - | tail -n $FZF_PREVIEW_LINES')
 
     if [[ -n "$selected" ]]; then
       target=$(echo "$selected" | cut -f2)

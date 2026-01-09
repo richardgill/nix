@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# ai-prompt: Run a prompt through an LLM with retries and timeout
+# Usage: ai-prompt "your prompt here"
+#    or: echo "your prompt" | ai-prompt
+
+set -euo pipefail
+
+TIMEOUT_SECS="${AI_PROMPT_TIMEOUT:-30}"
+MAX_RETRIES="${AI_PROMPT_RETRIES:-3}"
+MODEL="${AI_PROMPT_MODEL:-gpt-5.1-codex-mini}"
+
+# Read prompt from argument or stdin
+if [[ $# -gt 0 && "$1" != "-" ]]; then
+  PROMPT="$1"
+else
+  PROMPT=$(cat)
+fi
+
+[[ -z "$PROMPT" ]] && { echo "Error: No prompt provided" >&2; exit 1; }
+
+run_prompt() {
+  # if timeout "$TIMEOUT_SECS" opencode run "$PROMPT" --model anthropic/claude-haiku-4-5 2>&1; then return 0; fi
+  # if timeout "$TIMEOUT_SECS" claude -p --no-session-persistence --model haiku "$PROMPT" 2>&1; then return 0; fi
+  if timeout "$TIMEOUT_SECS" codex exec -m "$MODEL" "$PROMPT" 2>/dev/null; then return 0; fi
+  return 1
+}
+
+for attempt in $(seq 1 "$MAX_RETRIES"); do
+  if result=$(run_prompt); then
+    echo "$result"
+    exit 0
+  fi
+  [[ $attempt -lt $MAX_RETRIES ]] && sleep 1
+done
+
+echo "Error: Failed after $MAX_RETRIES attempts" >&2
+exit 1

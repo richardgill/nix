@@ -7,6 +7,8 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
 }
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 assume_yes=0
 session=""
 
@@ -32,7 +34,7 @@ if (( ! assume_yes )); then
   if [[ ! "$resp" =~ ^([yY]|[yY][eE][sS])$ ]]; then
     echo "Aborted session termination."
     log "User aborted session termination for: $session"
-    exit 0   # return 0 to avoid tmux reporting “returned 1”
+    exit 0
   fi
 fi
 
@@ -41,81 +43,35 @@ current_session="$(tmux display-message -p '#S' 2>/dev/null || true)"
 in_target_session=0
 [[ -n "$current_session" && "$current_session" == "$session" ]] && in_target_session=1
 self_tty="$(tty 2>/dev/null || true)"
-self_tty_name="${self_tty#/dev/}"
-self_pgid="$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')"
 trap '' HUP
 
-# 1) Capture pane TTYs before touching the session
-ttys=()
-while IFS= read -r tty; do [[ -n "$tty" ]] && ttys+=("$tty"); done \
-  < <(tmux list-panes -t "$session:" -s -F "#{pane_tty}" 2>/dev/null | sort -u || true)
+# Get all pane IDs in the session
+panes=()
+while IFS= read -r pane_id; do
+  [[ -n "$pane_id" ]] && panes+=("$pane_id")
+done < <(tmux list-panes -t "$session:" -s -F '#{session_name}:#{window_index}.#{pane_index}' 2>/dev/null || true)
 
-if (( ${#ttys[@]} == 0 )); then
-  log "No panes/TTYs found for session '$session'; skipping process signaling"
+if (( ${#panes[@]} == 0 )); then
+  log "No panes found for session '$session'"
 else
-  log "Found ${#ttys[@]} TTYs for session '$session': ${ttys[*]}"
+  log "Found ${#panes[@]} panes for session '$session': ${panes[*]}"
 
-  # Exclude tmux client TTYs (outer terminal emulators)
-  client_names=()
-  while IFS= read -r ct; do [[ -n "$ct" ]] && client_names+=("${ct#/dev/}"); done \
-    < <(tmux list-clients -t "$session" -F "#{client_tty}" 2>/dev/null | sort -u || true)
-
-  # 2) TERM: by pane TTY and by foreground PGID (TPGID)
-  for tty in "${ttys[@]}"; do
-    name="${tty#/dev/}"
-
-    # Skip our own TTY if we're killing the session we're in
-    if (( in_target_session )) && [[ "$name" == "$self_tty_name" ]]; then
-      log "Skipping own TTY: $name"
-      continue
+  # Kill each pane in parallel (tmux-kill-pane handles self-protection)
+  for pane in "${panes[@]}"; do
+    # Skip our own pane if we're in the target session (let kill-session handle it)
+    if (( in_target_session )); then
+      pane_tty=$(tmux display-message -t "$pane" -p '#{pane_tty}' 2>/dev/null || true)
+      [[ "$pane_tty" == "$self_tty" ]] && { log "Skipping own pane: $pane"; continue; }
     fi
-
-    # Skip known client TTYs
-    skip=0
-    for ct in "${client_names[@]}"; do [[ "$name" == "$ct" ]] && { skip=1; break; }; done
-    (( skip )) && { log "Skipping client TTY: $name"; continue; }
-
-    pkill -TERM -t "$name" 2>/dev/null || true
-    log "TERM via pkill -t $name"
-
-    tpgid="$(ps -o tpgid= -t "$tty" 2>/dev/null | awk 'NR==1{gsub(/[[:space:]]/,"");print}')"
-    if [[ -n "$tpgid" && "$tpgid" =~ ^[0-9]+$ && "$tpgid" -gt 1 ]]; then
-      if (( in_target_session )) && [[ "$tpgid" == "$self_pgid" ]]; then
-        log "Skipping own PGID: $tpgid"
-      else
-        kill -TERM -- -"${tpgid}" 2>/dev/null || true
-        log "TERM to PGID $tpgid"
-      fi
-    fi
+    "$SCRIPT_DIR/tmux-kill-pane" "$pane" &
   done
 
-  # 3) Unconditional delayed KILL sweep (detached); reuses captured targets
-  (
-    sleep 1
-    for tty in "${ttys[@]}"; do
-      name="${tty#/dev/}"
-      [[ $in_target_session -eq 1 && "$name" == "$self_tty_name" ]] && continue
-      skip=0
-      for ct in "${client_names[@]}"; do [[ "$name" == "$ct" ]] && { skip=1; break; }; done
-      (( skip )) && continue
-
-      pkill -KILL -t "$name" 2>/dev/null || true
-      log "KILL via pkill -t $name"
-
-      tpgid="$(ps -o tpgid= -t "$tty" 2>/dev/null | awk 'NR==1{gsub(/[[:space:]]/,"");print}')"
-      if [[ -n "$tpgid" && "$tpgid" =~ ^[0-9]+$ && "$tpgid" -gt 1 ]]; then
-        [[ $in_target_session -eq 1 && "$tpgid" == "$self_pgid" ]] || {
-          kill -KILL -- -"${tpgid}" 2>/dev/null || true
-          log "KILL to PGID $tpgid"
-        }
-      fi
-    done
-    log "KILL sweep complete"
-  ) >/dev/null 2>&1 & disown || true
+  # Wait for all background kill-pane processes
+  wait
+  log "All pane kills completed"
 fi
-# --- end teardown ---
 
-# Kill the session immediately
+# Kill the session
 if tmux kill-session -t "$session" 2>&1 | tee -a "$LOG_FILE"; then
   log "Successfully killed session: $session"
 else
