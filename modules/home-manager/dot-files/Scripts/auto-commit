@@ -50,10 +50,8 @@ else
 $(git diff --cached)"
 fi
 
-# if ! COMMIT_MSG=$(claude --model haiku -p "$PROMPT" 2>&1); then
-# if ! COMMIT_MSG=$(opencode run "$PROMPT" --model anthropic/claude-haiku-4-5 2>&1); then
-if ! COMMIT_MSG=$(opencode run "$PROMPT" --model anthropic/claude-haiku-4-5 2>&1); then
-  echo "Error generating commit message: $COMMIT_MSG" >&2
+if ! COMMIT_MSG=$(~/Scripts/ai-prompt "$PROMPT"); then
+  echo "Error generating commit message" >&2
   exit 1
 fi
 

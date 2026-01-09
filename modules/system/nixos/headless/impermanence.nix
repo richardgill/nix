@@ -78,6 +78,7 @@
           "Screenshots"
           (lib.removePrefix "/home/${vars.userName}/" config.customDirs.music)
           "go"
+          ".alchemy"
           ".cargo"
           ".claude/file-history"
           ".claude/plugins"
@@ -85,6 +86,7 @@
           ".claude/shell-snapshots"
           ".claude/statsig"
           ".claude/todos"
+          ".codex/sessions"
           ".config/chromium"
           ".config/google-chrome"
           ".config/cmus"
@@ -135,6 +137,8 @@
           ".claude.json"
           ".claude/.credentials.json"
           ".claude/history.jsonl"
+          ".codex/auth.json"
+          ".codex/history.jsonl"
         ];
       };
 

@@ -48,8 +48,7 @@ EOF
 Full diff:
 $(git diff origin/main...HEAD)"
     fi
-    # PR_CONTENT=$(claude --model haiku -p "$PROMPT")
-    PR_CONTENT=$(opencode run "$PROMPT" --model anthropic/claude-haiku-4-5)
+    PR_CONTENT=$(~/Scripts/ai-prompt "$PROMPT")
     
     # Save to temp file and open in editor for manual editing
     TEMP_FILE=$(mktemp)

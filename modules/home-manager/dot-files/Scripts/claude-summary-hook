@@ -78,23 +78,25 @@ echo "spawning background job" >> "$DEBUG_LOG"
 
   is_valid_summary() {
     local s="$1"
-    [[ -z "$s" ]] && return 1
-    [[ "$s" =~ ^(I\'ll|I\ need|I\ |Let\ me|Let\'s|The\ user|Based\ on|To\ |It\ ) ]] && return 1
-    [[ "$s" =~ ^\*\* ]] && return 1
-    [[ "$s" =~ ^\# ]] && return 1
-    [[ ${#s} -gt 60 ]] && return 1
+    # Strip ANSI escape codes for validation
+    local clean=$(echo "$s" | sed 's/\x1b\[[0-9;]*m//g')
+    [[ -z "$clean" ]] && return 1
+    [[ "$clean" =~ ^(I\'ll|I\ need|I\ |Let\ me|Let\'s|The\ user|Based\ on|To\ |It\ ) ]] && return 1
+    [[ "$clean" =~ ^\*\* ]] && return 1
+    [[ "$clean" =~ ^\# ]] && return 1
+    [[ "$clean" =~ [Ee]rror: ]] && return 1
+    [[ ${#clean} -gt 60 ]] && return 1
     return 0
   }
 
+  PROMPT="What is the user's main task? Reply with ONLY a 3-5 word task name (max 30 chars), nothing else.
+
+$transcript"
+
   summary=""
   for attempt in 1 2 3; do
-    echo "calling opencode (attempt $attempt)..."
-    summary=$(cat << EOF | timeout 30 opencode run \
-      "What is the user's main task? Reply with ONLY a 3-5 word task name (max 30 chars), nothing else." \
-      --model anthropic/claude-haiku-4-5 2>&1 | head -1 | tr -d '"' | cut -c1-50
-$transcript
-EOF
-)
+    echo "calling ai-prompt (attempt $attempt)..."
+    summary=$(~/Scripts/ai-prompt "$PROMPT" 2>/dev/null | head -1 | tr -d '"' | cut -c1-50)
     echo "summary: $summary"
 
     if is_valid_summary "$summary"; then

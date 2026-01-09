@@ -40,6 +40,17 @@ else
     echo "  Font already installed"
 fi
 
+# Create update script in home directory
+cat > ~/update.sh << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+set -e
+cd ~/nix
+git pull
+./modules/home-manager/dot-files/termux/install.sh
+EOF
+chmod +x ~/update.sh
+echo "  Created ~/update.sh"
+
 # Reload settings
 termux-reload-settings
 echo "Settings reloaded!"

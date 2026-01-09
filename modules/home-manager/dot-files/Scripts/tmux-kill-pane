@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+# Gracefully kills a tmux pane: SIGTERM → wait → SIGKILL → kill-pane
+# Usage: tmux-kill-pane [pane-target]
+# If no target provided, kills the current pane
+
+LOG_FILE="$HOME/Library/Logs/tmux-scripts/tmux-kill-pane.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
+}
+
+pane_target="${1:-%}"  # default to current pane
+
+# Get pane TTY
+pane_tty=$(tmux display-message -t "$pane_target" -p '#{pane_tty}' 2>/dev/null)
+if [[ -z "$pane_tty" ]]; then
+  log "Could not find pane: $pane_target"
+  exit 1
+fi
+
+tty_name="${pane_tty#/dev/}"
+log "Killing pane $pane_target (tty: $tty_name)"
+
+# Self-protection: don't signal our own TTY
+self_tty="$(tty 2>/dev/null || true)"
+self_tty_name="${self_tty#/dev/}"
+self_pgid="$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')"
+
+if [[ "$tty_name" == "$self_tty_name" ]]; then
+  log "Skipping signals for own TTY, just killing pane"
+  tmux kill-pane -t "$pane_target" 2>/dev/null || true
+  exit 0
+fi
+
+# SIGTERM to all processes on the pane's TTY
+pkill -TERM -t "$tty_name" 2>/dev/null || true
+log "TERM via pkill -t $tty_name"
+
+# Also signal the foreground process group
+tpgid="$(ps -o tpgid= -t "$pane_tty" 2>/dev/null | awk 'NR==1{gsub(/[[:space:]]/,"");print}')"
+if [[ -n "$tpgid" && "$tpgid" =~ ^[0-9]+$ && "$tpgid" -gt 1 && "$tpgid" != "$self_pgid" ]]; then
+  kill -TERM -- -"${tpgid}" 2>/dev/null || true
+  log "TERM to PGID $tpgid"
+fi
+
+# Brief wait for graceful shutdown
+sleep 0.3
+
+# SIGKILL any survivors
+pkill -KILL -t "$tty_name" 2>/dev/null || true
+log "KILL via pkill -t $tty_name"
+
+if [[ -n "$tpgid" && "$tpgid" =~ ^[0-9]+$ && "$tpgid" -gt 1 && "$tpgid" != "$self_pgid" ]]; then
+  kill -KILL -- -"${tpgid}" 2>/dev/null || true
+  log "KILL to PGID $tpgid"
+fi
+
+# Finally kill the pane
+tmux kill-pane -t "$pane_target" 2>/dev/null || true
+log "Killed pane $pane_target"

@@ -26,7 +26,7 @@ if [[ "$(git symbolic-ref --short HEAD 2>/dev/null)" == "main" ]]; then
       git pull "$remote" main
     else
       printf "main is %d commit(s) behind %s/main. Pull? (y/n) " "$behind" "$remote"
-      read -r -k 1 REPLY
+      read -r -n 1 REPLY
       echo
       [[ $REPLY =~ ^[Yy]$ ]] && git pull "$remote" main
     fi

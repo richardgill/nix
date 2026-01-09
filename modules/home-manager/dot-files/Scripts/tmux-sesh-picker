@@ -5,24 +5,21 @@ HOME_DIR="$HOME"
 
 selected=$(sesh list --icons | fzf --ansi \
   --no-sort --border-label ' sesh ' --prompt '⚡  ' \
-  --header '  ^a all ^t tmux ^g configs ^x zoxide ^d tmux kill ^f find | F12/§ prefix' \
+  --header '  ^f find ^q kill ^a all | F12/§ prefix' \
   --bind 'tab:down,btab:up' \
-  --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
-  --bind 'ctrl-t:change-prompt(🪟  )+reload(sesh list -t --icons)' \
-  --bind 'ctrl-g:change-prompt(⚙️  )+reload(sesh list -c --icons)' \
-  --bind 'ctrl-x:change-prompt(📁  )+reload(sesh list -z --icons)' \
   --bind "ctrl-f:change-prompt(🔎  )+reload($HOME_DIR/Scripts/find-dirs)" \
-  --bind "ctrl-d:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)" \
+  --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
+  --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)" \
   --bind "w:become($HOME_DIR/Scripts/claude-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
   --bind 's:abort+execute-silent(tmux select-window -t :3)' \
   --bind 't:abort+execute-silent(tmux select-window -t :4)' \
   --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
-  --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
-  --bind 'start:unbind(w,a,r,s,t,g,m)' \
-  --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,m)"' \
-  --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,m)"' \
+  --bind 'b:abort+execute-silent(tmux select-window -t :6)' \
+  --bind 'start:unbind(w,a,r,s,t,g,b)' \
+  --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,b)"' \
+  --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,b)"' \
   --preview-window 'right:55%,<65(down,75%)' \
   --layout=reverse \
   --preview 'sesh preview {}')

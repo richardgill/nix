@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Patch dev-browser plugin to use system Chromium via PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+# Runs in background, idempotent (no-op if already patched)
+
+set -euo pipefail
+
+plugin_base="$HOME/.claude/plugins/cache/dev-browser-marketplace/dev-browser"
+[[ -d "$plugin_base" ]] || exit 0
+
+# Find newest version directory
+version_dir=$(ls -1d "$plugin_base"/*/ 2>/dev/null | head -1)
+[[ -d "$version_dir" ]] || exit 0
+
+index_file="$version_dir/skills/dev-browser/src/index.ts"
+[[ -f "$index_file" ]] || exit 0
+
+# Already patched?
+grep -q 'PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH' "$index_file" && exit 0
+
+# Apply patch: add executablePath after args line in launchPersistentContext
+sed -i '/args: \[`--remote-debugging-port=\${cdpPort}`\],/a\    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH || undefined,' "$index_file"

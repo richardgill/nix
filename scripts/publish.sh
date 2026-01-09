@@ -73,8 +73,8 @@ if [[ "$force" == "true" ]]; then
   exit 0
 fi
 
-echo "=== AI Agent is checking for secrets/sensitive data ==="
-claude -p /check-secrets
+# echo "=== AI Agent is checking for secrets/sensitive data ==="
+# claude -p /check-secrets
 
 echo ""
 read -p "Continue to diff? (y/n): " -n 1 -r
