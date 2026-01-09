@@ -71,9 +71,13 @@ else
   log "All pane kills completed"
 fi
 
-# Kill the session
-if tmux kill-session -t "$session" 2>&1 | tee -a "$LOG_FILE"; then
-  log "Successfully killed session: $session"
+# Kill the session (if it still exists)
+if tmux has-session -t "$session" 2>/dev/null; then
+  if tmux kill-session -t "$session" 2>&1 | tee -a "$LOG_FILE"; then
+    log "Successfully killed session: $session"
+  else
+    log "Failed to kill session: $session"
+  fi
 else
-  log "Failed to kill session: $session"
+  log "Session '$session' already gone"
 fi

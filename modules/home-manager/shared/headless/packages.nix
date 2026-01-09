@@ -20,6 +20,7 @@
     gh
     nixfmt-rfc-style
     oh-my-posh
+    postgresql
     ripgrep
     sesh
     stripe-cli
