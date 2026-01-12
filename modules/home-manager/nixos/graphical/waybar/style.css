@@ -111,6 +111,7 @@ tooltip {
 #custom-cycle_wall,
 #backlight,
 #custom-screenrecord,
+#custom-voxtype,
 #clock {
     background: transparent;
     color: @foreground;
@@ -174,7 +175,8 @@ tooltip {
     color: @cyan;
 }
 
-#custom-screenrecord.recording {
+#custom-screenrecord.recording,
+#custom-voxtype.recording {
     color: @red;
 }
 

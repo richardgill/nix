@@ -68,6 +68,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    # https://github.com/peteonrails/voxtype/pull/25
+    voxtype = {
+      url = "github:peteonrails/voxtype/fix/nixos-packaging-feedback";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";

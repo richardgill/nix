@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -uo pipefail
+
+readonly STREAMS_FILE="/tmp/voxtype-ducked-streams"
+readonly STATE_FILE="/tmp/voxtype-state"
+readonly START_TIME="/tmp/voxtype-start-time"
+readonly SINK_VOLUME_FILE="/tmp/voxtype-sink-volume"
+readonly DUCKED_VOLUME="0.1"
+readonly TAP_THRESHOLD_MS=300
+readonly MEDIA_ROLES='["Music", "Movie", "Game", "video"]'
+
+get_state() { cat "$STATE_FILE" 2>/dev/null || echo "idle"; }
+
+get_media_stream_ids() {
+  pw-dump | jq -r --argjson roles "$MEDIA_ROLES" \
+    '.[] | select(.info.props["media.role"] as $role | $roles | index($role)) | .id'
+}
+
+duck_streams() {
+  rm -f "$STREAMS_FILE"
+  for id in $(get_media_stream_ids); do
+    vol=$(wpctl get-volume "$id" 2>/dev/null | awk '{print $2}') || continue
+    echo "$id:$vol" >> "$STREAMS_FILE"
+    wpctl set-volume "$id" "$DUCKED_VOLUME"
+  done
+}
+
+restore_streams() {
+  if [[ -f "$STREAMS_FILE" ]]; then
+    while IFS=: read -r id vol; do
+      wpctl set-volume "$id" "$vol" 2>/dev/null || true
+    done < "$STREAMS_FILE"
+    rm -f "$STREAMS_FILE"
+  fi
+}
+
+duck_sink() {
+  vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null | awk '{print $2}') || return
+  echo "$vol" > "$SINK_VOLUME_FILE"
+  wpctl set-volume @DEFAULT_AUDIO_SINK@ "$DUCKED_VOLUME"
+}
+
+restore_sink() {
+  if [[ -f "$SINK_VOLUME_FILE" ]]; then
+    wpctl set-volume @DEFAULT_AUDIO_SINK@ "$(cat "$SINK_VOLUME_FILE")" 2>/dev/null || true
+    rm -f "$SINK_VOLUME_FILE"
+  fi
+}
+
+restore_all() {
+  restore_streams
+  restore_sink
+}
+
+record_start() {
+  trap restore_all ERR EXIT
+  duck_streams
+  duck_sink
+  voxtype record start
+  trap - ERR EXIT
+}
+
+record_stop() {
+  voxtype record stop
+  sleep 0.15
+  restore_streams
+  restore_sink
+}
+
+case "${1-}" in
+  press)
+    state=$(get_state)
+    if [[ "$state" == "idle" ]]; then
+      date +%s%3N > "$START_TIME"
+      record_start
+      echo "recording" > "$STATE_FILE"
+    elif [[ "$state" == "toggle" ]]; then
+      record_stop
+      rm -f "$START_TIME"
+      echo "idle" > "$STATE_FILE"
+    fi
+    ;;
+  release)
+    state=$(get_state)
+    if [[ "$state" == "recording" ]]; then
+      start=$(cat "$START_TIME")
+      now=$(date +%s%3N)
+      elapsed=$((now - start))
+      if [[ $elapsed -lt $TAP_THRESHOLD_MS ]]; then
+        echo "toggle" > "$STATE_FILE"
+      else
+        record_stop
+        rm -f "$START_TIME"
+        echo "idle" > "$STATE_FILE"
+      fi
+    fi
+    ;;
+  restore)
+    restore_all
+    rm -f "$STATE_FILE" "$START_TIME"
+    echo "idle" > "$STATE_FILE"
+    ;;
+  *)
+    echo "Usage: $0 {press|release|restore}" >&2
+    exit 1
+    ;;
+esac
