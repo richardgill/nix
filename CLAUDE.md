@@ -1,6 +1,6 @@
 # Nix Configuration
 
-This repo contains all machine setup and configuration since this is a NixOS system - system packages, services, dotfiles, and home-manager config are all declared here.
+This repo contains all machine setup and configuration since this is a NixOS system - system packages, services, dotfiles, and home-manager config are all declared here. Sometimes they are suffixed with a .hbs (use `*.ext*` glob to match both).
 
 Assume this config is the configuration for all machines we discuss, unless I say otherwise.
 
@@ -21,3 +21,5 @@ If build fails with "Path X already exists", move conflicting files to persisten
 `sudo mkdir -p /persistent/home/$USER/<folder>; sudo mv /home/$USER/<file> /persistent/home/$USER/<folder>/; sudo chown -R $USER:users /persistent/home/$USER/<folder>`
 
 To debug scripts in `modules/home-manager/dot-files/Scripts/`, run them directly from the repo rather than from `~/Scripts/`.
+
+my aliases are in my zshrc file

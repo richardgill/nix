@@ -134,5 +134,8 @@ in
       # HumanLayer config (mutable)
       ".config/humanlayer/humanlayer.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/humanlayer/humanlayer.json";
+
+      ".config/voxtype/config.toml".source = ../../dot-files/voxtype/config.toml;
+      ".config/wireplumber/wireplumber.conf.d".source = ../../dot-files/wireplumber/wireplumber.conf.d;
     };
 }

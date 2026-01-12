@@ -77,7 +77,7 @@ _claude_get_terminal_state() {
     state="permission"
   elif echo "$pane_content" | grep -qF "Esc to cancel"; then
     state="permission"
-  elif echo "$pane_content" | grep -qF "esc to interrupt"; then
+  elif echo "$pane_content" | grep -qE "(esc|ctrl\+c) to interrupt"; then
     state="running"
   elif echo "$pane_content" | grep -qE '^❯'; then
     state="stopped"

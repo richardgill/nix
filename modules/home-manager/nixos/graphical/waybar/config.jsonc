@@ -9,6 +9,7 @@
   "modules-left": [],
   "modules-center": [],
   "modules-right": [
+    "custom/voxtype",
     "custom/screenrecord",
     "network",
     "clock",
@@ -54,6 +55,12 @@
       "on-scroll-up": "shift_up",
       "on-scroll-down": "shift_down"
     }
+  },
+  "custom/voxtype": {
+    "exec": "$HOME/Scripts/voxtype-waybar",
+    "return-type": "json",
+    "format": "{}",
+    "tooltip": true
   },
   "custom/screenrecord": {
     "exec": "pgrep -x wl-screenrec >/dev/null && echo '{\"text\":\"󰻂\",\"class\":\"recording\"}' || echo ''",

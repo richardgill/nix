@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+# Wrapper for voxtype status that only shows output when recording
+
+voxtype status --follow --format json | while IFS= read -r line; do
+  class=$(echo "$line" | jq -r '.class // empty')
+  if [[ "$class" == "recording" ]]; then
+    echo '{"text":"󰍬","class":"recording","tooltip":"Recording..."}'
+  else
+    echo ''
+  fi
+done

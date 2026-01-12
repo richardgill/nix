@@ -1,0 +1,28 @@
+state_file = "auto"
+
+[hotkey]
+enabled = false
+
+[audio]
+device = "default"
+sample_rate = 16000
+max_duration_secs = 60
+
+[audio.feedback]
+enabled = true
+theme = "default"
+volume = 0.7
+
+[whisper]
+model = "base.en"
+language = "en"
+
+[output]
+mode = "type"
+fallback_to_clipboard = true
+
+[output.notification]
+on_transcription = false
+
+[status]
+icon_theme = "nerd-font"

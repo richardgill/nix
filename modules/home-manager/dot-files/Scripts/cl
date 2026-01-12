@@ -17,6 +17,8 @@
 export TMPDIR="${TMPDIR:-/tmp}/claude-tmp"
 mkdir -p "$TMPDIR"
 
+export DISABLE_AUTOUPDATER=1
+
 session_start_hook='sid=$(cat | jq -r ".session_id // empty"); [[ -n "$TMUX_PANE" && -n "$sid" ]] && tmux set-option -t "$TMUX_PANE" -p @claude_session_id "$sid"'
 
 settings=$(jq -nc \
@@ -33,4 +35,4 @@ settings=$(jq -nc \
     }
   }')
 
-exec claude --settings "$settings" "$@"
+exec mise exec claude-code -- claude --settings "$settings" "$@"

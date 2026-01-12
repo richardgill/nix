@@ -5,6 +5,7 @@
   lib,
   pkgs,
   nixpkgs-unstable,
+  inputs,
   ...
 }:
 let
@@ -54,6 +55,7 @@ in
       unstable.wl-screenrec
       unstable.wiremix
       xournalpp
+      inputs.voxtype.packages.${pkgs.system}.vulkan
     ]
     ++ lib.optionals (!isAarch64Linux) [
       ghostty
