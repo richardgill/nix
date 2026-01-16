@@ -6,9 +6,8 @@ Assume this config is the configuration for all machines we discuss, unless I sa
 
 Use the `.justfile` for common tasks and commands.
 
-Run `just check` after making changes to validate the configuration.
 
-Run `just switch` to deploy changes (builds and activates the new configuration).
+Run `just switch` after making changes to directly deploy changes (builds and activates the new configuration). Only skip this if the change is particularly dangerous, but home dir changes are fine 
 
 To edit my dot files in `~/` they are actually symlinked from `modules/home-manager/dot-files.nix` so search there. 
 

@@ -80,6 +80,7 @@ in
       ".config/ghostty/config".source = "${builtTemplates}/ghostty/config";
       ".config/ripgrep/.ripgreprc".source = "${builtTemplates}/ripgrep/ripgreprc";
       ".config/ripgrep/.rgignore".source = "${builtTemplates}/ripgrep/rgignore";
+      ".config/shell/aliases.sh".source = "${builtTemplates}/shell/aliases.sh";
       # Note: .config/mise/config.toml is managed by mise.nix
       # Note: .zshrc is managed by programs.zsh in zsh.nix
 
@@ -109,6 +110,18 @@ in
       ".codex/skills".source = "${builtTemplates}/ai-agents/codex/skills";
       ".codex/prompts".source = "${builtTemplates}/ai-agents/codex/prompts";
 
+      # Pi config (~/.pi/agent/) (mutable)
+      ".pi/agent/AGENTS.md".source = "${builtTemplates}/ai-agents/pi/AGENTS.md";
+      ".pi/agent/settings.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/pi/settings.json";
+      ".pi/agent/presets.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/pi/presets.json";
+      ".pi/agent/skills".source = "${builtTemplates}/ai-agents/pi/skills";
+      ".pi/agent/extensions".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/pi/extensions";
+      ".pi/agent/themes".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/ai-agents/pi/themes";
+
       # Ampcode config (~/.config/amp/)
       ".config/amp/AGENTS.md".source = "${builtTemplates}/ai-agents/ampcode/AGENTS.md";
       ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
@@ -122,6 +135,7 @@ in
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
       ".config/git/templates/hooks/post-checkout".source = ../../dot-files/git/hooks/post-checkout;
       ".bash_profile".source = ../../dot-files/bash_profile;
+      ".bashrc".source = ../../dot-files/bashrc;
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;
       "code/.rgignore".source = ../../dot-files/code/rgignore;

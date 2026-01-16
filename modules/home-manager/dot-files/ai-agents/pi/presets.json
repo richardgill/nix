@@ -1,0 +1,17 @@
+{
+  "medium": {
+    "provider": "openai-codex",
+    "model": "gpt-5.1-codex-max",
+    "thinkingLevel": "medium"
+  },
+  "high": {
+    "provider": "openai-codex",
+    "model": "gpt-5.2-codex",
+    "thinkingLevel": "medium"
+  },
+  "xhigh": {
+    "provider": "openai-codex",
+    "model": "gpt-5.2",
+    "thinkingLevel": "xhigh"
+  }
+}

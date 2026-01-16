@@ -51,9 +51,3 @@ Prefer not to use npx or bunx for anything where package.json has it. Rely on pn
 There is a gitignored `scratch/` folder in all repos - you can use it for temporary work and experimentation.
 
 You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
-
-## Git Conventions
-
-When doing `git commit` write messages which are short, do not prefix them. I use a squash commit workflow, so the commit only shows up in the PR. Example: `git commit -m "Made pay button green"`
-
-When creating PRs use the following convention for monorepo projects: [App name|Package name]: What the PR does. Example [Website]: Made pay button green

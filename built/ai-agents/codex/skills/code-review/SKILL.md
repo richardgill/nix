@@ -1,6 +1,7 @@
 ---
 name: code-review
-description: Comprehensive code review. Use when user says "review", "code review", "check my code", "review this PR", "review changes", or wants feedback on code quality, patterns, and potential issues.
+description: Expert code review specialist. Use when reviewing code for quality, security, maintainability, or when examining recent changes
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Before starting the review, check if `.claude/prompts/review-criteria.md` or `.codex/prompts/review-criteria.md` exists in the project root. If it does, include those criteria as additional todos alongside the standard review.
@@ -91,5 +92,3 @@ End with a todo list for the user:
 - [ ] Fix: Extract parseConfig into smaller functions (src/utils/parser.ts:89)
 - [ ] Fix: Use shared ANIMATION_DURATION constant (src/components/Modal.tsx:5)
 </example>
-
-$ARGUMENTS
