@@ -13,6 +13,7 @@ let
     "openai-api-key"
     "joist-api-key"
     "beeper-api-token"
+    "exa-api-key"
   ];
 
   # Generate secret configurations with appropriate ownership

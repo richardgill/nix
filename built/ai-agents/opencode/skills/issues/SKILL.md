@@ -1,0 +1,97 @@
+---
+name: issues
+description: |
+  Manages the persistent file-based work tracker at thoughts/shared/issues/.
+  Use when the user says: "what's next", "what should I work on", "show backlog",
+  "track this", "create an issue", "add to backlog", "mark done", "close issue",
+  "show tasks", "triage issues", "update status", "show roadmap", "priorities",
+  "what's in progress", "move to done", or discusses work item tracking.
+  Not for debugging problems ("I have an issue with X") or one-off planning.
+---
+
+# Issue Management
+
+Manage the project's persistent work tracker in `thoughts/shared/issues/`.
+
+## Issue & Plan Storage
+
+Issues and plans are tracked in `thoughts/shared/issues/` with numbered phases:
+
+```
+thoughts/shared/issues/
+├── 10-phase-name/           # Single issue = flat folder
+│   └── plan.md
+├── 20-another-phase/
+│   ├── plan.md
+│   └── design.md          # Optional
+├── 30-multi-issue-phase/    # Multiple parallel issues = nested
+│   ├── feature-a/
+│   │   ├── plan.md
+│   │   └── design.md
+│   └── feature-b/
+│       └── plan.md
+└── done/                    # Completed issues moved here
+```
+
+**Conventions:**
+- **Single issue phase** → `NN-phase-name/` (flat)
+- **Multi-issue phase** → `NN-phase/issue-name/` (nested, all parallel)
+- **Gaps in numbers** (10, 20...) = room to insert phases later
+- Each issue has `plan.md` + optional `design.md`
+- **Completed issues** → move to `done/`
+
+**Workflow:**
+1. Work through phases in order (10 → 20 → 30...)
+2. Within a phase folder, pick any issue - they're independent
+3. Read issue's `plan.md` for scope
+
+## Commands
+
+### List Active Issues
+```bash
+ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/
+```
+
+### Show What's Next
+```bash
+ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/ | head -1
+```
+
+### Create Issue
+
+1. Check existing phases: `ls thoughts/shared/issues/`
+2. Pick phase number (use gaps like 10, 20, 30 for flexibility)
+3. Create folder:
+   - Single issue: `thoughts/shared/issues/NN-issue-name/`
+   - Multi-issue phase: `thoughts/shared/issues/NN-phase/issue-name/`
+4. Add `plan.md` with scope and implementation details
+5. Optionally add `design.md` for design notes
+
+### Complete Issue
+
+Move to done when fully implemented:
+```bash
+mkdir -p thoughts/shared/issues/done
+mv thoughts/shared/issues/NN-issue-name thoughts/shared/issues/done/
+```
+
+### Show Progress
+```bash
+echo "Active:" && ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/ | wc -l
+echo "Done:" && ls -1d thoughts/shared/issues/done/*/ 2>/dev/null | wc -l
+```
+
+### Triage/Prioritize
+
+1. Review all phases: `ls -la thoughts/shared/issues/`
+2. Check recent work to identify completed issues:
+   ```bash
+   git log --oneline -20
+   git diff main~10..main --stat
+   ```
+3. Move completed issues to done
+4. Renumber folders to reorder priority
+5. Move items between phases as needed
+6. Update any `plan.md` files with new scope
+
+$ARGUMENTS

@@ -87,6 +87,7 @@
           ".claude/statsig"
           ".claude/todos"
           ".codex/sessions"
+          ".pi/agent/sessions"
           ".config/chromium"
           ".config/google-chrome"
           ".config/cmus"
@@ -141,6 +142,7 @@
           ".claude/history.jsonl"
           ".codex/auth.json"
           ".codex/history.jsonl"
+          ".pi/agent/auth.json"
         ];
       };
 

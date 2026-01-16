@@ -1,6 +1,5 @@
 {
   vars,
-  lib,
   config,
   ...
 }:

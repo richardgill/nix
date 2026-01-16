@@ -1,5 +1,6 @@
 {
   "amp.git.commit.coauthor.enabled": false,
+  "excludeSkills": [],
   "amp.permissions": [
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-commit" }, "action": "allow" },
     { "tool": "Bash", "matches": { "cmd": "~/Scripts/auto-commit-pr" }, "action": "allow" },

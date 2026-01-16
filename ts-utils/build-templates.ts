@@ -12,36 +12,42 @@ import {
 } from "fs";
 import Handlebars from "handlebars";
 import { z } from "zod";
-import { directories, rootTemplates, DOT_FILES_PATH, agents, AgentName } from "./template-config";
+import { directories, rootTemplates, DOT_FILES_PATH } from "./template-config";
+import { agents, type AgentName } from "./agent-config";
 
 Handlebars.registerHelper("eq", (a, b) => a === b);
 
-const templateDataSchema = z.object({
-  isDarwin: z.boolean(),
-  isLinux: z.boolean(),
-  homeDir: z.string(),
-  homeDirectory: z.string(),
-  zshPath: z.string(),
-  coreUtilsPath: z.string(),
-  musicDir: z.string(),
-  anthropicApiKeyPath: z.string(),
-  kagiApiKeyPath: z.string(),
-  tavilyApiKeyPath: z.string(),
-  openaiApiKeyPath: z.string(),
-  joistApiKeyPath: z.string(),
-  beeperApiTokenPath: z.string(),
-  defaultShell: z.string(),
-  catppuccinPlugin: z.string(),
-  resurrectPlugin: z.string(),
-  continuumPlugin: z.string(),
-  firefoxProfilePath: z.string(),
-  firefoxProfilePathUrlEncoded: z.string(),
-  defaultEngineIdHash: z.string(),
-  profilePath: z.string(),
-}).strict();
+const templateDataSchema = z
+  .object({
+    isDarwin: z.boolean(),
+    isLinux: z.boolean(),
+    homeDir: z.string(),
+    homeDirectory: z.string(),
+    zshPath: z.string(),
+    coreUtilsPath: z.string(),
+    musicDir: z.string(),
+    anthropicApiKeyPath: z.string(),
+    kagiApiKeyPath: z.string(),
+    tavilyApiKeyPath: z.string(),
+    openaiApiKeyPath: z.string(),
+    joistApiKeyPath: z.string(),
+    beeperApiTokenPath: z.string(),
+    exaApiKeyPath: z.string(),
+    defaultShell: z.string(),
+    catppuccinPlugin: z.string(),
+    resurrectPlugin: z.string(),
+    continuumPlugin: z.string(),
+    firefoxProfilePath: z.string(),
+    firefoxProfilePathUrlEncoded: z.string(),
+    defaultEngineIdHash: z.string(),
+    profilePath: z.string(),
+  })
+  .strict();
 
 type TemplateData = z.infer<typeof templateDataSchema>;
-type RenderContext = TemplateData & { agent?: string };
+type RenderContext = TemplateData & { agent?: string; binary: string };
+
+const getAgentBinary = (agent: AgentName) => agents[agent].binary;
 
 const parseCliArgs = () => {
   const { values } = parseArgs({
@@ -136,10 +142,18 @@ const processSharedContent = (
   data: TemplateData,
 ) => {
   const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
-  const commandsPath = join(rootDir, DOT_FILES_PATH, "ai-agents/commands");
 
-  for (const [agent, config] of Object.entries(agents) as [AgentName, typeof agents[AgentName]][]) {
-    const agentData: RenderContext = { ...data, agent };
+  for (const [agent, config] of Object.entries(agents) as [
+    AgentName,
+    (typeof agents)[AgentName],
+  ][]) {
+    const agentData: RenderContext = {
+      ...data,
+      agent,
+      binary: getAgentBinary(agent),
+    };
+    const excludeSkills: readonly string[] =
+      "excludeSkills" in config ? config.excludeSkills : [];
 
     // Process shared/skills/
     if (config.sharedSkills && existsSync(sharedPath)) {
@@ -151,42 +165,20 @@ const processSharedContent = (
         const entries = readdirSync(sharedSkillsPath, { withFileTypes: true });
         for (const entry of entries) {
           if (entry.isDirectory()) {
-            const sourcePath = join(sharedSkillsPath, entry.name);
-            const destPath = join(targetSkillsPath, entry.name);
+            const skillName = entry.name;
+
+            // Skip excluded skills
+            if (excludeSkills.includes(skillName)) {
+              console.log(`  Skipping excluded skill: ${skillName}`);
+              continue;
+            }
+
+            const sourcePath = join(sharedSkillsPath, skillName);
+            const destPath = join(targetSkillsPath, skillName);
             processFileOrDir(sourcePath, destPath, agentData);
           }
         }
       }
-    }
-
-    // Process shared/agents/
-    if (config.sharedAgents && existsSync(sharedPath)) {
-      const sharedAgentsPath = join(sharedPath, "agents");
-      if (existsSync(sharedAgentsPath)) {
-        const targetAgentsPath = join(outDir, "ai-agents", agent, "agents");
-        console.log(`\nProcessing shared/agents/ for ${agent}`);
-
-        const entries = readdirSync(sharedAgentsPath, { withFileTypes: true });
-        for (const entry of entries) {
-          if (entry.isFile()) {
-            const sourcePath = join(sharedAgentsPath, entry.name);
-            const outputName = entry.name.replace(/\.hbs$/, "");
-            const destPath = join(targetAgentsPath, outputName);
-            if (entry.name.endsWith(".hbs")) {
-              renderTemplate(sourcePath, destPath, agentData);
-            } else {
-              copyFile(sourcePath, destPath);
-            }
-          }
-        }
-      }
-    }
-
-    // Process commands/
-    if (config.commands && existsSync(commandsPath)) {
-      const targetCommandsPath = join(outDir, "ai-agents", agent, config.commandsFolder);
-      console.log(`\nProcessing commands/ for ${agent}`);
-      processFileOrDir(commandsPath, targetCommandsPath, agentData);
     }
   }
 };
@@ -214,16 +206,30 @@ const processDirectory = (
 
       if (entry.isDirectory()) {
         // Skip partials, shared, and commands directories (processed separately)
-        if (entry.name === "partials" || entry.name === "shared" || entry.name === "commands") continue;
+        if (
+          entry.name === "partials" ||
+          entry.name === "shared" ||
+          entry.name === "commands"
+        )
+          continue;
 
         // Detect agent context for ai-agents subdirectories
         let subContext = context;
         if (isAiAgents && entry.name in agents) {
-          subContext = { ...context, agent: entry.name };
+          const agentName = entry.name as AgentName;
+          subContext = {
+            ...context,
+            agent: agentName,
+            binary: getAgentBinary(agentName),
+          };
         }
 
         // Recurse into subdirectory
-        processRecursively(sourcePath, join(currentOutPath, entry.name), subContext);
+        processRecursively(
+          sourcePath,
+          join(currentOutPath, entry.name),
+          subContext,
+        );
       } else if (entry.isFile()) {
         if (entry.name.endsWith(".hbs")) {
           // Render template (remove .hbs extension)
@@ -240,7 +246,7 @@ const processDirectory = (
   };
 
   console.log(`\nProcessing: ${dirName}`);
-  processRecursively(sourceDir, outputDir, data);
+  processRecursively(sourceDir, outputDir, { ...data, binary: "" });
 };
 
 const build = () => {
@@ -255,10 +261,16 @@ const build = () => {
   // Create output directory
   mkdirSync(outDir, { recursive: true });
 
-  // Register partials from all directories that have a partials folder
+  // Register partials from shared/partials subdirectory
   for (const dir of directories) {
-    const partialsPath = join(rootDir, DOT_FILES_PATH, dir, "partials");
-    registerPartialsFromDir(partialsPath);
+    const sharedPartialsPath = join(
+      rootDir,
+      DOT_FILES_PATH,
+      dir,
+      "shared",
+      "partials",
+    );
+    registerPartialsFromDir(sharedPartialsPath);
   }
 
   // Process each directory

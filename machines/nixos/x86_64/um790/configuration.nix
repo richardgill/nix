@@ -32,6 +32,7 @@
   home-manager.users.${vars.userName} = {
     imports = [
       ../../../../modules/home-manager/nixos/graphical
+      ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
     ];
   };
 

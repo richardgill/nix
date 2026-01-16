@@ -2,14 +2,16 @@
 # Sesh picker for use from within other fzf popups (via become)
 
 HOME_DIR="$HOME"
+# Puts tmux session named 'code' at the top (34m = blue = tmux sessions)
+SESH_LIST="sesh list --icons | awk '/\[34m.*code\$/ {first=\$0; next} {rest[++n]=\$0} END {print first; for(i=1;i<=n;i++) print rest[i]}'"
 
-selected=$(sesh list --icons | fzf --ansi \
+selected=$(eval "$SESH_LIST" | fzf --ansi \
   --no-sort --border-label ' sesh ' --prompt '⚡  ' \
   --header '  ^f find ^q kill ^a all | F12/§ prefix' \
   --bind 'tab:down,btab:up' \
   --bind "ctrl-f:change-prompt(🔎  )+reload($HOME_DIR/Scripts/find-dirs)" \
-  --bind 'ctrl-a:change-prompt(⚡  )+reload(sesh list --icons)' \
-  --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload(sesh list --icons)" \
+  --bind "ctrl-a:change-prompt(⚡  )+reload($SESH_LIST)" \
+  --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload($SESH_LIST)" \
   --bind "w:become($HOME_DIR/Scripts/claude-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \

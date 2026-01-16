@@ -11,4 +11,4 @@ user=${TUNNEL_USER-$USER}
 host=${TUNNEL_HOST-"localhost"}
 port=${TUNNEL_PORT-1999}
 
-ssh -t -o LogLevel=ERROR -l $user -p $port $host "$@"
+ssh -t -o LogLevel=ERROR -o ConnectTimeout=1 -l $user -p $port $host "$@"

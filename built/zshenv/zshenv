@@ -1,6 +1,5 @@
-export ANTHROPIC_API_KEY="$(cat /run/secrets/anthropic-api-key)"
 export KAGI_API_KEY="$(cat /run/secrets/kagi-api-key)"
 export TAVILY_API_KEY="$(cat /run/secrets/tavily-api-key)"
-export OPENAI_API_KEY="$(cat /run/secrets/openai-api-key)"
 export JOIST_API_KEY="$(cat /run/secrets/joist-api-key)"
 export BEEPER_API_TOKEN="$(cat /run/secrets/beeper-api-token)"
+export EXA_API_KEY="$(cat /run/secrets/exa-api-key)"
