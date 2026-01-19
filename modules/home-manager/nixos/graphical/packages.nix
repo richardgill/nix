@@ -42,6 +42,7 @@ in
       firefox
       imv
       mpv
+      video-trimmer
       p7zip
       satty
       slurp
@@ -55,7 +56,7 @@ in
       unstable.wl-screenrec
       unstable.wiremix
       xournalpp
-      inputs.voxtype.packages.${pkgs.system}.vulkan
+      inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.vulkan
     ]
     ++ lib.optionals (!isAarch64Linux) [
       ghostty

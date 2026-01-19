@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+width=$(tmux display-message -p '#{client_width}')
+threshold=120
+
+status_modules="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
+
+if (( width < threshold )); then
+  tmux set -g status 2
+  tmux set -g 'status-format[1]' "#[align=right]$status_modules"
+  tmux set -g status-right ''
+else
+  tmux set -g status on
+  tmux set -g status-right "$status_modules"
+fi

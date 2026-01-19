@@ -6,7 +6,7 @@ workspace="$1"
 hyprctl dispatch workspace "$workspace"
 
 if [[ "$workspace" == "10" ]]; then
-  if ! pgrep -f '^[^ ]*ghostty$' > /dev/null; then
+  if ! hyprctl clients -j | jq -e '.[] | select(.class == "com.mitchellh.ghostty")' > /dev/null; then
     uwsm app -- ~/Scripts/launch-ghostty
   fi
 elif [[ "$workspace" == "11" ]]; then

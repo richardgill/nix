@@ -19,6 +19,8 @@ sandbox_mode = "workspace-write"
 network_access = true
 
 # Feature flags
+exclude_skills = []
+
 [features]
 shell_tool = true
 parallel = true

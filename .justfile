@@ -27,7 +27,30 @@ switch machine='':
     @just _rebuild switch "{{ machine }}"
 
 update:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --others --exclude-standard)" ]; then
+      echo "Error: Working directory has uncommitted changes or untracked files"
+      echo "Please commit or stash your changes before updating"
+      exit 1
+    fi
+
+    session_type="${XDG_SESSION_TYPE-}"
+    if [ -z "$session_type" ] && [ -n "${XDG_SESSION_ID-}" ] && command -v loginctl >/dev/null 2>&1; then
+      session_type=$(loginctl show-session "$XDG_SESSION_ID" -p Type --value 2>/dev/null || true)
+    fi
+
+    if [ -n "${TMUX-}" ] || [ ! -t 0 ] || [ ! -t 1 ]; then
+      echo "Error: update must be run from a TTY: ctrl+alt+F3"
+      exit 1
+    fi
+
+    just _update-inner
+
+_update-inner:
     nix flake update
+    just switch
 
 check all="false":
     #!/usr/bin/env bash

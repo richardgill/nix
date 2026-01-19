@@ -5,6 +5,7 @@
   ...
 }:
 let
+  # Workaround: bar height in config.jsonc aligns with fractional scaling to avoid 1px gaps.
   waybarConfig = builtins.fromJSON (builtins.readFile ./config.jsonc);
 in
 {
