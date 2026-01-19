@@ -1,0 +1,7 @@
+if [ -f "$HOME/.config/shell/env.sh" ]; then
+  source "$HOME/.config/shell/env.sh"
+fi
+
+if [ -f "$HOME/.config/shell/aliases.sh" ]; then
+  source "$HOME/.config/shell/aliases.sh"
+fi

@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-tmux attach -t code || tmux new -s code -c ~/code

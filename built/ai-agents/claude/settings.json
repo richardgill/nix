@@ -77,22 +77,25 @@
       "Write(/tmp/**)",
       "Read(~/.cache/**)",
       "Write(~/.cache/**)",
-      "Skill(brainstorming)",
-      "Skill(executing-plans)",
-      "Skill(implementing-plans)",
-      "Skill(creating-plans)",
+      "Skill(brainstorm)",
+      "Skill(implement-plan)",
+      "Skill(create-plan)",
       "Skill(oracle)",
+      "Skill(code-review)",
+      "Skill(research-web)",
+      "Skill(codebase-pattern-finder)",
+      "Skill(tech-stack-researcher)",
       "SlashCommand(/brainstorm)",
       "SlashCommand(/review)",
+      "SlashCommand(/code-review)",
       "SlashCommand(/review-post)",
       "SlashCommand(/review-pr)",
       "SlashCommand(/create-plan)",
       "SlashCommand(/implement-plan)",
       "SlashCommand(/pr-diff)",
       "SlashCommand(/pull-main)",
-      "SlashCommand(/research)",
+      "SlashCommand(/research-web)",
       "SlashCommand(/diff)",
-      "SlashCommand(/search-web)",
       "SlashCommand(/tech-stack-choices)",
       "SlashCommand(/oracle)",
       "WebFetch(domain:github.com)",
@@ -170,7 +173,7 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
-    "dev-browser@dev-browser-marketplace": true
+    "lua-lsp@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false,
@@ -188,6 +191,7 @@
     ]
   },
   "alwaysThinkingEnabled": true,
+  "excludeSkills": [],
   "bypassPermissionsModeAccepted": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754325484811

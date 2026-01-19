@@ -1,0 +1,11 @@
+{
+  "name": "extension-task-tool",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "task-tool": "github:richardgill/pi-extensions#path:/extensions/task-tool"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  }
+}

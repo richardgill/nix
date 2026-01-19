@@ -12,6 +12,7 @@
       wl-clipboard
       xclip
       xdg-utils
+      libsecret
       mako
       hypridle
       swayosd

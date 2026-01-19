@@ -41,6 +41,12 @@ if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
 elif [ -f "$SOURCE/bun.lockb" ] || [ -f "$SOURCE/bun.lock" ]; then
   echo "running bun install"
   cd "$TARGET" && bun install
+elif [ -f "$SOURCE/package-lock.json" ] || [ -f "$SOURCE/npm-shrinkwrap.json" ]; then
+  echo "running npm install"
+  cd "$TARGET" && npm install
+elif [ -f "$SOURCE/yarn.lock" ]; then
+  echo "running yarn install"
+  cd "$TARGET" && yarn install
 fi
 
 

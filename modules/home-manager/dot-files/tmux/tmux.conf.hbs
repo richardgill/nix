@@ -4,9 +4,7 @@
 set -g base-index 1
 setw -g pane-base-index 1
 
-# Set the delay between prefix and command
-# https://superuser.com/a/252717
-set -s escape-time 1
+set -s escape-time 50
 
 # Allow images and OSC 52 clipboard sequences
 set -gq allow-passthrough on
@@ -19,6 +17,8 @@ set-option -g status-interval 5
 set-option -g focus-events on
 # Reindexes windows when one is deleted
 set-option -g renumber-windows on
+
+set -g extended-keys on
 
 # Update environment variables when attaching to session
 set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PID SSH_CONNECTION WINDOWID XAUTHORITY KRB5CCNAME SSH_CLIENT SSH_TTY WAYLAND_DISPLAY DBUS_SESSION_BUS_ADDRESS XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP XDG_SESSION_TYPE HYPRLAND_INSTANCE_SIGNATURE"
@@ -87,11 +87,11 @@ bind-key x run-shell "{{ homeDir }}/Scripts/tmux-kill-pane '#{pane_id}'"
 # Open scrollback in neovim popup with reverse line numbers (prefix + B)
 bind-key B run-shell "{{ homeDir }}/Scripts/tmux-view-scrollback"
 
-# Claude Code session picker (prefix + w)
-bind-key w display-popup -E -w 98% -h 95% "{{ homeDir }}/Scripts/claude-sessions"
+# AI session picker (prefix + w)
+bind-key w display-popup -E -w 98% -h 98% "{{ homeDir }}/Scripts/pi-sessions"
 
 # Start new Claude in recent tmux session (prefix + n)
-bind-key n display-popup -E -w 40% -h 40% "{{ homeDir }}/Scripts/claude-new"
+bind-key n display-popup -E -w 40% -h 40% "{{ homeDir }}/Scripts/pi-sessions new"
 
 # Smart pane switching with awareness of Vim splits (and fzf).
 # See: https://github.com/christoomey/vim-tmux-navigator
@@ -141,7 +141,7 @@ set -g detach-on-destroy off
 
 bind-key f display-popup -E -w 95% -h 95% "{{ homeDir }}/Scripts/tmux-sesh-picker"
 
-set -g @continuum-restore 'on'
+set -g @continuum-restore 'off'
 # otherwise nvim and some other processes are resumed
 set -g @resurrect-processes 'false'
 # leave just the first empty window in each session
@@ -156,11 +156,10 @@ set -g @catppuccin_status_left_separator "█"
 set -g @catppuccin_status_right_separator "█"
 set -g @catppuccin_window_status_style "basic"
 set -g @catppuccin_window_number_color "#7aa2f7"
-# Truncate window names to 3 chars when narrow: #{=3:...} truncates, width check uses subtraction trick
-set -g @catppuccin_window_text ' #{?#{m:-*,#{e|-:#{client_width},120}},#{=3:#{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}},#{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}}'
+set -g @catppuccin_window_text ' #{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}'
 set -g @catppuccin_window_number "#I"
 set -g @catppuccin_window_current_number_color "#ff9e64"
-set -g @catppuccin_window_current_text ' #{?#{m:-*,#{e|-:#{client_width},120}},#{=3:#{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}},#{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}}'
+set -g @catppuccin_window_current_text ' #{?#{==:#{window_name},zsh},#{b:pane_current_path},#{window_name}}'
 set -g @catppuccin_window_current_number "#I"
 
 set -g status-right-length 100
@@ -170,10 +169,15 @@ set -g status-left ""
 set -g @catppuccin_host_icon "󰒋 "
 set -g @catppuccin_host_text " #H"
 
-# Width check: #{m:-*,#{e|-:#{client_width},120}} matches if (width - 120) is negative (tmux >= is string comparison)
-set -g status-right "#{?#{&&:#{SSH_CONNECTION},#{?#{m:-*,#{e|-:#{client_width},120}},0,1}},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session}#{?#{m:-*,#{e|-:#{client_width},120}},, #{E:@catppuccin_status_application}}"
-
 # Initialize plugins (after all configuration is set)
 run-shell {{ catppuccinPlugin }}
 run-shell {{ resurrectPlugin }}
 run-shell {{ continuumPlugin }}
+
+# Ensure "code" session always exists (respawns if killed)
+set-hook -g session-closed 'run-shell "tmux has-session -t code 2>/dev/null || tmux new-session -d -s code -c {{ homeDir }}/code"'
+
+# Dynamic status bar: 2 lines on narrow terminals, 1 line on wide
+set-hook -g client-resized 'run-shell "{{ homeDir }}/Scripts/tmux-status-resize"'
+set-hook -g client-session-changed 'run-shell "{{ homeDir }}/Scripts/tmux-status-resize"'
+run-shell "{{ homeDir }}/Scripts/tmux-status-resize"

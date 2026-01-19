@@ -11,7 +11,15 @@
         "repo": "frontend",
         "profile": "xata"
       },
-      "/home/rich/code/ai-recipes/main": "ai-recipes"
+      "/home/rich/code/ai-recipes/main": "ai-recipes",
+      "/home/rich/code/xata/frontend/main": {
+        "repo": "frontend",
+        "profile": "xata"
+      },
+      "/home/rich/code/xata/frontend/dotenvx-to-1password": {
+        "repo": "frontend",
+        "profile": "xata"
+      }
     },
     "profiles": {
       "xata": {

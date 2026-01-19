@@ -48,15 +48,24 @@ setup_tmux_windows() {
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "short"
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"
 
+    AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "pi" -P -F "#{window_id}")
+    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-pi}" Enter
+
+    AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "pi" -P -F "#{window_id}")
+    tmux send-keys -t "$AI_WINDOW_2" "pi" Enter
+
+    AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "pi" -P -F "#{window_id}")
+    tmux send-keys -t "$AI_WINDOW_3" "pi" Enter
+
     # Stagger Claude Code launches - concurrent starts cause issues
-    AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
+    # AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+    # tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
 
-    AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    (sleep 2 && tmux send-keys -t "$AI_WINDOW_2" "cl" Enter) &
+    # AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+    # (sleep 2 && tmux send-keys -t "$AI_WINDOW_2" "cl" Enter) &
 
-    AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    (sleep 4 && tmux send-keys -t "$AI_WINDOW_3" "cl" Enter) &
+    # AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+    # (sleep 4 && tmux send-keys -t "$AI_WINDOW_3" "cl" Enter) &
 
     tmux select-window -t "$AI_WINDOW_1"
 

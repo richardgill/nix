@@ -3,3 +3,11 @@
 #   - Bash login shells (directly)
 #   - Non-interactive bash scripts (via BASH_ENV, set in ~/.zprofile)
 export PATH="$HOME/.local/share/mise/shims:$PATH"
+
+if [ -f "$HOME/.config/shell/env.sh" ]; then
+  source "$HOME/.config/shell/env.sh"
+fi
+
+if [ -f "$HOME/.config/shell/aliases.sh" ]; then
+  source "$HOME/.config/shell/aliases.sh"
+fi

@@ -1,6 +1,7 @@
 ---
 name: code-review
-description: Comprehensive code review. Use when user says "review", "code review", "check my code", "review this PR", "review changes", or wants feedback on code quality, patterns, and potential issues.
+description: Expert code review specialist. Use when reviewing code for quality, security, maintainability, or when examining recent changes
+allowed-tools: Read, Grep, Glob, Bash
 ---
 
 Before starting the review, check if `.claude/prompts/review-criteria.md` or `.codex/prompts/review-criteria.md` exists in the project root. If it does, include those criteria as additional todos alongside the standard review.
@@ -39,7 +40,7 @@ Push side effects to the edges: fetch, transform (pure), emit. Don't interleave 
 
 When invoked immediately create a todolist:
 
-- [ ] The default command to run to get all changes to review: `git diff main...HEAD` unless this is an obvious exception.
+- [ ] The default command to run to get all changes to review: `~/Scripts/git-pr-diff` unless this is an obvious exception.
 - [ ] Search codebase for similar code patterns to understand context
 - [ ] Code follows patterns and best practices of this codebase
 - [ ] Within the codebase: Does this PR introduce new functions or constants that already exist elsewhere. Or have a high probability of being reused/shared in future? If so consider which file / location makes the most sense for this code.
@@ -61,7 +62,7 @@ For each issue provide: file path, line number, brief description, and code exce
 
 If you decided to omit something from the list leave a note justifying why (but this is a strict code review, only exceptional / invalid feedback is omitted)
 
-End with a todo list for the user:
+End by printing a list of items to fix: 
 
 <example>
 ## Code Review results
@@ -91,5 +92,3 @@ End with a todo list for the user:
 - [ ] Fix: Extract parseConfig into smaller functions (src/utils/parser.ts:89)
 - [ ] Fix: Use shared ANIMATION_DURATION constant (src/components/Modal.tsx:5)
 </example>
-
-$ARGUMENTS

@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+file_path="${1:-}"
+range_arg="${2:-}"
+
+if [[ -z "$file_path" ]]; then
+  echo "Usage: tmux-nvim-open <file> [start-end[,start-end...]]" >&2
+  exit 1
+fi
+
+if [[ -z "${TMUX:-}" ]]; then
+  echo "Not in a tmux session" >&2
+  exit 1
+fi
+
+socket="${NVIM_SOCKET:-}"
+
+if [[ -z "$socket" ]]; then
+  tmux_socket=$(tmux show-environment NVIM_SOCKET 2>/dev/null || true)
+  if [[ "$tmux_socket" == NVIM_SOCKET=* ]]; then
+    socket="${tmux_socket#NVIM_SOCKET=}"
+  fi
+fi
+
+if [[ -z "$socket" ]]; then
+  echo "NVIM_SOCKET is not set" >&2
+  exit 1
+fi
+
+# Close other tabs/splits to keep one window open before loading the file (silent! stops toasts)
+nvim --server "$socket" --remote-send "<Cmd>silent! tabonly | silent! only<CR>"
+
+nvim --server "$socket" --remote "$file_path"
+
+if [[ -n "$range_arg" ]]; then
+  IFS=',' read -ra range_parts <<< "$range_arg"
+  line_list=()
+  first_line=""
+
+  for part in "${range_parts[@]}"; do
+    if [[ "$part" =~ ^([0-9]+)-([0-9]+)$ ]]; then
+      start_line="${BASH_REMATCH[1]}"
+      end_line="${BASH_REMATCH[2]}"
+    elif [[ "$part" =~ ^([0-9]+)$ ]]; then
+      start_line="${BASH_REMATCH[1]}"
+      end_line="${BASH_REMATCH[1]}"
+    else
+      echo "Range must be start-end or single line number" >&2
+      exit 1
+    fi
+
+    if (( start_line > end_line )); then
+      echo "Range start must be <= end" >&2
+      exit 1
+    fi
+
+    if [[ -z "$first_line" ]]; then
+      first_line="$start_line"
+    fi
+
+    for ((line_num=start_line; line_num<=end_line; line_num++)); do
+      line_list+=("$line_num")
+    done
+  done
+
+  if (( ${#line_list[@]} > 0 )); then
+    joined=$(IFS=,; echo "${line_list[*]}")
+    nvim --server "$socket" --remote-send "<Cmd>call cursor($first_line,1) | call matchaddpos('Visual', [${joined}])<CR>"
+  fi
+fi
+
+tmux select-window -t :1

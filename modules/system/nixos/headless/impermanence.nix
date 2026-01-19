@@ -44,6 +44,7 @@
       environment.persistence."/persistent" = {
         enable = true;
         hideMounts = true;
+        allowTrash = true;
         directories = [
           "/var/log"
           "/var/lib/bluetooth"
@@ -87,6 +88,7 @@
           ".claude/statsig"
           ".claude/todos"
           ".codex/sessions"
+          ".pi/agent/sessions"
           ".config/chromium"
           ".config/google-chrome"
           ".config/cmus"
@@ -141,6 +143,7 @@
           ".claude/history.jsonl"
           ".codex/auth.json"
           ".codex/history.jsonl"
+          ".pi/agent/auth.json"
         ];
       };
 
@@ -151,10 +154,6 @@
 
       fileSystems."/persistent".neededForBoot = true;
       fileSystems."/nix".neededForBoot = true;
-      fileSystems."/var/log".neededForBoot = true;
-
-      # Trash needs x-gvfs-trash mount option for Nautilus delete to work.
-      # PR here: https://github.com/nix-community/impermanence/pull/243 when it's merged we can get this working
 
       boot.initrd = {
         supportedFilesystems = [ "btrfs" ];
