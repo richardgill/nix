@@ -63,7 +63,13 @@ in
       slack
       spotify
       discord
-      google-chrome
+      (google-chrome.override {
+        commandLineArgs = [
+          "--remote-debugging-port=9222"
+          "--remote-debugging-address=127.0.0.1"
+          "--user-data-dir=${config.home.homeDirectory}/.config/google-chrome-remote-debug"
+        ];
+      })
       todoist-electron
       unstable._1password-gui
       unstable.code-cursor

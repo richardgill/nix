@@ -23,6 +23,11 @@ tmux list-panes -a -F '#{session_name}:#{window_index}.#{pane_index} #{pane_titl
 tmux capture-pane -p
 ```
 
+```bash
+# With ANSI colors
+tmux capture-pane -p -e 
+```
+
 ### Capture specific pane
 ```bash
 tmux capture-pane -t 'session:window.pane' -p

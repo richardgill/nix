@@ -30,6 +30,13 @@
     autoSuspend = false;
   };
 
+  services.gnome.gnome-keyring.enable = true;
+
+  security.pam.services = {
+    gdm.enableGnomeKeyring = true;
+    login.enableGnomeKeyring = true;
+  };
+
   xdg.portal = {
     enable = true;
     # Disable portal for xdg-open: the portal's OpenURI implementation ignores mimeapps.list
@@ -38,7 +45,10 @@
     config = {
       common.default = [ "gtk" ];
       hyprland = {
-        default = [ "hyprland" "gtk" ];
+        default = [
+          "hyprland"
+          "gtk"
+        ];
         "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
       };
     };

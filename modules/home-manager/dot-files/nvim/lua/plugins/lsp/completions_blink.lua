@@ -34,6 +34,13 @@ return {
       -- experimental signature help support
       signature = { enabled = false },
       completion = {
+        list = {
+          selection = {
+            auto_insert = function()
+              return vim.bo.filetype ~= 'prompt'
+            end,
+          },
+        },
         documentation = { auto_show = false, auto_show_delay_ms = 500 },
         -- Display a preview of the selected item on the current line
         ghost_text = { enabled = false },

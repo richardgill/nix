@@ -1,3 +1,14 @@
+local closeTabsAndSplits = function()
+  vim.cmd 'silent! tabonly | silent! only'
+end
+
+local closeTabsBeforeConfirm = function(picker, item, action)
+  if vim.api.nvim_win_is_valid(picker.main) then
+    vim.api.nvim_win_call(picker.main, closeTabsAndSplits)
+  end
+  require('snacks.picker.actions').confirm(picker, item, action)
+end
+
 return {
   'folke/snacks.nvim',
   priority = 1000,
@@ -5,6 +16,9 @@ return {
   opts = {
     picker = {
       ui_select = true,
+      actions = {
+        confirm = closeTabsBeforeConfirm,
+      },
       layouts = {
         custom_vertical = {
           reverse = true,

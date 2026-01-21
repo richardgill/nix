@@ -141,7 +141,7 @@ in
       ".bashrc".source = ../../dot-files/bashrc;
       ".lesskey".source = ../../dot-files/lesskey;
       ".stignore".source = ../../dot-files/stignore;
-      "code/.rgignore".source = ../../dot-files/code/rgignore;
+      "code/.ignore".source = ../../dot-files/code/ignore;
       ".config/btop/btop.conf".source = ../../dot-files/btop/btop.conf;
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
       ".config/sesh".source = ../../dot-files/sesh;
