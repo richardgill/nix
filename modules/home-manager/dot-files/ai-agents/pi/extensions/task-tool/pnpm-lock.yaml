@@ -10,7 +10,7 @@ importers:
     dependencies:
       task-tool:
         specifier: github:richardgill/pi-extensions#path:/extensions/task-tool
-        version: https://codeload.github.com/richardgill/pi-extensions/tar.gz/0d33254b1fd981821cbb6dd5f3fa24117f957163#path:/extensions/task-tool(ws@8.19.0)(zod@3.25.76)
+        version: https://codeload.github.com/richardgill/pi-extensions/tar.gz/01a51f57f50332a074d4b2d941b561fee2f514bf#path:/extensions/task-tool(ws@8.19.0)(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
@@ -871,8 +871,8 @@ packages:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
 
-  task-tool@https://codeload.github.com/richardgill/pi-extensions/tar.gz/0d33254b1fd981821cbb6dd5f3fa24117f957163#path:/extensions/task-tool:
-    resolution: {path: /extensions/task-tool, tarball: https://codeload.github.com/richardgill/pi-extensions/tar.gz/0d33254b1fd981821cbb6dd5f3fa24117f957163}
+  task-tool@https://codeload.github.com/richardgill/pi-extensions/tar.gz/01a51f57f50332a074d4b2d941b561fee2f514bf#path:/extensions/task-tool:
+    resolution: {path: /extensions/task-tool, tarball: https://codeload.github.com/richardgill/pi-extensions/tar.gz/01a51f57f50332a074d4b2d941b561fee2f514bf}
     version: 0.0.1
 
   thenify-all@1.6.0:
@@ -2218,7 +2218,7 @@ snapshots:
     dependencies:
       has-flag: 4.0.0
 
-  task-tool@https://codeload.github.com/richardgill/pi-extensions/tar.gz/0d33254b1fd981821cbb6dd5f3fa24117f957163#path:/extensions/task-tool(ws@8.19.0)(zod@3.25.76):
+  task-tool@https://codeload.github.com/richardgill/pi-extensions/tar.gz/01a51f57f50332a074d4b2d941b561fee2f514bf#path:/extensions/task-tool(ws@8.19.0)(zod@3.25.76):
     dependencies:
       '@mariozechner/pi-agent-core': 0.49.1(ws@8.19.0)(zod@3.25.76)
       '@mariozechner/pi-ai': 0.49.1(ws@8.19.0)(zod@3.25.76)

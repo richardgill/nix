@@ -22,7 +22,7 @@ const extension = taskTool({
 			match:
 				/Use the read tool to load a skill's file when the task matches its description\./i,
 			replace:
-				"Use skill directly: Use the read tool to load a skill's file when the task matches its description. Use skill in task: Pass the skill to the task tool and the task context will load it.",
+				"Use skill directly: Use the read tool to load a skill's file when the task matches its description. Use skill in task: Pass the skill to the task tool and the task context will load it.\n\nAlways use the task tool when running these skills:\n- skill: web-search openai-codex/gpt-5.1-codex-max thinking level: medium\n- skill: research-web openai-codex/gpt-5.1-codex-max thinking level: medium\n- skill: code-review openai-codex/gpt-5.2 thinking level: xhigh\nAll other skills do not run inside tasks they run in the main context",
 		},
 	],
 } satisfies TaskToolOptions);

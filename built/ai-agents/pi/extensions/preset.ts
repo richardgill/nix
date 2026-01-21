@@ -480,7 +480,7 @@ const registerPresetExtensions = (
 	pi: ExtensionAPI,
 	state: PresetState,
 ): void => {
-	pi.registerShortcut("ctrl+alt+p", {
+	pi.registerShortcut("ctrl+p", {
 		description: "Cycle presets",
 		handler: async (ctx) => {
 			if (ctx.hasUI) {

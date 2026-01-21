@@ -91,6 +91,7 @@
           ".pi/agent/sessions"
           ".config/chromium"
           ".config/google-chrome"
+          ".config/google-chrome-remote-debug"
           ".config/cmus"
           ".config/dconf" # GNOME application settings database
           ".config/gtk-3.0"
@@ -107,6 +108,8 @@
           ".config/Todoist"
           ".config/sops"
           ".config/op"
+          ".gmcli"
+          ".gccli"
           ".zoom"
           ".local/share/zoxide"
           ".local/state/mise"

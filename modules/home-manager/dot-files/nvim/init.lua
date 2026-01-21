@@ -17,4 +17,6 @@ require 'config.options'
 require 'config.autocommand'
 require 'custom.hotreload'
 require 'config.lazy'
+require 'custom.ai-prompt-completion-blink.prompt-file'
+require('custom.ai-prompt-completion-blink').setup()
 require 'config.spelling'

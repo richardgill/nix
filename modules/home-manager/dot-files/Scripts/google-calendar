@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+gccli_bin=$(mise which gccli)
+op_vault="${OP_GMAIL_CREDENTIALS_VAULT:-Private}"
+op_document="${OP_GMAIL_CREDENTIALS_DOCUMENT:-gsuite-credentials.json}"
+credentials_path="${HOME}/.gccli/credentials.json"
+
+if [[ ! -f "$credentials_path" ]]; then
+  "$gccli_bin" accounts credentials <(op document get "$op_document" --vault "$op_vault") >/dev/null
+fi
+
+exec "$gccli_bin" "$@"

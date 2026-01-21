@@ -1,4 +1,4 @@
 {
-  "cycleModelForward": "ctrl+alt+m",
-  "cycleModelBackward": "shift+ctrl+alt+m"
+  "cycleModelForward": "ctrl+shift+alt+9",
+  "cycleModelBackward": "ctrl+shift+alt+0"
 }
