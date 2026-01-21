@@ -49,15 +49,23 @@ end
 
 local get_query_data = function(line, cursor_col)
   local before = line:sub(1, cursor_col)
-  local query = before:match('.*(/' .. query_pattern .. ')$')
+  -- // Only match slash commands at line start or after whitespace to avoid @path segments.
+  local query = before:match('^(/' .. query_pattern .. ')$')
+  if query then
+    return { query = query, start_col = 1 }
+  end
+
+  query = before:match('.*%s(/' .. query_pattern .. ')$')
   if not query then
     return nil
   end
-  local start_col = before:match('.*()/' .. query_pattern .. '$')
-  if not start_col then
+
+  local space_start = before:match('.*()%s/' .. query_pattern .. '$')
+  if not space_start then
     return nil
   end
-  return { query = query, start_col = start_col }
+
+  return { query = query, start_col = space_start + 1 }
 end
 
 local get_text_edit_range = function(ctx, start_col)

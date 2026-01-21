@@ -82,8 +82,11 @@ run_case "05-smartcase-shared-lower" "@ai-agents/shared/"
 echo "EXPECT 06-missing: no items"
 run_case "06-missing" "@some/missing/path"
 
-echo "EXPECT 07-slash-root: show some pi skills"
-run_case "07-slash-root" "/"
+echo "EXPECT 07-slash-after-at: no skills for @something/"
+run_case "07-slash-after-at" "@something/"
+
+echo "EXPECT 08-slash-root: show some pi skills"
+run_case "08-slash-root" "/"
 
 
 tmux kill-session -t "$session"
