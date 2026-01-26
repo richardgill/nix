@@ -6,6 +6,8 @@
 # show hidden files
 --hidden
 
+--follow
+
 # global .rgignore
 --ignore-file=/home/rich/.config/ripgrep/.rgignore
 

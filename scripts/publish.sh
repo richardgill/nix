@@ -39,7 +39,7 @@ git checkout -b "$branch_name"
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git
-rsync -av --exclude='.git' --exclude='modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
+rsync -av --exclude='.git' --exclude='flake/modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
 
 # Remove built/ from .gitignore so built templates are tracked in public repo
 sed -i '/^built\/$/d' .gitignore
@@ -54,7 +54,7 @@ done
 
 git add -A
 # Force-add files ignored by global gitignore
-git add -f modules/home-manager/dot-files/Scripts/local-ci.sh 2>/dev/null || true
+git add -f flake/modules/home-manager/dot-files/Scripts/local-ci.sh 2>/dev/null || true
 
 if git diff --staged --quiet; then
   echo "No changes to commit"

@@ -10,7 +10,8 @@ Push side effects to the edges: fetch, transform (pure), emit. Don't interleave 
 
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
 
-- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy
+- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
+
 
 ## TypeScript / JavaScript Code Style Guide
 
@@ -51,5 +52,11 @@ Prefer not to use npx or bunx for anything where package.json has it. Rely on pn
 There is a gitignored `scratch/` folder in all repos - you can use it for temporary work and experimentation.
 
 You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
+
+Be helpful and proactive:
+
+- If missing info can be found via tools, procatively read files or run commands to gather the info without asking user.
+- Act autonomously for routine steps; ask before destructive or irreversible actions.
+
 
 When referencing files use a format like this from the project dir: ./folder/file.txt or ./folder/file.txt:4-7

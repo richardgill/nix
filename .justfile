@@ -2,7 +2,7 @@ default:
     just --list
 
 # path:. uses the path protocol to include untracked files (git protocol would require files to be staged)
-_rebuild action machine='':
+_rebuild action machine='' extra_flags='':
     @if [ "$(uname)" = "Darwin" ]; then \
       command="nix run nix-darwin --"; \
       sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
@@ -11,20 +11,35 @@ _rebuild action machine='':
       sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
     fi; \
     if [ -z "{{ machine }}" ]; then \
-      full_command="$sudo_prefix $command {{ action }} --flake path:."; \
+      full_command="$sudo_prefix $command {{ action }} {{ extra_flags }} --flake path:./flake"; \
       echo "Running: $full_command"; \
-      $sudo_prefix $command {{ action }} --flake path:.; \
+      $sudo_prefix $command {{ action }} {{ extra_flags }} --flake path:./flake; \
     else \
-      full_command="$sudo_prefix $command {{ action }} --flake \"path:.#{{ machine }}\""; \
+      full_command="$sudo_prefix $command {{ action }} {{ extra_flags }} --flake \"path:./flake#{{ machine }}\""; \
       echo "Running: $full_command"; \
-      $sudo_prefix $command {{ action }} --flake "path:.#{{ machine }}"; \
+      $sudo_prefix $command {{ action }} {{ extra_flags }} --flake "path:./flake#{{ machine }}"; \
     fi
 
 build machine='':
     @just _rebuild build "{{ machine }}"
 
 switch machine='':
-    @just _rebuild switch "{{ machine }}"
+    @just template-bundle
+    @if [ "$(uname)" = "Darwin" ]; then \
+      just _rebuild switch "{{ machine }}"; \
+    else \
+      scripts/switch-fast.sh "{{ machine }}"; \
+    fi
+
+switch-debug machine='':
+    #!/usr/bin/env bash
+    set -euo pipefail
+    start=$(date +%s)
+    just template-bundle
+    just _rebuild switch "{{ machine }}" "--debug --verbose --print-build-logs --log-format bar-with-logs" 2>&1 \
+      | awk '{ print strftime("[%F %T]"), $0; fflush(); }'
+    end=$(date +%s)
+    echo "Total seconds: $((end - start))"
 
 update:
     #!/usr/bin/env bash
@@ -49,7 +64,7 @@ update:
     just _update-inner
 
 _update-inner:
-    nix flake update
+    nix flake update ./flake
     just switch
 
 check all="false":
@@ -69,11 +84,11 @@ check all="false":
       echo "Building configurations for $sys..."
 
       # Build all checks for this system in one go to leverage Nix's deduplication
-      checks=$(nix eval --json path:.#checks.$sys --apply builtins.attrNames | jq -r '.[]' | grep -v formatting || true)
+      checks=$(nix eval --json path:./flake#checks.$sys --apply builtins.attrNames | jq -r '.[]' | grep -v formatting || true)
 
       for check in $checks; do
         echo "  Checking: $check"
-        nix build --no-link --print-out-paths path:.#checks.$sys.$check
+        nix build --no-link --print-out-paths path:./flake#checks.$sys.$check
       done
 
       echo "  ✓ All checks passed for $sys"
@@ -83,7 +98,7 @@ check all="false":
     echo "✓ All checks completed successfully"
 
 fmt:
-    nix fmt path:.
+    nix fmt path:./flake
 
 gc:
     sudo nix-collect-garbage -d && nix-collect-garbage -d
@@ -95,13 +110,13 @@ repair:
     sudo nix-store --verify --check-contents --repair
 
 sops-edit:
-    sops secrets/secrets.yaml
+    sops flake/secrets/secrets.yaml
 
 sops-rotate:
-    for file in secrets/*; do sops --rotate --in-place "$file"; done
+    for file in flake/secrets/*; do sops --rotate --in-place "$file"; done
 
 sops-update:
-    for file in secrets/*; do sops updatekeys "$file"; done
+    for file in flake/secrets/*; do sops updatekeys "$file"; done
 
 find-impermanent:
   @scripts/find-impermanent-files.sh
@@ -120,27 +135,41 @@ publish *flags:
 template machine='':
     #!/usr/bin/env bash
     set -euo pipefail
-    
+
+    just template-bundle
+
     if [ -z "{{ machine }}" ]; then
       machine=$(hostname)
     else
       machine="{{ machine }}"
     fi
-    
+
     echo "Building templates for: $machine"
 
     rm -rf built
 
     # Get template config from Nix
     data_file=$(mktemp)
-    nix eval --json "path:.#templateConfig.$machine" > "$data_file"
-    
+    nix eval --json "path:./flake#templateConfig.$machine" > "$data_file"
+
     echo "data_file written to: $data_file"
-    
+
     # Run the template builder
-    cd ts-utils
-    bun install --frozen-lockfile
-    bun run build-templates.ts --data-file "$data_file" --outDir ../built
-    
+    cd flake/template-builder
+    bun ./build-templates.bundle.js --data-file "$data_file" --outDir ../../built
+
     rm -f "$data_file"
     echo "Templates built to: built/"
+
+template-bundle:
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    cd ts-utils
+
+    if [ ! -d node_modules ] || [ bun.lock -nt node_modules ] || [ package.json -nt node_modules ]; then
+      bun install --frozen-lockfile
+    fi
+
+    mkdir -p ../flake/template-builder
+    bun build build-templates.ts --target bun --outfile ../flake/template-builder/build-templates.bundle.js

@@ -2,13 +2,15 @@
   "name": "nix-private-templates",
   "type": "module",
   "scripts": {
-    "build": "bun run templates/build.ts"
+    "build": "bun run templates/build.ts",
+    "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {
     "handlebars": "^4.7.8",
     "zod": "^4.2.1"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "typescript": "latest"
   }
 }

@@ -1,0 +1,11 @@
+{
+  "name": "extension-skill-task",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "skill-task": "github:richardgill/pi-extensions#path:/extensions/skill-task"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1"
+  }
+}

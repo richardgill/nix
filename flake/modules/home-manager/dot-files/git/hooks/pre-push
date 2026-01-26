@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+overlay_root="$HOME/code/personal-overlay"
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+
+if [ "$repo_root" = "$overlay_root" ]; then
+  exit 0
+fi
+
+overlay_sync="$HOME/Scripts/overlay-sync"
+
+if [ -x "$overlay_sync" ]; then
+  "$overlay_sync"
+fi

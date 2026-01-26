@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-if [ ! -d "scratch" ]; then
-    mkdir -p scratch
-    echo "✓ Created scratch/ directory"
-fi

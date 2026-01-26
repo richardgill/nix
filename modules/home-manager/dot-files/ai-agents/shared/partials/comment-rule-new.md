@@ -1,1 +1,0 @@
-Do NOT introduce new comments unless it's a truly exceptional case / noteworthy

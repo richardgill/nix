@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+START_TIME=$SECONDS
+
+SOURCE="$1"
+TARGET="$2"
+SOCKET_FILE="$3"
+
+# Platform specific copy-on-write flag
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  CP_FLAGS="-c"
+else
+  CP_FLAGS="--reflink=auto"
+fi
+
+echo "copying gitignored files"
+
+(cd "$SOURCE" && git status --ignored -s | grep '^!! ' | awk '{print $2}') | while read filename; do
+  if [[ "$filename" == "scratch" ]] || \
+     [[ "$filename" == "scratch/"* ]] || \
+     [[ "$filename" == "issues" ]] || \
+     [[ "$filename" == "issues/"* ]] || \
+     [[ "$filename" == *"node_modules"* ]] || \
+     [[ "$filename" == ".next/"* ]] || \
+     [[ "$filename" == ".turbo/"* ]]; then
+    echo "skipping: $filename"
+  else
+    echo "copying: $filename"
+    cp -R $CP_FLAGS "$SOURCE/$filename" "$TARGET/$filename"
+  fi
+done
+
+echo "setting up overlay"
+if ! (cd "$TARGET" && "$HOME/Scripts/overlay-setup"); then
+  exit 1
+fi
+
+# Trust mise configs after copy (may include gitignored .mise.local.toml etc)
+mise trust --all --cd "$TARGET"
+mise install --cd "$TARGET"
+
+if [ -f "$SOURCE/pnpm-lock.yaml" ]; then
+  echo "running: pnpm install"
+  cd "$TARGET" && pnpm install
+elif [ -f "$SOURCE/bun.lockb" ] || [ -f "$SOURCE/bun.lock" ]; then
+  echo "running bun install"
+  cd "$TARGET" && bun install
+elif [ -f "$SOURCE/package-lock.json" ] || [ -f "$SOURCE/npm-shrinkwrap.json" ]; then
+  echo "running npm install"
+  cd "$TARGET" && npm install
+elif [ -f "$SOURCE/yarn.lock" ]; then
+  echo "running yarn install"
+  cd "$TARGET" && yarn install
+fi
+
+
+if [ -n "$SOCKET_FILE" ]; then
+  echo "restarting nvim LSP"
+  nvim --server "$SOCKET_FILE" --remote-expr "v:lua.require'custom.utils'.restart_lsp()"
+fi
+
+ELAPSED=$((SECONDS - START_TIME))
+echo "Worktree setup took $ELAPSED seconds"

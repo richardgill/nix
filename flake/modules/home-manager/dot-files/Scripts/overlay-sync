@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+source "$SCRIPT_DIR/overlay-common"
+
+if [ ! -d "$overlay_root/.git" ]; then
+  echo "Error: overlay repo is not a git repo: $overlay_root" >&2
+  exit 1
+fi
+
+if [ ! -d "$overlay_repo" ]; then
+  echo "Error: overlay folder missing: $overlay_repo" >&2
+  exit 1
+fi
+
+changes=$(git -C "$overlay_root" status --porcelain -- "$repo_name")
+if [ -z "$changes" ]; then
+  echo "No overlay changes for $repo_name"
+  exit 0
+fi
+
+git -C "$overlay_root" add -- "$repo_name"
+git -C "$overlay_root" commit -m "Update overlay for $repo_name"
+git -C "$overlay_root" push

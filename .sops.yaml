@@ -7,7 +7,7 @@ keys:
   - &um790 age1n438j5dvvduk7why6mzh9artkv5auylhkmyg4ghvr79a3l5elygsgxg8h7
 
 creation_rules:
-  - path_regex: secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
+  - path_regex: flake/secrets/[^/]+(\.(yaml|json|env|ini|conf))?$
     key_groups:
       - age:
           - *master

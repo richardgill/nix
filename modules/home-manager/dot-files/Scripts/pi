@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-
-[[ -n "$TMUX_PANE" ]] && tmux rename-window -t "$TMUX_PANE" "pi"
-
-pi_bin=$(mise which pi)
-exec "$pi_bin" "$@"

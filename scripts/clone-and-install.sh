@@ -41,7 +41,7 @@ echo "Repository cloned successfully to /tmp/nixos-config"
 echo ""
 
 echo "Getting available machine configurations..."
-AVAILABLE_MACHINES=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./.); in builtins.concatStringsSep "\n" (builtins.attrNames flake.nixosConfigurations)')
+AVAILABLE_MACHINES=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./flake); in builtins.concatStringsSep "\n" (builtins.attrNames flake.nixosConfigurations)')
 
 if [ -z "$AVAILABLE_MACHINES" ]; then
     echo "ERROR: No machine configurations found in flake!"
@@ -60,7 +60,7 @@ echo "Selected machine: $MACHINE ✓"
 echo ""
 
 echo "Getting username from flake..."
-USERNAME=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./.); in flake.vars.userName')
+USERNAME=$(nix --extra-experimental-features nix-command --extra-experimental-features flakes eval --impure --raw --expr 'let flake = builtins.getFlake (toString ./flake); in flake.vars.userName')
 echo "Username: $USERNAME"
 echo ""
 
@@ -69,7 +69,7 @@ echo "Installing NixOS for $MACHINE"
 
 # We run disko standalone so we can use the new mount so we don't run out of disk space
 echo "Running disko for $MACHINE"
-sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run github:nix-community/disko -- --mode destroy,format,mount --flake ".#$MACHINE" --show-trace
+sudo nix --extra-experimental-features nix-command --extra-experimental-features flakes run github:nix-community/disko -- --mode destroy,format,mount --flake "./flake#$MACHINE" --show-trace
 
 # Create the swap file on the mounted partition so the nix store (tmpfs in ram) doesn't run out of space
 echo "Setting up swap so install iso doesn't run out of disk space (which is tmpfs in ram) debug with: df -h && swapon -s"
@@ -114,13 +114,13 @@ echo "1. Update .sops.yaml with the new host's age key:"
 echo "   keys:"
 echo "     - &$MACHINE $AGE_KEY # Add this line"
 echo "   creation_rules:"
-echo "     - path_regex: secrets/[^/]+(\\.(yaml|json|env|ini|conf))?$"
+echo "     - path_regex: flake/secrets/[^/]+(\\.(yaml|json|env|ini|conf))?$"
 echo "       key_groups:"
 echo "         - age:"
 echo "             - *$MACHINE  # Add this line"
 echo ""
 echo "2. Re-encrypt secrets:"
-echo "   sops updatekeys secrets/secrets.yaml"
+echo "   sops updatekeys flake/secrets/secrets.yaml"
 echo ""
 echo "3. Commit and push changes."
 echo ""
@@ -137,7 +137,7 @@ echo "Running NixOS installation for machine '$MACHINE'..."
 echo ""
 echo "Initial install with systemd-boot, secure-boot is disabled..."
 sudo mkdir -p /mnt/tmp
-sudo env INITIAL_INSTALL=1 TMPDIR=/mnt/tmp nixos-install --impure --no-root-passwd --root /mnt --flake ".#$MACHINE"
+sudo env INITIAL_INSTALL=1 TMPDIR=/mnt/tmp nixos-install --impure --no-root-passwd --root /mnt --flake "./flake#$MACHINE"
 
 echo ""
 echo "Installation complete!"
@@ -145,7 +145,7 @@ echo ""
 echo "If you're using Secure Boot"
 echo "1. Reboot into the new system"
 echo "2. Run 'just switch' to enable Lanzaboote (requires a working boot to install)"
-echo "3. Follow the instructions in modules/system/nixos/headless/optional/secure-boot.nix to complete setup"
+echo "3. Follow the instructions in flake/modules/system/nixos/headless/optional/secure-boot.nix to complete setup"
 echo ""
 read -p "Reboot now? (y/N): " -n 1 -r
 echo

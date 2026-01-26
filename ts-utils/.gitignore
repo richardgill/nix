@@ -6,6 +6,7 @@ out
 dist
 *.tgz
 built
+build-templates.bundle.js
 
 # code coverage
 coverage

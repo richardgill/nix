@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+
+if [ "$1" = "--quiet" ]; then
+  overlay_quiet=1
+  overlay_soft_fail=1
+elif [ -n "$1" ]; then
+  echo "Error: unknown option $1" >&2
+  exit 1
+fi
+
+source "$HOME/Scripts/overlay-common"
+
+if [ -e "$repo_root/scratch" ] || [ -e "$repo_root/issues" ]; then
+  overlay_fail "Error: scratch/ or issues/ already exist in $repo_root"
+fi
+
+mkdir -p "$overlay_scratch" "$overlay_issues"
+
+ln -s "$overlay_scratch" "$repo_root/scratch"
+ln -s "$overlay_issues" "$repo_root/issues"
+
+exclude_file=$(git -C "$repo_root" rev-parse --git-path info/exclude)
+mkdir -p "$(dirname "$exclude_file")"
+
+grep -qxF "scratch/" "$exclude_file" 2>/dev/null || echo "scratch/" >> "$exclude_file"
+grep -qxF "issues/" "$exclude_file" 2>/dev/null || echo "issues/" >> "$exclude_file"
+# exclude symlinks
+grep -qxF "scratch" "$exclude_file" 2>/dev/null || echo "scratch" >> "$exclude_file"
+grep -qxF "issues" "$exclude_file" 2>/dev/null || echo "issues" >> "$exclude_file"

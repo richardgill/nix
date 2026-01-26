@@ -2,7 +2,7 @@ My opinionated Nix config inspired by [Omarchy](https://omarchy.org/)'s system c
 
 Pragmatic Nix: Simple config with plain `.conf` and `.json` files. Uses `.nix` features when they provide clear benefits.
 
-Dotfiles: [modules/home-manager/dot-files](modules/home-manager/dot-files)
+Dotfiles: [flake/modules/home-manager/dot-files](flake/modules/home-manager/dot-files)
 
 ## Features
 
@@ -14,7 +14,7 @@ Dotfiles: [modules/home-manager/dot-files](modules/home-manager/dot-files)
   - [Secure Boot](#luks-auto-unlock-with-secure-boot--tpm2) with TPM2 auto-unlock of LUKS
 - [disko](https://github.com/nix-community/disko): declarative disk partitioning with btrfs
 - [impermanence](https://github.com/nix-community/impermanence) with btrfs
-  - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](modules/system/nixos/headless/impermanence.nix#L84)
+  - Filesystem wipes on reboot, keeping only folders that you explicitly persist in [your config](flake/modules/system/nixos/headless/impermanence.nix#L84)
   - Detect files which need persistence with `just find-impermanent`
 - Full installation happens entirely inside the NixOS ISO (works on machines with small memory)
 - [sops-nix](https://github.com/Mic92/sops-nix) manages secrets
@@ -33,48 +33,27 @@ Configuration is split onto folders:
 - `shared/` - Cross-platform configs (works on both NixOS and macOS)
 
 ```
-├── flake.nix                 # Entry point - defines all machines in nixosConfigurations
-├── vars.nix                  # Shared variables (username, etc.)
 ├── .justfile                 # Run `just --list` to see the commands
-│
-├── machines/                 # Per-machine configurations
-│   ├── nixos-machine-1/
-│   │   ├── configuration.nix           # Imports shared disko module
-│   │   └── hardware-configuration.nix
-│   └── mac-1/
-│       ├── configuration.nix
-│       └── hardware-configuration.nix  
-│
-├── modules/
-│   ├── system/               # System-level configurations
-│   │   ├── shared/           # Cross-platform system configs
-│   │   │   ├── headless/
-│   │   │   └── graphical/
-│   │   ├── nixos/            # NixOS-specific system configs
-│   │   │   ├── headless/
-│   │   │   │   └── optional/
-│   │   │   └── graphical/
-│   │   │       └── optional/
-│   │   └── mac/              # Mac-specific system configs
-│   │
-│   └── home-manager/         # User-level configurations
-│       ├── dot-files/        # Raw config files (nvim, tmux, etc.)
-│       ├── shared/           
-│       │   ├── headless/     
-│       │   └── graphical/    
-│       ├── nixos/            # NixOS-specific home-manager configs
-│       │   ├── headless/
-│       │   └── graphical/
-│       └── mac/              # Mac-specific home-manager configs
-│
-├── .sops.yaml                # sops-nix secrets configuration 
-├── secrets/                  # Encrypted secrets (via sops-nix)
-└── utils/                    # Utilities
+├── flake/
+│   ├── flake.nix             # Entry point - defines all machines in nixosConfigurations
+│   ├── flake.lock
+│   ├── vars.nix              # Shared variables (username, etc.)
+│   ├── treefmt.nix
+│   ├── machines/             # Per-machine configurations
+│   ├── modules/              # System + home-manager modules
+│   ├── overlays/
+│   ├── assets/
+│   ├── secrets/              # Encrypted secrets (via sops-nix)
+│   └── utils/                # Utilities
+├── out-of-store-config/      # Mutable sources for mkOutOfStoreSymlink
+├── built/                    # Template outputs (kept out of the flake root)
+├── ts-utils/                 # JS helpers (bundle copied into flake/template-builder)
+└── scripts/                  # Helper scripts (install, publish, etc.)
 ```
 
 ## Getting started 
 
-Check [vars.nix](./vars.nix) and update your username, public keys etc.
+Check [flake/vars.nix](./flake/vars.nix) and update your username, public keys etc.
 
 ## Installation - NixOS (Linux)
 
@@ -108,28 +87,28 @@ ssh nixos@$ISO_IP
 Each NixOS machine has the following structure:
 
 ```
-machines/<machine-name>/
+flake/machines/<machine-name>/
 ├── configuration.nix           # Machine config
 └── hardware-configuration.nix  # Auto-generated hardware config
 ```
 
 #### Create `hardware-configuration.nix`
 
-Every machine needs a `machines/<machine-name>/hardware-configuration.nix`
+Every machine needs a `flake/machines/<machine-name>/hardware-configuration.nix`
 
 You can generate hardware configuration directly from the live ISO:
 
 ```bash
 ssh nixos@$ISO_IP "sudo nixos-generate-config --no-filesystems && cat /etc/nixos/hardware-configuration.nix"
 ```
-Copy the configuration to: `machines/<machine-name>/hardware-configuration.nix` on your local machine.
+Copy the configuration to: `flake/machines/<machine-name>/hardware-configuration.nix` on your local machine.
 
 Commit and push it to git.
 
 #### Create `configuration.nix`
 
 1. **Copy an existing configuration** as a starting point:
-   - Example: [um790/configuration.nix](machines/nixos/x86_64/um790/configuration.nix)
+   - Example: [um790/configuration.nix](flake/machines/nixos/x86_64/um790/configuration.nix)
 
 2. **Import the disko module** with your disk configuration:
    ```nix
@@ -148,11 +127,11 @@ Commit and push it to git.
    ```
 
 3. **Import a base module** depending on your machine type:
-   - [`modules/system/nixos/headless`](modules/system/nixos/headless/default.nix) — for server machines
-   - [`modules/system/nixos/graphical`](modules/system/nixos/graphical/default.nix) — for GUI machines (includes headless features)
+   - [`flake/modules/system/nixos/headless`](flake/modules/system/nixos/headless/default.nix) — for server machines
+   - [`flake/modules/system/nixos/graphical`](flake/modules/system/nixos/graphical/default.nix) — for GUI machines (includes headless features)
 
 4. **Add optional features** as needed:
-   - Example: `modules/system/nixos/headless/optional/thunderbolt.nix`
+   - Example: `flake/modules/system/nixos/headless/optional/thunderbolt.nix`
 
 ### Install
 
@@ -220,17 +199,17 @@ You'll be prompted to enter the LUKS passphrase. The machine will continue booti
 ssh username@<machine-ip> 
 ```
 
-Configuration: [remote-unlock.nix](modules/system/nixos/headless/remote-unlock.nix)
+Configuration: [remote-unlock.nix](flake/modules/system/nixos/headless/remote-unlock.nix)
 
 ## LUKS auto unlock with Secure Boot + TPM2
 
-Import [modules/system/nixos/headless/optional/secure-boot.nix](modules/system/nixos/headless/optional/secure-boot.nix) in your machine's `configuration.nix`, then follow the setup instructions in that file.
+Import [flake/modules/system/nixos/headless/optional/secure-boot.nix](flake/modules/system/nixos/headless/optional/secure-boot.nix) in your machine's `configuration.nix`, then follow the setup instructions in that file.
 
 ## Impermanence
 
 This configuration uses btrfs with impermanence, where the root filesystem is reset on every boot. Only explicitly declared files and directories in `/persistent` survive reboots.
 
-When adding new persistence directories/files, they need to be added in `modules/system/nixos/headless/impermanence.nix` (for actual persistence)
+When adding new persistence directories/files, they need to be added in `flake/modules/system/nixos/headless/impermanence.nix` (for actual persistence)
 
 ### Find impermanent files
 
@@ -255,11 +234,11 @@ just build
 
 Some configs (like nvim) are symlinked directly to the repo rather than the Nix store, so edits take effect immediately without rebuilding.
 
-To make a config directly editable, use `mkOutOfStoreSymlink` in `modules/home-manager/shared/headless/dot-files.nix`:
+To make a config directly editable, use `mkOutOfStoreSymlink` in `flake/modules/home-manager/shared/headless/dot-files.nix`:
 
 ```nix
 ".config/nvim".source =
-  config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/modules/home-manager/dot-files/nvim";
+  config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/nvim";
 ```
 
 For directories where only some files need to be mutable, use the `sourceDirectory` helper with `outOfStoreSymlinks`:
