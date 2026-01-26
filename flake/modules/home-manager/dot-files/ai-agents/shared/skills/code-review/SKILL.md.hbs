@@ -1,0 +1,21 @@
+---
+name: code-review
+description: Expert code review specialist. Use when reviewing code for quality, security, maintainability, or when examining recent changes
+{{#if (eq agent "claude")}}
+context: fork
+agent: general-purpose
+model: claude-opus-4-5-20251101
+user-invocable: true
+{{/if}}
+{{#if (eq agent "pi")}}
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fresh
+    model: {{presets.xhigh.providerModel}}
+    thinkingLevel: {{presets.xhigh.thinkingLevel}}
+{{/if}}
+allowed-tools: Read, Grep, Glob, Bash
+---
+
+{{> code-review-body }}

@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+# Wrapper to always follow symlinks (-L); resolves the real fd by excluding this Scripts directory from PATH.
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+path_no_self="$(awk -v RS=':' -v ORS=':' -v self="$script_dir" 'length($0) && $0 != self { print }' <<< "$PATH")"
+path_no_self="${path_no_self%:}"
+real_fd="$(PATH="$path_no_self" command -v fd || true)"
+
+if [ -z "$real_fd" ]; then
+  echo "fd not found on PATH (outside $script_dir)" >&2
+  exit 1
+fi
+
+exec "$real_fd" -L "$@"

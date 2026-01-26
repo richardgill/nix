@@ -5,6 +5,8 @@ description: Gmail CLI for searching emails, reading threads, sending messages, 
 
 ## Usage
 
+Email style preference: start with "Hi" and end with "Thanks,\nRichard".
+
 Run `gmcli --help` for full command reference.
 
 First: run `gmcli accounts list` to find which emails exist. If there's only one, use that.

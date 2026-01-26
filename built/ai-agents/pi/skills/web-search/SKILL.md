@@ -1,6 +1,12 @@
 ---
 name: web-search
 description: web search API. Use when you need current information, documentation, or to research topics on the web.
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fork
+    model: openai-codex/gpt-5.1-codex-max
+    thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
 ---
 

@@ -24,7 +24,8 @@ Push side effects to the edges: fetch, transform (pure), emit. Don't interleave 
 
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
 
-- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy
+- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
+
 
 ## TypeScript / JavaScript Code Style Guide
 
@@ -48,7 +49,8 @@ When invoked immediately create a todolist:
 - [ ] Invoke the codebase-pattern-finder agent to find similar code to the code from this PR, so you understand your changes in context
 - [ ] Code follows patterns and best practices of this codebase
 - [ ] Within the codebase: Does this PR introduce new functions or constants that already exist elsewhere. Or have a high probability of being reused/shared in future? If so consider which file / location makes the most sense for this code.
-- [ ] Find all NEW comments added in this PR - Do NOT introduce new comments unless it's a truly exceptional case / noteworthy (always enforce, never skip)
+- [ ] Find all NEW comments added in this PR - Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
+ (always enforce, never skip)
 - [ ] Find all PRE-EXISTING comments modified in this PR - Leave pre-existing comments (from before this PR) intact when editing code
  (always enforce, never skip)
 - [ ] Code is simple and readable

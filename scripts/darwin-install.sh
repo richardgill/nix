@@ -40,7 +40,7 @@ echo "Profile directory permissions corrected ✓"
 echo ""
 
 echo "Getting available darwin configurations..."
-AVAILABLE_MACHINES=$(nix eval --json .#darwinConfigurations --apply builtins.attrNames | jq -r '.[]')
+AVAILABLE_MACHINES=$(nix eval --json path:./flake#darwinConfigurations --apply builtins.attrNames | jq -r '.[]')
 
 if [ -z "$AVAILABLE_MACHINES" ]; then
     echo "ERROR: No darwin configurations found in flake!"

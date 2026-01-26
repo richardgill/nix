@@ -21,7 +21,7 @@ Implement technical plans with verification - executes phases with success crite
 
 ### 2. Pre-Implementation Review
 - Immediately add items to your todo list:
-  - [ ] "Review implementation with code-reviewer and ask the Skill(oracle) for a code review in parallel"
+  - [ ] "Review implementation with code-reviewer"
   - [ ] Consolidate reviews and fix all issues with the reviews
 
 ### 3. Execute Each Phase

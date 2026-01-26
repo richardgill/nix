@@ -15,10 +15,10 @@ Manage the project's persistent work tracker in `thoughts/shared/issues/`.
 
 ## Issue & Plan Storage
 
-Issues and plans are tracked in `thoughts/shared/issues/` with numbered phases:
+Issues and plans are tracked in `./issues/` with numbered phases:
 
 ```
-thoughts/shared/issues/
+./issues/
 ├── 10-phase-name/           # Single issue = flat folder
 │   └── plan.md
 ├── 20-another-phase/

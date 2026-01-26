@@ -1,6 +1,7 @@
 ---
 name: create-plan
-description: Creates summary for human review - and comprehensive implementation plan for LLM, complete code examples, and verification steps
+description: Create implementation plans with human-readable summaries.
+
 ---
 
 # Creating Plans
@@ -15,51 +16,38 @@ A plan has two sections:
 
 ### Plan summary for human review at the top
 
-The summary tells a story the reviewer can follow in <150 lines. Not a file list - show the *shape* of the change to review the plan and spot issues early.
+The summary tells a story that a human engineer can follow in <150 lines. You must show the *shape* of the changes so the plan reviewer can spot issues early. The goal of the plan is to help the human understand what the high level plan is without an overwhelming amount of information.
 
-**Structure:**
-1. **Requirements** - Brief restatement with enough precision to be clear
-2. **How it works today** - Diagram showing current flow (builds shared context)
-3. **The change** - Diagram showing new flow + code in context. Present code changes outside-in, showing new code **in context** with surrounding existing code:
+The plan summary may include the following:
 
-1. **Usage & Signature** - reveal the API shape, types, and ergonomics
-2. **Flow** - show where new code lands relative to existing code
+- Reassert briefly your understanding of what the goal of the plan is (so that the human can verify that you understand)
+- The information that you gathered that the human likely doesn't already know which impacted the direction of the plan
+- The shape of the code after the plan is implemented, so they can verify the design is agreeable to them. Use the usage-signature-flow format below.
+- Decisions you made (possibly implicitly) that have a valid (>40% chance of being valid) other options.
+- Assumptions you made that could be incorrect (less than 85% certain)
+- Automated strategy that an agent will use to check changes fulfill the goals of the plan. Keep them simple, they should be as e2e as possible. They could involve writing a script in scratch/ to invoke functionality into a verifiable string that an agent can review.
 
-Example - adding a `formatCurrency` utility:
+#### Usage signature flow
+For quick comprehension you must present code changes outside-in, showing new code / code changes **in context** with surrounding existing code:
+You need to show me the code as a 'sketch' of the 'shape' of the code whilst being brief.
 
-```ts
-// Usage
-function formatCurrency(cents: number, currency: 'USD' | 'EUR' | 'GBP'): string
+What to include:
 
-formatCurrency(1999, 'USD');  // "$19.99"
-formatCurrency(1999, 'EUR');  // "€19.99"
+- The high level 'story' of function calls and high-level control flow.
+- Show the flow of the code as if I was reading the usages, so I can understand the structure that a first time reader of the code would see. But omit the
+ technical details from the code, it's a sketch.
+- I care about the functions (including signatures, put them as comments above the function usages). Use TypeScript imports at the top to show file paths, file status, and function status.
+- Relevant code context around the changes so I can understand how our changes and additions fit into the existing code
 
-// Flow - where it lands in existing code
-// src/components/ProductCard.tsx
-export function ProductCard({ product }: Props) {
-  const store = useStore();                          // existing
-  const price = formatCurrency(product.cents, ...);  // ← new
+What **not** to include:
+- Internal implementation details that are obvious, by default omit the code inside of functions themselves unless it's important
+- Too much information - you need to maximize comprehension so I can review the plan quickly
 
-  return (
-    <div className="card">                           {/* existing */}
-      <span className="price">{price}</span>         {/* ← new */}
-      <span className="name">{product.name}</span>   {/* existing */}
-    </div>
-  );
-}
-```
 
-The reviewer should see what already exists around the new code, not just the new code in isolation.
 
-4. **Verification** - Always include `local-ci.sh` + manual testing steps
-5. **Testing** - Match existing test patterns. List test files to add/update, then key cases to cover (edge cases, error states, happy path). Give confidence the plan has testing covered.
 
-**Guidelines:**
-- Show code in context - what's above and below, not floating snippets
-- Only mention alternatives if they were genuinely considered and could have gone either way
-- Don't pad with fake tradeoffs or invented alternatives
-- Don't list files separately if the diagram already shows them
-- Don't condescend ("Clarified with user:") - just state the decisions
+<example>
+## Plan Summary
 
 ### Plan implementation details
 
@@ -91,15 +79,14 @@ Start by creating a planning todo list:
 Collect context information:
 
 - [ ] Read any provided documents / context & Explore the relevant code
-- [ ] Search for similar patterns in the codebase
+- [ ] Use the codebase-pattern-finder skill to identify similar code
 - [ ] If you have questions or are unsure about anything please ask for clarification until everything is resolved
 
 Draft the plan and iterate:
 
 - [ ] Draft a full plan (summary + implementation) and write it to disk using the "issues skill" using the "issues skill"
 - [ ] Read the plan again and review it based on the plan criteria laid out here. Focus on how easy it is for human to digest and review the plan so they can give feedback on any potential issues early on.
-- [ ] Review this plan and the code within it. Use the feedback to improve the plan. If necessary go back to the previous todo and continue iterating on the plan.
-- [ ] Reply to user with the plan summary section and the implement command
 
-**End with:** The plan summary directly in the chat, always tell the user the exact command to run:
-`$implementing-plans thoughts/shared/issues/<path-to-issue>/plan.md`
+**End with:** The verbatim plan summary directly in the chat, always tell the user the exact command to run:
+Would you like to create a worktree using worktree skill to start working on this issue?
+`/implementing-plans ./issues/<path-to-issue>/plan.md`

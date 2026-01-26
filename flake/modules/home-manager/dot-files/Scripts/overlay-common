@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+overlay_fail() {
+  if [ -z "${overlay_quiet:-}" ]; then
+    echo "$1" >&2
+  fi
+  if [ -n "${overlay_soft_fail:-}" ]; then
+    exit 0
+  fi
+  exit 1
+}
+
+overlay_root="$HOME/code/personal-overlay"
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -z "$repo_root" ]; then
+  overlay_fail "Error: not in a git repo"
+fi
+
+if [ ! -d "$overlay_root" ]; then
+  overlay_fail "Error: overlay repo not found at $overlay_root"
+fi
+
+if [ "$repo_root" = "$overlay_root" ]; then
+  overlay_fail "Error: refusing to run inside overlay repo"
+fi
+
+parent_dir=$(dirname "$repo_root")
+if [ -d "$parent_dir/main" ]; then
+  repo_name=$(basename "$parent_dir")
+else
+  repo_name=$(basename "$repo_root")
+fi
+
+overlay_repo="$overlay_root/$repo_name"
+overlay_scratch="$overlay_repo/scratch"
+overlay_issues="$overlay_repo/issues"

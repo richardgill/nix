@@ -8,7 +8,7 @@ description: |
 
 # Beeper Desktop API
 
-Use the `beeper` CLI to access messages across chat networks (WhatsApp, Signal, Telegram, Instagram, etc.).
+Use the `~/Scripts/beeper` CLI to access messages across chat networks (WhatsApp, Signal, Telegram, Instagram, etc.).
 
 ## Commands
 

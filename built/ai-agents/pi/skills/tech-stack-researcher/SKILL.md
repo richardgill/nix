@@ -1,6 +1,12 @@
 ---
 name: tech-stack-researcher
 description: Researches and compares tech stack choices (libraries, frameworks, packages) with metrics and recommendations.
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fork
+    model: openai-codex/gpt-5.2
+    thinkingLevel: xhigh
 allowed-tools: WebSearch, WebFetch, Bash, Read, Grep, Glob, Task
 ---
 

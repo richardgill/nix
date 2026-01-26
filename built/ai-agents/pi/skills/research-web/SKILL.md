@@ -1,6 +1,12 @@
 ---
 name: research-web
 description: Searches the web, fetches documentation, and searches GitHub code. Use when you need current information, documentation, or real-world code examples from the web.
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fork
+    model: openai-codex/gpt-5.1-codex-max
+    thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
 ---
 

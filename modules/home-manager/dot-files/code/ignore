@@ -1,7 +1,0 @@
-!.env
-!.env.*
-!.dev.vars
-!scratch/
-!thoughts/
-!.claude/prompts/
-!mise.local.toml

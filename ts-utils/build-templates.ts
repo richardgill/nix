@@ -13,7 +13,13 @@ import {
 import Handlebars from "handlebars";
 import { z } from "zod";
 import { directories, rootTemplates, DOT_FILES_PATH } from "./template-config";
-import { agents, type AgentName } from "./agent-config";
+import {
+  agents,
+  type AgentConfig,
+  type AgentName,
+  type AgentPresets,
+  type ModelFamily,
+} from "./agent-config";
 
 Handlebars.registerHelper("eq", (a, b) => a === b);
 
@@ -45,9 +51,17 @@ const templateDataSchema = z
   .strict();
 
 type TemplateData = z.infer<typeof templateDataSchema>;
-type RenderContext = TemplateData & { agent?: string; binary: string };
+type RenderContext = TemplateData & {
+  agent?: AgentName;
+  binary: string;
+  modelFamily?: ModelFamily;
+  presets?: AgentPresets;
+};
 
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
+const getAgentModelFamily = (agent: AgentName) => agents[agent].modelFamily;
+const getAgentPresets = (agent: AgentName) =>
+  (agents[agent] as AgentConfig).presets;
 
 const parseCliArgs = () => {
   const { values } = parseArgs({
@@ -151,6 +165,8 @@ const processSharedContent = (
       ...data,
       agent,
       binary: getAgentBinary(agent),
+      modelFamily: getAgentModelFamily(agent),
+      presets: getAgentPresets(agent),
     };
     const excludeSkills: readonly string[] =
       "excludeSkills" in config ? config.excludeSkills : [];
@@ -221,6 +237,8 @@ const processDirectory = (
             ...context,
             agent: agentName,
             binary: getAgentBinary(agentName),
+            modelFamily: getAgentModelFamily(agentName),
+            presets: getAgentPresets(agentName),
           };
         }
 
@@ -252,8 +270,10 @@ const processDirectory = (
 const build = () => {
   const { dataFile, outDir } = parseCliArgs();
 
-  // Root is one level up from ts-utils/
-  const rootDir = dirname(import.meta.dir);
+  const repoRoot = dirname(import.meta.dir);
+  const rootDir = existsSync(join(repoRoot, "flake"))
+    ? join(repoRoot, "flake")
+    : repoRoot;
 
   const data = loadData(dataFile);
   console.log("Building templates with data:", JSON.stringify(data, null, 2));
@@ -288,7 +308,7 @@ const build = () => {
     const outputName = template.replace(/\.hbs$/, "");
     // Put root templates in their own directory (e.g., zprofile/zprofile)
     const outputPath = join(outDir, outputName, outputName);
-    renderTemplate(sourcePath, outputPath, data);
+    renderTemplate(sourcePath, outputPath, { ...data, binary: "" });
   }
 
   console.log("\nBuild complete!");

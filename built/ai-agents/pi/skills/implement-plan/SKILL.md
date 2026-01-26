@@ -6,6 +6,11 @@ description: |
   "work on the plan", "continue the plan", "pick up where we left off".
   Executes phases with success criteria checks, pauses for manual verification.
   Not for creating plans (use creating-plans) or batch execution (use executing-plans).
+metadata:
+  pi:
+    subProcess: false
+    model: openai-codex/gpt-5.1-codex-max
+    thinkingLevel: medium
 ---
 
 # Implementing Plans
@@ -21,7 +26,7 @@ Implement technical plans with verification - executes phases with success crite
 
 ### 2. Pre-Implementation Review
 - Immediately add items to your todo list:
-  - [ ] "Review implementation with code-reviewer and ask the Skill(oracle) for a code review in parallel"
+  - [ ] "Review implementation with code-reviewer"
   - [ ] Consolidate reviews and fix all issues with the reviews
 
 ### 3. Execute Each Phase

@@ -1,9 +1,11 @@
 .DS_Store
 Brewfile
 result
+.nix-fast-build/
 .claude/settings.local.json
-modules/home-manager/dot-files/obs-studio/logs/
-modules/home-manager/dot-files/obs-studio/profiler_data/
+out-of-store-config/obs-studio/logs/
+out-of-store-config/obs-studio/profiler_data/
 
 # Template build output
 node_modules/
+flake/template-builder/build-templates.bundle.js

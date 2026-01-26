@@ -20,7 +20,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
    nix --version
    ```
 
-2. **Identify version-pinned inputs in flake.nix** that need updating:
+2. **Identify version-pinned inputs in flake/flake.nix** that need updating:
    - `nixpkgs` (e.g., `nixos-25.05` → `nixos-25.11`)
    - `home-manager` (e.g., `release-25.05` → `release-25.11`)
    - `nix-darwin` (e.g., `nix-darwin-25.05` → `nix-darwin-25.11`)
@@ -43,7 +43,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
 
 6. **Execute upgrade** (when user is ready):
    ```bash
-   # Edit flake.nix with new versions
+   # Edit flake/flake.nix with new versions
    just update        # Update flake.lock
    just check         # Build without applying (safe)
    just switch        # Apply the upgrade
@@ -68,7 +68,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
 Print out the instructions to:
 ```bash
 sudo nixos-rebuild switch --rollback
-git checkout flake.nix flake.lock
+git checkout flake/flake.nix flake/flake.lock
 ```
 
 $ARGUMENTS

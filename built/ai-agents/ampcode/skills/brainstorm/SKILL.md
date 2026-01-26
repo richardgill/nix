@@ -37,7 +37,7 @@ You can use the research-web skill to search the web
 ## After the Design
 
 **Documentation:**
-- Use the Skill(issues) to write the validated design to `thoughts/shared/issues/<path-to-issue>/design.md`
+- Use the Skill(issues) to write the validated design to `./issues/<path-to-issue>/design.md`
 
 - Ask: "Want to create a plan or begin implementation?"
 - Create detailed implementation plan in the same issue folder
@@ -46,36 +46,23 @@ You can use the research-web skill to search the web
 
 - Prefer: sketch shape → confirm → implement. Get agreement on structure before details.
 
-- Present code changes outside-in, showing new code **in context** with surrounding existing code:
+- For quick comprehension you must present code changes outside-in, showing new code / code changes **in context** with surrounding existing code:
+You need to show me the code as a 'sketch' of the 'shape' of the code whilst being brief.
 
-1. **Usage & Signature** - reveal the API shape, types, and ergonomics
-2. **Flow** - show where new code lands relative to existing code
+What to include:
 
-Example - adding a `formatCurrency` utility:
+- The high level 'story' of function calls and high-level control flow.
+- Show the flow of the code as if I was reading the usages, so I can understand the structure that a first time reader of the code would see. But omit the
+ technical details from the code, it's a sketch.
+- I care about the functions (including signatures, put them as comments above the function usages). Use TypeScript imports at the top to show file paths, file status, and function status.
+- Relevant code context around the changes so I can understand how our changes and additions fit into the existing code
 
-```ts
-// Usage
-function formatCurrency(cents: number, currency: 'USD' | 'EUR' | 'GBP'): string
+What **not** to include:
+- Internal implementation details that are obvious, by default omit the code inside of functions themselves unless it's important
+- Too much information - you need to maximize comprehension so I can review the plan quickly
 
-formatCurrency(1999, 'USD');  // "$19.99"
-formatCurrency(1999, 'EUR');  // "€19.99"
 
-// Flow - where it lands in existing code
-// src/components/ProductCard.tsx
-export function ProductCard({ product }: Props) {
-  const store = useStore();                          // existing
-  const price = formatCurrency(product.cents, ...);  // ← new
 
-  return (
-    <div className="card">                           {/* existing */}
-      <span className="price">{price}</span>         {/* ← new */}
-      <span className="name">{product.name}</span>   {/* existing */}
-    </div>
-  );
-}
-```
-
-The reviewer should see what already exists around the new code, not just the new code in isolation.
 
 - Implementation: the "how" (often skippable unless important)
 - **One question at a time** - Don't overwhelm with multiple questions

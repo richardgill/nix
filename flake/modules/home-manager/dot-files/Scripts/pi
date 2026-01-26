@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+if [[ -n "$TMUX" ]]; then
+  window_id=$(tmux display-message -p '#{window_id}')
+  [[ -n "$window_id" ]] && tmux rename-window -t "$window_id" "pi"
+fi
+
+pi_bin=$(mise which pi)
+"$pi_bin" "$@"

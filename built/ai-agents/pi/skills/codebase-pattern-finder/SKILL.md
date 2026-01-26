@@ -1,6 +1,12 @@
 ---
 name: codebase-pattern-finder
 description: Finds similar implementations, usage examples, or existing patterns that can be modeled after. Use when you need concrete code examples with file:line references to follow existing patterns.
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fork
+    model: openai-codex/gpt-5.2
+    thinkingLevel: xhigh
 allowed-tools: Grep, Glob, Read
 ---
 

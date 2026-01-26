@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+overlay_setup="$HOME/Scripts/overlay-setup"
+
+if [ -x "$overlay_setup" ]; then
+  "$overlay_setup" --quiet
+fi
