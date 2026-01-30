@@ -16,7 +16,7 @@
       "WebFetch(domain:www.reddit.com)",
       "Edit(/tmp/**)",
       "Write(/tmp/**)",
-      "Skill(dev-browser:dev-browser)",
+      "Skill(browser:browser)",
       "Bash(npx tsx:*)"
     ]
   },

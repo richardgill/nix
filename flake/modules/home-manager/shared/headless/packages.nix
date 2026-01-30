@@ -18,6 +18,7 @@
     file # yazi uses this for mime type detection (previews)
     fzf
     gh
+    lefthook
     nixfmt-rfc-style
     oh-my-posh
     postgresql

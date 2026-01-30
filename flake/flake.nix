@@ -86,7 +86,7 @@
 
     # Playwright browsers for agent-browser/testing - pinned to match npm playwright version
     # https://github.com/pietdevries94/playwright-web-flake
-    playwright.url = "github:pietdevries94/playwright-web-flake/1.57.0";
+    playwright.url = "github:pietdevries94/playwright-web-flake/1.58.0";
   };
 
   outputs =

@@ -3,14 +3,23 @@
 
 HOME_DIR="$HOME"
 SESH_LIST="sesh list --icons"
+MODE_SESH="sesh"
+MODE_DIRS="all dirs"
+HEADER_BASE='  mode: %s | ^a toggle %s | ^q kill | F12/§ prefix'
+HEADER_SESH=$(printf "$HEADER_BASE" "$MODE_SESH" "$MODE_DIRS")
+HEADER_DIRS=$(printf "$HEADER_BASE" "$MODE_DIRS" "$MODE_SESH")
+MODE_FILE=$(mktemp)
+PREFIX_FILE=$(mktemp)
+printf '%s' "$MODE_SESH" > "$MODE_FILE"
+rm -f "$PREFIX_FILE"
+trap 'rm -f "$MODE_FILE" "$PREFIX_FILE"' EXIT
 
 selected=$(eval "$SESH_LIST" | fzf --ansi \
-  --no-sort --border-label ' sesh ' --prompt '⚡  ' \
-  --header '  ^f find ^q kill ^a all | F12/§ prefix' \
+  --no-sort --border-label ' sesh ' --prompt '' \
+  --header "$HEADER_SESH" \
   --bind 'tab:down,btab:up' \
-  --bind "ctrl-f:change-prompt(🔎  )+reload($HOME_DIR/Scripts/find-dirs)" \
-  --bind "ctrl-a:change-prompt(⚡  )+reload($SESH_LIST)" \
-  --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+change-prompt(⚡  )+reload($SESH_LIST)" \
+  --bind "ctrl-a:transform:[[ \"\$(cat \"$MODE_FILE\")\" == \"$MODE_DIRS\" ]] && echo \"execute-silent(printf '%s' '$MODE_SESH' > '$MODE_FILE')+change-header($HEADER_SESH)+reload($SESH_LIST)\" || echo \"execute-silent(printf '%s' '$MODE_DIRS' > '$MODE_FILE')+change-header($HEADER_DIRS)+reload($HOME_DIR/Scripts/find-dirs)\"" \
+  --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+execute-silent(printf '%s' '$MODE_SESH' > '$MODE_FILE')+change-header($HEADER_SESH)+reload($SESH_LIST)" \
   --bind "w:become($HOME_DIR/Scripts/claude-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
@@ -19,8 +28,8 @@ selected=$(eval "$SESH_LIST" | fzf --ansi \
   --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
   --bind 'b:abort+execute-silent(tmux select-window -t :6)' \
   --bind 'start:unbind(w,a,r,s,t,g,b)' \
-  --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,b)"' \
-  --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(w,a,r,s,t,g,b)" || echo "change-prompt(§ )+rebind(w,a,r,s,t,g,b)"' \
+  --bind "f12:transform:[[ -f \"$PREFIX_FILE\" ]] && echo \"execute-silent(rm -f '$PREFIX_FILE')+unbind(w,a,r,s,t,g,b)\" || echo \"execute-silent(touch '$PREFIX_FILE')+rebind(w,a,r,s,t,g,b)\"" \
+  --bind "§:transform:[[ -f \"$PREFIX_FILE\" ]] && echo \"execute-silent(rm -f '$PREFIX_FILE')+unbind(w,a,r,s,t,g,b)\" || echo \"execute-silent(touch '$PREFIX_FILE')+rebind(w,a,r,s,t,g,b)\"" \
   --preview-window 'right:55%,<65(down,75%)' \
   --layout=reverse \
   --preview 'sesh preview {}')

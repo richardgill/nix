@@ -1,5 +1,5 @@
 ---
-name: dev-browser
+name: browser
 description: |
   Browser automation with persistent page state. Use when users ask to navigate websites, fill forms,
   take screenshots, extract web data, test web apps, or automate browser workflows.

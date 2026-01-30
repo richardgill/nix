@@ -5,7 +5,7 @@ const extension = taskTool({
 	label: "Task",
 	description: [
 		"Run isolated pi subprocess tasks (single, chain, or parallel).",
-		"Supports optional skill wrapper (matches /skill: behavior) and optional model override (provider/modelId).",
+		"Optional model override (provider/modelId).",
 	].join(" "),
 	maxParallelTasks: 8,
 	maxConcurrency: 4,
@@ -16,7 +16,7 @@ const extension = taskTool({
 			match:
 				/\n\s*\n\s*in addition to the tools above, you may have access to other custom tools depending on the project\./i,
 			replace:
-				"\n- task: Run isolated pi subprocess tasks (single, chain, or parallel).",
+				"\n- task: never run this tool unless it's a skill run or I explictly ask you to",
 		},
 	],
 } satisfies TaskToolOptions);

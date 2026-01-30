@@ -3,6 +3,7 @@ if [ -f "$HOME/.config/shell/env.sh" ]; then
 fi
 
 eval "$(mise activate zsh)"
+export PATH="$HOME/Scripts:$PATH"
 
 # History
 HISTFILE="$HOME/.zsh_history"

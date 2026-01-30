@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+copy_cmd=()
+
+if command -v pbcopy >/dev/null 2>&1; then
+  copy_cmd=(pbcopy)
+elif command -v wl-copy >/dev/null 2>&1 && { [ -n "${WAYLAND_DISPLAY:-}" ] || [ "${XDG_SESSION_TYPE:-}" = "wayland" ]; }; then
+  copy_cmd=(wl-copy)
+elif command -v xclip >/dev/null 2>&1 && [ -n "${DISPLAY:-}" ]; then
+  copy_cmd=(xclip -selection clipboard)
+elif command -v xsel >/dev/null 2>&1 && [ -n "${DISPLAY:-}" ]; then
+  copy_cmd=(xsel --clipboard --input)
+else
+  echo "copy: no clipboard command available" >&2
+  exit 1
+fi
+
+if [ -t 0 ]; then
+  if [ "$#" -eq 0 ]; then
+    echo "copy: no input" >&2
+    exit 1
+  fi
+  printf '%s' "$*" | "${copy_cmd[@]}"
+else
+  "${copy_cmd[@]}"
+fi

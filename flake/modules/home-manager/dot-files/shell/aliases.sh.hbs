@@ -55,7 +55,9 @@ resetTo() {
 alias c="~/Scripts/cl"
 alias v="nvim"
 alias t="~/Scripts/tmux-start"
+alias pi="~/Scripts/pi"
 alias pnx="pnpm exec nx"
+alias ls="~/Scripts/ls"
 alias lso="{{ coreUtilsPath }}/bin/ls"
 alias tree="ls --tree"
 alias cato="{{ coreUtilsPath }}/bin/cat"
@@ -70,7 +72,6 @@ alias wifi="nmtui"
 {{/if}}
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then
-  alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions --all"
   alias cat="bat"
 fi
 

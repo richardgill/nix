@@ -1,4 +1,5 @@
 {
   "cycleModelForward": "ctrl+shift+alt+9",
-  "cycleModelBackward": "ctrl+shift+alt+0"
+  "cycleModelBackward": "ctrl+shift+alt+0",
+  "toggleSessionPath": "ctrl+shift+alt+8"
 }

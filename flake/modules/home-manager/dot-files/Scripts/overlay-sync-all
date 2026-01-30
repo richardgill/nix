@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -e
+
+overlay_root="${OVERLAY_ROOT:-$HOME/code/personal-overlay}"
+
+if [ ! -d "$overlay_root" ]; then
+  echo "Error: overlay repo not found at $overlay_root" >&2
+  exit 1
+fi
+
+if [ ! -d "$overlay_root/.git" ]; then
+  echo "Error: overlay repo is not a git repo: $overlay_root" >&2
+  exit 1
+fi
+
+git -C "$overlay_root" pull --rebase --autostash
+
+changes=$(git -C "$overlay_root" status --porcelain)
+if [ -z "$changes" ]; then
+  echo "No overlay changes"
+  exit 0
+fi
+
+git -C "$overlay_root" add -A
+git -C "$overlay_root" commit -m "Update overlays"
+git -C "$overlay_root" push || {
+  git -C "$overlay_root" pull --rebase --autostash
+  git -C "$overlay_root" push
+}
