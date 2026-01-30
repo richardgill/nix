@@ -9,6 +9,7 @@
     ./keyboard.nix
     ./networking.nix
     ./nix.nix
+    ./overlay-sync-all.nix
     ./packages.nix
     ./secrets.nix
     ./security.nix

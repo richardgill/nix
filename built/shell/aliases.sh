@@ -55,7 +55,9 @@ resetTo() {
 alias c="~/Scripts/cl"
 alias v="nvim"
 alias t="~/Scripts/tmux-start"
+alias pi="~/Scripts/pi"
 alias pnx="pnpm exec nx"
+alias ls="~/Scripts/ls"
 alias lso="/nix/store/iiishysy5bzkjrawxl4rld1s04qj0k0c-coreutils-9.8/bin/ls"
 alias tree="ls --tree"
 alias cato="/nix/store/iiishysy5bzkjrawxl4rld1s04qj0k0c-coreutils-9.8/bin/cat"
@@ -68,7 +70,6 @@ alias bluetooth="blueberry"
 alias wifi="nmtui"
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then
-  alias ls="eza --color=always --long --git --no-filesize --icons=always --no-time --no-user --no-permissions --all"
   alias cat="bat"
 fi
 

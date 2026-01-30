@@ -20,15 +20,6 @@
     "keepRecentTokens": 20000
   },
   "excludeSkills": [],
-  "skills": {
-    "enabled": true,
-    "enableCodexUser": false,
-    "enableClaudeUser": false,
-    "enableClaudeProject": true,
-    "enablePiUser": true,
-    "enablePiProject": true,
-    "enableSkillCommands": true
-  },
   "retry": {
     "enabled": true,
     "maxRetries": 3,
@@ -42,6 +33,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.49.3",
-  "editorPaddingX": 1
+  "lastChangelogVersion": "0.50.4",
+  "editorPaddingX": 1,
+  "enableSkillCommands": true
 }

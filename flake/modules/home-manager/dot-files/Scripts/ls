@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+path_no_self="$(awk -v RS=':' -v ORS=':' -v self="$script_dir" 'length($0) && $0 != self { print }' <<< "$PATH")"
+path_no_self="${path_no_self%:}"
+real_ls="$(PATH="$path_no_self" command -v ls || true)"
+
+if [ -z "$real_ls" ]; then
+  echo "ls not found on PATH (outside $script_dir)" >&2
+  exit 1
+fi
+
+exec "$real_ls" -L --color=auto -1 "$@"

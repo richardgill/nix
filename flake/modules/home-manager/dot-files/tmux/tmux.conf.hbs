@@ -118,8 +118,8 @@ bind-key -r Left swap-window -t -1\; select-window -t -1
 bind-key -r Right swap-window -t +1\; select-window -t +1
 
 set -g mouse on
-bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-selection
-bind-key -T copy-mode-vi MouseDragEnd1Pane send-keys -X copy-selection
+bind-key -T copy-mode MouseDragEnd1Pane if-shell -F '#{?scroll_position,0,1}' 'send-keys -X copy-pipe-and-cancel "copy"' 'send-keys -X copy-pipe "copy"'
+bind-key -T copy-mode-vi MouseDragEnd1Pane if-shell -F '#{?scroll_position,0,1}' 'send-keys -X copy-pipe-and-cancel "copy"' 'send-keys -X copy-pipe "copy"'
 
 set -g pane-active-border-style bg=default,fg=#333333
 set -g pane-border-style bg=default,fg=#333333

@@ -15,6 +15,9 @@
         "installation_mode": "force_installed"
       }
     },
+    "Certificates": {
+      "ImportEnterpriseRoots": true
+    },
     "HTTPSOnlyMode": {
       "Enabled": true,
       "Locked": false,

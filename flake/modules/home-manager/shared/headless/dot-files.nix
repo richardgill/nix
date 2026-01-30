@@ -137,8 +137,6 @@ in
       ".config/git/ignore".source = ../../dot-files/git/ignore;
       ".config/delta/themes.gitconfig".source = ../../dot-files/git/delta-themes.gitconfig;
       ".config/git/templates/hooks/post-checkout".source = ../../dot-files/git/hooks/post-checkout;
-      ".config/git/templates/hooks/pre-push".source = ../../dot-files/git/hooks/pre-push;
-      ".config/git/hooks/pre-push".source = ../../dot-files/git/hooks/pre-push;
       ".bash_profile".source = ../../dot-files/bash_profile;
       ".bashrc".source = ../../dot-files/bashrc;
       ".lesskey".source = ../../dot-files/lesskey;
@@ -149,7 +147,6 @@ in
       ".config/sesh".source = ../../dot-files/sesh;
       ".ssh/config".source = ../../dot-files/ssh/config;
       ".config/yazi".source = ../../dot-files/yazi;
-
 
       ".config/voxtype/config.toml".source = ../../dot-files/voxtype/config.toml;
       ".config/wireplumber/wireplumber.conf.d".source = ../../dot-files/wireplumber/wireplumber.conf.d;

@@ -34,7 +34,6 @@
 	version-check = 1748500785
 [core]
 	editor = nvim +startinsert
-	hooksPath = ~/.config/git/hooks
 	pager = delta
 [interactive]
 	diffFilter = delta --color-only

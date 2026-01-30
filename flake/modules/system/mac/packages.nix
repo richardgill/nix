@@ -76,6 +76,8 @@ in
       echo "Please install them using: xcode-select --install"
       exit 1
     fi
-    softwareupdate --install-rosetta --agree-to-license
+    if ! /usr/sbin/pkgutil --pkg-info com.apple.pkg.RosettaUpdateAuto >/dev/null 2>&1; then
+      softwareupdate --install-rosetta --agree-to-license
+    fi
   '';
 }

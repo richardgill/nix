@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -z "$repo_root" ]; then
+  exit 0
+fi
+
 overlay_setup="$HOME/Scripts/overlay-setup"
 
 if [ -x "$overlay_setup" ]; then

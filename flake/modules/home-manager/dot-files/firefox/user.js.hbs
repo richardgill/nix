@@ -42,4 +42,6 @@ user_pref("sidebar.visibility.sidebar-main", true);
 
 user_pref("network.proxy.type", 2);
 user_pref("network.proxy.autoconfig_url", "file://{{ firefoxProfilePathUrlEncoded }}/proxy.pac");
+// needed to work with paths in urls for pac rules
+user_pref("network.proxy.autoconfig_url.include_path", true);
 user_pref("network.proxy.socks_remote_dns", true);
