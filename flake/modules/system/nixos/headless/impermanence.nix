@@ -104,6 +104,7 @@
           ".config/Slack"
           ".config/BambuStudio"
           ".config/BeeperTexts"
+          ".config/blender"
           ".config/spotify"
           ".config/Todoist"
           ".config/sops"

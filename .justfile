@@ -64,7 +64,7 @@ update:
     just _update-inner
 
 _update-inner:
-    nix flake update ./flake
+    nix flake update --flake ./flake
     just switch
 
 check all="false":

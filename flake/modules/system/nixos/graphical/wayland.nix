@@ -1,62 +1,23 @@
 {
-  pkgs,
+  lib,
+  vars,
   ...
 }:
+let
+  compositor = vars.waylandCompositor or "hyprland";
+in
 {
-  environment.sessionVariables = {
-    NIXOS_OZONE_WL = 1;
-    ELECTRON_OZONE_PLATFORM_HINT = "wayland";
-    # SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
-    DISABLE_QT5_COMPAT = 0;
-    GDK_BACKEND = "wayland";
-    QT_QPA_PLATFORM = "wayland";
-    MOZ_ENABLE_WAYLAND = 1;
-    WLR_RENDERER = "vulkan";
-    XDG_CURRENT_DESKTOP = "Hyprland";
-    XDG_SESSION_TYPE = "wayland";
-    XDG_SESSION_DESKTOP = "Hyprland";
-    SDL_VIDEODRIVER = "wayland";
-    CLUTTER_BACKEND = "wayland";
-  };
-  programs.hyprland = {
-    enable = true;
-    package = pkgs.hyprland;
-    portalPackage = pkgs.xdg-desktop-portal-hyprland;
-  };
+  assertions = [
+    {
+      assertion = builtins.elem compositor [
+        "hyprland"
+        "niri"
+      ];
+      message = "vars.waylandCompositor must be either \"hyprland\" or \"niri\".";
+    }
+  ];
 
-  services.xserver.enable = true;
-  services.displayManager.gdm = {
-    enable = true;
-    autoSuspend = false;
-  };
-
-  services.gnome.gnome-keyring.enable = true;
-
-  security.pam.services = {
-    gdm.enableGnomeKeyring = true;
-    login.enableGnomeKeyring = true;
-  };
-
-  xdg.portal = {
-    enable = true;
-    # Disable portal for xdg-open: the portal's OpenURI implementation ignores mimeapps.list
-    # and tries to launch Chrome with X11 settings instead of respecting Firefox as the default browser
-    xdgOpenUsePortal = false;
-    config = {
-      common.default = [ "gtk" ];
-      hyprland = {
-        default = [
-          "hyprland"
-          "gtk"
-        ];
-        "org.freedesktop.impl.portal.FileChooser" = [ "gtk" ];
-      };
-    };
-
-    # note: screen sharing dialogs on chromium: https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/11
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-hyprland
-      xdg-desktop-portal-gtk
-    ];
-  };
+  imports =
+    lib.optionals (compositor == "hyprland") [ ./wayland-hyprland.nix ]
+    ++ lib.optionals (compositor == "niri") [ ./wayland-niri.nix ];
 }

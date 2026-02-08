@@ -10,7 +10,7 @@ in
     Service = {
       Type = "oneshot";
       ExecStart = scriptPath;
-      Environment = [ "PATH=/run/current-system/sw/bin:/usr/bin:/bin" ];
+      Environment = [ "PATH=/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin" ];
     };
   };
 

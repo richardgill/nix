@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$HOME/Scripts/nixos/workspace-map"
+source "$HOME/Scripts/nixos/niri/lib-wm"
+
+workspace_key="$(workspace_key_from_input "${1:-}")"
+workspace="$(workspace_for_compositor niri "$workspace_key")"
+
+focus_or_launch() {
+  local workspace_name="$1"
+  local app_id_pattern="$2"
+  local title_pattern="$3"
+  local exclude_title_pattern="$4"
+  shift 4
+  local -a launch_cmd=("$@")
+
+  wm_focus_oldest_window "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern" && return 0
+
+  wm_focus_workspace "$workspace_name"
+  "${launch_cmd[@]}" &
+}
+
+if [[ "$workspace_key" == "terminal" ]]; then
+  focus_or_launch "terminal" '^com\.mitchellh\.ghostty$|^ghostty$' '' '' "$HOME/Scripts/nixos/launch-ghostty"
+elif [[ "$workspace_key" == "files" ]]; then
+  focus_or_launch "files" '^org\.gnome\.Nautilus$|^Nautilus$' '' '^Screenshots$' nautilus --new-window
+elif [[ "$workspace_key" == "browser" ]]; then
+  focus_or_launch "browser" '^firefox$' '' '' firefox
+elif [[ "$workspace_key" == "activity" ]]; then
+  focus_or_launch "activity" '' '^btop$' '' "$HOME/Scripts/nixos/launch-terminal-app" btop
+elif [[ "$workspace_key" == "discord" ]]; then
+  focus_or_launch "discord" '^discord$' '' '' discord
+elif [[ "$workspace_key" == "password" ]]; then
+  focus_or_launch "password" '^1password$|^1Password$' '' '' 1password
+elif [[ "$workspace_key" == "slack" ]]; then
+  focus_or_launch "slack" '^Slack$|^slack$' '' '' slack
+elif [[ "$workspace_key" == "beeper" ]]; then
+  focus_or_launch "beeper" '^Beeper$|^beeper$' '' '' beeper
+elif [[ "$workspace_key" == "music" ]]; then
+  wm_focus_oldest_window "music" '^spotify$' '' '' \
+    || wm_focus_oldest_window "music" '' '^cmus$' '' \
+    || {
+      wm_focus_workspace "music"
+      "$HOME/Scripts/nixos/launch-terminal-app" cmus &
+    }
+elif [[ "$workspace_key" == "zoom" ]]; then
+  wm_focus_oldest_window "zoom" 'chrome-app\.zoom' '' '' \
+    || {
+      wm_focus_workspace "zoom"
+      if ! "$HOME/Scripts/nixos/check-webapp-open" zoom; then
+        omarchy-launch-webapp "https://app.zoom.us/wc/home" &
+      fi
+    }
+elif [[ "$workspace_key" == "todoist" ]]; then
+  focus_or_launch "todoist" '^Todoist$|^todoist-electron$' '' '' todoist-electron
+elif [[ "$workspace_key" == "chrome" ]]; then
+  focus_or_launch "chrome" 'google-chrome|chromium|Chromium' '' '' google-chrome-stable
+else
+  wm_focus_workspace "$workspace"
+fi

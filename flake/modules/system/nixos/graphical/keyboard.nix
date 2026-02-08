@@ -16,6 +16,7 @@
   ];
 
   services.xremap = {
+    package = pkgs.xremap;
     # Needed to detect currently active application
     withWlroots = true;
     # This didn't work and needed to use wlroots
@@ -26,49 +27,82 @@
     debug = false;
     config = {
       virtual_modifiers = [ "CapsLock" ];
+      modmap = [
+        {
+          name = "Voxtype push-to-talk";
+          remap = {
+            "KEY_F23" = {
+              skip_key_event = true;
+              press = {
+                launch = [
+                  "/home/${vars.userName}/Scripts/nixos/voxtype-record"
+                  "press"
+                ];
+              };
+              release = {
+                launch = [
+                  "/home/${vars.userName}/Scripts/nixos/voxtype-record"
+                  "release"
+                ];
+              };
+            };
+          };
+        }
+      ];
       keymap = [
         {
           name = "Hyper key mappings";
           exact_match = true;
-          remap = lib.listToAttrs (
-            map (key: lib.nameValuePair "CapsLock-${key}" "SHIFT-C-M-SUPER-${key}") [
-              "a"
-              "b"
-              "c"
-              "d"
-              "e"
-              "f"
-              "g"
-              "h"
-              "i"
-              "j"
-              "k"
-              "l"
-              "m"
-              "n"
-              "o"
-              "p"
-              "q"
-              "r"
-              "s"
-              "t"
-              "u"
-              "v"
-              "w"
-              "x"
-              "y"
-              "z"
-              "1"
-              "2"
-              "3"
-              "4"
-              "5"
-              "6"
-              "7"
-              "8"
-              "9"
-            ]
-          );
+          remap =
+            (lib.listToAttrs (
+              map (key: lib.nameValuePair "CapsLock-${key}" "SHIFT-C-M-SUPER-${key}") [
+                "a"
+                "b"
+                "c"
+                "d"
+                "e"
+                "f"
+                "g"
+                "h"
+                "i"
+                "j"
+                "k"
+                "l"
+                "m"
+                "n"
+                "o"
+                "p"
+                "q"
+                "r"
+                "s"
+                "t"
+                "u"
+                "v"
+                "w"
+                "x"
+                "y"
+                "z"
+                "1"
+                "2"
+                "3"
+                "4"
+                "5"
+                "6"
+                "7"
+                "8"
+                "9"
+              ]
+            ))
+            // {
+              "CapsLock-Left" = "C-M-SUPER-Left";
+              "CapsLock-Right" = "C-M-SUPER-Right";
+              "CapsLock-Up" = "C-M-SUPER-Up";
+              "CapsLock-Down" = "C-M-SUPER-Down";
+              "CapsLock-Shift-Left" = "C-M-SUPER-Shift-Left";
+              "CapsLock-Shift-Right" = "C-M-SUPER-Shift-Right";
+              "CapsLock-Shift-Up" = "C-M-SUPER-Shift-Up";
+              "CapsLock-Shift-Down" = "C-M-SUPER-Shift-Down";
+            };
         }
         {
           name = "Universal bindings exact match";
@@ -79,10 +113,12 @@
         }
         {
           name = "Universal bindings";
-          exact_match = false; # We want home + shift to work still
+          exact_match = true;
           remap = {
             "Super-Left" = "Home";
             "Super-Right" = "End";
+            "Super-Shift-Left" = "Shift-Home";
+            "Super-Shift-Right" = "Shift-End";
           };
         }
         {
@@ -165,6 +201,9 @@
       RestartSec = 3;
       StartLimitBurst = 5;
       StartLimitIntervalSec = 60;
+      Environment = [
+        "PATH=/etc/profiles/per-user/${vars.userName}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
+      ];
     };
   };
 

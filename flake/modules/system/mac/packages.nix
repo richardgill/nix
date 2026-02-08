@@ -2,11 +2,14 @@
   config,
   inputs,
   pkgs,
+  nixpkgs-unstable,
   vars,
   ...
 }:
 let
-  sharedPackages = import ../shared/headless/packages.nix { inherit pkgs; };
+  sharedPackages = import ../shared/headless/packages.nix {
+    inherit pkgs nixpkgs-unstable;
+  };
 in
 {
   imports = [
@@ -45,6 +48,7 @@ in
       "1password"
       "alacritty"
       "beeper"
+      "blender"
       "cursor"
       "discord"
       "docker-desktop"

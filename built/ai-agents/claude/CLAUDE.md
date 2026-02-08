@@ -53,4 +53,3 @@ There is a gitignored `scratch/` folder in all repos - you can use it for tempor
 
 You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
 
-

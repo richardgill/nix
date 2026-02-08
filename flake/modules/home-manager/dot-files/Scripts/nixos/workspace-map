@@ -1,0 +1,94 @@
+workspace_key_from_input() {
+  local input="${1:-}"
+
+  if [[ "$input" == "10" || "$input" == "terminal" ]]; then
+    echo "terminal"
+  elif [[ "$input" == "11" || "$input" == "files" ]]; then
+    echo "files"
+  elif [[ "$input" == "12" || "$input" == "browser" ]]; then
+    echo "browser"
+  elif [[ "$input" == "13" || "$input" == "activity" ]]; then
+    echo "activity"
+  elif [[ "$input" == "14" || "$input" == "discord" ]]; then
+    echo "discord"
+  elif [[ "$input" == "15" || "$input" == "password" ]]; then
+    echo "password"
+  elif [[ "$input" == "16" || "$input" == "slack" ]]; then
+    echo "slack"
+  elif [[ "$input" == "17" || "$input" == "beeper" ]]; then
+    echo "beeper"
+  elif [[ "$input" == "18" || "$input" == "music" ]]; then
+    echo "music"
+  elif [[ "$input" == "19" || "$input" == "zoom" ]]; then
+    echo "zoom"
+  elif [[ "$input" == "20" || "$input" == "todoist" ]]; then
+    echo "todoist"
+  elif [[ "$input" == "21" || "$input" == "chrome" ]]; then
+    echo "chrome"
+  else
+    echo "$input"
+  fi
+}
+
+workspace_for_compositor() {
+  local compositor="$1"
+  local workspace_key="$2"
+
+  if [[ "$compositor" == "hyprland" ]]; then
+    if [[ "$workspace_key" == "terminal" ]]; then
+      echo "10"
+    elif [[ "$workspace_key" == "files" ]]; then
+      echo "11"
+    elif [[ "$workspace_key" == "browser" ]]; then
+      echo "12"
+    elif [[ "$workspace_key" == "activity" ]]; then
+      echo "13"
+    elif [[ "$workspace_key" == "discord" ]]; then
+      echo "14"
+    elif [[ "$workspace_key" == "password" ]]; then
+      echo "15"
+    elif [[ "$workspace_key" == "slack" ]]; then
+      echo "16"
+    elif [[ "$workspace_key" == "beeper" ]]; then
+      echo "17"
+    elif [[ "$workspace_key" == "music" ]]; then
+      echo "18"
+    elif [[ "$workspace_key" == "zoom" ]]; then
+      echo "19"
+    elif [[ "$workspace_key" == "todoist" ]]; then
+      echo "20"
+    elif [[ "$workspace_key" == "chrome" ]]; then
+      echo "21"
+    else
+      echo "$workspace_key"
+    fi
+  else
+    if [[ "$workspace_key" == "terminal" ]]; then
+      echo "terminal"
+    elif [[ "$workspace_key" == "files" ]]; then
+      echo "files"
+    elif [[ "$workspace_key" == "browser" ]]; then
+      echo "browser"
+    elif [[ "$workspace_key" == "activity" ]]; then
+      echo "activity"
+    elif [[ "$workspace_key" == "discord" ]]; then
+      echo "discord"
+    elif [[ "$workspace_key" == "password" ]]; then
+      echo "password"
+    elif [[ "$workspace_key" == "slack" ]]; then
+      echo "slack"
+    elif [[ "$workspace_key" == "beeper" ]]; then
+      echo "beeper"
+    elif [[ "$workspace_key" == "music" ]]; then
+      echo "music"
+    elif [[ "$workspace_key" == "zoom" ]]; then
+      echo "zoom"
+    elif [[ "$workspace_key" == "todoist" ]]; then
+      echo "todoist"
+    elif [[ "$workspace_key" == "chrome" ]]; then
+      echo "chrome"
+    else
+      echo "$workspace_key"
+    fi
+  fi
+}

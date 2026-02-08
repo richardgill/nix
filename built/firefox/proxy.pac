@@ -1,6 +1,6 @@
 function FindProxyForURL(url, host) {
   var allowedUrlPatterns = [
-    /^https?:\/\/news\.ycombinator\.com\/item(\?|$).*/
+    /^https?:\/\/news\.ycombinator\.com\/item(\?|$).*/,
   ];
 
   for (var i = 0; i < allowedUrlPatterns.length; i++) {
@@ -29,9 +29,7 @@ function FindProxyForURL(url, host) {
     /^https?:\/\/news\.ycombinator\.com\/?$/,
     /^https?:\/\/news\.ycombinator\.com\/(news|newest|front|best|show|ask|jobs|newcomments|threads)(\?.*)?$/,
 
-    /^https?:\/\/(www\.)?linkedin\.com\/feed(\/|$).*/,
-    /^https?:\/\/(www\.)?linkedin\.com\/notifications(\/|$).*/,
-    /^https?:\/\/(www\.)?linkedin\.com\/mynetwork(\/|$).*/,
+    /^https?:\/\/(www\.)?linkedin\.com(\/|$).*/,
 
     /^https?:\/\/(www\.)?reddit\.com\/?$/,
     /^https?:\/\/(www\.)?reddit\.com\/\?.*/,

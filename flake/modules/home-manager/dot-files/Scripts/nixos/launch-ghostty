@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+script_name="${0##*/}"
+compositor="$($HOME/Scripts/nixos/compositor)"
+exec "$HOME/Scripts/nixos/$compositor/$script_name" "$@"

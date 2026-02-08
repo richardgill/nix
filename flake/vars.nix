@@ -8,6 +8,7 @@ in
   fullName = "Rich";
   userName = "rich";
   userEmail = "richard@rgill.co.uk";
+  waylandCompositor = "niri";
   inherit sshPublicKeyPersonal sshPublicKeyPhone sshPublicKeyWork sshPublicKeyUm790;
   sshAllPublicKeys = [
     sshPublicKeyPersonal

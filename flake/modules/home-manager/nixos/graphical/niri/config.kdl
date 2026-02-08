@@ -1,0 +1,277 @@
+input {
+    keyboard {
+        repeat-delay 300
+        repeat-rate 25
+        numlock
+    }
+    touchpad {
+        natural-scroll
+    }
+
+    mouse {
+        accel-speed 0.3
+    }
+
+    mod-key "Super"
+}
+
+output "DP-4" {
+    scale 1.6667
+}
+
+layout {
+    gaps 6
+    center-focused-column "never"
+
+    default-column-width { proportion 0.5; }
+
+    focus-ring {
+        width 2
+        active-color "#7aa2f7"
+        inactive-color "#3b4261"
+    }
+
+    border {
+        off
+    }
+
+    shadow {
+        on
+        softness 10
+        spread 2
+        offset x=0 y=2
+        color "#00000080"
+    }
+}
+
+animations {
+    slowdown 0.75
+
+    workspace-switch {
+        off
+    }
+}
+
+gestures {
+    hot-corners {
+        off
+    }
+}
+
+prefer-no-csd
+
+// Fix xdg-open not focusing apps on other workspaces (e.g. Firefox/Nautilus).
+// Docs: https://yalter.github.io/niri/Configuration%3A-Debug-Options.html#honor-xdg-activation-with-invalid-serial
+debug {
+    honor-xdg-activation-with-invalid-serial
+}
+
+screenshot-path "~/Screenshots/screenshot-%Y-%m-%d_%H-%M-%S.png"
+
+workspace "terminal"
+workspace "files"
+workspace "browser"
+workspace "activity"
+workspace "discord"
+workspace "password"
+workspace "slack"
+workspace "beeper"
+workspace "music"
+workspace "zoom"
+workspace "todoist"
+workspace "chrome"
+
+spawn-at-startup "waybar"
+spawn-at-startup "mako"
+spawn-at-startup "wl-clip-persist" "--clipboard" "both"
+spawn-sh-at-startup "wl-paste --watch cliphist store"
+spawn-at-startup "voxtype" "daemon"
+spawn-sh-at-startup "systemctl --user restart xremap"
+spawn-sh-at-startup "swayidle -w timeout 300 $HOME/Scripts/nixos/lock-screen timeout 360 'niri msg action power-off-monitors' before-sleep $HOME/Scripts/nixos/lock-screen"
+spawn-sh-at-startup "$HOME/Scripts/nixos/niri/launch-wallpaper > ~/.cache/swaybg.log 2>&1"
+spawn-sh-at-startup "sleep 1 && firefox"
+spawn-sh-at-startup "sleep 2 && ~/Scripts/nixos/launch-ghostty"
+spawn-sh-at-startup "sleep 3 && 1password"
+spawn-sh-at-startup "sleep 4 && todoist-electron"
+
+window-rule {
+    match app-id=r#"^swayosd$"#
+    draw-border-with-background false
+}
+
+window-rule {
+    match app-id=r#"^com\.gabm\.satty$"#
+    open-floating true
+}
+
+// Track niri smart-maximize support (open-maximized-if-alone): https://github.com/niri-wm/niri/pull/2240
+window-rule {
+    match app-id=r#"^com\.mitchellh\.ghostty$"#
+    open-on-workspace "terminal"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.Nautilus$|^Nautilus$"# title="Screenshots"
+    open-floating true
+}
+
+window-rule {
+    match app-id=r#"^org\.gnome\.Nautilus$|^Nautilus$"#
+    exclude title="Screenshots"
+    open-on-workspace "files"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"firefox$"#
+    open-on-workspace "browser"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match title="btop"
+    open-on-workspace "activity"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^discord$"#
+    open-on-workspace "discord"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^1password$|^1Password$"#
+    open-on-workspace "password"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^Slack$|^slack$"#
+    open-on-workspace "slack"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^Beeper$|^beeper$"#
+    open-on-workspace "beeper"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^spotify$"#
+    open-on-workspace "music"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match title="cmus"
+    open-on-workspace "music"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"chrome-app\.zoom"#
+    open-on-workspace "zoom"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"^Todoist$|^todoist-electron$"#
+    open-on-workspace "todoist"
+    open-maximized-to-edges true
+}
+
+window-rule {
+    match app-id=r#"google-chrome|chromium|Chromium"#
+    open-on-workspace "chrome"
+    open-maximized-to-edges true
+}
+
+recent-windows {
+    binds {
+    }
+}
+
+binds {
+    Super+Space repeat=false { spawn "rofi" "-show" "drun"; }
+    Super+Alt+V repeat=false { spawn-sh "cliphist list | rofi -dmenu -display-columns 2 -sort -window-title \"\" | cliphist decode | wl-copy"; }
+    // Voxtype key handling is in xremap because niri has no bindr/on-release binding.
+
+    Ctrl+Super+Q repeat=false { spawn "~/Scripts/nixos/lock-screen"; }
+
+    Super+Q repeat=false { close-window; }
+    Super+O repeat=false { toggle-overview; }
+    Super+Shift+F { fullscreen-window; }
+    Super+Shift+M { maximize-window-to-edges; }
+
+    Ctrl+Alt+Super+Left { focus-column-left; }
+    Ctrl+Alt+Super+Right { focus-column-right; }
+    Ctrl+Alt+Super+Up { focus-window-up; }
+    Ctrl+Alt+Super+Down { focus-window-down; }
+    Ctrl+Alt+Shift+Super+Left { move-column-left; }
+    Ctrl+Alt+Shift+Super+Right { move-column-right; }
+    Ctrl+Alt+Shift+Super+Up { move-window-up; }
+    Ctrl+Alt+Shift+Super+Down { move-window-down; }
+
+
+    Super+1 { focus-workspace "terminal"; }
+    Super+2 { focus-workspace "files"; }
+    Super+3 { focus-workspace "browser"; }
+    Super+4 { focus-workspace "discord"; }
+    Super+5 { focus-workspace "music"; }
+    Super+6 { focus-workspace "todoist"; }
+    Super+7 { focus-workspace "slack"; }
+    Super+8 { focus-workspace "beeper"; }
+    Super+9 { focus-workspace "zoom"; }
+
+    Super+Ctrl+1 { move-column-to-workspace "terminal"; }
+    Super+Ctrl+2 { move-column-to-workspace "files"; }
+    Super+Ctrl+3 { move-column-to-workspace "browser"; }
+    Super+Ctrl+4 { move-column-to-workspace "discord"; }
+    Super+Ctrl+5 { move-column-to-workspace "music"; }
+    Super+Ctrl+6 { move-column-to-workspace "todoist"; }
+    Super+Ctrl+7 { move-column-to-workspace "slack"; }
+    Super+Ctrl+8 { move-column-to-workspace "beeper"; }
+    Super+Ctrl+9 { move-column-to-workspace "zoom"; }
+
+    Ctrl+Alt+Shift+Super+A repeat=false { spawn "~/Scripts/nixos/launch-app" "activity"; }
+    Ctrl+Alt+Shift+Super+B repeat=false { spawn "~/Scripts/nixos/launch-app" "files"; }
+    Ctrl+Alt+Shift+Super+C repeat=false { spawn-sh "niri msg action focus-workspace browser; firefox https://chatgpt.com"; }
+    Ctrl+Alt+Shift+Super+D repeat=false { spawn "~/Scripts/nixos/launch-app" "discord"; }
+    Ctrl+Alt+Shift+Super+F repeat=false { spawn "~/Scripts/nixos/launch-app" "browser"; }
+    Ctrl+Alt+Shift+Super+G repeat=false { spawn "~/Scripts/nixos/launch-app" "terminal"; }
+    Ctrl+Alt+Shift+Super+H repeat=false { spawn "~/Scripts/nixos/launch-app" "password"; }
+    Ctrl+Alt+Shift+Super+I repeat=false { spawn "~/Scripts/nixos/launch-app" "chrome"; }
+    Ctrl+Alt+Shift+Super+M repeat=false { spawn "~/Scripts/nixos/launch-app" "music"; }
+    Ctrl+Alt+Shift+Super+S repeat=false { spawn "~/Scripts/nixos/launch-app" "slack"; }
+    Ctrl+Alt+Shift+Super+T repeat=false { spawn "~/Scripts/nixos/launch-app" "todoist"; }
+    Ctrl+Alt+Shift+Super+W repeat=false { spawn "~/Scripts/nixos/launch-app" "beeper"; }
+    Ctrl+Alt+Shift+Super+Z repeat=false { spawn "~/Scripts/nixos/launch-app" "zoom"; }
+
+    Super+Shift+0 repeat=false { spawn-sh "nautilus ~/Screenshots --new-window"; }
+    Super+Shift+3 repeat=false { spawn-sh "niri msg action screenshot-screen --write-to-disk false --show-pointer false && wl-paste --type image/png | satty --filename -"; }
+    Super+Shift+4 repeat=false { spawn-sh "niri msg action screenshot && wl-paste --type image | satty --filename -"; }
+    Super+Shift+5 repeat=false { spawn "~/Scripts/nixos/screen-record" "output"; }
+    Super+Shift+6 repeat=false { spawn "~/Scripts/nixos/screen-record"; }
+
+    XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "raise"; }
+    XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "lower"; }
+    XF86AudioMute allow-when-locked=true { spawn "swayosd-client" "--output-volume" "mute-toggle"; }
+    XF86AudioMicMute allow-when-locked=true { spawn "swayosd-client" "--input-volume" "mute-toggle"; }
+
+    Alt+XF86AudioRaiseVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "+1"; }
+    Alt+XF86AudioLowerVolume allow-when-locked=true { spawn "swayosd-client" "--output-volume" "-1"; }
+
+    XF86MonBrightnessUp allow-when-locked=true { spawn "swayosd-client" "--brightness" "raise"; }
+    XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "lower"; }
+    Alt+XF86MonBrightnessUp allow-when-locked=true { spawn "swayosd-client" "--brightness" "+1"; }
+    Alt+XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "-1"; }
+
+    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioPause allow-when-locked=true { spawn "playerctl" "play-pause"; }
+    XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
+    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
+    XF86AudioStop allow-when-locked=true { spawn "playerctl" "stop"; }
+}

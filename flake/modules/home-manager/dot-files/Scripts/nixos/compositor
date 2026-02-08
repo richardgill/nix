@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+compositor_override="${COMPOSITOR:-}"
+if [[ -n "$compositor_override" ]]; then
+  echo "$compositor_override"
+  exit 0
+fi
+
+if [[ -n "${NIRI_SOCKET:-}" ]]; then
+  echo "niri"
+  exit 0
+fi
+
+if [[ -n "${HYPRLAND_INSTANCE_SIGNATURE:-}" ]]; then
+  echo "hyprland"
+  exit 0
+fi
+
+desktop="${XDG_CURRENT_DESKTOP:-}"
+desktop_lower="$(echo "$desktop" | tr '[:upper:]' '[:lower:]')"
+if [[ "$desktop_lower" == *niri* ]]; then
+  echo "niri"
+  exit 0
+fi
+
+if [[ "$desktop_lower" == *hyprland* ]]; then
+  echo "hyprland"
+  exit 0
+fi
+
+echo "Unable to detect compositor" >&2
+exit 1
