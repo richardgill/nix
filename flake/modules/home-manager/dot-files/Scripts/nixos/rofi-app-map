@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${1:-}"
+
+if [[ -z "$cmd" ]]; then
+  exit 0
+fi
+
+app_lower=$(echo "$cmd" | tr '[:upper:]' '[:lower:]')
+
+if [[ "$app_lower" == *ghostty* ]]; then
+  echo "terminal"
+elif [[ "$app_lower" == *nautilus* ]]; then
+  echo "files"
+elif [[ "$app_lower" == *firefox* ]]; then
+  echo "browser"
+elif [[ "$app_lower" == *google-chrome* || "$app_lower" == *chromium* || "$app_lower" == *chrome* ]]; then
+  echo "chrome"
+elif [[ "$app_lower" == *btop* ]]; then
+  echo "activity"
+elif [[ "$app_lower" == *discord* ]]; then
+  echo "discord"
+elif [[ "$app_lower" == *1password* ]]; then
+  echo "password"
+elif [[ "$app_lower" == *slack* ]]; then
+  echo "slack"
+elif [[ "$app_lower" == *beeper* ]]; then
+  echo "beeper"
+elif [[ "$app_lower" == *cmus* || "$app_lower" == *spotify* ]]; then
+  echo "music"
+elif [[ "$app_lower" == *zoom* ]]; then
+  echo "zoom"
+elif [[ "$app_lower" == *todoist* ]]; then
+  echo "todoist"
+else
+  echo ""
+fi

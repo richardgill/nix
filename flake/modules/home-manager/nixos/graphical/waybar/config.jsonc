@@ -57,7 +57,7 @@
     }
   },
   "custom/voxtype": {
-    "exec": "$HOME/Scripts/voxtype-waybar",
+    "exec": "$HOME/Scripts/nixos/voxtype-waybar",
     "return-type": "json",
     "format": "{}",
     "tooltip": true
@@ -65,7 +65,7 @@
   "custom/screenrecord": {
     "exec": "pgrep -x wl-screenrec >/dev/null && echo '{\"text\":\"󰻂\",\"class\":\"recording\"}' || echo ''",
     "return-type": "json",
-    "on-click": "$HOME/Scripts/screen-record",
+    "on-click": "$HOME/Scripts/nixos/screen-record",
     "interval": 1
   },
   "custom/power": {

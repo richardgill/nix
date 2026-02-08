@@ -7,7 +7,6 @@
     ./firefox.nix
     ./fonts.nix
     ./gnome-desktop-manager.nix
-    ./hyprland.nix
     ./keyboard.nix
     ./nautilus.nix
     ./obs.nix

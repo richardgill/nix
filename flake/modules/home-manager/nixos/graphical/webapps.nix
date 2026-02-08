@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  vars,
   ...
 }:
 # Web app configuration using chromium in app mode
@@ -11,13 +12,9 @@
 # To fix: Enable "Continue where I left off" in chrome://settings/onStartup
 # This will persist session cookies across browser restarts (affects all sites).
 let
-  launchWebappScript = pkgs.writeShellScriptBin "omarchy-launch-webapp" (
-    builtins.readFile ./webapps/omarchy-launch-webapp.sh
-  );
+  launchWebappScript = pkgs.writeShellScriptBin "omarchy-launch-webapp" (builtins.readFile ./webapps/omarchy-launch-webapp.sh);
 
-  zoomHandlerScript = pkgs.writeShellScriptBin "omarchy-webapp-handler-zoom" (
-    builtins.readFile ./webapps/omarchy-webapp-handler-zoom.sh
-  );
+  zoomHandlerScript = pkgs.writeShellScriptBin "omarchy-webapp-handler-zoom" (builtins.readFile ./webapps/omarchy-webapp-handler-zoom.sh);
 in
 {
   home.packages = [

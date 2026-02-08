@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+compositor="$($HOME/Scripts/nixos/compositor)"
+exec "$HOME/Scripts/nixos/$compositor/launch-terminal-app" "$@"

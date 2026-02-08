@@ -70,7 +70,7 @@
 
     # https://github.com/peteonrails/voxtype/pull/25
     voxtype = {
-      url = "github:peteonrails/voxtype/fix/nixos-packaging-feedback";
+      url = "github:peteonrails/voxtype/v0.5.5";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

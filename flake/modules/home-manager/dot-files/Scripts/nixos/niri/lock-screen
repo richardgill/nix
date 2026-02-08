@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec swaylock -f \
+  --color 1a1b26 \
+  --inside-color 1a1b26cc \
+  --ring-color 7aa2f7 \
+  --line-color 00000000 \
+  --text-color c0caf5 \
+  --inside-clear-color 1a1b26cc \
+  --ring-clear-color e0af68 \
+  --line-clear-color 00000000 \
+  --text-clear-color e0af68 \
+  --inside-ver-color 1a1b26cc \
+  --ring-ver-color 7dcfff \
+  --line-ver-color 00000000 \
+  --text-ver-color 7dcfff \
+  --inside-wrong-color 1a1b26cc \
+  --ring-wrong-color f7768e \
+  --line-wrong-color 00000000 \
+  --text-wrong-color f7768e \
+  --key-hl-color 73daca \
+  --bs-hl-color f7768e \
+  --separator-color 00000000 \
+  --indicator-radius 110 \
+  --indicator-thickness 6 \
+  --indicator-caps-lock \
+  --indicator-idle-visible \
+  "$@"

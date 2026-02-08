@@ -6,6 +6,7 @@
   pkgs,
   nixpkgs-unstable,
   inputs,
+  vars,
   ...
 }:
 let
@@ -14,6 +15,7 @@ let
     config.allowUnfree = true;
   };
   isAarch64Linux = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
+  isNiri = (vars.waylandCompositor or "hyprland") == "niri";
 in
 {
   home.sessionVariables = {
@@ -37,6 +39,7 @@ in
       evince
       file-roller
       glib
+      hyprpolkitagent
       hyprpaper
       hyprshot
       firefox
@@ -46,7 +49,10 @@ in
       p7zip
       satty
       slurp
+      swayidle
+      swaylock
       swayosd
+      brightnessctl
       vscode
       walker
       wayland
@@ -73,5 +79,10 @@ in
       todoist-electron
       unstable._1password-gui
       unstable.code-cursor
+    ]
+    ++ lib.optionals isNiri [
+      swaybg
+      xsettingsd
+      xwayland-satellite
     ];
 }

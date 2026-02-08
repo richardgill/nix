@@ -71,6 +71,10 @@ in
       target = "Scripts/lib";
       source = ../../dot-files/Scripts/lib;
     }
+    // lib.optionalAttrs pkgs.stdenv.isLinux (sourceDirectory {
+      target = "Scripts/nixos";
+      source = ../../dot-files/Scripts/nixos;
+    })
     // {
       # From built templates (in Nix store)
       # Note: .zshenv is managed by programs.zsh.envExtra in zsh.nix

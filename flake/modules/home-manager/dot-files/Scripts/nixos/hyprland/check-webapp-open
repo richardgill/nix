@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_NAME="$1"
+APP_NAME="${1:-}"
 
 if [[ -z "$APP_NAME" ]]; then
   echo "Usage: check-webapp-open <app-name>"

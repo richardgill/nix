@@ -6,5 +6,6 @@
     ../../shared/headless
     ./home.nix
     ./overlay-sync-all.nix
+    ./packages.nix
   ];
 }

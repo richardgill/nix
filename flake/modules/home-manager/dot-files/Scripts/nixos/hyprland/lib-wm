@@ -1,0 +1,19 @@
+wm_focus_workspace() {
+  hyprctl dispatch workspace "$1"
+}
+
+wm_window_exists_by_class_regex() {
+  local class_regex="$1"
+  hyprctl clients -j | jq -e --arg class "$class_regex" '.[] | select((.class // "") | test($class))' >/dev/null
+}
+
+wm_window_exists_by_class_or_title_regex() {
+  local class_regex="$1"
+  local title_regex="$2"
+
+  hyprctl clients -j | jq -e --arg class "$class_regex" --arg title "$title_regex" '.[] | select(((.class // "") | test($class)) or ((.title // "") | test($title)))' >/dev/null
+}
+
+wm_active_window_address() {
+  hyprctl activewindow -j | jq -r '.address'
+}

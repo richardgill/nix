@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  exec sudo ncdu /
+fi
+
+sudo mkdir -p /mnt/btrfs-top
+sudo mount -t btrfs -o ro,subvol=/ /dev/mapper/cryptroot /mnt/btrfs-top
+sudo nix shell nixpkgs#btdu -c btdu /mnt/btrfs-top
+sudo umount /mnt/btrfs-top

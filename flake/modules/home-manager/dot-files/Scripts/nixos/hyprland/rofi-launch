@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$HOME/Scripts/nixos/workspace-map"
+source "$HOME/Scripts/nixos/hyprland/lib-wm"
+
+cmd="${1:-}"
+if [[ -z "$cmd" ]]; then
+  echo "Usage: rofi-launch <command>" >&2
+  exit 1
+fi
+
+app_key="$($HOME/Scripts/nixos/rofi-app-map "$cmd")"
+workspace="$(workspace_for_compositor hyprland "$app_key")"
+
+if pgrep -f "$cmd" >/dev/null; then
+  is_running=true
+else
+  is_running=false
+fi
+
+if [[ -n "$workspace" && "$is_running" == "false" ]]; then
+  wm_focus_workspace "$workspace"
+  hyprctl dispatch exec "uwsm app -- $cmd"
+else
+  wm_focus_workspace 1
+  hyprctl dispatch exec "uwsm app -- $cmd"
+fi

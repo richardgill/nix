@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$HOME/Scripts/nixos/workspace-map"
+source "$HOME/Scripts/nixos/hyprland/lib-wm"
+
+workspace_key="$(workspace_key_from_input "${1:-}")"
+workspace="$(workspace_for_compositor hyprland "$workspace_key")"
+
+[[ -z "$workspace" ]] && exit 0
+
+wm_focus_workspace "$workspace"
+
+if [[ "$workspace_key" == "terminal" ]]; then
+  if ! wm_window_exists_by_class_regex '^com\.mitchellh\.ghostty$|^ghostty$'; then
+    uwsm app -- "$HOME/Scripts/nixos/launch-ghostty"
+  fi
+elif [[ "$workspace_key" == "files" ]]; then
+  if ! pgrep nautilus >/dev/null; then
+    uwsm app -- nautilus --new-window &
+  fi
+elif [[ "$workspace_key" == "browser" ]]; then
+  if ! pgrep firefox >/dev/null; then
+    uwsm app -- firefox &
+  fi
+elif [[ "$workspace_key" == "activity" ]]; then
+  if ! pgrep -f 'ghostty.*btop' >/dev/null; then
+    "$HOME/Scripts/nixos/launch-terminal-app" btop &
+  fi
+elif [[ "$workspace_key" == "discord" ]]; then
+  if ! pgrep -x discord >/dev/null; then
+    uwsm app -- discord &
+  fi
+elif [[ "$workspace_key" == "password" ]]; then
+  if ! pgrep -x 1password >/dev/null; then
+    uwsm app -- 1password &
+  fi
+elif [[ "$workspace_key" == "slack" ]]; then
+  if ! wm_window_exists_by_class_regex '^Slack$|^slack$'; then
+    uwsm app -- slack &
+    sleep 3
+  fi
+
+  address="$(wm_active_window_address)"
+  "$HOME/Scripts/nixos/hyprland/delay-app" 15 "$address" $((60 * 3)) &
+elif [[ "$workspace_key" == "beeper" ]]; then
+  if ! pgrep -x beeper >/dev/null; then
+    uwsm app -- beeper &
+  fi
+elif [[ "$workspace_key" == "music" ]]; then
+  if ! wm_window_exists_by_class_or_title_regex '^spotify$' '^cmus$'; then
+    "$HOME/Scripts/nixos/launch-terminal-app" cmus &
+  fi
+elif [[ "$workspace_key" == "zoom" ]]; then
+  if ! "$HOME/Scripts/nixos/check-webapp-open" zoom; then
+    omarchy-launch-webapp "https://app.zoom.us/wc/home" &
+  fi
+elif [[ "$workspace_key" == "todoist" ]]; then
+  if ! wm_window_exists_by_class_regex '^Todoist$|^todoist-electron$'; then
+    uwsm app -- todoist-electron &
+  fi
+elif [[ "$workspace_key" == "chrome" ]]; then
+  if ! wm_window_exists_by_class_regex 'google-chrome|chromium|Chromium'; then
+    uwsm app -- google-chrome-stable &
+  fi
+fi

@@ -1,0 +1,10 @@
+is_ai_agent() {
+  local agent="${AI_AGENT:-}"
+  if [[ -n "$agent" ]]; then
+    case "${agent,,}" in
+      claude|codex|pi) return 0;;
+    esac
+  fi
+
+  [[ -n "${IS_CLAUDE:-}" || -n "${CLAUDE_CODE:-}" || -n "${CODEX_MANAGED_BY_BUN:-}" || -n "${CODEX_MANAGED_BY_NPM:-}" || -n "${PI_CODING_AGENT_DIR:-}" ]]
+}

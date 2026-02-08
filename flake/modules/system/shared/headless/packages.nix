@@ -1,4 +1,10 @@
-{ pkgs, ... }:
+{ pkgs, nixpkgs-unstable, ... }:
+let
+  unstable = import nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+  };
+in
 {
   packages = with pkgs; [
     _1password-cli
@@ -21,7 +27,7 @@
     just
     less
     home-manager
-    mise
+    unstable.mise
     nix-fast-build
     nixfmt-rfc-style
     nixd
