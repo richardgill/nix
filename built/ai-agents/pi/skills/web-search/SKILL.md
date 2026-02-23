@@ -5,7 +5,7 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fork
-    model: openai-codex/gpt-5.1-codex-max
+    model: openai-codex/gpt-5.3-codex-spark
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
 ---

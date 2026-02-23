@@ -42,6 +42,7 @@ in
       hyprpolkitagent
       hyprpaper
       hyprshot
+      grim
       firefox
       imv
       mpv

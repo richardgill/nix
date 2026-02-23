@@ -1,8 +1,8 @@
 {
   "medium": {
     "provider": "openai-codex",
-    "model": "gpt-5.1-codex-max",
-    "thinkingLevel": "medium"
+    "model": "gpt-5.3-codex-spark",
+    "thinkingLevel": "high"
   },
   "high": {
     "provider": "openai-codex",

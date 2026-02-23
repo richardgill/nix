@@ -9,7 +9,7 @@ description: |
 metadata:
   pi:
     subProcess: false
-    model: openai-codex/gpt-5.1-codex-max
+    model: openai-codex/gpt-5.3-codex-spark
     thinkingLevel: medium
 ---
 

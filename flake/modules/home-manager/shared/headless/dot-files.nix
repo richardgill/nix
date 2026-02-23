@@ -153,6 +153,7 @@ in
       ".config/yazi".source = ../../dot-files/yazi;
 
       ".config/voxtype/config.toml".source = ../../dot-files/voxtype/config.toml;
+      ".config/pipewire/pipewire.conf.d".source = ../../dot-files/pipewire/pipewire.conf.d;
       ".config/wireplumber/wireplumber.conf.d".source = ../../dot-files/wireplumber/wireplumber.conf.d;
     };
 }

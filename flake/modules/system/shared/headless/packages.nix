@@ -8,6 +8,7 @@ in
 {
   packages = with pkgs; [
     _1password-cli
+    android-tools
     autossh
     eternal-terminal
     cargo
@@ -35,5 +36,6 @@ in
     sops
     tmux
     unzip
+    zip
   ];
 }
