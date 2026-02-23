@@ -71,14 +71,14 @@ export const agents = {
     presets: {
       low: {
         provider: "openai-codex",
-        model: "gpt-5.1-codex-max",
-        providerModel: "openai-codex/gpt-5.1-codex-max",
+        model: "gpt-5.3-codex-spark",
+        providerModel: "openai-codex/gpt-5.3-codex-spark",
         thinkingLevel: "low",
       },
       medium: {
         provider: "openai-codex",
-        model: "gpt-5.1-codex-max",
-        providerModel: "openai-codex/gpt-5.1-codex-max",
+        model: "gpt-5.3-codex-spark",
+        providerModel: "openai-codex/gpt-5.3-codex-spark",
         thinkingLevel: "medium",
       },
       high: {

@@ -8,9 +8,7 @@ input {
         natural-scroll
     }
 
-    mouse {
-        accel-speed 0.3
-    }
+    // per device mouse settings: https://github.com/niri-wm/niri/issues/371
 
     mod-key "Super"
 }
@@ -58,6 +56,10 @@ gestures {
     }
 }
 
+hotkey-overlay {
+    skip-at-startup
+}
+
 prefer-no-csd
 
 // Fix xdg-open not focusing apps on other workspaces (e.g. Firefox/Nautilus).
@@ -66,7 +68,7 @@ debug {
     honor-xdg-activation-with-invalid-serial
 }
 
-screenshot-path "~/Screenshots/screenshot-%Y-%m-%d_%H-%M-%S.png"
+screenshot-path null
 
 workspace "terminal"
 workspace "files"
@@ -251,8 +253,8 @@ binds {
     Ctrl+Alt+Shift+Super+Z repeat=false { spawn "~/Scripts/nixos/launch-app" "zoom"; }
 
     Super+Shift+0 repeat=false { spawn-sh "nautilus ~/Screenshots --new-window"; }
-    Super+Shift+3 repeat=false { spawn-sh "niri msg action screenshot-screen --write-to-disk false --show-pointer false && wl-paste --type image/png | satty --filename -"; }
-    Super+Shift+4 repeat=false { spawn-sh "niri msg action screenshot && wl-paste --type image | satty --filename -"; }
+    Super+Shift+3 repeat=false { spawn-sh "grim -g \"$(slurp -o)\" - | satty --filename -"; }
+    Super+Shift+4 repeat=false { spawn-sh "grim -g \"$(slurp)\" - | satty --filename -"; }
     Super+Shift+5 repeat=false { spawn "~/Scripts/nixos/screen-record" "output"; }
     Super+Shift+6 repeat=false { spawn "~/Scripts/nixos/screen-record"; }
 

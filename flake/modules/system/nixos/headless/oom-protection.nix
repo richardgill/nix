@@ -6,15 +6,13 @@
   # More aggressively kill processes when getting close to no memory
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 5; # Start killing when less than 10% RAM left
-    freeSwapThreshold = 100; # Ignore swap - kill based on RAM (which includes zram?!) alone
+    freeMemThreshold = 3; # Start killing only when RAM is critically low
+    freeSwapThreshold = 5; # Require swap pressure too, instead of killing based on RAM alone
     enableNotifications = true;
     reportInterval = 60;
     extraArgs = [
       "--avoid"
-      "'^(Hyprland|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|firefox|kitty)$'"
-      "--prefer"
-      "'^(Web Content|Isolated Web Co|electron|chromium|slack|discord|teams|node|nvim)$'"
+      "'^(Hyprland|niri|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|xwayland-satellite|firefox|kitty)$'"
     ];
   };
 

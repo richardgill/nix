@@ -8,24 +8,24 @@ description: |
 
 # Beeper Desktop API
 
-Use the `~/Scripts/beeper` CLI to access messages across chat networks (WhatsApp, Signal, Telegram, Instagram, etc.).
+Use the `~/Scripts/beeper-cli` CLI to access messages across chat networks (WhatsApp, Signal, Telegram, Instagram, etc.).
 
 ## Commands
 
 ```bash
 # List/search chats
-beeper chats
-beeper chats -q "John"
-beeper chats --unread
+beeper-cli chats
+beeper-cli chats -q "John"
+beeper-cli chats --unread
 
 # Search messages across all chats
-beeper search "meeting tomorrow"
+beeper-cli search "meeting tomorrow"
 
 # Get messages from a specific chat (use chat ID from chats command)
-beeper messages "!chatID:beeper.local"
+beeper-cli messages "!chatID:beeper.local"
 
 # Get a single chat's details
-beeper chat "!chatID:beeper.local"
+beeper-cli chat "!chatID:beeper.local"
 ```
 
 ## Tips

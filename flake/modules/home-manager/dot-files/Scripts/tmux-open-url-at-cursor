@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+line="${1-}"
+cursor="${2-0}"
+
+[[ -z "$line" ]] && exit 0
+
+if ! [[ "$cursor" =~ ^[0-9]+$ ]]; then
+  cursor=0
+fi
+
+remaining="$line"
+offset=0
+first_url=""
+selected_url=""
+
+while [[ "$remaining" =~ https?://[^[:space:]]+ ]]; do
+  raw_url="${BASH_REMATCH[0]}"
+  prefix="${remaining%%"$raw_url"*}"
+  start=$((offset + ${#prefix}))
+  consumed=$(( ${#prefix} + ${#raw_url} ))
+  offset=$((offset + consumed))
+  remaining="${remaining:$consumed}"
+
+  url="$raw_url"
+  while [[ -n "$url" ]]; do
+    last_char="${url: -1}"
+    case "$last_char" in
+      "."|","|";"|":"|"!"|"?"|")"|"]"|"}"|"'"|'"') url="${url%?}" ;;
+      *) break ;;
+    esac
+  done
+
+  [[ -z "$url" ]] && continue
+  [[ -z "$first_url" ]] && first_url="$url"
+
+  end=$((start + ${#url}))
+  cursor_prev=$((cursor > 0 ? cursor - 1 : 0))
+
+  if (( (cursor >= start && cursor < end) || (cursor_prev >= start && cursor_prev < end) )); then
+    selected_url="$url"
+    break
+  fi
+done
+
+url="${selected_url:-$first_url}"
+[[ -z "$url" ]] && exit 0
+
+open "$url"
