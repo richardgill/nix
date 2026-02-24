@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ lib, pkgs, ... }:
 {
   xdg.configFile."niri/config.kdl".source = ./config.kdl;
 
@@ -9,6 +9,17 @@
       "Xft/DPI" = 98304;
       "Gdk/WindowScalingFactor" = 1;
       "Gdk/UnscaledDPI" = 98304;
+    };
+  };
+
+  systemd.user.services.xsettingsd = {
+    Unit = {
+      After = [ "niri.service" ];
+    };
+    Service = {
+      # Home Manager's xsettingsd module sets Restart=on-abort by default; force on-failure so startup races with Xwayland are retried and to avoid a conflicting option definition.
+      Restart = lib.mkForce "on-failure";
+      RestartSec = "2s";
     };
   };
 

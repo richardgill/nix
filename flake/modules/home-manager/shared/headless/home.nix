@@ -18,6 +18,7 @@ in
 
     sessionVariables = {
       SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
+      JAVA_HOME = pkgs.jdk17.home;
       ANDROID_HOME = androidHome;
       ANDROID_SDK_ROOT = androidHome;
     };

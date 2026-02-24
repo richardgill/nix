@@ -6,5 +6,5 @@
 
   programs.adb.enable = true;
 
-  users.users.${vars.userName}.extraGroups = [ "adbusers" ];
+  users.users.${vars.userName}.extraGroups = [ "adbusers" "kvm" ];
 }

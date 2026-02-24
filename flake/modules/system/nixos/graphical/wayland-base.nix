@@ -8,7 +8,8 @@
     # SSH_AUTH_SOCK = "/run/user/1000/ssh-agent";
     DISABLE_QT5_COMPAT = 0;
     GDK_BACKEND = "wayland";
-    QT_QPA_PLATFORM = "wayland";
+    # xcb fallback was needed for android stuff
+    QT_QPA_PLATFORM = "wayland;xcb";
     MOZ_ENABLE_WAYLAND = 1;
     WLR_RENDERER = "vulkan";
     XDG_SESSION_TYPE = "wayland";

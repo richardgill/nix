@@ -25,6 +25,7 @@ in
     gnused
     gnumake
     jq
+    jdk17
     just
     less
     home-manager
