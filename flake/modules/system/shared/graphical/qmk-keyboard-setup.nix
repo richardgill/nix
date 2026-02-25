@@ -8,20 +8,22 @@ let
     import sys
     import time
 
-    VENDOR_ID = 0x4359
-    PRODUCT_ID = 0x0000
-    USAGE_PAGE = 0xFF60
-    USAGE = 0x61
+    KEYBOARD_IDS = [
+        (0x4359, 0x0000),
+        (0xFEED, 0x0001),
+    ]
+
+    def find_raw_hid_path():
+        # RAW_HID is typically on interface 1 in QMK
+        for vendor_id, product_id in KEYBOARD_IDS:
+            devices = hid.enumerate(vendor_id, product_id)
+            for d in devices:
+                if d.get('interface_number') == 1:
+                    return d['path']
+        return None
 
     def send_unicode_mode_command(mode):
-        devices = hid.enumerate(VENDOR_ID, PRODUCT_ID)
-
-        # RAW_HID is typically on interface 1 in QMK
-        raw_hid_path = None
-        for d in devices:
-            if d.get('interface_number') == 1:
-                raw_hid_path = d['path']
-                break
+        raw_hid_path = find_raw_hid_path()
 
         if not raw_hid_path:
             print("RAW_HID interface (interface 1) not found", file=sys.stderr)

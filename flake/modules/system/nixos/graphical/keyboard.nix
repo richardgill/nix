@@ -209,7 +209,10 @@
 
   services.udev.extraRules = ''
     # QMK keyboard setup: Set Unicode mode to Linux when keyboard is connected
+    # cyboard imprint
     SUBSYSTEM=="usb", ATTR{idVendor}=="4359", ATTR{idProduct}=="0000", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="qmk-keyboard-setup.service", MODE="0666"
+    # cosmos lemon
+    SUBSYSTEM=="usb", ATTR{idVendor}=="feed", ATTR{idProduct}=="0001", ACTION=="add", TAG+="systemd", ENV{SYSTEMD_USER_WANTS}="qmk-keyboard-setup.service", MODE="0666"
 
     # Auto-restart xremap when keyboards are connected/disconnected
     # This prevents xremap crashes when keyboards are unplugged while xremap is running
