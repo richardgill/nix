@@ -1,9 +1,14 @@
 return {
   'esmuellert/codediff.nvim',
-  dependencies = { 'MunifTanjim/nui.nvim' },
   cmd = 'CodeDiff',
   config = function()
     require('codediff').setup {
+      highlights = {
+        line_insert = 'DiffAdd',
+        line_delete = 'LeftPaneAdd',
+        char_insert = 'DiffText',
+        char_delete = 'LeftPaneText',
+      },
       diff = {
         disable_inlay_hints = true,
       },
@@ -18,11 +23,12 @@ return {
           prev_hunk = '[c',
           next_file = '<Tab>',
           prev_file = '<S-Tab>',
+          close_on_open_in_prev_tab = true,
+          toggle_stage = 's',
         },
         explorer = {
           select = '<CR>',
           refresh = 'R',
-          toggle_stage = 's',
         },
       },
     }

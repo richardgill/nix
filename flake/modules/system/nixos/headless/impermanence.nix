@@ -76,6 +76,7 @@
           "code"
           "Documents"
           "Downloads"
+          "Backups"
           "Screenshots"
           "Android/Sdk"
           (lib.removePrefix "/home/${vars.userName}/" config.customDirs.music)
@@ -112,6 +113,7 @@
           ".config/spotify"
           ".config/Todoist"
           ".config/sops"
+          ".config/secrets"
           ".config/op"
           ".java"
           ".gmcli"

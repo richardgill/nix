@@ -1,30 +1,33 @@
 # Codex CLI Configuration
 # https://developers.openai.com/codex/config-reference
 
-# Model selection - use the default (gpt-5.2-codex for signed-in users)
-# model = "gpt-5.2-codex"
+# Model selection - use the default (gpt-5.4-codex for signed-in users)
+# model = "gpt-5.4-codex"
 model_reasoning_effort = "medium"
 
 # Recognize CLAUDE.md as fallback for projects without AGENTS.md
 project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", ".claude/CLAUDE.md"]
 
 # Approval and sandbox policies
-# Options: untrusted, on-failure, on-request, never
-approval_policy = "on-failure"
+# Options: untrusted, on-request, never
+approval_policy = "never"
 
 # Options: read-only, workspace-write, danger-full-access
 sandbox_mode = "workspace-write"
+personality = "pragmatic"
+model = "gpt-5.3-codex-spark"
+service_tier = "fast"
 
 [sandbox_workspace_write]
 network_access = true
 
 # Feature flags
 exclude_skills = []
+web_search = "live"
 
 [features]
 shell_tool = true
 parallel = true
-web_search_request = true
 view_image_tool = true
 skills = true
 
@@ -32,3 +35,9 @@ skills = true
 [shell_environment_policy]
 inherit = "core"
 exclude = ["AWS_SECRET*", "AZURE_*", "GOOGLE_*"]
+
+[projects."/home/rich/code/notes"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"

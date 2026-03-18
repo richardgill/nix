@@ -32,4 +32,8 @@ beeper-cli chat "!chatID:beeper.local"
 
 Chat IDs start with "!" - the CLI handles URL encoding automatically. Pipe to jq to filter JSON output. Search returns matching chats in the "chats" field.
 
+## Auth Issues
+
+If any Beeper CLI command fails due to authentication/session issues, stop and tell the user that authentication is required. Ask them to re-authenticate, and do not attempt to work around or fix authentication automatically.
+
 $ARGUMENTS

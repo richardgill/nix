@@ -11,7 +11,7 @@
   },
   "xhigh": {
     "provider": "openai-codex",
-    "model": "gpt-5.2",
-    "thinkingLevel": "xhigh"
+    "model": "gpt-5.4",
+    "thinkingLevel": "high"
   }
 }

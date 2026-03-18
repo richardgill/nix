@@ -4,7 +4,7 @@
   "defaultModel": "gpt-5.3-codex",
   "defaultThinkingLevel": "high",
   "enabledModels": [
-    "openai-codex/gpt-5.2",
+    "openai-codex/gpt-5.4",
     "openai-codex/gpt-5.3-codex",
     "openai-codex/gpt-5.3-codex-spark",
     "github-copilot/claude-opus-4.6",
@@ -34,7 +34,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.54.1",
+  "lastChangelogVersion": "0.57.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true
 }

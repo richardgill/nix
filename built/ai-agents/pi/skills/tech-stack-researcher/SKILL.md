@@ -5,7 +5,7 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fork
-    model: openai-codex/gpt-5.2
+    model: openai-codex/gpt-5.4
     thinkingLevel: xhigh
 allowed-tools: WebSearch, WebFetch, Bash, Read, Grep, Glob, Task
 ---

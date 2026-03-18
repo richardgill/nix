@@ -37,7 +37,6 @@ const templateDataSchema = z
     tavilyApiKeyPath: z.string(),
     openaiApiKeyPath: z.string(),
     joistApiKeyPath: z.string(),
-    beeperApiTokenPath: z.string(),
     exaApiKeyPath: z.string(),
     defaultShell: z.string(),
     catppuccinPlugin: z.string(),

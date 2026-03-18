@@ -2,6 +2,16 @@ local closeTabsAndSplits = function()
   vim.cmd 'silent! tabonly | silent! only'
 end
 
+-- Make <leader>ff treat ./path and path as the same query.
+local normalizeRelativeSearch = function(_, filter)
+  local normalized = filter.search:gsub('^%./+', '')
+  if normalized == filter.search then
+    return
+  end
+  filter.search = normalized
+  return true
+end
+
 local closeTabsBeforeConfirm = function(picker, item, action)
   if vim.api.nvim_win_is_valid(picker.main) then
     vim.api.nvim_win_call(picker.main, closeTabsAndSplits)
@@ -57,6 +67,9 @@ return {
           cmd = 'rg',
           hidden = true,
           follow = true,
+          filter = {
+            transform = normalizeRelativeSearch,
+          },
         },
         grep = {
           cmd = 'rg',

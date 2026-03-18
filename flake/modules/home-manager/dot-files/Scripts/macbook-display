@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+mode="${1:-auto}"
+quiet="${2:-}"
+
+say() {
+  [ "$quiet" = "--quiet" ] || echo "$1"
+}
+
+has_external_display() {
+  system_profiler SPDisplaysDataType -json | jq -e '
+    [.SPDisplaysDataType[].spdisplays_ndrvs[]?
+      | select(.spdisplays_online == "spdisplays_yes")
+      | select((.spdisplays_builtin // "spdisplays_no") != "spdisplays_yes")
+    ] | length > 0
+  ' >/dev/null
+}
+
+lunar_cli_works() {
+  local cli_path="$1"
+
+  [ -x "$cli_path" ] || return 1
+  "$cli_path" --help >/dev/null 2>&1
+}
+
+resolve_lunar_cli() {
+  local app_path="/Applications/Lunar.app/Contents/MacOS/Lunar"
+  local path_cli=""
+
+  path_cli="$(command -v lunar 2>/dev/null || true)"
+  if [ -n "$path_cli" ] && lunar_cli_works "$path_cli"; then
+    echo "$path_cli"
+    return 0
+  fi
+
+  if lunar_cli_works "$HOME/.local/bin/lunar"; then
+    echo "$HOME/.local/bin/lunar"
+    return 0
+  fi
+
+  [ -x "$app_path" ] || {
+    echo "Lunar app not found at $app_path" >&2
+    return 1
+  }
+
+  "$app_path" install-cli >/dev/null
+
+  if lunar_cli_works "$HOME/.local/bin/lunar"; then
+    echo "$HOME/.local/bin/lunar"
+    return 0
+  fi
+
+  echo "Lunar CLI install failed" >&2
+  return 1
+}
+
+set_builtin_brightness() {
+  local target="$1"
+
+  "$lunar_cmd" displays builtin brightness "$target" >/dev/null
+}
+
+[ "$mode" = "auto" ] || [ "$mode" = "on" ] || [ "$mode" = "off" ] || {
+  echo "Usage: macbook-display auto|on|off [--quiet]" >&2
+  exit 1
+}
+
+lunar_cmd="$(resolve_lunar_cli)"
+
+if [ "$mode" = "auto" ]; then
+  mode="on"
+  if has_external_display; then
+    mode="off"
+  fi
+fi
+
+target="0"
+if [ "$mode" = "on" ]; then
+  target="${MACBOOK_DISPLAY_ON_BRIGHTNESS:-68}"
+fi
+
+if set_builtin_brightness "$target"; then
+  say "MacBook display $mode"
+  exit 0
+fi
+
+echo "Unable to set MacBook display $mode" >&2
+exit 1

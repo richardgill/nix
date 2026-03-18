@@ -191,6 +191,8 @@
     ]
   },
   "alwaysThinkingEnabled": true,
+  "voiceEnabled": true,
+  "skipDangerousModePermissionPrompt": true,
   "excludeSkills": [],
   "bypassPermissionsModeAccepted": true,
   "feedbackSurveyState": {

@@ -3,6 +3,7 @@
     ../shared/headless
     ../shared/graphical
     ../shared/graphical/qmk-keyboard-setup.nix
+    ./macbook-display.nix
     ./dock.nix
     ./eternal-terminal-server.nix
     ./home-manager.nix

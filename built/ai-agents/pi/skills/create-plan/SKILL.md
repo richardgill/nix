@@ -4,7 +4,7 @@ description: Create implementation plans with human-readable summaries.
 metadata:
   pi:
     subProcess: false
-    model: openai-codex/gpt-5.2
+    model: openai-codex/gpt-5.4
     thinkingLevel: xhigh
 
 ---

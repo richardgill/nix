@@ -4,6 +4,13 @@ fi
 
 eval "$(mise activate zsh)"
 export PATH="$HOME/Scripts/nixos:$HOME/Scripts:$PATH"
+androidSdkRoot="${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}"
+if [ -d "$androidSdkRoot/build-tools" ]; then
+  latestBuildTools="$(find "$androidSdkRoot/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n1)"
+  if [ -n "$latestBuildTools" ] && [[ ":$PATH:" != *":$latestBuildTools:"* ]]; then
+    export PATH="$latestBuildTools:$PATH"
+  fi
+fi
 
 # History
 HISTFILE="$HOME/.zsh_history"
@@ -180,3 +187,10 @@ _fzf_compgen_dir() {
 
 source <(argc --argc-completions zsh git-browse)
 source <(argc --argc-completions zsh worktree-open)
+if backlog version >/dev/null 2>&1; then
+  mkdir -p "$HOME/.zsh/completions"
+  if [ ! -f "$HOME/.zsh/completions/_backlog" ]; then
+    backlog completion install --shell zsh >/dev/null 2>&1
+  fi
+  fpath=("$HOME/.zsh/completions" $fpath)
+fi

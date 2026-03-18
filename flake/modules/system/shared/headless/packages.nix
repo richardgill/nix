@@ -27,6 +27,8 @@ in
     jq
     jdk17
     just
+    # Needed for Firefox build tooling (pkg-config).
+    pkg-config
     less
     home-manager
     unstable.mise
@@ -34,9 +36,11 @@ in
     nixfmt-rfc-style
     nixd
     openssl
+    qrencode
     sops
     tmux
     unzip
+    xxd
     zip
   ];
 }

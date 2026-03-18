@@ -1,6 +1,7 @@
 {
   lib,
   config,
+  pkgs,
   ...
 }:
 {
@@ -9,6 +10,8 @@
 
   # nix-ld enables running prebuilt binaries by providing dynamic library loading
   programs.nix-ld.enable = true;
+  # Provide libcrypt.so.1 for foreign prebuilt binaries (e.g. mise Python).
+  programs.nix-ld.libraries = with pkgs; [ libxcrypt-legacy ];
 
   # envfs creates FUSE filesystem at /bin and /usr/bin to fix scripts expecting #!/bin/bash etc
   services.envfs.enable = true;

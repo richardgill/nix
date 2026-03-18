@@ -110,7 +110,8 @@ in
       ".config/opencode/command".source = "${builtTemplates}/ai-agents/opencode/command";
 
       # Codex config (individual files so Codex can write to ~/.codex/)
-      ".codex/config.toml".source = "${builtTemplates}/ai-agents/codex/config.toml";
+      ".codex/config.toml".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/codex/config.toml";
       ".codex/AGENTS.md".source = "${builtTemplates}/ai-agents/codex/AGENTS.md";
       ".codex/skills".source = "${builtTemplates}/ai-agents/codex/skills";
       ".codex/prompts".source = "${builtTemplates}/ai-agents/codex/prompts";

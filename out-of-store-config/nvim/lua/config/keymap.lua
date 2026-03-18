@@ -52,7 +52,7 @@ vim.api.nvim_set_keymap('v', '<', '<gv', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', 'p', 'P', { noremap = true, silent = true })
 
 -- Git diff toggle: change this to switch between diffview and codediff
-local use_codediff = false
+local use_codediff = true
 
 if use_codediff then
   vim.keymap.set('n', '<leader>dd', '<cmd>:CodeDiff<cr>', { desc = 'Git [d]iff' })

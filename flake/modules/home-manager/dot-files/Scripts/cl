@@ -32,4 +32,4 @@ settings=$(jq -nc \
     }
   }')
 
-exec mise exec claude-code -- claude --settings "$settings" "$@"
+exec mise exec npm:@anthropic-ai/claude-code -- claude --settings "$settings" "$@"

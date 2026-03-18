@@ -1,6 +1,7 @@
 .android
 .cache
 ~/Downloads
+~/Backups
 ~/Applications
 ~/Library
 node_modules/

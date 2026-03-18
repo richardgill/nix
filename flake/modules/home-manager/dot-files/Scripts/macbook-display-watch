@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+display_script="${MACBOOK_DISPLAY_SCRIPT_PATH:-$HOME/Scripts/macbook-display}"
+poll_interval="${MACBOOK_DISPLAY_POLL_INTERVAL:-5}"
+allowlist="${MACBOOK_DISPLAY_ALLOWLIST:-}"
+cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/macbook-display"
+state_path="$cache_dir/online-displays"
+
+snapshot_monitored_displays() {
+  system_profiler SPDisplaysDataType -json | jq -r --arg allowlist "$allowlist" '
+    ($allowlist | split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))) as $tokens
+    | [.SPDisplaysDataType[].spdisplays_ndrvs[]?
+      | select(.spdisplays_online == "spdisplays_yes")
+      | select((.spdisplays_connection_type // "") != "spdisplays_internal")
+      | {
+          id: (._spdisplays_displayID // ""),
+          serial: (."_spdisplays_display-serial-number" // ""),
+          name: (._name // ""),
+          connection: (.spdisplays_connection_type // "")
+        }
+      | . as $display
+      | select(
+          ($tokens | length) == 0
+          or ($tokens | index($display.id) != null)
+          or ($tokens | index($display.serial) != null)
+          or ($tokens | index($display.name) != null)
+        )
+      | "\(.id)|\(.serial)|\(.name)|\(.connection)"
+    ]
+    | sort
+    | join("\n")
+  '
+}
+
+current_snapshot() {
+  snapshot_monitored_displays 2>/dev/null || true
+}
+
+read_previous_snapshot() {
+  [ -f "$state_path" ] && head -n 200 "$state_path" || true
+}
+
+write_snapshot() {
+  local snapshot="$1"
+
+  mkdir -p "$cache_dir"
+  printf '%s\n' "$snapshot" > "$state_path"
+}
+
+apply_mode_for_snapshot() {
+  local snapshot="$1"
+
+  if [ -n "$snapshot" ]; then
+    "$display_script" off --quiet || true
+    return
+  fi
+
+  "$display_script" on --quiet || true
+}
+
+initial="$(current_snapshot)"
+write_snapshot "$initial"
+apply_mode_for_snapshot "$initial"
+
+while true; do
+  latest="$(current_snapshot)"
+  previous="$(read_previous_snapshot)"
+
+  if [ "$latest" != "$previous" ]; then
+    write_snapshot "$latest"
+    apply_mode_for_snapshot "$latest"
+  fi
+
+  sleep "$poll_interval"
+done

@@ -36,11 +36,13 @@ return {
         hl['LeftPaneChange'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
         hl['LeftPaneText'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
         -- vscode-diff.nvim highlight groups (left pane = deletions/red, right pane = insertions/green)
+        local codediff_filler_bg = util.blend(colors.fg_gutter, 0.08, colors.bg)
         hl['CodeDiffLineInsert'] = { bg = util.blend(gh_green, 0.20, colors.bg) }
+        hl['CodeDiffLineChange'] = { bg = util.blend(gh_blue, 0.12, colors.bg) }
         hl['CodeDiffLineDelete'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
         hl['CodeDiffCharInsert'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
         hl['CodeDiffCharDelete'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
-        hl['CodeDiffFiller'] = { fg = colors.bg, bg = util.blend(colors.fg_gutter, 0.08, colors.bg) }
+        hl['CodeDiffFiller'] = { fg = codediff_filler_bg, bg = codediff_filler_bg }
 
         -- highlighting for multi cursor plugin
         hl['MultiCursor'] = hl['IncSearch']

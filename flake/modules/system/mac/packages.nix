@@ -61,6 +61,7 @@ in
       "google-chrome"
       "hammerspoon"
       "karabiner-elements"
+      "lunar"
       "rectangle"
       "screen-studio"
       "slack"

@@ -12,7 +12,6 @@ let
     "tavily-api-key"
     "openai-api-key"
     "joist-api-key"
-    "beeper-api-token"
     "exa-api-key"
   ];
 
