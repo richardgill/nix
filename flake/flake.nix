@@ -84,6 +84,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    neovim-nightly-overlay = {
+      url = "github:nix-community/neovim-nightly-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     # Playwright browsers for agent-browser/testing - pinned to match npm playwright version
     # https://github.com/pietdevries94/playwright-web-flake
     playwright.url = "github:pietdevries94/playwright-web-flake/1.58.0";

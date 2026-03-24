@@ -2,8 +2,15 @@
 # Platform-specific packages: modules/home-manager/nixos/ and modules/home-manager/mac/
 {
   pkgs,
+  nixpkgs-unstable,
   ...
 }:
+let
+  unstable = import nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+  };
+in
 {
   home.packages =
     with pkgs;
@@ -26,6 +33,7 @@
       ripgrep
       sesh
       stripe-cli
+      unstable.todoist
       socat
       xdg-utils
       yazi

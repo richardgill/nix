@@ -2,7 +2,7 @@
   imports = [
     ./bat.nix
     ./dot-files.nix
-    ./lsp-formatters.nix
+    ./ide.nix
     ./mise.nix
     ./packages.nix
     ./tmux.nix

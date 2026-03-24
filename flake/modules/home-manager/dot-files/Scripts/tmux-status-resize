@@ -7,11 +7,19 @@ threshold=120
 
 status_modules="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
 
+# tmux-continuum prepends a #(...) interpolation to status-right for periodic saves;
+# preserve it so auto-saving survives resize/session-change events
+current_right=$(tmux show-option -gqv status-right)
+continuum_prefix=""
+if [[ "$current_right" == '#('* ]]; then
+  continuum_prefix="${current_right%%')'*})"
+fi
+
 if (( width < threshold )); then
   tmux set -g status 2
   tmux set -g 'status-format[1]' "#[align=right]$status_modules"
-  tmux set -g status-right ''
+  tmux set -g status-right "$continuum_prefix"
 else
   tmux set -g status on
-  tmux set -g status-right "$status_modules"
+  tmux set -g status-right "${continuum_prefix}${status_modules}"
 fi

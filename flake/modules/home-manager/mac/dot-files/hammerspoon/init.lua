@@ -41,6 +41,28 @@ hs.hotkey.bind(hyper, "f", function()
 	end
 end)
 
+hs.hotkey.bind(hyper, "i", function()
+	local app = hs.application.get("com.google.Chrome")
+	if app then
+		app:activate()
+	else
+		hs.task
+			.new(
+				"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+				nil,
+				function()
+					return true
+				end,
+				{
+					"--remote-debugging-port=9222",
+					"--remote-debugging-address=127.0.0.1",
+					"--user-data-dir=" .. os.getenv("HOME") .. "/.config/google-chrome-remote-debug",
+				}
+			)
+			:start()
+	end
+end)
+
 hs.hotkey.bind(hyper, "g", function()
 	hs.application.launchOrFocus("Ghostty")
 end)

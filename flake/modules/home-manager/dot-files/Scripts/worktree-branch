@@ -1,12 +1,23 @@
 #!/usr/bin/env bash
 # @describe Create git worktree with tmux session
 # @option -c --cmd Command to run in ai1 window instead of default 'cl' (e.g. wtb -c 'claude "fix bug"' my-branch)
+# @option --prompt Prompt to pass to Claude Code (handles quoting automatically, builds --cmd for you)
+# @option --prompt-file Path to a file to use as the prompt (e.g. an issue plan.md)
+# @option -b --binary=cl Binary to use for Claude Code
 # @flag -d --detached Don't switch to the new tmux session
 # @flag -p --pull Automatically pull main if behind (no prompt)
 # @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
 # @arg dest_name Destination name (defaults to source_branch name)
 
 eval "$(argc --argc-eval "$0" "$@")"
+
+if [[ -n "$argc_prompt_file" ]]; then
+  argc_cmd="$argc_binary \"\$(cat '$(realpath "$argc_prompt_file")')\""
+elif [[ -n "$argc_prompt" ]]; then
+  PROMPT_FILE=$(mktemp /tmp/worktree-prompt-XXXXXX)
+  printf '%s' "$argc_prompt" > "$PROMPT_FILE"
+  argc_cmd="$argc_binary \"\$(cat '$PROMPT_FILE')\""
+fi
 
 source "$(dirname "$0")/tmux-setup-windows"
 source ~/Scripts/lib/git

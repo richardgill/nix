@@ -16,7 +16,24 @@ require 'config.keymap'
 require 'config.options'
 require 'config.autocommand'
 require 'custom.hotreload'
-require 'config.lazy'
+vim.api.nvim_create_autocmd('PackChanged', {
+  callback = function(ev)
+    local name, kind = ev.data.spec.name, ev.data.kind
+    if name == 'tailwind-tools.nvim' and kind == 'update' then
+      if not ev.data.active then
+        vim.cmd.packadd('tailwind-tools.nvim')
+      end
+      vim.cmd('UpdateRemotePlugins')
+    end
+  end,
+})
 require 'custom.ai-prompt-completion-blink.prompt-file'
-require('custom.ai-prompt-completion-blink').setup()
 require 'config.spelling'
+
+-- Defer blink-dependent setup until after plugin/ files load
+vim.api.nvim_create_autocmd('VimEnter', {
+  once = true,
+  callback = function()
+    require('custom.ai-prompt-completion-blink').setup()
+  end,
+})
