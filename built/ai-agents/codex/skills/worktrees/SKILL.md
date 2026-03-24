@@ -12,25 +12,44 @@ description: |
 
 Create a git worktree in a new tmux session with Claude Code running a specific prompt.
 
+## Choosing the prompt source
+
+Pick the best option based on what's available:
+
+1. **Issue file** — if the work references an issue in `thoughts/shared/issues/`, use `--prompt-file` pointing to the issue's `plan.md`
+2. **Other .md file** — if the user references a specific markdown file (design doc, spec, etc.), use `--prompt-file` with that path
+3. **Text prompt** — otherwise, use `--prompt` with a descriptive prompt string
+
 ## Command
 
 ```bash
-~/Scripts/worktree-branch --detached --pull --cmd 'codex "$PROMPT"' "$BRANCH"
+# With an issue or markdown file
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt-file "$FILE" "$BRANCH"
+
+# With a text prompt
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt "$PROMPT" "$BRANCH"
 ```
 
 ## Parameters
 
 - `$BRANCH` - Branch name or remote/branch (e.g., `my-feature`)
-- `$PROMPT` - The prompt to pass to Claude Code in the new worktree
+- `$FILE` - Path to a .md file to use as the prompt (e.g., `thoughts/shared/issues/10-feature/plan.md`)
+- `$PROMPT` - Text prompt to pass to Claude Code in the new worktree
 
 ## Examples
 
 ```bash
-# Create worktree from new branch with Claude prompt
-~/Scripts/worktree-branch --detached --pull --cmd 'codex "fix the login bug"' fix-login
+# From an issue plan
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt-file thoughts/shared/issues/10-add-auth/plan.md add-auth
 
-# Create worktree from remote branch
-~/Scripts/worktree-branch --detached --pull --cmd 'codex "implement the feature from the PR description"' origin/feature-branch
+# From a design doc
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt-file docs/migration-spec.md migration
+
+# From a text prompt
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt "fix the login bug" fix-login
+
+# From a remote branch
+~/Scripts/worktree-branch --detached --pull --binary codex --prompt "implement the feature from the PR description" origin/feature-branch
 ```
 
 ## Notes
@@ -39,5 +58,6 @@ Create a git worktree in a new tmux session with Claude Code running a specific 
 - Uses `--pull` to automatically pull main if behind (no prompt)
 - The new worktree session is created but not switched to
 - Claude Code starts automatically in the `ai1` window with the given prompt
+- Both `--prompt` and `--prompt-file` handle quoting/escaping internally via temp files
 
 $ARGUMENTS

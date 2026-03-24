@@ -151,6 +151,7 @@ set -g detach-on-destroy off
 bind-key f display-popup -E -w 95% -h 95% "{{ homeDir }}/Scripts/tmux-sesh-picker"
 
 set -g @continuum-restore 'off'
+set -g @continuum-save-interval '5'
 # otherwise nvim and some other processes are resumed
 set -g @resurrect-processes 'false'
 # leave just the first empty window in each session

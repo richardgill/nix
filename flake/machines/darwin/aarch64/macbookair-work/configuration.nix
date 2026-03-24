@@ -27,6 +27,7 @@
       ${vars.userName} = {
         imports = [
           ../../../../modules/home-manager/mac
+          ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
         ];
       };
     };

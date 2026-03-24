@@ -112,6 +112,7 @@
           ".config/blender"
           ".config/spotify"
           ".config/Todoist"
+          ".config/todoist"
           ".config/sops"
           ".config/secrets"
           ".config/op"

@@ -13,7 +13,7 @@ local function should_reload_buffer(buf)
   local name = vim.api.nvim_buf_get_name(buf)
   local buftype = vim.api.nvim_get_option_value('buftype', { buf = buf })
   local modified = vim.api.nvim_get_option_value('modified', { buf = buf })
-  local is_real_file = name ~= '' and not name:match '^%w+://' -- Skip URIs like diffview://, fugitive://, etc
+  local is_real_file = name ~= '' and not name:match '^%w+://' -- Skip URIs like fugitive://, etc
 
   return is_real_file and buftype == '' and not modified
 end

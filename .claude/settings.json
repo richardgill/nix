@@ -20,17 +20,6 @@
       "Bash(npx tsx:*)"
     ]
   },
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "local-ci.sh"
-          }
-        ]
-      }
-    ]
-  }
+  "hooks": {}
 }
 

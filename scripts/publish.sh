@@ -38,8 +38,11 @@ git checkout -b "$branch_name"
 # Remove all files except .git
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
-# Copy everything from current repo except .git
-rsync -av --exclude='.git' --exclude='flake/modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
+# Copy everything from current repo except .git and gitignored files
+rsync -av --filter=':- .gitignore' --exclude='.git' --exclude='flake/modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='todo.md' "$source_dir/" .
+
+# Copy built/ separately since it's gitignored in source but tracked in public repo
+rsync -av "$source_dir/built/" ./built/
 
 # Remove built/ from .gitignore so built templates are tracked in public repo
 sed -i '/^built\/$/d' .gitignore

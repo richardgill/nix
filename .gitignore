@@ -6,6 +6,8 @@ result
 out-of-store-config/obs-studio/logs/
 out-of-store-config/obs-studio/profiler_data/
 
+scratch/
+
 # Template build output
 node_modules/
 flake/template-builder/build-templates.bundle.js

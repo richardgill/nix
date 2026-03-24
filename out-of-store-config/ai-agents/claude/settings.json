@@ -153,15 +153,6 @@
             "command": "~/Scripts/beep"
           }
         ]
-      },
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "local-ci.sh"
-          }
-        ]
       }
     ]
   },
