@@ -1,7 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # Connect to um790 and attach/create tmux code session
 # Trap ensures ET is killed before Termux tears down the PTY,
-# preventing ET from reading garbage terminal size and sending it to the server
+# preventing ET from reading garbage terminal size and sending it to the server,
+# which was causing tmux to hang
 trap 'kill $ET_PID 2>/dev/null; wait $ET_PID 2>/dev/null' EXIT HUP TERM
 et rich@um790 -e -c 't' &
 ET_PID=$!
