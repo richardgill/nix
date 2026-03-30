@@ -15,7 +15,7 @@ git clone https://github.com/richardgill/nix ~/nix
 
 # Run install script
 cd nix
-./modules/home-manager/dot-files/termux/install.sh
+./flake/modules/home-manager/dot-files/termux/install.sh
 
 # Install a nerd font (run after install.sh)
 getnf -i JetBrainsMono
