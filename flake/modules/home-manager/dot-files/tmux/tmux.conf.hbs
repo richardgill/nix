@@ -89,10 +89,10 @@ bind-key x run-shell "{{ homeDir }}/Scripts/tmux-kill-pane '#{pane_id}'"
 bind-key B run-shell "{{ homeDir }}/Scripts/tmux-view-scrollback"
 
 # AI session picker (prefix + w)
-bind-key w display-popup -E -w 98% -h 98% "{{ homeDir }}/Scripts/pi-sessions"
+bind-key w display-popup -E -w 98% -h 98% "{{ homeDir }}/Scripts/ai-sessions"
 
-# Start new Claude in recent tmux session (prefix + n)
-bind-key n display-popup -E -w 40% -h 40% "{{ homeDir }}/Scripts/pi-sessions new"
+# Start new AI agent in recent tmux session (prefix + n)
+bind-key n display-popup -E -w 40% -h 40% "{{ homeDir }}/Scripts/ai-sessions new"
 
 # Smart pane switching with awareness of Vim splits (and fzf).
 # See: https://github.com/christoomey/vim-tmux-navigator
@@ -140,9 +140,6 @@ bind-key -n End send Escape "OF"
 
 # ctrl-g types git commit -m "" when at zsh prompt, otherwise pass through
 bind-key -n C-g if-shell "$is_zsh_fg" "send-keys 'git commit -m \"\"' ; send-keys Left" 'send-keys C-g'
-# ctrl-f forks claude session when in claude, otherwise pass through
-bind-key -n C-f if-shell "$is_claude" "run-shell '{{ homeDir }}/Scripts/claude-fork'" 'send-keys C-f'
-
 set -g status on
 
 # don't exit from tmux when closing a session

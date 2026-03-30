@@ -3,13 +3,16 @@
 # @option -c --cmd Command to run in ai1 window instead of default 'cl' (e.g. wtb -c 'claude "fix bug"' my-branch)
 # @option --prompt Prompt to pass to Claude Code (handles quoting automatically, builds --cmd for you)
 # @option --prompt-file Path to a file to use as the prompt (e.g. an issue plan.md)
-# @option -b --binary=cl Binary to use for Claude Code
-# @flag -d --detached Don't switch to the new tmux session
+# @option -b --binary Binary to use for AI agent (defaults to ~/.config/ai-agent)
+# @flag -d --no-switch Don't switch to the new tmux session
 # @flag -p --pull Automatically pull main if behind (no prompt)
 # @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
 # @arg dest_name Destination name (defaults to source_branch name)
 
 eval "$(argc --argc-eval "$0" "$@")"
+
+source ~/Scripts/lib/ai-agent
+argc_binary="${argc_binary:-$(default_ai_agent)}"
 
 if [[ -n "$argc_prompt_file" ]]; then
   argc_cmd="$argc_binary \"\$(cat '$(realpath "$argc_prompt_file")')\""
@@ -82,33 +85,31 @@ if [ -n "$argc_dest_name" ]; then
     REMOTE=$(echo "$SOURCE_BRANCH" | cut -d'/' -f1)
     BRANCH=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
     echo "Fetching remote branch $SOURCE_BRANCH..."
-    git fetch "$REMOTE" "$BRANCH"
-    git worktree add -b "$DEST_NAME" "$TARGET" "$SOURCE_BRANCH"
-    # Push the new branch to create origin/$DEST_NAME and update tracking from origin/$BRANCH to origin/$DEST_NAME
-    cd "$TARGET"
+    git fetch "$REMOTE" "$BRANCH" || { echo "Error: failed to fetch $SOURCE_BRANCH" >&2; exit 1; }
+    git worktree add -b "$DEST_NAME" "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
+    cd "$TARGET" || { echo "Error: failed to cd to $TARGET" >&2; exit 1; }
     git push -u origin "$DEST_NAME"
-    cd -
+    cd - > /dev/null
   else
-    git worktree add "$TARGET" "$SOURCE_BRANCH"
+    git worktree add "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
   fi
 elif [[ "$SOURCE_BRANCH" == */* ]]; then
   REMOTE=$(echo "$SOURCE_BRANCH" | cut -d'/' -f1)
   BRANCH=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
   echo "Fetching remote branch $SOURCE_BRANCH..."
-  git fetch "$REMOTE" "$BRANCH"
-  git worktree add -b "$DEST_NAME" "$TARGET" "$SOURCE_BRANCH"
-  # Push the new branch to create origin/$DEST_NAME and update tracking from origin/$BRANCH to origin/$DEST_NAME
-  cd "$TARGET"
+  git fetch "$REMOTE" "$BRANCH" || { echo "Error: failed to fetch $SOURCE_BRANCH" >&2; exit 1; }
+  git worktree add -b "$DEST_NAME" "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
+  cd "$TARGET" || { echo "Error: failed to cd to $TARGET" >&2; exit 1; }
   git push -u origin "$DEST_NAME"
-  cd -
+  cd - > /dev/null
 else
-  git worktree add "$TARGET"
+  git worktree add "$TARGET" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
 fi
 
 # Trust mise configs before tmux session starts (shell hook runs on cd to TARGET)
 mise trust --all --cd "$TARGET"
 
-TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET") "$argc_detached")
+TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET") "$argc_no_switch")
 SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd")
 
 tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktree-branch-setup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

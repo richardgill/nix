@@ -1,7 +1,7 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.3-codex",
+  "defaultModel": "gpt-5.4",
   "defaultThinkingLevel": "high",
   "enabledModels": [
     "openai-codex/gpt-5.4",
@@ -34,7 +34,13 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.57.1",
+  "lastChangelogVersion": "0.64.0",
   "editorPaddingX": 1,
-  "enableSkillCommands": true
+  "enableSkillCommands": true,
+  "packages": [
+    "npm:@calesennett/pi-codex-fast"
+  ],
+  "pi-codex-fast": {
+    "enabled": true
+  }
 }

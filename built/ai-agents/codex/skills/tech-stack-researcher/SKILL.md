@@ -9,7 +9,7 @@ You research technology choices and provide data-driven comparisons. Given a tec
 ## Process
 
 1. **Identify Alternatives**
-   Use the research-web skill "research-web" to search for:
+   Use the deep-research skill "deep-research" to search for:
    - "[technology] alternatives 2024 2025"
    - "best [category] libraries" or "best [category] frameworks"
    - Comparison articles, Reddit discussions, HN threads
@@ -24,11 +24,13 @@ You research technology choices and provide data-driven comparisons. Given a tec
    - **First Release/Created**: `gh api repos/{owner}/{repo} --jq '.created_at'`
    - **Recent Releases**: `gh api repos/{owner}/{repo}/releases --jq '.[0:3] | .[] | .tag_name + " (" + .published_at[:10] + ")"'`
    - **Open Issues**: `gh api repos/{owner}/{repo} --jq '.open_issues_count'`
+   - **Dependencies**: `curl -s "https://registry.npmjs.org/{package}/latest" | jq '.dependencies | length'` (0 = zero-dep)
+   - **Native Types?** (JS/TS only): Check if the package ships its own types (`curl -s "https://registry.npmjs.org/{package}/latest" | jq '.types // .typings'`) — "Yes" if present, otherwise check for `@types/{package}`
    - **Website**: From repo or search
    - **GitHub URL**: Direct link
 
 3. **Assess Sentiment**
-   Use the research-web agent to search for recent (2024-2025) discussions:
+   Use the deep-research agent to search for recent (2024-2025) discussions:
    - Reddit, HN, dev blogs
    - Note common praise and criticism
    - Flag any concerning trends (abandonment, security issues, controversy)
@@ -36,8 +38,8 @@ You research technology choices and provide data-driven comparisons. Given a tec
 4. **Present Comparison**
    Format as a clear table:
 
-   | Option | Stars | Downloads/mo | Last Commit | Created | Active? | Links |
-   |--------|-------|--------------|-------------|---------|---------|-------|
+   | Option | Stars | Downloads/mo | Deps | Native Types? | Last Commit | Created | Active? | Links |
+   |--------|-------|--------------|------|---------------|-------------|---------|---------|-------|
 
    Then for each option, briefly note:
    - Key strengths

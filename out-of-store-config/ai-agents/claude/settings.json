@@ -82,7 +82,7 @@
       "Skill(create-plan)",
       "Skill(oracle)",
       "Skill(code-review)",
-      "Skill(research-web)",
+      "Skill(deep-research)",
       "Skill(codebase-pattern-finder)",
       "Skill(tech-stack-researcher)",
       "SlashCommand(/brainstorm)",
@@ -94,7 +94,7 @@
       "SlashCommand(/implement-plan)",
       "SlashCommand(/pr-diff)",
       "SlashCommand(/pull-main)",
-      "SlashCommand(/research-web)",
+      "SlashCommand(/deep-research)",
       "SlashCommand(/diff)",
       "SlashCommand(/tech-stack-choices)",
       "SlashCommand(/oracle)",
@@ -164,7 +164,8 @@
   "enabledPlugins": {
     "typescript-lsp@claude-plugins-official": true,
     "ralph-loop@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false,

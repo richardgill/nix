@@ -1,7 +1,7 @@
 vim.pack.add({ 'https://github.com/folke/snacks.nvim' })
 
 local closeTabsAndSplits = function()
-  vim.cmd 'silent! tabonly | silent! only'
+  vim.cmd 'silent! tabonly'
 end
 
 -- Make <leader>ff treat ./path and path as the same query.
@@ -60,6 +60,11 @@ require('snacks').setup {
       },
     },
     win = {
+      -- Override scrolloff for the list window. vim.opt.scrolloff is inherited
+      -- and creates a tiny active zone with reverse layouts, causing cursor jumps.
+      list = {
+        wo = { scrolloff = 0 },
+      },
       input = {
         keys = {
           ['<C-Down>'] = { 'list_scroll_down', mode = { 'i', 'n' } },

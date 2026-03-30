@@ -25,10 +25,19 @@ export type AgentConfig = {
   presets?: AgentPresets;
 };
 
+const isCodexPro = false;
+const mediumModel = isCodexPro ? "gpt-5.3-codex-spark" : "gpt-5.3-codex";
+const mediumProvider = `openai-codex/${mediumModel}`;
+const webSearchSkills = ["web-search-exa", "web-search-kagi"];
+const activeWebSearchSkill = "web-search-kagi";
+const inactiveWebSearchSkills = webSearchSkills.filter(
+  (skill) => skill !== activeWebSearchSkill,
+);
+
 export const agents = {
   claude: {
     sharedSkills: true,
-    excludeSkills: ["web-search"],
+    excludeSkills: webSearchSkills,
     sharedAgents: true,
     commands: true,
     commandsFolder: "commands",
@@ -37,7 +46,7 @@ export const agents = {
   },
   codex: {
     sharedSkills: true,
-    excludeSkills: ["web-search"],
+    excludeSkills: webSearchSkills,
     sharedAgents: false,
     commands: true,
     commandsFolder: "commands",
@@ -46,7 +55,7 @@ export const agents = {
   },
   ampcode: {
     sharedSkills: true,
-    excludeSkills: ["web-search"],
+    excludeSkills: webSearchSkills,
     sharedAgents: false,
     commands: true,
     commandsFolder: "commands",
@@ -55,6 +64,7 @@ export const agents = {
   },
   opencode: {
     sharedSkills: true,
+    excludeSkills: inactiveWebSearchSkills,
     sharedAgents: false,
     commands: true,
     commandsFolder: "command",
@@ -63,6 +73,7 @@ export const agents = {
   },
   pi: {
     sharedSkills: true,
+    excludeSkills: inactiveWebSearchSkills,
     sharedAgents: false,
     commands: false,
     commandsFolder: "",
@@ -71,20 +82,20 @@ export const agents = {
     presets: {
       low: {
         provider: "openai-codex",
-        model: "gpt-5.3-codex-spark",
-        providerModel: "openai-codex/gpt-5.3-codex-spark",
+        model: mediumModel,
+        providerModel: mediumProvider,
         thinkingLevel: "low",
       },
       medium: {
         provider: "openai-codex",
-        model: "gpt-5.3-codex-spark",
-        providerModel: "openai-codex/gpt-5.3-codex-spark",
+        model: mediumModel,
+        providerModel: mediumProvider,
         thinkingLevel: "medium",
       },
       high: {
         provider: "openai-codex",
-        model: "gpt-5.4-codex",
-        providerModel: "openai-codex/gpt-5.4-codex",
+        model: "gpt-5.4",
+        providerModel: "openai-codex/gpt-5.4",
         thinkingLevel: "high",
       },
       xhigh: {

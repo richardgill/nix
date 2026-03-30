@@ -20,7 +20,7 @@ selected=$(eval "$SESH_LIST" | fzf --ansi \
   --bind 'tab:down,btab:up' \
   --bind "ctrl-a:transform:[[ \"\$(cat \"$MODE_FILE\")\" == \"$MODE_DIRS\" ]] && echo \"execute-silent(printf '%s' '$MODE_SESH' > '$MODE_FILE')+change-header($HEADER_SESH)+reload($SESH_LIST)\" || echo \"execute-silent(printf '%s' '$MODE_DIRS' > '$MODE_FILE')+change-header($HEADER_DIRS)+reload($HOME_DIR/Scripts/find-dirs)\"" \
   --bind "ctrl-q:execute($HOME_DIR/Scripts/tmux-kill-session --yes {2..})+execute-silent(printf '%s' '$MODE_SESH' > '$MODE_FILE')+change-header($HEADER_SESH)+reload($SESH_LIST)" \
-  --bind "w:become($HOME_DIR/Scripts/claude-sessions)" \
+  --bind "w:become($HOME_DIR/Scripts/ai-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
   --bind 's:abort+execute-silent(tmux select-window -t :3)' \

@@ -1,0 +1,351 @@
+#!/usr/bin/env bash
+
+source ~/Scripts/lib/ai-agent
+source ~/Scripts/lib/ai-sessions/claude-sessions
+source ~/Scripts/lib/ai-sessions/pi-sessions
+
+AI_SESSIONS_FZF_LISTEN_PORT=51779
+
+ai_sessions_normalize_agent() {
+  case "${1:-}" in
+    "") echo "" ;;
+    cl|claude) echo "claude" ;;
+    pi) echo "pi" ;;
+    *) echo "" ; return 1 ;;
+  esac
+}
+
+ai_sessions_default_agent() {
+  ai_sessions_normalize_agent "$(default_ai_agent)"
+}
+
+ai_sessions_effective_agent() {
+  local agent="$1"
+  [[ -n "$agent" ]] && { echo "$agent"; return; }
+  ai_sessions_default_agent
+}
+
+ai_sessions_agent_arg() {
+  local agent="$1"
+  [[ -n "$agent" ]] && echo " --agent=$agent"
+}
+
+ai_sessions_list_json() {
+  local agent="$1"
+
+  case "$agent" in
+    claude)
+      claude_sessions_list_json
+      ;;
+    pi)
+      pi_sessions_list_json
+      ;;
+    "")
+      jq -s 'add' <(claude_sessions_list_json) <(pi_sessions_list_json)
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+ai_sessions_render_list() {
+  local list_json="$1"
+  echo "$list_json" | jq -r '
+    group_by(.state == "ignored") |
+    (.[0] // []) as $active |
+    (.[1] // []) as $ignored |
+    ($active | sort_by([-.tmux_last_attached, .idle_secs])) + ($ignored | sort_by(-.ignored_at))
+    | .[] |
+    (if .state == "ignored" then "○"
+     elif .state == "permission" then "\u001b[33m󰂞\u001b[0m"
+     elif .state == "stopped" then "\u001b[34m■\u001b[0m"
+     elif .state == "running" then "\u001b[32m▶\u001b[0m"
+     else "?" end) as $indicator |
+    (if .state == "permission" or .state == "stopped" or .state == "ignored" then " (\(.idle_secs |
+       if . < 60 then "\(.)s"
+       elif . < 3600 then "\(. / 60 | floor)m"
+       elif . < 86400 then "\(. / 3600 | floor)h"
+       else "\(. / 86400 | floor)d" end))"
+     else "" end) as $suffix |
+    (if .summary != "" then .summary else .topic end | gsub("\n"; " ")) as $display |
+    (if .state == "ignored" then "\u001b[2m" else "" end) as $dim |
+    (if .state == "ignored" then "\u001b[0m" else "" end) as $reset |
+    (if .agent == "claude" then "cl" else "pi" end) as $agent |
+    "\(.pid)\t\(.tmux_target)\t\(.session_id)\t\(.agent)\t\($dim)\($indicator)  \(.tmux_target | . + (" " * (24 - length))[:24])  \($agent)  \($display)\($suffix)\($reset)"
+  '
+}
+
+ai_sessions_debug_lines() {
+  local list_json="$1"
+  echo "$list_json" | jq -r '
+    group_by(.state == "ignored") |
+    (.[0] // []) as $active |
+    (.[1] // []) as $ignored |
+    ($active | sort_by([-.tmux_last_attached, .idle_secs])) + ($ignored | sort_by(-.ignored_at))
+    | .[] | "\(.agent)\t\(.tmux_target)\t\(.state)\ttmux_last_attached=\(.tmux_last_attached)\tidle=\(.idle_secs)s"
+  '
+}
+
+ai_sessions_get_pane_height() {
+  local height
+  height=$(stty size 2>/dev/null | awk '{print $1}')
+  if [[ -z "$height" || ! "$height" =~ ^[0-9]+$ ]]; then
+    height=$(tput lines 2>/dev/null)
+  fi
+  if [[ -z "$height" || ! "$height" =~ ^[0-9]+$ ]]; then
+    height=$(tmux display -p '#{pane_height}' 2>/dev/null)
+  fi
+  [[ -n "$height" && "$height" =~ ^[0-9]+$ ]] && echo "$height"
+}
+
+ai_sessions_list_rows_max() {
+  local height="$1"
+
+  if [[ -z "$height" ]]; then
+    echo "7"
+    return
+  fi
+
+  if (( height <= 22 )); then
+    echo "5"
+  elif (( height <= 36 )); then
+    echo "7"
+  else
+    echo "10"
+  fi
+}
+
+ai_sessions_list_rows() {
+  local height="$1"
+  local count="$2"
+  local max_rows
+  max_rows=$(ai_sessions_list_rows_max "$height")
+
+  if [[ -z "$max_rows" || ! "$max_rows" =~ ^[0-9]+$ ]]; then
+    echo "7"
+    return
+  fi
+
+  if [[ -z "$count" || ! "$count" =~ ^[0-9]+$ ]]; then
+    echo "$max_rows"
+    return
+  fi
+
+  if (( count < max_rows )); then
+    echo "$count"
+  else
+    echo "$max_rows"
+  fi
+}
+
+ai_sessions_preview_window() {
+  local height="$1"
+  local list_count="$2"
+
+  if [[ -z "$height" || ! "$height" =~ ^[0-9]+$ ]]; then
+    echo "down:16"
+    return
+  fi
+
+  local list_rows
+  list_rows=$(ai_sessions_list_rows "$height" "$list_count")
+  if [[ -z "$list_rows" || ! "$list_rows" =~ ^[0-9]+$ ]]; then
+    echo "down:16"
+    return
+  fi
+
+  local preview_lines
+  preview_lines=$((height - list_rows - 3))
+  (( preview_lines < 1 )) && preview_lines=1
+  echo "down:$preview_lines"
+}
+
+ai_sessions_pick_agent() {
+  local default_agent
+  default_agent=$(ai_sessions_default_agent)
+  local secondary_agent="pi"
+  [[ "$default_agent" == "claude" ]] || secondary_agent="claude"
+
+  local selected
+  selected=$(printf '%s\n%s\n' "$default_agent" "$secondary_agent" | jq -R . | jq -rs --arg default "$default_agent" '
+    map(select(. != ""))
+    | map({
+        key: .,
+        label: (if . == "claude" then "Claude" else "Pi" end) + (if . == $default then " (default)" else "" end)
+      })
+    | .[]
+    | "\(.key)\t\(.label)"
+  ' | fzf --no-sort \
+    --prompt '⚡  ' \
+    --with-nth=2.. \
+    --header 'Start new AI session (esc to go back)' \
+    --bind 'tab:down,btab:up')
+
+  [[ -n "$selected" ]] && echo "$selected" | cut -f1
+}
+
+ai_sessions_new() {
+  local agent="$1"
+  if [[ -z "$agent" ]]; then
+    agent=$(ai_sessions_pick_agent)
+  fi
+  [[ -z "$agent" ]] && return
+
+  case "$agent" in
+    claude) claude_sessions_new ;;
+    pi) pi_sessions_new ;;
+    *) return 1 ;;
+  esac
+}
+
+ai_sessions_fork() {
+  local agent
+  agent=$(ai_sessions_effective_agent "$1")
+
+  case "$agent" in
+    claude) claude_sessions_fork "$2" ;;
+    pi) pi_sessions_fork "$2" ;;
+    *) return 1 ;;
+  esac
+}
+
+ai_sessions_ignore() {
+  local agent
+  agent=$(ai_sessions_effective_agent "$1")
+
+  case "$agent" in
+    claude) claude_sessions_ignore "$2" ;;
+    pi) pi_sessions_ignore "$2" ;;
+    *) return 1 ;;
+  esac
+}
+
+ai_sessions_clear() {
+  local agent
+  agent=$(ai_sessions_effective_agent "$1")
+
+  case "$agent" in
+    claude) claude_sessions_clear "$2" ;;
+    pi) pi_sessions_clear "$2" ;;
+    *) return 1 ;;
+  esac
+}
+
+ai_sessions_run() {
+  local agent="$1"
+  local script_path
+  script_path=$(realpath "$0")
+  local refresh_interval="${REFRESH_INTERVAL:-4}"
+  local agent_arg
+  agent_arg=$(ai_sessions_agent_arg "$agent")
+  local list_command="$script_path list$agent_arg"
+
+  (
+    sleep "$refresh_interval"
+    while true; do
+      curl -s "localhost:$AI_SESSIONS_FZF_LISTEN_PORT" -d "reload($list_command)" >/dev/null 2>&1 || break
+      sleep "$refresh_interval"
+    done
+  ) &
+  local reload_pid=$!
+  trap "kill $reload_pid 2>/dev/null" EXIT
+
+  local list_json
+  list_json=$(ai_sessions_list_json "$agent")
+  local list
+  list=$(ai_sessions_render_list "$list_json")
+  local list_count
+  list_count=$(echo "$list_json" | jq 'length')
+  local height
+  height=$(ai_sessions_get_pane_height)
+  local preview_window
+  preview_window=$(ai_sessions_preview_window "$height" "$list_count")
+  local selected
+  selected=$(printf '%s' "$list" | fzf --ansi \
+    --disabled \
+    --no-sort \
+    --info=hidden \
+    --no-separator \
+    --pointer='' \
+    --no-input \
+    --listen "$AI_SESSIONS_FZF_LISTEN_PORT" \
+    --with-nth=5.. \
+    --header "c=clear  ^q=quit  n=new  f=fork  i=ignore" \
+    --bind 'tab:down,btab:up' \
+    --bind 'focus:refresh-preview' \
+    --bind 'load:refresh-preview' \
+    --bind "ctrl-r:reload:$list_command" \
+    --bind "f:execute($script_path fork --agent={4} {3})+abort" \
+    --bind "n:execute($script_path new$agent_arg)" \
+    --bind "i:execute-silent($script_path ignore --agent={4} {3})+reload:$list_command" \
+    --bind "c:execute($script_path clear --agent={4} {2})+reload:$list_command" \
+    --bind "ctrl-q:execute-silent($HOME/Scripts/tmux-kill-session --yes {2})+reload:$list_command" \
+    --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
+    --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
+    --bind 's:abort+execute-silent(tmux select-window -t :3)' \
+    --bind 't:abort+execute-silent(tmux select-window -t :4)' \
+    --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
+    --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
+    --bind 'alt-shift-left:abort' \
+    --bind 'alt-shift-right:abort' \
+    --bind 'start:first+unbind(a,r,s,t,g,m)' \
+    --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
+    --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
+    --preview-window "$preview_window" \
+    --layout=reverse \
+    --preview 'tmux capture-pane -ep -t {2} -S - | tail -n $FZF_PREVIEW_LINES')
+
+  if [[ -n "$selected" ]]; then
+    local target
+    target=$(echo "$selected" | cut -f2)
+    tmux switch-client -t "$target"
+  fi
+}
+
+action="run"
+agent=""
+declare -a positionals=()
+
+while (( $# > 0 )); do
+  case "$1" in
+    --agent=*)
+      agent=$(ai_sessions_normalize_agent "${1#*=}") || { echo "invalid agent: ${1#*=}" >&2; exit 1; }
+      ;;
+    --agent)
+      shift
+      agent=$(ai_sessions_normalize_agent "${1:-}") || { echo "invalid agent: ${1:-}" >&2; exit 1; }
+      ;;
+    run|list|debug|new|fork|ignore|clear)
+      action="$1"
+      ;;
+    *)
+      positionals+=("$1")
+      ;;
+  esac
+  shift
+done
+
+case "$action" in
+  list)
+    ai_sessions_render_list "$(ai_sessions_list_json "$agent")"
+    ;;
+  debug)
+    ai_sessions_debug_lines "$(ai_sessions_list_json "$agent")"
+    ;;
+  new)
+    ai_sessions_new "$agent"
+    ;;
+  fork)
+    ai_sessions_fork "$agent" "${positionals[0]:-}"
+    ;;
+  ignore)
+    ai_sessions_ignore "$agent" "${positionals[0]:-}"
+    ;;
+  clear)
+    ai_sessions_clear "$agent" "${positionals[0]:-}"
+    ;;
+  run)
+    ai_sessions_run "$agent"
+    ;;
+esac

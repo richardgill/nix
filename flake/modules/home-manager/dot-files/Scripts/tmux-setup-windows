@@ -1,17 +1,35 @@
 #!/usr/bin/env bash
 
+session_name_for_path() {
+  local expanded_path="$1"
+  if [ -d "$(realpath "$expanded_path/../main" 2>/dev/null)" ]; then
+    echo "$(basename "$(dirname "$expanded_path")")/$(basename "$expanded_path")"
+  else
+    echo "$(basename "$expanded_path")"
+  fi
+}
+
 create_worktree_session() {
   local expanded_path="$1"
   local detached="$2"
-  local session_name="$(basename "$(dirname "$expanded_path")")/$(basename "$expanded_path")"
+  local session_name
+  session_name=$(session_name_for_path "$expanded_path")
   tmux new-session -d -s "$session_name" -c "$expanded_path"
-  [[ -z "$detached" ]] && tmux switch-client -t "$session_name"
+  if [[ -z "$detached" ]]; then
+    tmux switch-client -t "$session_name"
+  elif [[ -n "$TMUX" ]]; then
+    local prev_session
+    prev_session=$(tmux display-message -p "#{session_name}")
+    tmux switch-client -t "$session_name"
+    tmux switch-client -t "$prev_session"
+  fi
   echo "$session_name"
 }
 
 create_repo_session() {
   local expanded_path="$1"
-  local session_name="$(basename "$expanded_path")"
+  local session_name
+  session_name=$(session_name_for_path "$expanded_path")
   tmux new-session -d -s "$session_name" -c "$expanded_path"
   tmux switch-client -t "$session_name"
   echo "$session_name"
@@ -27,9 +45,13 @@ create_session_for_path() {
   fi
 }
 
+source ~/Scripts/lib/ai-agent
+
 setup_tmux_windows() {
   local session_name="$1"
   local ai1_cmd="$2"
+  local default_ai
+  default_ai=$(default_ai_agent)
   if [ -z "$session_name" ] && [ -n "$TMUX" ]; then
     session_name=$(tmux display-message -p "#{session_name}")
   fi
@@ -48,11 +70,11 @@ setup_tmux_windows() {
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "short"
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"
 
-    AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
+    AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
+    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-$default_ai}" Enter
 
-    AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_2" "cl" Enter
+    AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
+    tmux send-keys -t "$AI_WINDOW_2" "$default_ai" Enter
 
     # Stagger Claude Code launches - concurrent starts cause issues
     # AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")

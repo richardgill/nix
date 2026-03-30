@@ -1,0 +1,110 @@
+source ~/Scripts/lib/claude
+
+claude_sessions_list_json() {
+  list_claude_sessions | jq 'map(. + {agent: "claude"})'
+}
+
+claude_sessions_tmux_sessions_list() {
+  tmux list-sessions -F '#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_name}' \
+    | sort -t$'\t' -k1 -rn \
+    | while IFS=$'\t' read -r _ name; do
+      [[ -z "$name" ]] && continue
+      printf '%s\t\033[34m\033[0m %s\n' "$name" "$name"
+    done
+}
+
+claude_sessions_new() {
+  local selected
+  selected=$(claude_sessions_tmux_sessions_list | fzf --ansi \
+    --no-sort \
+    --prompt '⚡  ' \
+    --with-nth=2.. \
+    --header 'Start new Claude in session (esc to go back)' \
+    --bind 'tab:down,btab:up')
+
+  [[ -z "$selected" ]] && return
+
+  local session_name
+  session_name=$(echo "$selected" | cut -f1)
+  local reusable_target
+  reusable_target=$(list_claude_sessions --include-new | jq -r --arg sess "$session_name" '
+    .[] | select((.state == "cleared" or .state == "new") and .tmux_session == $sess) | .tmux_target
+  ' | head -1)
+
+  if [[ -n "$reusable_target" ]]; then
+    tmux switch-client -t "$reusable_target"
+    return
+  fi
+
+  local start_dir
+  start_dir=$(tmux display -t "${session_name}:0" -p '#{pane_current_path}')
+  local target
+  target=$(tmux new-window -t "$session_name" -c "$start_dir" -P -F '#{session_name}:#{window_index}')
+  tmux send-keys -t "$target" "cl" Enter
+  tmux switch-client -t "$target"
+}
+
+claude_sessions_log_fork() {
+  local log_file="/tmp/claude-fork.log"
+  local msg="[$(date +%H:%M:%S)] $*"
+  echo "$msg" >> "$log_file"
+  echo "[claude-fork] $*" >&2
+}
+
+claude_sessions_fork() {
+  : > "/tmp/claude-fork.log"
+
+  local source_target="${1:-}"
+  claude_sessions_log_fork "Called with source_target='$source_target'"
+
+  local current_session
+  local session_id
+  if [[ -n "$source_target" ]]; then
+    current_session="${source_target%%:*}"
+    session_id=$(tmux display -t "$source_target" -p '#{@claude_session_id}' 2>/dev/null)
+  else
+    current_session=$(tmux display -p '#{session_name}')
+    session_id=$(tmux display -p '#{@claude_session_id}' 2>/dev/null)
+  fi
+
+  claude_sessions_log_fork "Current session: $current_session, Session ID: $session_id"
+  [[ -z "$session_id" ]] && { claude_sessions_log_fork "Error: No claude session ID found (use 'cl' wrapper to launch claude)"; return 1; }
+
+  local target
+  target=$(list_claude_sessions --include-new | jq -r --arg session "$current_session" '
+    first(.[] | select(.tmux_session == $session and .state == "new")) |
+    "\(.tmux_target)\t\(.pid)"
+  ' 2>/dev/null)
+
+  local target_window
+  local target_pid
+  target_window=$(echo "$target" | cut -f1)
+  target_pid=$(echo "$target" | cut -f2)
+
+  if [[ -z "$target_window" || "$target_window" == "null" || -z "$target_pid" || "$target_pid" == "null" ]]; then
+    claude_sessions_log_fork "No new window found, creating one in $current_session"
+    target_window=$(tmux new-window -t "$current_session" -P -F '#{session_name}:#{window_index}')
+    [[ -z "$target_window" ]] && { claude_sessions_log_fork "Failed to create window"; return 1; }
+    claude_sessions_log_fork "Created window: $target_window"
+    tmux send-keys -t "$target_window" "claude --resume $session_id --fork-session" Enter
+  else
+    claude_sessions_log_fork "Killing pid $target_pid and launching fork in $target_window"
+    kill "$target_pid" 2>/dev/null || true
+    for _ in {1..10}; do
+      kill -0 "$target_pid" 2>/dev/null || break
+      sleep 0.1
+    done
+    tmux send-keys -t "$target_window" "claude --resume $session_id --fork-session" Enter
+  fi
+
+  tmux select-window -t "$target_window"
+  claude_sessions_log_fork "Switched to $target_window - Done"
+}
+
+claude_sessions_ignore() {
+  claude_toggle_ignore_session "$1"
+}
+
+claude_sessions_clear() {
+  tmux respawn-pane -k -t "$1" "$HOME/Scripts/cl"
+}

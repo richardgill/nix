@@ -23,3 +23,5 @@ If build fails with "Path X already exists", move conflicting files to persisten
 To debug scripts in `flake/modules/home-manager/dot-files/Scripts/`, run them directly from the repo rather than from `~/Scripts/`.
 
 my aliases are in my zshrc file
+
+Custom hapi fork lives at `~/code/hapi/richard-custom`. Run `~/code/hapi/richard-custom/scripts/build-local.sh` to rebuild the binary. It's on PATH (via `bun-linux-x64-baseline` dir) in `flake/modules/home-manager/nixos/headless/home.nix`.

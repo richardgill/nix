@@ -6,7 +6,7 @@ metadata:
     subProcess: true
     subProcessContext: fork
     model: openai-codex/gpt-5.4
-    thinkingLevel: xhigh
+    thinkingLevel: high
 allowed-tools: Grep, Glob, Read
 ---
 

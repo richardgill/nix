@@ -162,7 +162,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id=r#"^spotify$"#
+    match app-id=r#"(?i)^spotify$"#
     open-on-workspace "music"
     open-maximized-to-edges true
 }
