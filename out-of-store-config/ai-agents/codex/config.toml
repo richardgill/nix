@@ -15,8 +15,7 @@ approval_policy = "never"
 # Options: read-only, workspace-write, danger-full-access
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
-model = "gpt-5.3-codex-spark"
-service_tier = "fast"
+model = "gpt-5.4"
 
 [sandbox_workspace_write]
 network_access = true
@@ -39,5 +38,11 @@ exclude = ["AWS_SECRET*", "AZURE_*", "GOOGLE_*"]
 [projects."/home/rich/code/notes"]
 trust_level = "trusted"
 
+[projects."/home/rich/code/nix-private"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
+
+[plugins."github@openai-curated"]
+enabled = true

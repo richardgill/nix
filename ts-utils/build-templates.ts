@@ -34,6 +34,7 @@ const templateDataSchema = z
     musicDir: z.string(),
     anthropicApiKeyPath: z.string(),
     kagiApiKeyPath: z.string(),
+    kagiSessionTokenPath: z.string(),
     tavilyApiKeyPath: z.string(),
     openaiApiKeyPath: z.string(),
     joistApiKeyPath: z.string(),
@@ -45,6 +46,7 @@ const templateDataSchema = z
     firefoxProfilePath: z.string(),
     firefoxProfilePathUrlEncoded: z.string(),
     defaultEngineIdHash: z.string(),
+    defaultAiAgent: z.string(),
     profilePath: z.string(),
   })
   .strict();

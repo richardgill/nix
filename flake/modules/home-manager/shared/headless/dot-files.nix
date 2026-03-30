@@ -21,7 +21,7 @@ let
       vars
       ;
   };
-  inherit (templates) builtTemplates;
+  inherit (templates) builtTemplates templateData;
 
   # Programmatically generate Scripts entries
   scriptFiles = builtins.readDir ../../dot-files/Scripts;
@@ -120,8 +120,7 @@ in
       ".pi/agent/AGENTS.md".source = "${builtTemplates}/ai-agents/pi/AGENTS.md";
       ".pi/agent/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/settings.json";
-      ".pi/agent/presets.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/presets.json";
+      ".pi/agent/presets.json".source = "${builtTemplates}/ai-agents/pi/presets.json";
       ".pi/agent/keybindings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/keybindings.json";
       ".pi/agent/skills".source = "${builtTemplates}/ai-agents/pi/skills";
@@ -152,6 +151,8 @@ in
       ".config/sesh".source = ../../dot-files/sesh;
       ".ssh/config".source = ../../dot-files/ssh/config;
       ".config/yazi".source = ../../dot-files/yazi;
+
+      ".config/ai-agent".text = templateData.defaultAiAgent;
 
       ".config/voxtype/config.toml".source = ../../dot-files/voxtype/config.toml;
       ".config/pipewire/pipewire.conf.d".source = ../../dot-files/pipewire/pipewire.conf.d;

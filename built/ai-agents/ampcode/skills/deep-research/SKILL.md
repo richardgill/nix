@@ -1,10 +1,6 @@
 ---
-name: research-web
+name: deep-research
 description: Searches the web, fetches documentation, and searches GitHub code. Use when you need current information, documentation, or real-world code examples from the web.
-context: fork
-agent: general-purpose
-model: claude-sonnet-4-20250514
-user-invocable: true
 allowed-tools: WebSearch, WebFetch, Bash, Read, Grep, Glob
 ---
 

@@ -1,0 +1,12 @@
+{
+  "high": {
+    "provider": "openai-codex",
+    "model": "gpt-5.4",
+    "thinkingLevel": "high"
+  },
+  "xhigh": {
+    "provider": "openai-codex",
+    "model": "gpt-5.4",
+    "thinkingLevel": "xhigh"
+  }
+}

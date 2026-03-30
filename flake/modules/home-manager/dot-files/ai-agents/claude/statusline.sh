@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Claude Code status line script
 # Shows model, git status counts, context window info
@@ -69,30 +69,33 @@ git_padding=$((GIT_WIDTH - git_len))
 [ "$git_padding" -lt 0 ] && git_padding=0
 git_info="${git_info}$(printf '%*s' "$git_padding" '')"
 
-# Context window info (progress bar spanning 200k with 100k midpoint marker)
+# Context window info (progress bar scaled to actual context window size)
 context_info=""
 if [ "$context_size" -gt 0 ] 2>/dev/null; then
     total_tokens=$((current_input + current_output + cache_creation + cache_read))
     total_k=$((total_tokens / 1000))
 
-    # Progress bar: full=20 chars (10k/char), narrow=10 chars (20k/char)
-    # Midpoint │ at 100k (position 10 or 5)
+    if [ "$context_size" -ge 1000000 ]; then
+        context_max_label=$(awk "BEGIN {v=$context_size/1000000; if(v==int(v)) printf \"%dM\",v; else printf \"%.1fM\",v}")
+    else
+        context_max_label="$((context_size / 1000))k"
+    fi
+
     if [ "$narrow_term" -eq 1 ]; then
         bar_width=10
-        midpoint=5
-        tokens_per_char=20000
     else
         bar_width=20
-        midpoint=10
-        tokens_per_char=10000
     fi
+    midpoint=$((bar_width / 2))
+    tokens_per_char=$((context_size / bar_width))
     filled=$((total_tokens / tokens_per_char))
     [ "$filled" -gt "$bar_width" ] && filled=$bar_width
 
-    # Color based on token usage: red at 100k+, yellow at 70k+, purple otherwise
-    if [ "$total_tokens" -ge 100000 ]; then
+    threshold_red=$((context_size / 2))
+    threshold_yellow=$((context_size * 35 / 100))
+    if [ "$total_tokens" -ge "$threshold_red" ]; then
         bar_color="$RED"
-    elif [ "$total_tokens" -ge 70000 ]; then
+    elif [ "$total_tokens" -ge "$threshold_yellow" ]; then
         bar_color="$YELLOW"
     else
         bar_color="$PURPLE"
@@ -111,7 +114,7 @@ if [ "$context_size" -gt 0 ] 2>/dev/null; then
         fi
     done
 
-    context_info="${total_k}k ${bar_color}[${bar}${bar_color}]${RESET} 200k"
+    context_info="${total_k}k ${bar_color}[${bar}${bar_color}]${RESET} ${context_max_label}"
 fi
 
 # Model info

@@ -91,6 +91,7 @@
           ".claude/statsig"
           ".claude/todos"
           ".codex/sessions"
+          ".hapi"
           ".pi/agent/sessions"
           ".config/chromium"
           ".config/google-chrome"

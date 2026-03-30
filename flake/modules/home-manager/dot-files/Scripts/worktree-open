@@ -33,6 +33,9 @@ if [ -n "$TMUX" ]; then
     exit 0
   fi
 
+  tmux rename-session -t "$session_name" "$(session_name_for_path "$(pwd)")"
+  session_name=$(tmux display-message -p "#{session_name}")
+
   # Count total windows in the session
   existing_windows=$(tmux list-windows -t "$session_name" | wc -l)
 

@@ -9,6 +9,7 @@ let
     "anthropic-api-key"
     "kagi-api-key"
     "kagi-search-token"
+    "kagi-session-token"
     "tavily-api-key"
     "openai-api-key"
     "joist-api-key"

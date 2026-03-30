@@ -55,7 +55,7 @@ cat > ~/bin/update-termux << 'EOF'
 set -e
 cd ~/nix
 git pull
-./modules/home-manager/dot-files/termux/install.sh
+./flake/modules/home-manager/dot-files/termux/install.sh
 EOF
 chmod +x ~/bin/update-termux
 echo "  Created ~/bin/update-termux"

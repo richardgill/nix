@@ -5,7 +5,7 @@ metadata:
   pi:
     subProcess: false
     model: openai-codex/gpt-5.4
-    thinkingLevel: xhigh
+    thinkingLevel: high
 
 ---
 
