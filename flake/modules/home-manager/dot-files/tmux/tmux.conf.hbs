@@ -184,7 +184,10 @@ run-shell {{ continuumPlugin }}
 # Ensure "code" session always exists (respawns if killed)
 set-hook -g session-closed 'run-shell "tmux has-session -t code 2>/dev/null || tmux new-session -d -s code -c {{ homeDir }}/code"'
 
+# Detach clients with absurd terminal sizes (ET/Termux sends garbage dimensions)
+set-hook -g client-attached 'run-shell "{{ homeDir }}/Scripts/tmux-guard-client-size"'
+
 # Dynamic status bar: 2 lines on narrow terminals, 1 line on wide
-set-hook -g client-resized 'run-shell "{{ homeDir }}/Scripts/tmux-status-resize"'
+set-hook -g client-resized 'run-shell "{{ homeDir }}/Scripts/tmux-guard-client-size && {{ homeDir }}/Scripts/tmux-status-resize"'
 set-hook -g client-session-changed 'run-shell "{{ homeDir }}/Scripts/tmux-status-resize"'
 run-shell "{{ homeDir }}/Scripts/tmux-status-resize"

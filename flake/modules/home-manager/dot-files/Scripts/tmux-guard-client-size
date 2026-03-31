@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Detach tmux clients that report absurd terminal dimensions.
+# ET (Eternal Terminal) can send garbage sizes (e.g. 27082x55986) when
+# ioctl(TIOCGWINSZ) fails on the client side (common with Termux on Android).
+# This causes tmux to hang trying to render ~1.5 billion cells.
+
+MAX_WIDTH=1000
+MAX_HEIGHT=1000
+
+while IFS= read -r line; do
+  tty=$(echo "$line" | awk '{print $1}')
+  width=$(echo "$line" | awk '{print $2}')
+  height=$(echo "$line" | awk '{print $3}')
+
+  if (( width > MAX_WIDTH || height > MAX_HEIGHT )); then
+    tmux detach-client -t "$tty"
+  fi
+done < <(tmux list-clients -F '#{client_tty} #{client_width} #{client_height}' 2>/dev/null)
