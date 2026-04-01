@@ -3,8 +3,8 @@
 am startservice --user 0 \
   -n com.termux/com.termux.app.TermuxService \
   -a com.termux.service_execute \
-  --es com.termux.execute.command_path "$HOME/.shortcuts/scripts/um790" \
+  -d "com.termux.file:$HOME/.shortcuts/scripts/um790" \
   --es com.termux.execute.runner "terminal-session" \
   --es com.termux.execute.shell_name "um790" \
   --es com.termux.execute.shell_create_mode "no-shell-with-name" \
-  --ei com.termux.execute.session_action 0
+  --es com.termux.execute.session_action "0"
