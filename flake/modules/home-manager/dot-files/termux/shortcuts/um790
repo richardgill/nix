@@ -1,0 +1,4 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# If ET is already running, exit immediately (closes this duplicate tab)
+pgrep -x et && exit 0
+et rich@um790 -e -c 't'

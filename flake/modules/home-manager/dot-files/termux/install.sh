@@ -25,14 +25,11 @@ cp "$SCRIPT_DIR/colors.properties" ~/.termux/
 echo "  Copied termux.properties and colors.properties"
 
 # Install widget shortcuts (for Termux:Widget from F-Droid)
-# scripts/ = actual commands, tasks/ = singleton launchers (background, no terminal)
-mkdir -p ~/.shortcuts/scripts ~/.shortcuts/tasks
-rm -f ~/.shortcuts/um790
-cp "$SCRIPT_DIR/scripts/"* ~/.shortcuts/scripts/
-chmod +x ~/.shortcuts/scripts/*
-cp "$SCRIPT_DIR/launchers/"* ~/.shortcuts/tasks/
-chmod +x ~/.shortcuts/tasks/*
-echo "  Installed widget shortcuts (singleton launchers)"
+mkdir -p ~/.shortcuts
+rm -rf ~/.shortcuts/scripts ~/.shortcuts/tasks
+cp "$SCRIPT_DIR/shortcuts/"* ~/.shortcuts/
+chmod +x ~/.shortcuts/*
+echo "  Installed widget shortcuts"
 
 # Install nerd font via termux-nf
 if [[ ! -f ~/.termux/font.ttf ]]; then
