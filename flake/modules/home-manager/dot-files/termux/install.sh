@@ -25,10 +25,14 @@ cp "$SCRIPT_DIR/colors.properties" ~/.termux/
 echo "  Copied termux.properties and colors.properties"
 
 # Install widget shortcuts (for Termux:Widget from F-Droid)
-mkdir -p ~/.shortcuts
-cp "$SCRIPT_DIR/um790" ~/.shortcuts/
-chmod +x ~/.shortcuts/um790
-echo "  Installed ~/.shortcuts/um790 (add Termux:Widget to home screen)"
+# scripts/ = actual commands, tasks/ = singleton launchers (background, no terminal)
+mkdir -p ~/.shortcuts/scripts ~/.shortcuts/tasks
+rm -f ~/.shortcuts/um790
+cp "$SCRIPT_DIR/scripts/"* ~/.shortcuts/scripts/
+chmod +x ~/.shortcuts/scripts/*
+cp "$SCRIPT_DIR/launchers/"* ~/.shortcuts/tasks/
+chmod +x ~/.shortcuts/tasks/*
+echo "  Installed widget shortcuts (singleton launchers)"
 
 # Install nerd font via termux-nf
 if [[ ! -f ~/.termux/font.ttf ]]; then
@@ -59,6 +63,21 @@ git pull
 EOF
 chmod +x ~/bin/update-termux
 echo "  Created ~/bin/update-termux"
+
+# Set SharedPreferences (settings not available in termux.properties)
+PREFS_DIR="/data/data/com.termux/shared_prefs"
+PREFS_FILE="$PREFS_DIR/com.termux_preferences.xml"
+if [[ -f "$PREFS_FILE" ]]; then
+    # Enable keep screen on
+    if grep -q 'name="screen_always_on"' "$PREFS_FILE"; then
+        sed -i 's|<boolean name="screen_always_on" value="false"/>|<boolean name="screen_always_on" value="true"/>|' "$PREFS_FILE"
+    else
+        sed -i 's|</map>|    <boolean name="screen_always_on" value="true" />\n</map>|' "$PREFS_FILE"
+    fi
+    echo "  Set screen_always_on=true in SharedPreferences"
+else
+    echo "  Warning: SharedPreferences file not found, set 'Keep screen on' manually via long-press menu"
+fi
 
 # Reload settings
 termux-reload-settings
