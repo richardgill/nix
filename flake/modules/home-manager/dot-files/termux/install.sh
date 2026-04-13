@@ -94,6 +94,13 @@ EOF
 chmod +x ~/bin/ett
 echo "  Installed ~/bin/ett"
 
+if command -v termux-fix-shebang > /dev/null; then
+    termux-fix-shebang ~/Scripts/et-with-tunnel ~/Scripts/tunnel-setup ~/.shortcuts/* ~/bin/ett
+    echo "  Fixed shebangs for Termux:Widget scripts"
+else
+    echo "  Warning: termux-fix-shebang not found, widget scripts may fail"
+fi
+
 if ! grep -q "alias ett=" ~/.bashrc 2>/dev/null; then
     echo "alias ett='et-with-tunnel'" >> ~/.bashrc
     echo "  Added ett alias to .bashrc"
