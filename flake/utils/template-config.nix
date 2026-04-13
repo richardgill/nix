@@ -11,11 +11,11 @@ let
     else
       "${homeDir}/.mozilla/firefox";
 
-  firefoxProfilePathUrlEncoded =
+  firefoxProxyPacPathUrlEncoded =
     if pkgs.stdenv.isDarwin then
-      "${homeDir}/Library/Application%20Support/Firefox/Profiles/default"
+      "${homeDir}/Library/Application%20Support/Firefox/proxy.pac"
     else
-      "${firefoxConfigDir}/default";
+      "${firefoxConfigDir}/default/proxy.pac";
 
   firefoxProfilePath =
     if pkgs.stdenv.isDarwin then "Profiles/default" else "default";
@@ -37,7 +37,7 @@ let
       ''
     )
   );
-  defaultAiAgent = "cl";
+  defaultAiAgent = "pi";
 in
 {
   isDarwin = pkgs.stdenv.isDarwin;
@@ -58,6 +58,11 @@ in
   catppuccinPlugin = "${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux";
   resurrectPlugin = "${pkgs.tmuxPlugins.resurrect}/share/tmux-plugins/resurrect/resurrect.tmux";
   continuumPlugin = "${pkgs.tmuxPlugins.continuum}/share/tmux-plugins/continuum/continuum.tmux";
-  inherit firefoxProfilePath firefoxProfilePathUrlEncoded defaultEngineIdHash defaultAiAgent;
+  inherit
+    firefoxProfilePath
+    firefoxProxyPacPathUrlEncoded
+    defaultEngineIdHash
+    defaultAiAgent
+    ;
   profilePath = firefoxProfilePath;
 }

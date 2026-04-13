@@ -47,6 +47,9 @@ trust_level = "trusted"
 [projects."/home/rich/code/xata/maki/main"]
 trust_level = "trusted"
 
+[projects."/Users/rich/code/nix-private"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 

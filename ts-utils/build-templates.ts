@@ -44,7 +44,7 @@ const templateDataSchema = z
     resurrectPlugin: z.string(),
     continuumPlugin: z.string(),
     firefoxProfilePath: z.string(),
-    firefoxProfilePathUrlEncoded: z.string(),
+    firefoxProxyPacPathUrlEncoded: z.string(),
     defaultEngineIdHash: z.string(),
     defaultAiAgent: z.string(),
     profilePath: z.string(),

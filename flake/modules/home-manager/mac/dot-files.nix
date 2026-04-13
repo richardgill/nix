@@ -43,6 +43,8 @@ _:
     after = [ "writeBoundary" ];
     before = [ ];
     data = ''
+      chmod -R +w "$HOME/Library/Application Support/com.ospfranco.sol" 2>/dev/null || true
+      rm -rf "$HOME/Library/Application Support/com.ospfranco.sol"
       mkdir -p "$HOME/Library/Application Support/com.ospfranco.sol"
       cp -rf "${./dot-files}/Application Support/com.ospfranco.sol/"* "$HOME/Library/Application Support/com.ospfranco.sol/"
       mkdir -p "$HOME/Library/Preferences"

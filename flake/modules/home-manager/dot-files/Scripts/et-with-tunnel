@@ -9,7 +9,7 @@
 HOST="${1:?Usage: et-with-tunnel <remote-host> [remote-user] [et-args...]}"
 shift
 
-REMOTE_USER="$USER"
+REMOTE_USER="${TUNNEL_REMOTE_USER:-$USER}"
 if [ $# -gt 0 ] && [[ "$1" != -* ]]; then
   REMOTE_USER="$1"
   shift

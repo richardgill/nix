@@ -38,6 +38,17 @@ cp "$SCRIPT_DIR/termux.properties" ~/.termux/
 cp "$SCRIPT_DIR/colors.properties" ~/.termux/
 echo "  Copied termux.properties and colors.properties"
 
+if ! grep -q '^Host um790$' ~/.ssh/config 2>/dev/null; then
+    cat >> ~/.ssh/config << 'EOF'
+
+Host um790
+    User rich
+EOF
+    echo "  Added SSH user mapping for um790"
+else
+    echo "  SSH user mapping for um790 already set"
+fi
+
 # Install widget shortcuts (for Termux:Widget from F-Droid)
 mkdir -p ~/.shortcuts
 rm -rf ~/.shortcuts/scripts ~/.shortcuts/tasks
@@ -81,6 +92,13 @@ if ! grep -q "alias ett=" ~/.bashrc 2>/dev/null; then
     echo "  Added ett alias to .bashrc"
 else
     echo "  ett alias already set"
+fi
+
+if ! grep -q "TUNNEL_REMOTE_USER" ~/.bashrc 2>/dev/null; then
+    echo 'export TUNNEL_REMOTE_USER=rich' >> ~/.bashrc
+    echo "  Set TUNNEL_REMOTE_USER=rich in .bashrc"
+else
+    echo "  TUNNEL_REMOTE_USER already set"
 fi
 
 # Termux sshd listens on 8022, not 22 - tunnel-setup reads this as the

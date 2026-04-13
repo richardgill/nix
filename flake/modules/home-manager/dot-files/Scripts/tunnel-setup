@@ -2,7 +2,7 @@
 # Helper script for reverse SSH tunnel with tunnel-open script (https://github.com/suan/local-open)
 
 REMOTE_HOST="${1:-}"
-REMOTE_USER="${2:-$USER}"
+REMOTE_USER="${2:-${TUNNEL_REMOTE_USER:-$USER}}"
 SSH_PORT="${3:-${TUNNEL_SSH_PORT:-22}}"
 TUNNEL_PORT="${4:-1999}"
 
