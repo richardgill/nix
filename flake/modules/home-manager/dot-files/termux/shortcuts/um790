@@ -1,4 +1,9 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # If ET is already running, exit immediately (closes this duplicate tab)
 pgrep -x et && exit 0
-et rich@um790 -e -c 't'
+# Make sure sshd is up so reverse tunnels (beep, tunnel-open) can reach us
+pgrep -x sshd > /dev/null || sshd
+# Ensure ett and tunnel-setup are on PATH even if .bashrc hasn't sourced yet
+export PATH="$HOME/Scripts:$HOME/bin:$PATH"
+export TUNNEL_SSH_PORT="${TUNNEL_SSH_PORT:-8022}"
+ett um790 rich -e -c 't'

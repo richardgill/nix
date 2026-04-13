@@ -3,13 +3,21 @@
 
 REMOTE_HOST="${1:-}"
 REMOTE_USER="${2:-$USER}"
-SSH_PORT="${3:-22}"
+SSH_PORT="${3:-${TUNNEL_SSH_PORT:-22}}"
 TUNNEL_PORT="${4:-1999}"
+
+# Space-separated list of dev ports to forward client→remote alongside the
+# reverse tunnel, so `localhost:PORT` in a local browser hits the remote's
+# dev server. Set FORWARD_PORTS="" to disable. Failures are non-fatal, so
+# ports already bound locally just get skipped.
+FORWARD_PORTS="${FORWARD_PORTS-3000 3001 3002 3003 4000 4001 4002 4003 4004 4005 4006 4321 5173 5174 8000 8080 8888}"
 
 if [ -z "$REMOTE_HOST" ]; then
   echo "Usage: tunnel-setup <remote-host> [remote-user] [ssh-port] [tunnel-port]"
   echo ""
-  echo "Creates a reverse SSH tunnel for tunnel-open to work from a remote host."
+  echo "Creates a reverse SSH tunnel for tunnel-open to work from a remote host,"
+  echo "plus forward tunnels for common dev ports so remote dev servers are"
+  echo "reachable as localhost:PORT on this machine."
   echo ""
   echo "Arguments:"
   echo "  remote-host      Remote hostname or IP (required)"
@@ -17,28 +25,51 @@ if [ -z "$REMOTE_HOST" ]; then
   echo "  ssh-port         SSH port on local machine (default: 22)"
   echo "  tunnel-port      Tunnel port on remote (default: 1999)"
   echo ""
+  echo "Environment:"
+  echo "  FORWARD_PORTS    Space-separated dev ports to forward (default: 3000"
+  echo "                   3001 3002 3003 4000 4001 4002 4003 4004 4005 4006"
+  echo "                   4321 5173 5174 8000 8080 8888). Set to empty string"
+  echo "                   to disable forward tunnels."
+  echo "  TUNNEL_SSH_PORT  Fallback default for ssh-port when positional arg"
+  echo "                   is omitted (useful for termux: 8022)."
+  echo ""
   echo "Examples:"
   echo "  tunnel-setup myserver.com"
   echo "  tunnel-setup 192.168.1.100 myuser 22 1999"
+  echo "  FORWARD_PORTS=\"3000 5173\" tunnel-setup um790"
   echo ""
   echo "On the remote host, set: export TUNNEL_PORT=$TUNNEL_PORT"
   exit 1
 fi
 
+forward_args=()
+for port in $FORWARD_PORTS; do
+  forward_args+=(-L "$port:$REMOTE_HOST:$port")
+done
+
 # autossh is more robust at keeping the session open
 # -f fork into background
 # -N tunneling
-# -R reverse tunnel
+# -R reverse tunnel (for tunnel-open / beep from remote)
+# -L forward tunnels (for localhost:PORT → remote dev servers)
 if command -v autossh &> /dev/null; then
   echo "Starting reverse SSH tunnel with autossh..."
-  echo "Remote: $REMOTE_USER@$REMOTE_HOST"
-  echo "Tunnel: $TUNNEL_PORT:localhost:$SSH_PORT"
-  autossh -M $((TUNNEL_PORT - 1)) -f -N -R "$TUNNEL_PORT:localhost:$SSH_PORT" "$REMOTE_USER@$REMOTE_HOST"
+  echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
+  echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
+  [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
+  autossh -M $((TUNNEL_PORT - 1)) -f -N \
+    -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
+    "${forward_args[@]}" \
+    "$REMOTE_USER@$REMOTE_HOST"
 else
   echo "autossh not found, using plain ssh..."
-  echo "Remote: $REMOTE_USER@$REMOTE_HOST"
-  echo "Tunnel: $TUNNEL_PORT:localhost:$SSH_PORT"
-  ssh -f -N -R "$TUNNEL_PORT:localhost:$SSH_PORT" "$REMOTE_USER@$REMOTE_HOST"
+  echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
+  echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
+  [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
+  ssh -f -N \
+    -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
+    "${forward_args[@]}" \
+    "$REMOTE_USER@$REMOTE_HOST"
 fi
 
 echo ""

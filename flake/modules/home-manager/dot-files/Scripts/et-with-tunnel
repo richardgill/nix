@@ -1,24 +1,30 @@
 #!/usr/bin/env bash
 # Eternal Terminal with automatic reverse tunnel setup
-# Usage: et-with-tunnel <remote-host> [remote-user]
-#        ett <remote-host> [remote-user]  (alias)
+# Usage: et-with-tunnel <remote-host> [remote-user] [et-args...]
+#        ett <remote-host> [remote-user] [et-args...]  (alias)
 #
 # Establishes a reverse SSH tunnel in background, then connects with ET.
 # On the remote, you can use 'tunnel-open' and 'beep' to interact with your local machine.
 
-HOST="${1:?Usage: et-with-tunnel <remote-host> [remote-user]}"
-USER="${2:-$USER}"
+HOST="${1:?Usage: et-with-tunnel <remote-host> [remote-user] [et-args...]}"
+shift
 
-tunnel-setup "$@"
+REMOTE_USER="$USER"
+if [ $# -gt 0 ] && [[ "$1" != -* ]]; then
+  REMOTE_USER="$1"
+  shift
+fi
+
+tunnel-setup "$HOST" "$REMOTE_USER"
 
 # Connect with Eternal Terminal (handles reconnection automatically)
 # Fall back to SSH if ET not available
 if command -v et &>/dev/null; then
-  et "$USER@$HOST"
+  et "$REMOTE_USER@$HOST" "$@"
 else
   if command -v caffeinate &>/dev/null; then
-    caffeinate -i ssh "$USER@$HOST"
+    caffeinate -i ssh "$REMOTE_USER@$HOST" "$@"
   else
-    ssh "$USER@$HOST"
+    ssh "$REMOTE_USER@$HOST" "$@"
   fi
 fi
