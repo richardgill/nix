@@ -15,20 +15,6 @@ else
     echo "  Eternal Terminal already installed"
 fi
 
-if ! command -v autossh &> /dev/null; then
-    echo "  Installing autossh..."
-    pkg install -y autossh
-else
-    echo "  autossh already installed"
-fi
-
-if ! command -v sshd &> /dev/null; then
-    echo "  Installing openssh..."
-    pkg install -y openssh
-else
-    echo "  openssh already installed"
-fi
-
 # Create directories
 mkdir -p ~/.termux
 mkdir -p ~/.ssh
@@ -37,17 +23,6 @@ mkdir -p ~/.ssh
 cp "$SCRIPT_DIR/termux.properties" ~/.termux/
 cp "$SCRIPT_DIR/colors.properties" ~/.termux/
 echo "  Copied termux.properties and colors.properties"
-
-if ! grep -q '^Host um790$' ~/.ssh/config 2>/dev/null; then
-    cat >> ~/.ssh/config << 'EOF'
-
-Host um790
-    User rich
-EOF
-    echo "  Added SSH user mapping for um790"
-else
-    echo "  SSH user mapping for um790 already set"
-fi
 
 # Install widget shortcuts (for Termux:Widget from F-Droid)
 mkdir -p ~/.shortcuts
@@ -75,61 +50,25 @@ else
     echo "  ~/bin already in PATH"
 fi
 
-# Symlink shared Scripts dir so ett/tunnel-* and friends are available,
-# matching the ~/Scripts layout used on NixOS/Mac home-manager
-ln -sfn "$SCRIPT_DIR/../Scripts" ~/Scripts
-echo "  Symlinked ~/Scripts -> $SCRIPT_DIR/../Scripts"
-
-if ! grep -q 'PATH="$HOME/Scripts' ~/.bashrc 2>/dev/null; then
-    echo 'export PATH="$HOME/Scripts:$PATH"' >> ~/.bashrc
-    echo "  Added ~/Scripts to PATH in .bashrc"
-else
-    echo "  ~/Scripts already in PATH"
+rm -f ~/bin/ett
+if [[ -L ~/Scripts ]]; then
+    rm ~/Scripts
 fi
 
-cat > ~/bin/ett << 'EOF'
-#!/data/data/com.termux/files/usr/bin/bash
-exec et-with-tunnel "$@"
-EOF
-chmod +x ~/bin/ett
-echo "  Installed ~/bin/ett"
-
-if command -v termux-fix-shebang > /dev/null; then
-    termux-fix-shebang ~/Scripts/et-with-tunnel ~/Scripts/tunnel-setup ~/.shortcuts/* ~/bin/ett
-    echo "  Fixed shebangs for Termux:Widget scripts"
-else
-    echo "  Warning: termux-fix-shebang not found, widget scripts may fail"
+if [[ -f ~/.bashrc ]]; then
+    tmp_bashrc=$(mktemp)
+    grep -v -E "alias ett='et-with-tunnel'|export TUNNEL_REMOTE_USER=rich|export TUNNEL_SSH_PORT=8022|export PATH=\"\$HOME/Scripts:\$PATH\"" ~/.bashrc > "$tmp_bashrc"
+    mv "$tmp_bashrc" ~/.bashrc
 fi
 
-if ! grep -q "alias ett=" ~/.bashrc 2>/dev/null; then
-    echo "alias ett='et-with-tunnel'" >> ~/.bashrc
-    echo "  Added ett alias to .bashrc"
-else
-    echo "  ett alias already set"
-fi
-
-if ! grep -q "TUNNEL_REMOTE_USER" ~/.bashrc 2>/dev/null; then
-    echo 'export TUNNEL_REMOTE_USER=rich' >> ~/.bashrc
-    echo "  Set TUNNEL_REMOTE_USER=rich in .bashrc"
-else
-    echo "  TUNNEL_REMOTE_USER already set"
-fi
-
-# Termux sshd listens on 8022, not 22 - tunnel-setup reads this as the
-# fallback default so reverse tunnels target the right port
-if ! grep -q "TUNNEL_SSH_PORT" ~/.bashrc 2>/dev/null; then
-    echo 'export TUNNEL_SSH_PORT=8022' >> ~/.bashrc
-    echo "  Set TUNNEL_SSH_PORT=8022 in .bashrc"
-else
-    echo "  TUNNEL_SSH_PORT already set"
-fi
-
-# Start sshd so reverse tunnels (beep, tunnel-open) can reach this device
-if ! pgrep -x sshd > /dev/null; then
-    sshd
-    echo "  Started sshd on port 8022"
-else
-    echo "  sshd already running"
+if [[ -f ~/.ssh/config ]]; then
+    tmp_ssh_config=$(mktemp)
+    awk '
+        $0 == "Host um790" { skip = 1; next }
+        skip && $0 == "    User rich" { skip = 0; next }
+        { if (skip) skip = 0; print }
+    ' ~/.ssh/config > "$tmp_ssh_config"
+    mv "$tmp_ssh_config" ~/.ssh/config
 fi
 
 # Create update script in ~/bin
@@ -170,12 +109,5 @@ if [[ ! -f ~/.ssh/id_ed25519 ]]; then
     echo "  ssh-copy-id rich@<host>"
 fi
 
-# Reminder about reverse-tunnel auth
-if [[ ! -f ~/.ssh/authorized_keys ]]; then
-    echo ""
-    echo "For reverse tunnels (beep/tunnel-open) from remote hosts, add the"
-    echo "remote's public key to ~/.ssh/authorized_keys on this device."
-fi
-
 echo ""
-echo "Done! Connect with: ett <host>"
+echo "Done! Connect with: et <host>"
