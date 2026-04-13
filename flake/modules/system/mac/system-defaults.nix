@@ -103,15 +103,15 @@
             }
           ];
         };
-        "com.apple.inputsources" = {
-          AppleEnabledThirdPartyInputSources = [
-            {
-              InputSourceKind = "Keyboard Layout";
-              "KeyboardLayout ID" = -12952;
-              "KeyboardLayout Name" = "Unicode Hex Input - fixed british";
-            }
-          ];
-        };
+        # "com.apple.inputsources" = {
+        #   AppleEnabledThirdPartyInputSources = [
+        #     {
+        #       InputSourceKind = "Keyboard Layout";
+        #       "KeyboardLayout ID" = -12952;
+        #       "KeyboardLayout Name" = "Unicode Hex Input - fixed british";
+        #     }
+        #   ];
+        # };
 
       };
     };

@@ -9,10 +9,30 @@
 # @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
 # @arg dest_name Destination name (defaults to source_branch name)
 
+if [[ $# -eq 0 ]]; then
+  "$0" --help
+  cat <<'EXAMPLES'
+
+EXAMPLES:
+  wtb my-feature                          New branch + worktree from main
+  wtb origin/fix-login                    Fetch remote branch, create worktree
+  wtb origin/some-branch local-name       Remote branch with custom local name
+  wtb --prompt "fix the auth bug" my-fix  Start Claude with a prompt
+  wtb --prompt-file plan.md my-fix        Start Claude with a prompt file
+  wtb -p my-feature                       Auto-pull main if behind
+  wtb -d my-feature                       Create worktree, stay in current session
+EXAMPLES
+  exit 0
+fi
+
 eval "$(argc --argc-eval "$0" "$@")"
 
 source ~/Scripts/lib/ai-agent
 argc_binary="${argc_binary:-$(default_ai_agent)}"
+
+if is_ai_agent && [[ -z "$argc_no_switch" ]]; then
+  argc_no_switch=1
+fi
 
 if [[ -n "$argc_prompt_file" ]]; then
   argc_cmd="$argc_binary \"\$(cat '$(realpath "$argc_prompt_file")')\""
@@ -62,20 +82,26 @@ if [ -z "$DEST_NAME" ]; then
   DEST_NAME="$SOURCE_BRANCH"
 fi
 
-TARGET="$SOURCE/../$DEST_NAME"
+# Replace slashes with dashes so branch names become flat sibling directories
+# e.g. "dependabot/bun/foo" -> "dependabot-bun-foo"
+DIR_NAME="${DEST_NAME//\//-}"
+TARGET="$SOURCE/../$DIR_NAME"
 
-name_exists() {
-  local name="$1"
-  [ -d "$SOURCE/../$name" ] || git worktree list | grep -qE "\[$name\]$"
+dir_exists() {
+  [ -d "$SOURCE/../$1" ]
 }
 
-if name_exists "$DEST_NAME"; then
-  echo "Error: '$DEST_NAME' already exists" >&2
+branch_in_worktree() {
+  git worktree list | grep -qE "\[$1\]$"
+}
+
+if dir_exists "$DIR_NAME" || branch_in_worktree "$DEST_NAME"; then
+  echo "Error: '$DIR_NAME' already exists" >&2
   [ -d "$TARGET" ] && echo "  directory: $TARGET" >&2
   git worktree list | grep -E "\[$DEST_NAME\]$" | awk '{print "  worktree: " $1}' >&2
   n=1
-  while name_exists "$DEST_NAME-$n"; do ((n++)); done
-  echo "next available branch name: $DEST_NAME-$n" >&2
+  while dir_exists "$DIR_NAME-$n" || branch_in_worktree "$DEST_NAME-$n"; do ((n++)); done
+  echo "next available name: $DIR_NAME-$n" >&2
   exit 1
 fi
 

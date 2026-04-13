@@ -1,12 +1,12 @@
 {
+  "medium": {
+    "provider": "openai-codex",
+    "model": "gpt-5.3-codex",
+    "thinkingLevel": "medium"
+  },
   "high": {
     "provider": "openai-codex",
     "model": "gpt-5.4",
     "thinkingLevel": "high"
-  },
-  "xhigh": {
-    "provider": "openai-codex",
-    "model": "gpt-5.4",
-    "thinkingLevel": "xhigh"
   }
 }

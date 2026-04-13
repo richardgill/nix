@@ -9,6 +9,7 @@
     # xcb fallback was needed for android stuff
     QT_QPA_PLATFORM = "wayland;xcb";
     MOZ_ENABLE_WAYLAND = 1;
+    NIXOS_OZONE_WL = 1;
     WLR_RENDERER = "vulkan";
     XDG_SESSION_TYPE = "wayland";
     SDL_VIDEODRIVER = "wayland";

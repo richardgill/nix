@@ -15,6 +15,20 @@ else
     echo "  Eternal Terminal already installed"
 fi
 
+if ! command -v autossh &> /dev/null; then
+    echo "  Installing autossh..."
+    pkg install -y autossh
+else
+    echo "  autossh already installed"
+fi
+
+if ! command -v sshd &> /dev/null; then
+    echo "  Installing openssh..."
+    pkg install -y openssh
+else
+    echo "  openssh already installed"
+fi
+
 # Create directories
 mkdir -p ~/.termux
 mkdir -p ~/.ssh
@@ -48,6 +62,42 @@ if ! grep -q 'PATH="$HOME/bin' ~/.bashrc 2>/dev/null; then
     echo "  Added ~/bin to PATH in .bashrc"
 else
     echo "  ~/bin already in PATH"
+fi
+
+# Symlink shared Scripts dir so ett/tunnel-* and friends are available,
+# matching the ~/Scripts layout used on NixOS/Mac home-manager
+ln -sfn "$SCRIPT_DIR/../Scripts" ~/Scripts
+echo "  Symlinked ~/Scripts -> $SCRIPT_DIR/../Scripts"
+
+if ! grep -q 'PATH="$HOME/Scripts' ~/.bashrc 2>/dev/null; then
+    echo 'export PATH="$HOME/Scripts:$PATH"' >> ~/.bashrc
+    echo "  Added ~/Scripts to PATH in .bashrc"
+else
+    echo "  ~/Scripts already in PATH"
+fi
+
+if ! grep -q "alias ett=" ~/.bashrc 2>/dev/null; then
+    echo "alias ett='et-with-tunnel'" >> ~/.bashrc
+    echo "  Added ett alias to .bashrc"
+else
+    echo "  ett alias already set"
+fi
+
+# Termux sshd listens on 8022, not 22 - tunnel-setup reads this as the
+# fallback default so reverse tunnels target the right port
+if ! grep -q "TUNNEL_SSH_PORT" ~/.bashrc 2>/dev/null; then
+    echo 'export TUNNEL_SSH_PORT=8022' >> ~/.bashrc
+    echo "  Set TUNNEL_SSH_PORT=8022 in .bashrc"
+else
+    echo "  TUNNEL_SSH_PORT already set"
+fi
+
+# Start sshd so reverse tunnels (beep, tunnel-open) can reach this device
+if ! pgrep -x sshd > /dev/null; then
+    sshd
+    echo "  Started sshd on port 8022"
+else
+    echo "  sshd already running"
 fi
 
 # Create update script in ~/bin
@@ -88,5 +138,12 @@ if [[ ! -f ~/.ssh/id_ed25519 ]]; then
     echo "  ssh-copy-id rich@<host>"
 fi
 
+# Reminder about reverse-tunnel auth
+if [[ ! -f ~/.ssh/authorized_keys ]]; then
+    echo ""
+    echo "For reverse tunnels (beep/tunnel-open) from remote hosts, add the"
+    echo "remote's public key to ~/.ssh/authorized_keys on this device."
+fi
+
 echo ""
-echo "Done! Connect with: et <host>"
+echo "Done! Connect with: ett <host>"
