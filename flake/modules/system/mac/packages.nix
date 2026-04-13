@@ -71,6 +71,7 @@ in
       "tailscale-app"
       "todoist-app"
       "visual-studio-code"
+      "vlc"
       "zoom"
     ];
     masApps = {

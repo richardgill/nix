@@ -4,8 +4,17 @@ set -euo pipefail
 
 trap 'echo "Error on line $LINENO" >&2; exit 1' ERR
 
-# Only add all files if nothing is staged
-if [ -z "$(git diff --cached --name-only)" ]; then
+ADD_ALL=false
+for arg in "$@"; do
+  if [ "$arg" = "--add-all" ]; then
+    ADD_ALL=true
+  fi
+done
+
+if [ "$ADD_ALL" = true ]; then
+    echo "$ git add ."
+    git add .
+elif [ -z "$(git diff --cached --name-only)" ]; then
     echo "$ git add ."
     git add .
 else

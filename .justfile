@@ -156,7 +156,7 @@ template machine='':
 
     # Run the template builder
     cd flake/template-builder
-    bun ./build-templates.bundle.js --data-file "$data_file" --outDir ../../built
+    nix shell nixpkgs#bun --command bun ./build-templates.bundle.js --data-file "$data_file" --outDir ../../built
 
     rm -f "$data_file"
     echo "Templates built to: built/"
@@ -165,11 +165,13 @@ template-bundle:
     #!/usr/bin/env bash
     set -euo pipefail
 
+    bun_cmd=(nix shell nixpkgs#bun --command bun)
+
     cd ts-utils
 
     if [ ! -d node_modules ] || [ bun.lock -nt node_modules ] || [ package.json -nt node_modules ]; then
-      bun install --frozen-lockfile
+      "${bun_cmd[@]}" install --frozen-lockfile
     fi
 
     mkdir -p ../flake/template-builder
-    bun build build-templates.ts --target bun --outfile ../flake/template-builder/build-templates.bundle.js
+    "${bun_cmd[@]}" build build-templates.ts --target bun --outfile ../flake/template-builder/build-templates.bundle.js
