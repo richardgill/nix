@@ -87,6 +87,13 @@ else
     echo "  ~/Scripts already in PATH"
 fi
 
+cat > ~/bin/ett << 'EOF'
+#!/data/data/com.termux/files/usr/bin/bash
+exec et-with-tunnel "$@"
+EOF
+chmod +x ~/bin/ett
+echo "  Installed ~/bin/ett"
+
 if ! grep -q "alias ett=" ~/.bashrc 2>/dev/null; then
     echo "alias ett='et-with-tunnel'" >> ~/.bashrc
     echo "  Added ett alias to .bashrc"

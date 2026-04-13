@@ -6,4 +6,4 @@ pgrep -x sshd > /dev/null || sshd
 # Ensure ett and tunnel-setup are on PATH even if .bashrc hasn't sourced yet
 export PATH="$HOME/Scripts:$HOME/bin:$PATH"
 export TUNNEL_SSH_PORT="${TUNNEL_SSH_PORT:-8022}"
-ett um790 rich -e -c 't'
+et-with-tunnel um790 rich -e -c 't'
