@@ -50,6 +50,12 @@ trust_level = "trusted"
 [projects."/Users/rich/code/nix-private"]
 trust_level = "trusted"
 
+[projects."/home/rich/code/xata/infra-new/main"]
+trust_level = "trusted"
+
+[projects."/home/rich/code/xata/frontend/main"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.4"
 
