@@ -13,7 +13,7 @@
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
   "shellInitCommand": "shopt -s expand_aliases; eval ",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "collapseChangelog": false,
   "compaction": {
     "enabled": false,
@@ -34,7 +34,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.66.1",
+  "lastChangelogVersion": "0.67.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
