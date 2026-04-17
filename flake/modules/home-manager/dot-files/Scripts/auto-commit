@@ -59,15 +59,20 @@ else
 $(git diff --cached)"
 fi
 
-if ! COMMIT_MSG=$(~/Scripts/ai-prompt "$PROMPT"); then
+if ! COMMIT_MSG_OUTPUT=$(AI_PROMPT_MODEL=gpt-5.3-codex-spark ~/Scripts/ai-prompt "$PROMPT" 2>&1); then
+  printf '%s\n' "$COMMIT_MSG_OUTPUT" >&2
   echo "Error generating commit message" >&2
   exit 1
 fi
 
+COMMIT_MSG="$COMMIT_MSG_OUTPUT"
 echo -e "\nCommit message generated: $COMMIT_MSG"
 
-if ! git commit -m "$COMMIT_MSG" 2>&1; then
+if ! COMMIT_OUTPUT=$(git commit -m "$COMMIT_MSG" 2>&1); then
+  printf '%s\n' "$COMMIT_OUTPUT" >&2
   echo "Error: git commit failed" >&2
   exit 1
 fi
+
+printf '%s\n' "$COMMIT_OUTPUT"
 

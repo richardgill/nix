@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+require_env() {
+  local name="$1"
+
+  if [[ -n "${!name:-}" ]]; then
+    return
+  fi
+
+  echo "$name is required" >&2
+  exit 1
+}
+
+read_message() {
+  if [[ $# -gt 0 ]]; then
+    printf '%s' "$*"
+    return
+  fi
+
+  if [[ ! -t 0 ]]; then
+    cat
+    return
+  fi
+
+  echo "message required" >&2
+  exit 1
+}
+
+read_token() {
+  tr -d '\n' < "$TELEGRAM_BOT_TOKEN_FILE"
+}
+
+send_message() {
+  local message="$1"
+  local token
+
+  token="$(read_token)"
+
+  curl -fsS -X POST "https://api.telegram.org/bot${token}/sendMessage" \
+    -d "chat_id=${TELEGRAM_CHAT_ID}" \
+    --data-urlencode "text=${message}" \
+    >/dev/null
+}
+
+main() {
+  require_env TELEGRAM_BOT_TOKEN_FILE
+  require_env TELEGRAM_CHAT_ID
+  send_message "$(read_message "$@")"
+}
+
+main "$@"

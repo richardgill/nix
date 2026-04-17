@@ -2,6 +2,7 @@
   vars,
   pkgs,
   config,
+  osConfig,
   ...
 }:
 let
@@ -21,6 +22,8 @@ in
       JAVA_HOME = pkgs.jdk17.home;
       ANDROID_HOME = androidHome;
       ANDROID_SDK_ROOT = androidHome;
+      TELEGRAM_BOT_TOKEN_FILE = osConfig.sops.secrets."telegram-bot-token".path;
+      TELEGRAM_CHAT_ID = "7743550827";
     };
 
     sessionPath = [
