@@ -69,6 +69,7 @@ in
       "spotify"
       "stats"
       "tailscale-app"
+      "telegram"
       "todoist-app"
       "visual-studio-code"
       "vlc"

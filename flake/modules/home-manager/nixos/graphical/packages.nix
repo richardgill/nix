@@ -51,6 +51,7 @@ in
       satty
       slurp
       swayidle
+      telegram-desktop
       swaylock
       swayosd
       brightnessctl

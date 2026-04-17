@@ -166,7 +166,9 @@
     "ralph-loop@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true,
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "slack@claude-plugins-official": false,
+    "notion@claude-plugins-official": false
   },
   "sandbox": {
     "enabled": false,
