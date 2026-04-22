@@ -14,6 +14,7 @@ let
     "openai-api-key"
     "joist-api-key"
     "exa-api-key"
+    "telegram-bot-token"
   ];
 
   # Generate secret configurations with appropriate ownership

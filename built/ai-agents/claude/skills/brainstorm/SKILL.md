@@ -50,7 +50,7 @@ You can use the deep-research skill to search the web
 
 ## Key Principles
 
-- Prefer: sketch shape → confirm → implement. Get agreement on structure before details.
+- Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "intefaces" / code seams before details.
 
 - For quick comprehension you must present code changes outside-in, showing new code / code changes **in context** with surrounding existing code:
 You need to show me the code as a 'sketch' of the 'shape' of the code whilst being brief.

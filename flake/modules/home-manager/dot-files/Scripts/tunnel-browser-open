@@ -22,13 +22,6 @@ if ! is_ssh_session; then
 else
   if [[ "$1" =~ ^https?:// ]]; then
     url="$1"
-    if [[ "$url" == *localhost* ]]; then
-      url=${url/localhost/$remote_hostname}
-    elif [[ "$url" == *"127.0.0.1"* ]]; then
-      url=${url/127\.0\.0\.1/$remote_hostname}
-    elif [[ "$url" == *"0.0.0.0"* ]]; then
-      url=${url/0\.0\.0\.0/$remote_hostname}
-    fi
     tunnel-exec "open \"$url\""
   else
     echo "Error: '$1' is not a valid URL" >&2

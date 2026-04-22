@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_dir="$HOME/code/nix-private/out-of-store-config/services/ai-cron"
+cd "$repo_dir"
+exec pnpm exec tsx src/cli.ts "$@"

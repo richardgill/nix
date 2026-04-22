@@ -1,30 +1,28 @@
 ---
 name: google-calendar
-description: Google Calendar CLI for listing calendars, viewing/creating/updating events, and checking availability.
+description: Google Calendar via gws.
 ---
 
+# Google Calendar via gws
 
-## Usage
+Use `gws` for Google Calendar operations.
 
-Run `gccli --help` for full command reference.
+When you need the official generated skill docs, create a temp directory under `/tmp/`, run `gws generate-skills` there, concatenate the generated Calendar skill docs into one file, then read that file:
 
-First: run `gmcli accounts list` to find which emails exist. If there's only one, use that.
+```bash
+tmpdir="$(mktemp -d /tmp/gws-calendar.XXXXXX)"
+combined="$tmpdir/gws-calendar.md"
+(
+  cd "$tmpdir"
+  gws generate-skills
+  shopt -s nullglob
+  : > "$combined"
+  for file in skills/gws-calendar*/SKILL.md; do
+    printf '\n\n%s\n\n' "--- $file ---" >> "$combined"
+    cat "$file" >> "$combined"
+  done
+)
+```
 
-Common operations:
-- `gccli <email> calendars` - List all calendars
-- `gccli <email> events <calendarId> [--from <dt>] [--to <dt>]` - List events
-- `gccli <email> event <calendarId> <eventId>` - Get event details
-- `gccli <email> create <calendarId> --summary <s> --start <dt> --end <dt>` - Create event
-- `gccli <email> freebusy <calendarIds> --from <dt> --to <dt>` - Check availability
-
-Use `primary` as calendarId for the main calendar.
-
-## Date/Time Format
-
-- Timed events: `YYYY-MM-DDTHH:MM:SSZ` (UTC) or `YYYY-MM-DDTHH:MM:SS` (local)
-- All-day events: `YYYY-MM-DD` with `--all-day` flag
-
-## Data Storage
-
-- `~/.gccli/credentials.json` - OAuth client credentials
-- `~/.gccli/accounts.json` - Account tokens
+You only need to read this:
+- `$tmpdir/gws-calendar.md`

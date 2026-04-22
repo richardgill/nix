@@ -1,28 +1,28 @@
 ---
 name: gmail
-description: Gmail CLI for searching emails, reading threads, sending messages, managing drafts, and handling labels/attachments.
+description: Gmail via gws.
 ---
 
-## Usage
+# Gmail via gws
 
-Email style preference: start with "Hi" and end with "Thanks,\nRichard".
+Use `gws` for Gmail operations.
 
-Run `gmcli --help` for full command reference.
+When you need the official generated skill docs, create a temp directory under `/tmp/`, run `gws generate-skills` there, concatenate the generated Gmail skill docs into one file, then read that file:
 
-First: run `gmcli accounts list` to find which emails exist. If there's only one, use that.
+```bash
+tmpdir="$(mktemp -d /tmp/gws-gmail.XXXXXX)"
+combined="$tmpdir/gws-gmail.md"
+(
+  cd "$tmpdir"
+  gws generate-skills
+  shopt -s nullglob
+  : > "$combined"
+  for file in skills/gws-gmail*/SKILL.md; do
+    printf '\n\n%s\n\n' "--- $file ---" >> "$combined"
+    cat "$file" >> "$combined"
+  done
+)
+```
 
-Common operations:
-- `gmcli <email> search "<query>"` - Search emails using Gmail query syntax
-- `gmcli <email> thread <threadId>` - Read a thread with all messages
-- `gmcli <email> url <threadIds...>` - Generate canonical Gmail thread URL(s); prefer this over manually constructing links
-- URL format returned: `https://mail.google.com/mail/?authuser=<email>#all/<threadId>`
-- `gmcli <email> send --to <emails> --subject <s> --body <b>` - Send email
-- For newlines in `--body`, use Bash ANSI-C quoting like `--body $'Line 1\n\nLine 2'` or paste literal newlines
-- `gmcli <email> labels list` - List all labels
-- `gmcli <email> drafts list` - List drafts
-
-## Data Storage
-
-- `~/.gmcli/credentials.json` - OAuth client credentials
-- `~/.gmcli/accounts.json` - Account tokens
-- `~/.gmcli/attachments/` - Downloaded attachments
+You only need to read this:
+- `$tmpdir/gws-gmail.md`

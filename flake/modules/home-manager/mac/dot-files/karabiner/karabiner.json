@@ -21,6 +21,9 @@
                       },
                       {
                         "vendor_id": 17241
+                      },
+                      {
+                        "vendor_id": 65261
                       }
                     ],
                     "type": "device_if"
@@ -83,6 +86,9 @@
                       },
                       {
                         "vendor_id": 17241
+                      },
+                      {
+                        "vendor_id": 65261
                       }
                     ],
                     "type": "device_if"
@@ -148,6 +154,9 @@
                       },
                       {
                         "vendor_id": 17241
+                      },
+                      {
+                        "vendor_id": 65261
                       }
                     ],
                     "type": "device_if"
@@ -210,6 +219,9 @@
                       },
                       {
                         "vendor_id": 17241
+                      },
+                      {
+                        "vendor_id": 65261
                       }
                     ],
                     "type": "device_if"
@@ -364,6 +376,18 @@
           "identifiers": {
             "is_keyboard": true,
             "vendor_id": 17241
+          },
+          "simple_modifications": [
+            {
+              "from": { "key_code": "f23" },
+              "to": [{ "apple_vendor_top_case_key_code": "keyboard_fn" }]
+            }
+          ]
+        },
+        {
+          "identifiers": {
+            "is_keyboard": true,
+            "vendor_id": 65261
           },
           "simple_modifications": [
             {

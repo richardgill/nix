@@ -6,11 +6,18 @@ end
 
 -- Make <leader>ff treat ./path and path as the same query.
 local normalizeRelativeSearch = function(_, filter)
-  local normalized = filter.search:gsub('^%./+', '')
-  if normalized == filter.search then
+  local normalize = function(value)
+    return value:gsub('^%./+', '')
+  end
+
+  local normalizedPattern = normalize(filter.pattern)
+  local normalizedSearch = normalize(filter.search)
+  if normalizedPattern == filter.pattern and normalizedSearch == filter.search then
     return
   end
-  filter.search = normalized
+
+  filter.pattern = normalizedPattern
+  filter.search = normalizedSearch
   return true
 end
 

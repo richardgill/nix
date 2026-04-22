@@ -232,6 +232,20 @@ ai_sessions_clear() {
   esac
 }
 
+ai_sessions_send() {
+  local agent
+  agent=$(ai_sessions_effective_agent "$1")
+
+  case "$agent" in
+    pi) pi_sessions_send_text "$2" "${@:3}" ;;
+    claude)
+      echo "send is only supported for pi sessions" >&2
+      return 1
+      ;;
+    *) return 1 ;;
+  esac
+}
+
 ai_sessions_run() {
   local agent="$1"
   local script_path
@@ -316,7 +330,7 @@ while (( $# > 0 )); do
       shift
       agent=$(ai_sessions_normalize_agent "${1:-}") || { echo "invalid agent: ${1:-}" >&2; exit 1; }
       ;;
-    run|list|debug|new|fork|ignore|clear)
+    run|list|debug|new|fork|ignore|clear|send)
       action="$1"
       ;;
     *)
@@ -344,6 +358,9 @@ case "$action" in
     ;;
   clear)
     ai_sessions_clear "$agent" "${positionals[0]:-}"
+    ;;
+  send)
+    ai_sessions_send "$agent" "${positionals[0]:-}" "${positionals[@]:1}"
     ;;
   run)
     ai_sessions_run "$agent"
