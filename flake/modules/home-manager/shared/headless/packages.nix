@@ -33,6 +33,7 @@ in
       ripgrep
       sesh
       stripe-cli
+      unstable.gws
       unstable.todoist
       socat
       xdg-utils
