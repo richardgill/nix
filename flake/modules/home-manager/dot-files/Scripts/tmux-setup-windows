@@ -65,7 +65,7 @@ setup_tmux_windows() {
     ORIGINAL_PATH=$(tmux display-message -t "$session_name" -p "#{pane_current_path}")
 
     tmux rename-window -t "$ORIGINAL_WINDOW" "nvim"
-    tmux send-keys -t "$ORIGINAL_PANE" "v . --listen $SOCKET_FILE" Enter
+    tmux send-keys -t "$ORIGINAL_PANE" "v ." Enter
 
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "short"
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"

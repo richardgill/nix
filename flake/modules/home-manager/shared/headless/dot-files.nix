@@ -134,6 +134,9 @@ in
       ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
       ".config/amp/commands".source = "${builtTemplates}/ai-agents/ampcode/commands";
 
+      ".config/mcp2cli/baked.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcp2cli/baked.json";
+
       # Static files (not templated)
       ".config/obs-studio".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/obs-studio";

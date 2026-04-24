@@ -94,14 +94,14 @@ export const agents = {
       },
       high: {
         provider: "openai-codex",
-        model: "gpt-5.4",
-        providerModel: "openai-codex/gpt-5.4",
+        model: "gpt-5.5",
+        providerModel: "openai-codex/gpt-5.5",
         thinkingLevel: "high",
       },
       xhigh: {
         provider: "openai-codex",
-        model: "gpt-5.4",
-        providerModel: "openai-codex/gpt-5.4",
+        model: "gpt-5.5",
+        providerModel: "openai-codex/gpt-5.5",
         thinkingLevel: "xhigh",
       },
     },

@@ -10,7 +10,7 @@ importers:
     dependencies:
       skill-task:
         specifier: github:richardgill/pi-extensions#path:/extensions/skill-task
-        version: https://codeload.github.com/richardgill/pi-extensions/tar.gz/dd24654544e56e7725b11cbd113bf5c482c3f195#path:/extensions/skill-task(ws@8.19.0)(zod@3.25.76)
+        version: https://codeload.github.com/richardgill/pi-extensions/tar.gz/e4e9798b66448179be0afb944d0d57247c30a93d#path:/extensions/skill-task(ws@8.19.0)(zod@3.25.76)
     devDependencies:
       '@types/node':
         specifier: ^22.13.1
@@ -919,8 +919,8 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
-  skill-task@https://codeload.github.com/richardgill/pi-extensions/tar.gz/dd24654544e56e7725b11cbd113bf5c482c3f195#path:/extensions/skill-task:
-    resolution: {path: /extensions/skill-task, tarball: https://codeload.github.com/richardgill/pi-extensions/tar.gz/dd24654544e56e7725b11cbd113bf5c482c3f195}
+  skill-task@https://codeload.github.com/richardgill/pi-extensions/tar.gz/e4e9798b66448179be0afb944d0d57247c30a93d#path:/extensions/skill-task:
+    resolution: {path: /extensions/skill-task, tarball: https://codeload.github.com/richardgill/pi-extensions/tar.gz/e4e9798b66448179be0afb944d0d57247c30a93d}
     version: 0.0.1
 
   smart-buffer@4.2.0:
@@ -2371,7 +2371,7 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
-  skill-task@https://codeload.github.com/richardgill/pi-extensions/tar.gz/dd24654544e56e7725b11cbd113bf5c482c3f195#path:/extensions/skill-task(ws@8.19.0)(zod@3.25.76):
+  skill-task@https://codeload.github.com/richardgill/pi-extensions/tar.gz/e4e9798b66448179be0afb944d0d57247c30a93d#path:/extensions/skill-task(ws@8.19.0)(zod@3.25.76):
     dependencies:
       '@mariozechner/pi-coding-agent': 0.51.6(ws@8.19.0)(zod@3.25.76)
     transitivePeerDependencies:

@@ -62,6 +62,7 @@ in
       "hammerspoon"
       "karabiner-elements"
       "lunar"
+      "moonlight"
       "rectangle"
       "screen-studio"
       "slack"

@@ -15,8 +15,10 @@ Open files in the running nvim instance connected to this tmux session.
 ## Command
 
 ```bash
-nvim --server "$NVIM_SOCKET" --remote <files...>
+v <files...>
 ```
+
+`v` forwards files to the nvim listening on `$NVIM_SOCKET` if one is live; otherwise it launches nvim on those files.
 
 ## Environment
 
@@ -26,19 +28,19 @@ nvim --server "$NVIM_SOCKET" --remote <files...>
 
 ```bash
 # Open a single file
-nvim --server "$NVIM_SOCKET" --remote src/index.ts
+v src/index.ts
 
 # Open multiple files
-nvim --server "$NVIM_SOCKET" --remote src/index.ts src/utils.ts
+v src/index.ts src/utils.ts
 
 # Open file at specific line (use +line before filename)
-nvim --server "$NVIM_SOCKET" --remote +42 src/index.ts
+v +42 src/index.ts
 ```
 
 ## Troubleshooting
 
 - **Socket not set**: Ensure you're in a worktree session, or manually set `NVIM_SOCKET`
-- **Connection refused**: The nvim instance may have closed; restart nvim with `v . --listen $NVIM_SOCKET`
+- **Connection refused**: The nvim instance may have closed; restart nvim with `v .`
 - **File not opening**: Verify the file path is correct and accessible
 
 ## Notes

@@ -1,9 +1,9 @@
 ## Issue & Plan Storage
 
-Issues and plans are tracked in `./issues/` with numbered phases:
+Issues and plans are tracked in `./overlay/issues/` with numbered phases:
 
 ```
-./issues/
+./overlay/issues/
 ├── 10-phase-name/           # Single issue = flat folder
 │   └── plan.md
 ├── 20-another-phase/

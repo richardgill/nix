@@ -115,6 +115,7 @@
           ".config/spotify"
           ".config/Todoist"
           ".config/todoist"
+          ".config/sunshine"
           ".config/sops"
           ".config/secrets"
           ".config/op"
