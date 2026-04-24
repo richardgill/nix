@@ -17,6 +17,7 @@ export PATH="$HOME/.config/xata/bin:$PATH"
 export PATH="$PATH:$HOME/code/reference-repos/web-search-exa"
 export PATH="$HOME/Scripts/nixos:$HOME/Scripts:$PATH"
 
+# local secrets
 SECRETS_ENV_FILE="$HOME/.config/secrets/env.sh"
 if [ -r "$SECRETS_ENV_FILE" ]; then
   . "$SECRETS_ENV_FILE"

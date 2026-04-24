@@ -1,106 +1,73 @@
 ---
 name: mcp2cli-claude-mcp
 description: |
-  Quick workflow for setting up a Claude Code MCP server (Notion example), then switching to mcp2cli + skill-based usage.
-  Triggers: "setup notion mcp", "claude mcp add", "disable claude mcp", "use mcp2cli instead", "mcp2cli skill".
+  An MCP (Slack, Notion, ...) in mcp2cli by reusing the OAuth client_id + redirect_uri that Claude Code registers.
+  Triggers: "setup mcp" "setup notion mcp", "setup slack mcp", "bake mcp2cli", "fake claude mcp client".
 ---
 
-# Claude MCP -> mcp2cli Skill Workflow (Notion example)
+# Fake Claude's OAuth client in mcp2cli
 
-Use this when you want Claude Code to bootstrap a hosted MCP once, then switch to `mcp2cli`.
+Hosted MCPs only accept pre-registered OAuth clients (Slack disallows DCR entirely). Rather than installing Claude Code's plugin to bootstrap auth, reuse the client_id + redirect_uri that Claude publishes — directly from mcp2cli.
 
-## 1) Install the Claude Code plugin
-
-In Claude Code, run `/plugins`, install the MCP plugin you want, then make sure it works there first.
-
-For Notion:
-
-- plugin MCP config: `~/.claude/plugins/cache/claude-plugins-official/notion/0.1.0/.mcp.json`
-- hosted MCP URL: `https://mcp.notion.com/mcp`
-
-## 2) Reuse Claude's OAuth in mcp2cli
-
-Confirm Claude stored the hosted MCP credentials:
+Slack values are published at https://github.com/slackapi/slack-mcp-plugin. For other servers, grep the Claude plugin cache:
 
 ```bash
-rg -n "notion|mcpOAuth|serverUrl" ~/.claude/.credentials.json
+grep -rn 'client_id\|clientId\|redirect' ~/.claude/plugins/cache/claude-plugins-official/
 ```
 
-If needed, copy the Notion token from `~/.claude/.credentials.json` into mcp2cli's cache:
+## 1) Bake
 
-- cache dir: `~/.cache/mcp2cli/oauth/1cbd18bf1818c780/`
-- token file: `~/.cache/mcp2cli/oauth/1cbd18bf1818c780/tokens.json`
-
-check it works using mcp2cli:
+DCR-capable (Notion):
 
 ```bash
-mcp2cli \
-  --mcp https://mcp.notion.com/mcp \
-  --oauth \
-  --list
+mcp2cli bake create notion --mcp https://mcp.notion.com/mcp --oauth
 ```
 
-## 3) Bake it
+DCR-less (Slack) — pin both values:
 
 ```bash
-mcp2cli bake create notion \
-  --mcp https://mcp.notion.com/mcp \
-  --oauth
-```
-Check it works
-```bash
-mcp2cli @notion --list
+mcp2cli bake create slack \
+  --mcp https://mcp.slack.com/mcp --oauth \
+  --oauth-client-id 1601185624273.8899143856786 \
+  --oauth-redirect-uri http://localhost:3118/callback
 ```
 
-## 4) Disable the Claude Code plugin
-
-List plugins first:
+## 2) Trigger OAuth
 
 ```bash
-claude plugin list
+mcp2cli @slack --list   # opens browser → consent → tokens cached
 ```
 
-Then disable the plugin:
+Tokens land in `~/.cache/mcp2cli/oauth/<hash>/tokens.json` and refresh automatically. To re-auth, delete `tokens.json` and re-run. Locate a cache dir by server URL:
 
 ```bash
-claude plugin disable notion@claude-plugins-official
-claude plugin list
+grep -l "mcp.slack.com" ~/.cache/mcp2cli/oauth/*/client.json
 ```
 
-## 5) Create a shared skill for the MCP
+## Gotcha: port 3118
 
-After baking the MCP as `@notion`, create a new skill under:
+Claude Code desktop holds `127.0.0.1:3118` while running, which blocks mcp2cli's callback server. Quit Claude Code before auth or re-auth.
 
+## 3) Create a skill
 
-Example skill
+Path: `./flake/modules/home-manager/dot-files/ai-agents/shared/skills/<server>/SKILL.md`
 
-Path:
-
-- `./flake/modules/home-manager/dot-files/ai-agents/shared/skills/notion/SKILL.md`
-
-```md
+````md
 ---
-name: notion
-description: Use the baked Notion MCP via mcp2cli.
+name: slack
+description: Use the baked Slack MCP via mcp2cli.
 ---
 
-Use `mcp2cli @notion` for Notion operations.
+Use `mcp2cli @slack` for Slack operations.
 
-To discover what the Notion MCP can do:
-
-- best for exploration:
+Discover tools:
 
 ```bash
-mcp2cli @notion --list --verbose
+mcp2cli @slack --list --verbose     # exploration
+mcp2cli @slack --search <term>      # focused lookup
 ```
 
-- best for focused lookup:
-
-```bash
-mcp2cli @notion --search <term>
-```
-
-When you need to perform a Notion task, first use the discovery commands above to find the right tool, then call it with `mcp2cli @notion ...`.
-```
+Then call: `mcp2cli @slack <tool-name> ...`
+````
 
 $ARGUMENTS

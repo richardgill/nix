@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+socket_live() {
+  [[ -n "${NVIM_SOCKET:-}" ]] && [[ -n "$(ss -lxH src "$NVIM_SOCKET" 2>/dev/null)" ]]
+}
+
+if socket_live && [[ $# -gt 0 ]]; then
+  exec nvim --server "$NVIM_SOCKET" --remote "$@"
+fi
+
+if [[ -n "${NVIM_SOCKET:-}" ]] && ! socket_live; then
+  exec nvim --listen "$NVIM_SOCKET" "$@"
+fi
+
+exec nvim "$@"

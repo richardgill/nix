@@ -10,9 +10,7 @@ let
     "kagi-api-key"
     "kagi-search-token"
     "kagi-session-token"
-    "tavily-api-key"
     "openai-api-key"
-    "joist-api-key"
     "exa-api-key"
     "telegram-bot-token"
   ];

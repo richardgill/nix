@@ -6,13 +6,13 @@
   # More aggressively kill processes when getting close to no memory
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 3; # Start killing only when RAM is critically low
-    freeSwapThreshold = 5; # Require swap pressure too, instead of killing based on RAM alone
+    freeMemThreshold = 8; # Start killing before the system reaches a hard OOM cliff
+    freeSwapThreshold = 10; # React once swap is also getting tight
     enableNotifications = true;
     reportInterval = 60;
     extraArgs = [
       "--avoid"
-      "'^(Hyprland|niri|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|xwayland-satellite|firefox|kitty)$'"
+      "^(Hyprland|niri|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|xwayland-satellite|kitty)$"
     ];
   };
 
@@ -21,7 +21,7 @@
   # https://github.com/NixOS/nixpkgs/pull/268121
   boot.kernel.sysctl = {
     "vm.overcommit_memory" = 1;
-    "vm.swappiness" = 180;
+    "vm.swappiness" = 100;
     "vm.watermark_boost_factor" = 0;
     "vm.watermark_scale_factor" = 125;
     "vm.page-cluster" = 0;
@@ -30,6 +30,6 @@
   zramSwap = {
     enable = lib.mkForce true;
     algorithm = "zstd";
-    memoryPercent = 150;
+    memoryPercent = 100;
   };
 }

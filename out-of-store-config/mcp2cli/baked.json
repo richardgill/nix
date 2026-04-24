@@ -1,0 +1,42 @@
+{
+  "notion": {
+    "source_type": "mcp",
+    "source": "https://mcp.notion.com/mcp",
+    "base_url": null,
+    "auth_headers": [],
+    "env_vars": {},
+    "cache_ttl": 3600,
+    "transport": "auto",
+    "oauth": true,
+    "oauth_client_id": null,
+    "oauth_client_secret": null,
+    "oauth_client_name": "mcp2cli",
+    "oauth_scope": null,
+    "oauth_redirect_uri": "http://127.0.0.1:3118/callback",
+    "oauth_flow": "authorization_code",
+    "include": [],
+    "exclude": [],
+    "methods": [],
+    "description": ""
+  },
+  "slack": {
+    "source_type": "mcp",
+    "source": "https://mcp.slack.com/mcp",
+    "base_url": null,
+    "auth_headers": [],
+    "env_vars": {},
+    "cache_ttl": 3600,
+    "transport": "auto",
+    "oauth": true,
+    "oauth_client_id": "1601185624273.8899143856786",
+    "oauth_client_secret": null,
+    "oauth_client_name": "mcp2cli",
+    "oauth_scope": null,
+    "oauth_redirect_uri": "http://localhost:3118/callback",
+    "oauth_flow": "authorization_code",
+    "include": [],
+    "exclude": [],
+    "methods": [],
+    "description": ""
+  }
+}

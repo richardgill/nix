@@ -43,7 +43,7 @@ You can use the deep-research skill to search the web
 ## After the Design
 
 **Documentation:**
-- Use the Skill(issues) to write the validated design to `./issues/<path-to-issue>/design.md`
+- Use the Skill(issues) to write the validated design to `./overlay/issues/<path-to-issue>/design.md`
 
 - Ask: "Want to create a plan or begin implementation?"
 - Create detailed implementation plan in the same issue folder
