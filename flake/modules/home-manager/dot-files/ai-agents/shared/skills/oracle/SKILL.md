@@ -1,7 +1,7 @@
 ---
 name: oracle
 description: |
-  Consults GPT-5.4 with high reasoning for deep analysis.
+  Consults GPT-5.5 with high reasoning for deep analysis.
   Triggers: "ask the oracle", "consult oracle", "get a second opinion", "ask GPT",
   "check with GPT", "what would GPT think", "cross-check my reasoning", "external AI".
   Use for complex debugging, architectural decisions, security audits, or code review
@@ -10,7 +10,7 @@ description: |
 
 # Oracle
 
-Escalate to GPT-5.4 with high reasoning effort for problems requiring deeper analysis. Use for:
+Escalate to GPT-5.5 with high reasoning effort for problems requiring deeper analysis. Use for:
 - Complex debugging with elusive bugs
 - Architectural decisions and tradeoffs
 - Security audits and vulnerability analysis
@@ -18,10 +18,10 @@ Escalate to GPT-5.4 with high reasoning effort for problems requiring deeper ana
 
 ## Main command
 
-Run Codex with GPT-5.4 in non-interactive mode with high reasoning:
+Run Codex with GPT-5.5 in non-interactive mode with high reasoning:
 
 ```bash
-codex exec -m gpt-5.4 --sandbox read-only -c model_reasoning_effort='"high"' "$PROMPT"
+codex exec -m gpt-5.5 --sandbox read-only -c model_reasoning_effort='"high"' "$PROMPT"
 ```
 
 Where `$PROMPT` is your analysis request. Codex bundles relevant context from your repo automatically.
@@ -50,15 +50,15 @@ Where `$PROMPT` is your analysis request. Codex bundles relevant context from yo
 
 ```bash
 # Debug intermittent auth issue
-codex exec -m gpt-5.4 --sandbox read-only -c model_reasoning_effort='"high"' \
+codex exec -m gpt-5.5 --sandbox read-only -c model_reasoning_effort='"high"' \
   "The auth flow fails intermittently. Check src/auth/ for race conditions."
 
 # Architectural review
-codex exec -m gpt-5.4 --sandbox read-only -c model_reasoning_effort='"high"' \
+codex exec -m gpt-5.5 --sandbox read-only -c model_reasoning_effort='"high"' \
   "Review src/api/ data flow and suggest improvements for scalability."
 
 # Security audit
-codex exec -m gpt-5.4 --sandbox read-only -c model_reasoning_effort='"high"' \
+codex exec -m gpt-5.5 --sandbox read-only -c model_reasoning_effort='"high"' \
   "Audit src/handlers/ for OWASP top 10 vulnerabilities."
 ```
 

@@ -83,18 +83,18 @@ workspace "zoom"
 workspace "todoist"
 workspace "chrome"
 
-spawn-at-startup "waybar"
-spawn-at-startup "mako"
-spawn-at-startup "wl-clip-persist" "--clipboard" "both"
-spawn-sh-at-startup "wl-paste --watch cliphist store"
-spawn-at-startup "voxtype" "daemon"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "waybar"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "mako"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "wl-clip-persist" "--clipboard" "both"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "wl-paste" "--watch" "cliphist" "store"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "voxtype" "daemon"
 spawn-sh-at-startup "systemctl --user restart xremap"
-spawn-sh-at-startup "swayidle -w timeout 300 $HOME/Scripts/nixos/lock-screen timeout 360 'niri msg action power-off-monitors' before-sleep $HOME/Scripts/nixos/lock-screen"
-spawn-sh-at-startup "$HOME/Scripts/nixos/niri/launch-wallpaper > ~/.cache/swaybg.log 2>&1"
-spawn-sh-at-startup "sleep 1 && firefox"
-spawn-sh-at-startup "sleep 2 && ~/Scripts/nixos/launch-ghostty"
-spawn-sh-at-startup "sleep 3 && 1password"
-spawn-sh-at-startup "sleep 4 && todoist-electron"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "swayidle" "-w" "timeout" "300" "/home/rich/Scripts/nixos/lock-screen" "timeout" "360" "niri msg action power-off-monitors" "before-sleep" "/home/rich/Scripts/nixos/lock-screen"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "/home/rich/Scripts/nixos/niri/launch-wallpaper"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "1" "firefox"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "2" "/home/rich/Scripts/nixos/launch-ghostty"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "3" "1password"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "4" "todoist-electron"
 
 window-rule {
     match app-id=r#"^swayosd$"#
@@ -240,7 +240,7 @@ binds {
 
     Ctrl+Alt+Shift+Super+A repeat=false { spawn "~/Scripts/nixos/launch-app" "activity"; }
     Ctrl+Alt+Shift+Super+B repeat=false { spawn "~/Scripts/nixos/launch-app" "files"; }
-    Ctrl+Alt+Shift+Super+C repeat=false { spawn-sh "niri msg action focus-workspace browser; firefox https://chatgpt.com"; }
+    Ctrl+Alt+Shift+Super+C repeat=false { spawn-sh "niri msg action focus-workspace browser; exec $HOME/Scripts/nixos/launch-in-app-scope firefox https://chatgpt.com"; }
     Ctrl+Alt+Shift+Super+D repeat=false { spawn "~/Scripts/nixos/launch-app" "discord"; }
     Ctrl+Alt+Shift+Super+F repeat=false { spawn "~/Scripts/nixos/launch-app" "browser"; }
     Ctrl+Alt+Shift+Super+G repeat=false { spawn "~/Scripts/nixos/launch-app" "terminal"; }
@@ -252,7 +252,7 @@ binds {
     Ctrl+Alt+Shift+Super+W repeat=false { spawn "~/Scripts/nixos/launch-app" "beeper"; }
     Ctrl+Alt+Shift+Super+Z repeat=false { spawn "~/Scripts/nixos/launch-app" "zoom"; }
 
-    Super+Shift+0 repeat=false { spawn-sh "nautilus ~/Screenshots --new-window"; }
+    Super+Shift+0 repeat=false { spawn-sh "exec $HOME/Scripts/nixos/launch-in-app-scope nautilus ~/Screenshots --new-window"; }
     Super+Shift+3 repeat=false { spawn-sh "grim -g \"$(slurp -o)\" - | satty --filename -"; }
     Super+Shift+4 repeat=false { spawn-sh "grim -g \"$(slurp)\" - | satty --filename -"; }
     Super+Shift+5 repeat=false { spawn "~/Scripts/nixos/screen-record" "output"; }

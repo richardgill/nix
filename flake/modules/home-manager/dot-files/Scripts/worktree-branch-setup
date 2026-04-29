@@ -16,10 +16,8 @@ fi
 echo "copying gitignored files"
 
 (cd "$SOURCE" && git status --ignored -s | grep '^!! ' | awk '{print $2}') | while read filename; do
-  if [[ "$filename" == "scratch" ]] || \
-     [[ "$filename" == "scratch/"* ]] || \
-     [[ "$filename" == "issues" ]] || \
-     [[ "$filename" == "issues/"* ]] || \
+  if [[ "$filename" == "overlay" ]] || \
+     [[ "$filename" == "overlay/"* ]] || \
      [[ "$filename" == *"node_modules"* ]] || \
      [[ "$filename" == ".next/"* ]] || \
      [[ "$filename" == ".turbo/"* ]]; then

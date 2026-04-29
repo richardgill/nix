@@ -50,9 +50,7 @@ in
   anthropicApiKeyPath = config.sops.secrets."anthropic-api-key".path;
   kagiApiKeyPath = config.sops.secrets."kagi-api-key".path;
   kagiSessionTokenPath = config.sops.secrets."kagi-session-token".path;
-  tavilyApiKeyPath = config.sops.secrets."tavily-api-key".path;
   openaiApiKeyPath = config.sops.secrets."openai-api-key".path;
-  joistApiKeyPath = config.sops.secrets."joist-api-key".path;
   exaApiKeyPath = config.sops.secrets."exa-api-key".path;
   defaultShell = "${pkgs.zsh}/bin/zsh";
   catppuccinPlugin = "${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux";

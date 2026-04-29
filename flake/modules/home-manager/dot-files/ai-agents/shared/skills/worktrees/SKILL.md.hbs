@@ -16,7 +16,7 @@ Create a git worktree in a new tmux session with Claude Code running a specific 
 
 Pick the best option based on what's available:
 
-1. **Issue file** — if the work references an issue in `thoughts/shared/issues/`, use `--prompt-file` pointing to the issue's `plan.md`
+1. **Issue file** — if the work references an issue in `overlay/issues/`, use `--prompt-file` pointing to the issue's `plan.md`
 2. **Other .md file** — if the user references a specific markdown file (design doc, spec, etc.), use `--prompt-file` with that path
 3. **Text prompt** — otherwise, write the prompt text to a timestamped file in `/tmp` and pass that path via `--prompt-file`
 
@@ -37,7 +37,7 @@ EOF
 ## Parameters
 
 - `$BRANCH` - Branch name or remote/branch (e.g., `my-feature`)
-- `$FILE` - Path to a .md file to use as the prompt (e.g., `thoughts/shared/issues/10-feature/plan.md`)
+- `$FILE` - Path to a .md file to use as the prompt (e.g., `overlay/issues/10-feature/plan.md`)
 - `$PROMPT` - Text prompt to write to a timestamped `/tmp` file before passing via `--prompt-file`
 
 ## Examples

@@ -11,6 +11,7 @@ TUNNEL_PORT="${4:-1999}"
 # dev server. Set FORWARD_PORTS="" to disable. Failures are non-fatal, so
 # ports already bound locally just get skipped.
 FORWARD_PORTS="${FORWARD_PORTS-3000 3001 3002 3003 4000 4001 4002 4003 4004 4005 4006 4321 5173 5174 8000 8080 8888}"
+LOOPBACK_FORWARD_PORTS="${LOOPBACK_FORWARD_PORTS-3118}"
 
 if [ -z "$REMOTE_HOST" ]; then
   echo "Usage: tunnel-setup <remote-host> [remote-user] [ssh-port] [tunnel-port]"
@@ -30,6 +31,9 @@ if [ -z "$REMOTE_HOST" ]; then
   echo "                   3001 3002 3003 4000 4001 4002 4003 4004 4005 4006"
   echo "                   4321 5173 5174 8000 8080 8888). Set to empty string"
   echo "                   to disable forward tunnels."
+  echo "  LOOPBACK_FORWARD_PORTS"
+  echo "                   Space-separated ports to forward to remote 127.0.0.1"
+  echo "                   (default: 3118). Set to empty string to disable."
   echo "  TUNNEL_SSH_PORT  Fallback default for ssh-port when positional arg"
   echo "                   is omitted (useful for termux: 8022)."
   echo ""
@@ -46,6 +50,9 @@ forward_args=()
 for port in $FORWARD_PORTS; do
   forward_args+=(-L "$port:$REMOTE_HOST:$port")
 done
+for port in $LOOPBACK_FORWARD_PORTS; do
+  forward_args+=(-L "$port:127.0.0.1:$port")
+done
 
 # autossh is more robust at keeping the session open
 # -f fork into background
@@ -57,6 +64,7 @@ if command -v autossh &> /dev/null; then
   echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
   echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
   [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
+  [ -n "$LOOPBACK_FORWARD_PORTS" ] && echo "Forward loopback: $LOOPBACK_FORWARD_PORTS"
   autossh -M $((TUNNEL_PORT - 1)) -f -N \
     -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
     "${forward_args[@]}" \
@@ -66,6 +74,7 @@ else
   echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
   echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
   [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
+  [ -n "$LOOPBACK_FORWARD_PORTS" ] && echo "Forward loopback: $LOOPBACK_FORWARD_PORTS"
   ssh -f -N \
     -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
     "${forward_args[@]}" \

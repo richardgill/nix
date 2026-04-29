@@ -25,7 +25,7 @@ The plan summary may include the following:
 - The shape of the code after the plan is implemented, so they can verify the design is agreeable to them. Use the usage-signature-flow format below.
 - Decisions you made (possibly implicitly) that have a valid (>40% chance of being valid) other options.
 - Assumptions you made that could be incorrect (less than 85% certain)
-- Automated strategy that an agent will use to check changes fulfill the goals of the plan. Keep them simple, they should be as e2e as possible. They could involve writing a script in scratch/ to invoke functionality into a verifiable string that an agent can review.
+- Automated strategy that an agent will use to check changes fulfill the goals of the plan. Keep them simple, they should be as e2e as possible. They could involve writing a script in overlay/branch/ to invoke functionality into a verifiable string that an agent can review.
 
 #### Usage signature flow
 For quick comprehension you must present code changes outside-in, showing new code / code changes **in context** with surrounding existing code:
@@ -92,5 +92,5 @@ Draft the plan and iterate:
 ```
 You can also use: ctrl-o to see human readable plan verbatim
 Would you like to create a worktree with worktree skill to start working on this issue?
-/implement-plan ./issues/<path-to-issue>/plan.md
+/implement-plan ./overlay/issues/<path-to-issue>/plan.md
 ```
