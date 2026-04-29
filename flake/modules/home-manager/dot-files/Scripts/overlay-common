@@ -33,5 +33,3 @@ else
 fi
 
 overlay_repo="$overlay_root/$repo_name"
-overlay_scratch="$overlay_repo/scratch"
-overlay_issues="$overlay_repo/issues"

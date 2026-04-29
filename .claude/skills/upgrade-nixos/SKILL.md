@@ -36,7 +36,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
    - Key areas: Hyprland, Docker, Steam, Secure Boot, impermanence
 
 5. **Create upgrade plan** (use creating-plans skill):
-   - Save to `thoughts/shared/issues/NN-nixos-<version>-upgrade/plan.md`
+   - Save to `overlay/issues/NN-nixos-<version>-upgrade/plan.md`
    - Include exact file changes with line numbers
    - Include verification commands
    - Include rollback instructions

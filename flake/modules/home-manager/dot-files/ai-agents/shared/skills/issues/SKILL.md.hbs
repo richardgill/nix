@@ -1,7 +1,7 @@
 ---
 name: issues
 description: |
-  Manages the persistent file-based work tracker at thoughts/shared/issues/.
+  Manages the persistent file-based work tracker at overlay/issues/.
   Use when the user says: "what's next", "what should I work on", "show backlog",
   "track this", "create an issue", "add to backlog", "mark done", "close issue",
   "show tasks", "triage issues", "update status", "show roadmap", "priorities",
@@ -11,7 +11,7 @@ description: |
 
 # Issue Management
 
-Manage the project's persistent work tracker in `thoughts/shared/issues/`.
+Manage the project's persistent work tracker in `overlay/issues/`.
 
 {{> issues-structure }}
 
@@ -19,21 +19,21 @@ Manage the project's persistent work tracker in `thoughts/shared/issues/`.
 
 ### List Active Issues
 ```bash
-ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/
+ls -1d overlay/issues/*/ 2>/dev/null | grep -v done/
 ```
 
 ### Show What's Next
 ```bash
-ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/ | head -1
+ls -1d overlay/issues/*/ 2>/dev/null | grep -v done/ | head -1
 ```
 
 ### Create Issue
 
-1. Check existing phases: `ls thoughts/shared/issues/`
+1. Check existing phases: `ls overlay/issues/`
 2. Pick phase number (use gaps like 10, 20, 30 for flexibility)
 3. Create folder:
-   - Single issue: `thoughts/shared/issues/NN-issue-name/`
-   - Multi-issue phase: `thoughts/shared/issues/NN-phase/issue-name/`
+   - Single issue: `overlay/issues/NN-issue-name/`
+   - Multi-issue phase: `overlay/issues/NN-phase/issue-name/`
 4. Add `plan.md` with scope and implementation details
 5. Optionally add `design.md` for design notes
 
@@ -41,19 +41,19 @@ ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/ | head -1
 
 Move to done when fully implemented:
 ```bash
-mkdir -p thoughts/shared/issues/done
-mv thoughts/shared/issues/NN-issue-name thoughts/shared/issues/done/
+mkdir -p overlay/issues/done
+mv overlay/issues/NN-issue-name overlay/issues/done/
 ```
 
 ### Show Progress
 ```bash
-echo "Active:" && ls -1d thoughts/shared/issues/*/ 2>/dev/null | grep -v done/ | wc -l
-echo "Done:" && ls -1d thoughts/shared/issues/done/*/ 2>/dev/null | wc -l
+echo "Active:" && ls -1d overlay/issues/*/ 2>/dev/null | grep -v done/ | wc -l
+echo "Done:" && ls -1d overlay/issues/done/*/ 2>/dev/null | wc -l
 ```
 
 ### Triage/Prioritize
 
-1. Review all phases: `ls -la thoughts/shared/issues/`
+1. Review all phases: `ls -la overlay/issues/`
 2. Check recent work to identify completed issues:
    ```bash
    git log --oneline -20

@@ -14,6 +14,7 @@
     ./packages.nix
     ./printers.nix
     ./stylix.nix
+    ./sunshine.nix
     ./swayosd.nix
     ./wayland.nix
   ];

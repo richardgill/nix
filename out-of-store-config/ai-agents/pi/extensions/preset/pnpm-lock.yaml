@@ -1,0 +1,13 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      preset:
+        specifier: link:/home/rich/code/pi-extensions/preset-extension/extensions/preset
+        version: link:../../../../../../pi-extensions/preset-extension/extensions/preset

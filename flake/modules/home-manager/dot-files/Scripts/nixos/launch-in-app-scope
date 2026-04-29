@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+delay_seconds=""
+if [[ "${1:-}" == "--delay" ]]; then
+  delay_seconds="${2:-}"
+  shift 2
+fi
+
+if [[ $# -eq 0 ]]; then
+  echo "Usage: launch-in-app-scope [--delay seconds] <command> [args...]" >&2
+  exit 1
+fi
+
+if [[ -n "$delay_seconds" ]]; then
+  setsid --fork bash -c 'sleep "$1"; shift; exec "$0" "$@"' "$0" "$delay_seconds" "$@" >/dev/null 2>&1 &
+  exit 0
+fi
+
+if command -v uwsm >/dev/null 2>&1 && uwsm check is-active >/dev/null 2>&1; then
+  setsid --fork uwsm app -- "$@" >/dev/null 2>&1 &
+  exit 0
+fi
+
+setsid --fork "$@" >/dev/null 2>&1 &

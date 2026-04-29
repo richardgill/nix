@@ -1,14 +1,14 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.4",
-  "defaultThinkingLevel": "high",
+  "defaultModel": "gpt-5.3-codex",
+  "defaultThinkingLevel": "medium",
   "enabledModels": [
-    "openai-codex/gpt-5.4",
     "openai-codex/gpt-5.3-codex",
     "openai-codex/gpt-5.3-codex-spark",
     "github-copilot/claude-opus-4.6",
-    "github-copilot/claude-sonnet-4.5"
+    "github-copilot/claude-sonnet-4.5",
+    "openai-codex/gpt-5.5"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
@@ -34,7 +34,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.67.68",
+  "lastChangelogVersion": "0.70.6",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [

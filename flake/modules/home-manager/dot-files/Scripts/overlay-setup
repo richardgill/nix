@@ -10,20 +10,33 @@ fi
 
 source "$HOME/Scripts/overlay-common"
 
-if [ -e "$repo_root/scratch" ] || [ -e "$repo_root/issues" ]; then
-  overlay_fail "Error: scratch/ or issues/ already exist in $repo_root"
+ensure_link() {
+  local link=$1 target=$2
+  if [ -L "$link" ]; then
+    [ "$(readlink "$link")" = "$target" ] && return
+    rm "$link"
+  elif [ -e "$link" ]; then
+    overlay_fail "Error: $link exists and is not a symlink"
+  fi
+  ln -s "$target" "$link"
+}
+
+mkdir -p "$repo_root/overlay"
+mkdir -p "$overlay_repo/branches" "$overlay_repo/issues"
+
+ensure_link "$repo_root/overlay/branches" "$overlay_repo/branches"
+ensure_link "$repo_root/overlay/issues"   "$overlay_repo/issues"
+
+branch_name=$(git -C "$repo_root" symbolic-ref --short HEAD 2>/dev/null)
+if [ -n "$branch_name" ]; then
+  safe_name="${branch_name//\//-}"
+  mkdir -p "$overlay_repo/branches/$safe_name"
+  ensure_link "$repo_root/overlay/branch" "branches/$safe_name"
 fi
-
-mkdir -p "$overlay_scratch" "$overlay_issues"
-
-ln -s "$overlay_scratch" "$repo_root/scratch"
-ln -s "$overlay_issues" "$repo_root/issues"
 
 exclude_file=$(git -C "$repo_root" rev-parse --git-path info/exclude)
 mkdir -p "$(dirname "$exclude_file")"
 
-grep -qxF "scratch/" "$exclude_file" 2>/dev/null || echo "scratch/" >> "$exclude_file"
-grep -qxF "issues/" "$exclude_file" 2>/dev/null || echo "issues/" >> "$exclude_file"
-# exclude symlinks
-grep -qxF "scratch" "$exclude_file" 2>/dev/null || echo "scratch" >> "$exclude_file"
-grep -qxF "issues" "$exclude_file" 2>/dev/null || echo "issues" >> "$exclude_file"
+for entry in overlay overlay/; do
+  grep -qxF "$entry" "$exclude_file" 2>/dev/null || echo "$entry" >> "$exclude_file"
+done

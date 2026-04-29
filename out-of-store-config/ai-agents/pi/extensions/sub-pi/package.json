@@ -1,0 +1,15 @@
+{
+  "private": true,
+  "type": "module",
+  "pi": {
+    "extensions": [
+      "./config.ts"
+    ]
+  },
+  "pi-pack": {
+    "managed": true
+  },
+  "dependencies": {
+    "sub-pi": "link:/home/rich/code/pi-extensions/main/extensions/sub-pi"
+  }
+}

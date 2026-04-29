@@ -23,11 +23,6 @@
 		}
 	},
 	"mcp": {
-		"tavily": {
-			"type": "remote",
-			"url": "https://mcp.tavily.com/mcp/?tavilyApiKey={env:TAVILY_API_KEY}",
-			"enabled": false
-		},
 		"kagi": {
 			"type": "local",
 			"command": ["uvx", "kagimcp"],

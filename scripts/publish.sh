@@ -39,7 +39,7 @@ git checkout -b "$branch_name"
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git and gitignored files
-rsync -av --filter=':- .gitignore' --exclude='.git' --exclude='flake/modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/slack/slack-client.sh' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/posthog/***' --exclude='out-of-store-config/services/ai-cron/***' --exclude='todo.md' "$source_dir/" .
+rsync -av --filter=':- .gitignore' --exclude='.git' --exclude='flake/modules/home-manager/dot-files/Scripts/final-cut-pro.swift' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/slack/slack-client.sh' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/posthog/***' --exclude='flake/modules/system/nixos/headless/optional/tailscaled-work.nix' --exclude='out-of-store-config/services/ai-cron/***' --exclude='todo.md' "$source_dir/" .
 
 # Copy built/ separately since it's gitignored in source but tracked in public repo
 rsync -av --exclude='ai-agents/*/skills/slack/***' --exclude='ai-agents/*/skills/posthog/***' "$source_dir/built/" ./built/

@@ -37,6 +37,13 @@ kagi quick --format pretty "your question"
 kagi ask-page https://example.com "What is this page about?"
 ```
 
+### YouTube Search
+```bash
+nix shell nixpkgs#yt-dlp -c yt-dlp "ytsearch10:your query" --flat-playlist
+```
+
+Use this when web search results are thin, stale, or you specifically need YouTube videos.
+
 ## Token-Efficient Workflow
 
 1. **Search first**: `kagi search "query"`

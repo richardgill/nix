@@ -49,9 +49,13 @@ Only do git commits when I explicitly ask.
 
 Prefer not to use npx or bunx for anything where package.json has it. Rely on pnpm exec
 
-There is a gitignored `scratch/` folder in all repos - you can use it for temporary work and experimentation.
 
 You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
+There is a gitignored `overlay/` folder in all repos:
+
+`overlay/branch` use this for your temporary work and experimentation.
+`overlay/branches` other branches temporary work and experimentation.
+
 Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "intefaces" / code seams before details.
 For quick comprehension you must present code changes outside-in, showing new code / code changes **in context** with surrounding existing code:
 You need to show me the code as a 'sketch' of the 'shape' of the code whilst being brief.

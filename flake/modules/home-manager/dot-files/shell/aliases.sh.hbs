@@ -56,7 +56,6 @@ resetTo() {
 
 # app aliases
 alias c="~/Scripts/cl"
-alias v="nvim"
 alias t="~/Scripts/tmux-start"
 alias pi="~/Scripts/pi"
 alias pnx="pnpm exec nx"

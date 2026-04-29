@@ -17,4 +17,4 @@ if [[ -n "$workspace" ]]; then
   wm_focus_workspace "$workspace"
 fi
 
-sh -c "$cmd" &
+exec "$HOME/Scripts/nixos/launch-in-app-scope" sh -c "$cmd"
