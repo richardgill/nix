@@ -9,6 +9,7 @@ let
   unstable = import nixpkgs-unstable {
     inherit (pkgs.stdenv.hostPlatform) system;
     config.allowUnfree = true;
+    overlays = [ (import ../../../../overlays/gws.nix) ];
   };
 in
 {

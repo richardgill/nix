@@ -6,6 +6,7 @@
 - Always define functions at the root scope, do not nest function definitions in functions unless really you need to
 - Always use TypeScript `type` in favor of `interface` unless you must use interface (or it follows conventions in the code)
 - Favor `??` over `||` where it makes sense.
+- Never use nullish coalescing assignment (`??=`).
 - Favor `Boolean(blah)` over `!!blah`
 - Do not use: `while`, `switch`, `continue`, `break`, `in` keywords except if there is good reason to do so
 - New comments: Always single line // comments

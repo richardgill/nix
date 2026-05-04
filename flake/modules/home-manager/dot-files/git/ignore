@@ -1,6 +1,8 @@
 .DS_Store
 mise.local.toml
 .claude/settings.local.json
+CLAUDE.local.md
+AGENTS.local.md
 .claude/prompts/
 local-ci.sh
 lefthook-local.yml

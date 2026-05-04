@@ -26,11 +26,34 @@ beeper-cli messages "!chatID:beeper.local"
 
 # Get a single chat's details
 beeper-cli chat "!chatID:beeper.local"
+
+# Send a message to an allowed chat
+# First call prints a one-time confirmation code and does not send. The CLI enforces the allowed recipient list
+beeper-cli send "!chatID:beeper.local" "message text"
+beeper-cli send --confirm-code "abc123" "!chatID:beeper.local" "message text"
 ```
 
 ## Tips
 
 Chat IDs start with "!" - the CLI handles URL encoding automatically. Pipe to jq to filter JSON output. Search returns matching chats in the "chats" field.
+
+## Finding your own WhatsApp chat
+
+Use `/v1/accounts` to get the WhatsApp self user ID, then find the single WhatsApp chat containing that participant:
+
+```bash
+self_id=$(~/Scripts/beeper-cli raw http://localhost:23373/v1/accounts \
+  | jq -r '.[] | select(.accountID=="whatsapp") | .user.id')
+
+~/Scripts/beeper-cli chats \
+  | jq -r --arg participant "@whatsapp_${self_id}:beeper.local" '
+      .items[]
+      | select(.accountID=="whatsapp"
+          and .type=="single"
+          and any(.participants.items[]?; .id == $participant))
+      | [.id, .title, .lastActivity] | @tsv
+    '
+```
 
 ## Auth Issues
 

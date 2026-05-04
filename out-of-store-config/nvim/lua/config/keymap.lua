@@ -9,6 +9,7 @@ vim.g.maplocalleader = ' '
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<Esc><Esc>', function()
   vim.fn.clearmatches()
+  require('custom.agent-events').clear_highlight()
 end)
 
 -- Close a tab

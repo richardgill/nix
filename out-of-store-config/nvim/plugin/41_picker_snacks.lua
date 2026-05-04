@@ -1,4 +1,5 @@
 local picker = require('snacks').picker
+local agent_events = require 'custom.agent-events'
 
 vim.keymap.set('n', '<leader>fh', function()
   picker.help()
@@ -36,6 +37,8 @@ vim.keymap.set('n', '<leader>fb', function()
     current = false,
   }
 end, { desc = '[F]ind [B]uffers' })
+
+vim.keymap.set('n', '<leader>fa', agent_events.pick, { desc = '[F]ind [A]gent file events' })
 
 vim.keymap.set('n', '<leader>/', function()
   picker.lines {

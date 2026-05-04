@@ -1,8 +1,8 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.3-codex",
-  "defaultThinkingLevel": "medium",
+  "defaultModel": "gpt-5.5",
+  "defaultThinkingLevel": "high",
   "enabledModels": [
     "openai-codex/gpt-5.3-codex",
     "openai-codex/gpt-5.3-codex-spark",
@@ -34,11 +34,16 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.70.6",
+  "lastChangelogVersion": "0.72.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
-    "npm:@calesennett/pi-codex-fast"
+    "npm:@calesennett/pi-codex-fast",
+    "~/code/pi-extensions/main/extensions/preset",
+    "~/code/pi-extensions/main/extensions/sub-pi",
+    "~/code/pi-extensions/main/extensions/sub-pi-skill",
+    "~/code/pi-extensions/main/extensions/file-collector",
+    "~/code/pi-extensions/main/extensions/extra-context-files"
   ],
   "pi-codex-fast": {
     "enabled": true

@@ -1,5 +1,6 @@
 {
   "app.model.cycleForward": "ctrl+shift+alt+9",
   "app.model.cycleBackward": "ctrl+shift+alt+0",
-  "app.session.togglePath": "ctrl+shift+alt+8"
+  "app.session.togglePath": "ctrl+shift+alt+8",
+  "app.models.toggleProvider": []
 }

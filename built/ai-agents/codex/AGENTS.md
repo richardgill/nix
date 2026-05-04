@@ -20,6 +20,7 @@ Push side effects to the edges: fetch, transform (pure), emit. Don't interleave 
 - Always define functions at the root scope, do not nest function definitions in functions unless really you need to
 - Always use TypeScript `type` in favor of `interface` unless you must use interface (or it follows conventions in the code)
 - Favor `??` over `||` where it makes sense.
+- Never use nullish coalescing assignment (`??=`).
 - Favor `Boolean(blah)` over `!!blah`
 - Do not use: `while`, `switch`, `continue`, `break`, `in` keywords except if there is good reason to do so
 - New comments: Always single line // comments
@@ -45,6 +46,8 @@ curl -X POST https://api.example.com/data \
 </example>
 I work on Mac or NixOS and the filesystem is case sensitive
 
+To run software without installing it, prefer `nix shell nixpkgs#<pkg> -c <cmd>`; fall back to `mise` for specific tool versions.
+
 Only do git commits when I explicitly ask.
 
 Prefer not to use npx or bunx for anything where package.json has it. Rely on pnpm exec
@@ -53,7 +56,7 @@ Prefer not to use npx or bunx for anything where package.json has it. Rely on pn
 You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
 There is a gitignored `overlay/` folder in all repos:
 
-`overlay/branch` use this for your temporary work and experimentation.
+`overlay/branch` use this by default for your temporary work and experimentation. When I say `overlay` assume this is what I mean.
 `overlay/branches` other branches temporary work and experimentation.
 
 Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "intefaces" / code seams before details.
@@ -74,6 +77,7 @@ What **not** to include:
 
 
 
+When referencing files use a format like this from the project dir: ./folder/file.txt or ./folder/file.txt:5 or ./folder/file.txt:4-7
 
 Default to terse, high-signal responses.
 

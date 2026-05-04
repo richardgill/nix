@@ -1,10 +1,8 @@
 {
   pkgs,
-  inputs,
   ...
 }:
 let
-  neovim-nightly = inputs.neovim-nightly-overlay.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
   treesitter-parsers = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
     p.bash
     p.diff
@@ -20,9 +18,6 @@ let
 in
 {
   home.packages = with pkgs; [
-    # Neovim nightly (0.12+) — needed for vim.pack
-    neovim-nightly
-
     # LSP servers
     astro-language-server
     biome

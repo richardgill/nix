@@ -5,6 +5,7 @@
 {{> overlays }}
 {{> sketch-first }}
 {{> usage-signature-flow }}
+{{> file-reference-format }}
 
 {{#if (eq modelFamily "openai")}}
 {{> briefness }}
