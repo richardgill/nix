@@ -147,6 +147,7 @@
           ".cache/thumbnails"
           ".local/state/ai-cron"
           ".local/state/nvim"
+          ".local/state/tmux"
           ".local/state/yazi"
           ".local/state/wireplumber"
           ".local/share/libvirt"

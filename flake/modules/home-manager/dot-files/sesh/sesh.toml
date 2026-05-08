@@ -1,4 +1,0 @@
-sort_order = ["tmux", "zoxide"]
-
-[default_session]
-preview_command = "eza --all --git --icons --color=always {}"

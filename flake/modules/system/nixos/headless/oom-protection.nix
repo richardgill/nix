@@ -1,13 +1,25 @@
 # Test by creating memory heavy processes with: nix-shell -p stress-ng --run "stress-ng --vm 1 --vm-bytes 5G --timeout 60s"
 { lib, ... }:
 {
-  systemd.oomd.enable = lib.mkForce false;
+  systemd.oomd = {
+    enable = true;
+    enableUserSlices = true; # Let systemd-oomd kill runaway user app/session scopes under memory pressure
+    settings.OOM = {
+      DefaultMemoryPressureLimit = "50%";
+      DefaultMemoryPressureDurationSec = "15s";
+      SwapUsedLimit = "70%";
+    };
+  };
+
+  systemd.slices."user".sliceConfig.ManagedOOMSwap = "kill";
 
   # More aggressively kill processes when getting close to no memory
   services.earlyoom = {
     enable = true;
-    freeMemThreshold = 8; # Start killing before the system reaches a hard OOM cliff
-    freeSwapThreshold = 10; # React once swap is also getting tight
+    freeMemThreshold = 25; # Start killing before the system reaches a hard OOM cliff
+    freeMemKillThreshold = 15; # Escalate from SIGTERM to SIGKILL if available memory drops below this percent
+    freeSwapThreshold = 20; # React once swap is also getting tight
+    freeSwapKillThreshold = 5; # Escalate from SIGTERM to SIGKILL if free swap drops below this percent
     enableNotifications = true;
     reportInterval = 60;
     extraArgs = [
@@ -32,6 +44,6 @@
   zramSwap = {
     enable = lib.mkForce true;
     algorithm = "zstd";
-    memoryPercent = 100;
+    memoryPercent = 50;
   };
 }

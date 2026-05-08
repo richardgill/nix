@@ -294,7 +294,7 @@ ai_sessions_run() {
     --bind "n:execute($script_path new$agent_arg)" \
     --bind "i:execute-silent($script_path ignore --agent={4} {3})+reload:$list_command" \
     --bind "c:execute($script_path clear --agent={4} {2})+reload:$list_command" \
-    --bind "ctrl-q:execute-silent($HOME/Scripts/tmux-kill-session --yes {2})+reload:$list_command" \
+    --bind "ctrl-q:execute-silent($HOME/Scripts/tmux-kill-session --yes {2})+exclude" \
     --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
     --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
     --bind 's:abort+execute-silent(tmux select-window -t :3)' \

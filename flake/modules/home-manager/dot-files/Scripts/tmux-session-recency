@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+session="${1:-}"
+[[ -n "$session" ]] || exit 0
+
+file="${XDG_STATE_HOME:-$HOME/.local/state}/tmux/session-recency.tsv"
+mkdir -p "$(dirname "$file")"
+
+tmp=$(mktemp)
+printf '%s\t%s\n' "$(date +%s)" "$session" > "$tmp"
+if [[ -f "$file" ]]; then
+  awk -F '\t' -v session="$session" 'NF >= 2 && $2 != session' "$file" >> "$tmp"
+fi
+mv "$tmp" "$file"

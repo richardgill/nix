@@ -34,18 +34,22 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.72.1",
+  "lastChangelogVersion": "0.73.0",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
-    "npm:@calesennett/pi-codex-fast",
     "~/code/pi-extensions/main/extensions/preset",
     "~/code/pi-extensions/main/extensions/sub-pi",
     "~/code/pi-extensions/main/extensions/sub-pi-skill",
     "~/code/pi-extensions/main/extensions/file-collector",
-    "~/code/pi-extensions/main/extensions/extra-context-files"
+    "~/code/pi-extensions/main/extensions/extra-context-files",
+    "~/code/pi-extensions/main/extensions/bash-timeout-guard",
+    "npm:@calesennett/pi-codex-fast",
+    "npm:@romansix/pi-tmux",
+    "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
     "enabled": true
   }
 }
+

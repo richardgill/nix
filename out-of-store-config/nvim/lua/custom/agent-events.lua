@@ -5,6 +5,20 @@ local ns = vim.api.nvim_create_namespace 'custom.agent-events'
 local sign_hl = 'AgentEventSign'
 local sign_text = '▌'
 local valid_kinds = { bash = true, edit = true, read = true, write = true, assistant_citation = true }
+local source_kinds = {
+  read_tool = 'read',
+  write_tool = 'write',
+  edit_tool = 'edit',
+  bash_command = 'bash',
+  bash_output = 'bash',
+  assistant_output = 'assistant_citation',
+}
+local source_actions = {
+  read_tool = 'read',
+  write_tool = 'write',
+  edit_tool = 'edited',
+  assistant_output = 'cited',
+}
 local kind_highlights = {
   bash = 'Function',
   write = 'Statement',
@@ -116,8 +130,21 @@ local age = function(timestamp)
   return string.format('%dd', math.floor(diff / 86400))
 end
 
-local action = function(event)
-  return event.action
+local bash_action = function(event)
+  if type(event.command) == 'string' and event.command ~= '' then
+    return 'bash ' .. event.command
+  end
+  return 'bash output'
+end
+
+local event_action = function(event)
+  if type(event.action) == 'string' then
+    return event.action
+  end
+  if event.source == 'bash_command' or event.source == 'bash_output' then
+    return bash_action(event)
+  end
+  return source_actions[event.source]
 end
 
 local location = function(event, cwd)
@@ -139,14 +166,18 @@ local stat_file = function(path)
 end
 
 local event_kind = function(event)
+  local source_kind = source_kinds[event.source]
+  if source_kind then
+    return source_kind
+  end
   return valid_kinds[event.kind] and event.kind or nil
 end
 
 local is_file_event = function(event)
   return type(event) == 'table'
-    and type(event.action) == 'string'
     and type(event.absolutePath) == 'string'
     and event_kind(event)
+    and type(event_action(event)) == 'string'
     and stat_file(event.absolutePath)
 end
 
@@ -187,7 +218,7 @@ end
 
 local to_item = function(event, index, cwd)
   local item_location = location(event, cwd)
-  local item_action = action(event)
+  local item_action = event_action(event)
   local detail = event_detail(event)
   local item_display = event.display or (item_action .. ' ' .. item_location)
   return {

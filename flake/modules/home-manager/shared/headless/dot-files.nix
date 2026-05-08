@@ -151,7 +151,6 @@ in
       "code/.ignore".source = ../../dot-files/code/ignore;
       ".config/btop/btop.conf".source = ../../dot-files/btop/btop.conf;
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
-      ".config/sesh".source = ../../dot-files/sesh;
       ".ssh/config".source = ../../dot-files/ssh/config;
       ".config/yazi".source = ../../dot-files/yazi;
 

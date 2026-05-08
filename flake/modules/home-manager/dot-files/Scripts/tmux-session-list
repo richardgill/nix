@@ -1,0 +1,72 @@
+#!/usr/bin/env bash
+
+recency_file() {
+  local file="${XDG_STATE_HOME:-$HOME/.local/state}/tmux/session-recency.tsv"
+  [[ -f "$file" ]] && echo "$file"
+}
+
+home_path() {
+  local path="$1"
+  case "$path" in
+    "$HOME") echo "~" ;;
+    "$HOME"/*) echo "~${path#$HOME}" ;;
+    *) echo "$path" ;;
+  esac
+}
+
+session_rows() {
+  local file
+  file=$(recency_file)
+  tmux list-sessions -F '#{session_name}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
+    | awk -F '\t' -v recency_file="$file" '
+        BEGIN {
+          if (recency_file != "") {
+            while ((getline line < recency_file) > 0) {
+              split(line, parts, "\t")
+              if (parts[2] != "" && !(parts[2] in recency)) recency[parts[2]] = parts[1] + 0
+            }
+          }
+        }
+        {
+          name = $1
+          last_attached = $2 + 0
+          activity = $3 + 0
+          last_seen = (name in recency) ? recency[name] : 0
+          printf "%d\t%d\t%d\t%s\n", last_seen, last_attached, activity, name
+        }
+      ' \
+    | sort -t $'\t' -k1,1nr -k2,2nr -k3,3nr -k4,4 \
+    | cut -f4- \
+    | while IFS= read -r session; do
+        printf 'tmux\t%s\t\033[34m\033[39m %s\n' "$session" "$session"
+      done
+}
+
+zoxide_rows() {
+  zoxide query -l 2>/dev/null \
+    | while IFS= read -r path; do
+        [[ -d "$path" ]] && printf 'dir\t%s\t\033[36m\033[39m %s\n' "$path" "$(home_path "$path")"
+      done
+}
+
+all_dir_rows() {
+  "$HOME/Scripts/find-dirs" \
+    | while IFS= read -r path; do
+        local expanded_path="${path/#\~/$HOME}"
+        [[ -d "$expanded_path" ]] && printf 'dir\t%s\t\033[36m\033[39m %s\n' "$expanded_path" "$path"
+      done
+}
+
+case "${1:-sessions}" in
+  sessions)
+    session_rows
+    zoxide_rows
+    ;;
+  dirs)
+    all_dir_rows
+    ;;
+  *)
+    echo "Usage: $0 {sessions|dirs}" >&2
+    exit 1
+    ;;
+esac

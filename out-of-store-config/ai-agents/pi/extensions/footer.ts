@@ -25,9 +25,18 @@ const formatContextUsage = (usage: ContextUsage | undefined) => {
 	return `ctx ${formatTokenCount(usage.tokens)}/${window} ${usage.percent.toFixed(1)}%`;
 };
 
-const getStatuses = (statuses: ReadonlyMap<string, string>) =>
-	Array.from(statuses.values()).filter(Boolean).join(" ");
+const hiddenStatusKeys = new Set(["codex-status"]);
 
+const formatStatus = (key: string, value: string) => {
+	if (key === "fast-priority") return value.replace("OpenAI fast mode", "Fast mode");
+	return value;
+};
+
+const getStatuses = (statuses: ReadonlyMap<string, string>) =>
+	Array.from(statuses.entries())
+		.filter(([key, value]) => Boolean(value) && !hiddenStatusKeys.has(key))
+		.map(([key, value]) => formatStatus(key, value))
+		.join(" ");
 
 export default function (pi: ExtensionAPI) {
 	pi.on("session_start", (_event, ctx) => {

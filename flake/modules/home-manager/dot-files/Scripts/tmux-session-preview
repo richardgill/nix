@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+type="$1"
+target="$2"
+
+preview_tmux_session() {
+  local session="$1"
+  tmux capture-pane -ep -t "$session:" -S - 2>/dev/null || echo "No tmux session: $session"
+}
+
+preview_dir() {
+  local path="$1"
+  local expanded_path="${path/#\~/$HOME}"
+  if [[ ! -d "$expanded_path" ]]; then
+    echo "No directory: $path"
+    return
+  fi
+  eza --all --git --icons --color=always "$expanded_path"
+}
+
+case "$type" in
+  tmux)
+    preview_tmux_session "$target"
+    ;;
+  dir)
+    preview_dir "$target"
+    ;;
+  *)
+    echo "No preview"
+    ;;
+esac

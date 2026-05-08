@@ -32,7 +32,6 @@ in
       oh-my-posh
       postgresql
       ripgrep
-      sesh
       stripe-cli
       unstable.gws
       unstable.todoist
