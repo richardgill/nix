@@ -1,18 +1,38 @@
 #!/usr/bin/env bash
 
 source "$(dirname "$0")/tmux-setup-windows"
-# Strip the first two chars which are icons, but only if arg doesn't contain a space
-if [[ "$1" == *" "* ]]; then
-  arg="${1:2}"
-else
-  arg="$1"
-fi
 
-expanded_path="${arg/#\~/$HOME}"
+connect_tmux_session() {
+  local session="$1"
+  [[ -n "$session" ]] || return 1
+  tmux switch-client -t "$session"
+}
 
-if [ -d "$expanded_path" ]; then
+connect_dir() {
+  local path="$1"
+  local expanded_path="${path/#\~/$HOME}"
+  [[ -d "$expanded_path" ]] || return 1
+
+  zoxide add "$expanded_path"
+  local session_name
+  session_name=$(session_name_for_path "$expanded_path")
+  if tmux has-session -t "$session_name" 2>/dev/null; then
+    tmux switch-client -t "$session_name"
+    return
+  fi
+
   create_session_for_path "$expanded_path" >/dev/null
-  exit 0
-fi
+}
 
-sesh connect "$arg" >/dev/null
+case "${1:-}" in
+  tmux)
+    connect_tmux_session "${2:-}"
+    ;;
+  dir)
+    connect_dir "${2:-}"
+    ;;
+  *)
+    echo "Usage: $0 {tmux <session>|dir <path>}" >&2
+    exit 1
+    ;;
+esac
