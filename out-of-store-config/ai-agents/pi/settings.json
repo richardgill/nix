@@ -34,7 +34,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.73.0",
+  "lastChangelogVersion": "0.74.0",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -46,10 +46,18 @@
     "~/code/pi-extensions/main/extensions/bash-timeout-guard",
     "npm:@calesennett/pi-codex-fast",
     "npm:@romansix/pi-tmux",
-    "npm:pi-codex-status"
+    "npm:pi-codex-status",
+    {
+      "source": "npm:@normful/picadillo",
+      "extensions": [
+        "extensions/parrot.ts"
+      ],
+      "skills": [],
+      "prompts": [],
+      "themes": []
+    }
   ],
   "pi-codex-fast": {
     "enabled": true
   }
 }
-

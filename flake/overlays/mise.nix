@@ -1,19 +1,16 @@
-final: prev: {
-  mise = prev.mise.overrideAttrs (old: let
-    # Pin mise v2026.2.1 (Node 24.12/24.13 GPG fix); remove overlay once nixpkgs-unstable catches up.
-    version = "2026.2.1";
-    src = prev.fetchFromGitHub {
-      owner = "jdx";
-      repo = "mise";
-      rev = "v${version}";
-      hash = "sha256-7TsSK3mk6tSxvWPNYq8Viyc8x4BYmR/QrqRT/sfetz4=";
-    };
-    cargoHash = "sha256-/gltCohAPGdCpcCvou7HBG0yioiOaGjnIF60FQzkB+s=";
-  in {
-    inherit version src cargoHash;
-    cargoDeps = prev.rustPlatform.fetchCargoVendor {
-      inherit src;
-      hash = cargoHash;
-    };
-  });
+final: prev:
+let
+  # Pin mise to a nixpkgs commit that ships 2026.4.20 (prebuilt in cache).
+  # Bump rev to pull a newer mise; keep the rest of nixpkgs-unstable untouched.
+  nixpkgsForMise = import (prev.fetchFromGitHub {
+    owner = "nixos";
+    repo = "nixpkgs";
+    rev = "68a8af93ff4297686cb68880845e61e5e2e41d92";
+    hash = "sha256-pYEytCNic/czazbV9r3tbQ6BZzqRBg/41x2dIC5ymOo=";
+  }) {
+    inherit (prev.stdenv.hostPlatform) system;
+    config.allowUnfree = true;
+  };
+in {
+  mise = nixpkgsForMise.mise;
 }

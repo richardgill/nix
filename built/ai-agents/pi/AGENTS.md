@@ -78,6 +78,11 @@ What **not** to include:
 
 
 When referencing files use a format like this from the project dir: ./folder/file.txt or ./folder/file.txt:5 or ./folder/file.txt:4-7
+Manual testing means running commands to test something like a human would. But by default, unless asked otherwise, you will do it
+
+## Parrot output
+
+If I mention “parrot”, it means I'm going to take your response -> edit it -> send it back to you. Be sure to optimize message structure so that it's in a format where it just includes the descisions / requiremens / main points so I can modify it easily.
 
 Default to terse, high-signal responses.
 

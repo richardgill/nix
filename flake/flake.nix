@@ -154,6 +154,7 @@
             {
               nixpkgs.overlays = [
                 (import ./overlays/bambu-studio.nix)
+                (import ./overlays/mise.nix)
               ];
             }
           ];
