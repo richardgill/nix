@@ -933,6 +933,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-firefox-wayland-context-menu-fix": {
+      "locked": {
+        "lastModified": 1761597516,
+        "narHash": "sha256-wxX7u6D2rpkJLWkZ2E932SIvDJW8+ON/0Yy8+a5vsDU=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "daf6dc47aa4b44791372d6139ab7b25269184d55",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "daf6dc47aa4b44791372d6139ab7b25269184d55",
+        "type": "github"
+      }
+    },
     "nixpkgs-lib": {
       "locked": {
         "lastModified": 1765674936,
@@ -1116,6 +1132,7 @@
         "nix-homebrew": "nix-homebrew",
         "nixarr": "nixarr",
         "nixpkgs": "nixpkgs_3",
+        "nixpkgs-firefox-wayland-context-menu-fix": "nixpkgs-firefox-wayland-context-menu-fix",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "playwright": "playwright",
         "sops-nix": "sops-nix",
