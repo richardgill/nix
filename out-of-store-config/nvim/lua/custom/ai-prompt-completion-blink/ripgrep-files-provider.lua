@@ -61,13 +61,22 @@ local filter_paths = function(paths, query)
   return filtered
 end
 
-local build_items = function(paths, range)
+local path_score_offset = function(path)
+  if path:match('^overlay/') then
+    return -7
+  end
+  return 0
+end
+
+local build_items = function(paths, range, query)
+  local filter_text = query ~= '' and query or nil
   local items = {}
   for _, path in ipairs(paths) do
     items[#items + 1] = {
       label = path,
       kind = CompletionItemKind.File,
-      filterText = path,
+      filterText = filter_text or path,
+      score_offset = path_score_offset(path),
       textEdit = {
         newText = path,
         range = range,
@@ -123,8 +132,8 @@ function source:get_completions(ctx, callback)
 
   return list_files(self, cwd, function(files)
     local filtered = filter_paths(files, query_data.query)
-    local items = build_items(filtered, range)
-    callback { items = items, is_incomplete_forward = false, is_incomplete_backward = false }
+    local items = build_items(filtered, range, query_data.query)
+    callback { items = items, is_incomplete_forward = true, is_incomplete_backward = true }
   end)
 end
 

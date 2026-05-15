@@ -1,10 +1,11 @@
 ---
 name: browser
 description: |
-  Browser automation with persistent page state. Use when users ask to navigate websites, fill forms,
-  take screenshots, extract web data, test web apps, or automate browser workflows.
-  Trigger phrases include "go to [url]", "click on", "fill out the form", "take a screenshot",
-  "scrape", "automate", "test the website", "log into", or any browser interaction request.
+  Browser automation with persistent page state. Use when the assistant needs to inspect, automate,
+  or interact with a page: click, fill, login, scrape, extract data, test UI, take screenshots,
+  or report what is visible. Do not use this skill for plain link opening; use `open <url>` instead.
+  Trigger phrases include "click on", "fill out the form", "take a screenshot", "scrape",
+  "automate", "test the website", "log into", "inspect this page", or any browser interaction request.
 ---
 
 # Browser Automation with agent-browser
@@ -160,6 +161,31 @@ agent-browser network route <url> --body '{}'  # Mock response
 agent-browser network unroute [url]            # Remove routes
 agent-browser network requests                 # View tracked requests
 agent-browser network requests --filter api    # Filter requests
+```
+
+### Full request/response capture
+
+Use `agent-browser-request-capture` when you need full request/response headers and bodies for traffic caused by `agent-browser` actions.
+
+```bash
+agent-browser-request-capture attach
+# Save AGENT_BROWSER_REQUEST_CAPTURE_DIR from output
+
+agent-browser click @e1
+agent-browser wait 1000
+
+agent-browser-request-capture stop /tmp/agent-browser-request-capture-...
+cat /tmp/agent-browser-request-capture-.../files.txt
+jq . /tmp/agent-browser-request-capture-.../*.json
+```
+
+For named sessions, attach to the same session:
+
+```bash
+agent-browser --session test open https://example.com
+agent-browser-request-capture attach --session test
+agent-browser --session test click @e1
+agent-browser-request-capture stop /tmp/agent-browser-request-capture-...
 ```
 
 ### Tabs & Windows

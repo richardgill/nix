@@ -11,9 +11,9 @@ vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
     vim.opt_local.foldcolumn = '0'
     vim.opt_local.statuscolumn = ''
     vim.cmd 'normal! G$' -- go to end of file
-    vim.cmd 'startinsert!'
     -- save and quit
     vim.keymap.set('n', '<C-g>', '<cmd>wq<cr>', { buffer = event.buf, silent = true, nowait = true })
     vim.keymap.set('i', '<C-g>', '<Esc><cmd>wq<cr>', { buffer = event.buf, silent = true, nowait = true })
+    require('custom.ai-prompt-completion-blink.native').setup_buffer(event.buf)
   end,
 })

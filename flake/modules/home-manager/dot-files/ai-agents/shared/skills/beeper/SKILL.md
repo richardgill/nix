@@ -37,6 +37,14 @@ beeper-cli send --confirm-code "abc123" "!chatID:beeper.local" "message text"
 
 Chat IDs start with "!" - the CLI handles URL encoding automatically. Pipe to jq to filter JSON output. Search returns matching chats in the "chats" field.
 
+## Known chat IDs
+
+- Richard Gill self-chat: `!rqHUkM62EsHmG8oo1gID:beeper.local`
+- Zoë Balkwell: `!M8sDc3MkF0qdCJaPdnvG:beeper.local`
+- Mike Ford: `!OMfv59J6iSzPFF4RtOs7:beeper.local`
+- Jack Hodkinson: `!tJXj0bU430vuj4J6GTpf:beeper.local`
+- Daniel Everts: `!ORWRxp01v241CtWfaodF:beeper.local`
+
 ## Finding your own WhatsApp chat
 
 Use `/v1/accounts` to get the WhatsApp self user ID, then find the single WhatsApp chat containing that participant:

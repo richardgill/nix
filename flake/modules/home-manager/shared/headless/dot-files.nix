@@ -123,6 +123,8 @@ in
       ".pi/agent/presets.json".source = "${builtTemplates}/ai-agents/pi/presets.json";
       ".pi/agent/keybindings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/keybindings.json";
+      ".pi/agent/extension-config".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extension-config";
       ".pi/agent/skills".source = "${builtTemplates}/ai-agents/pi/skills";
       ".pi/agent/extensions".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extensions";

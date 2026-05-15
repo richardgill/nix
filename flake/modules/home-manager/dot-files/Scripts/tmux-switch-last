@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+last_session=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
+
+if [[ -z "$last_session" ]]; then
+  if tmux has-session -t code 2>/dev/null; then
+    last_session="code"
+  else
+    last_session=$(tmux list-sessions -F '#{session_name}' 2>/dev/null | head -1)
+  fi
+fi
+
+[[ -n "$last_session" ]] || exit 0
+
+last_window=$(tmux list-windows -t "$last_session" -F '#{window_activity} #{window_index}' | sort -rn | head -1 | cut -d' ' -f2)
+[[ -n "$last_window" ]] || exit 0
+
+target="$last_session:$last_window"
+clients=$(tmux list-clients -F '#{client_tty}' 2>/dev/null || true)
+
+if [[ -z "$clients" ]]; then
+  tmux select-window -t "$target"
+  exit 0
+fi
+
+while IFS= read -r client; do
+  if [[ -n "$client" ]]; then
+    tmux switch-client -c "$client" -t "$target"
+  fi
+done <<< "$clients"
