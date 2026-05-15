@@ -17,8 +17,9 @@ home_path() {
 session_rows() {
   local file
   file=$(recency_file)
+  local bg_filter="${TMUX_SESSION_BG_FILTER:-hide}"
   tmux list-sessions -F '#{session_name}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
-    | awk -F '\t' -v recency_file="$file" '
+    | awk -F '\t' -v recency_file="$file" -v bg_filter="$bg_filter" '
         BEGIN {
           if (recency_file != "") {
             while ((getline line < recency_file) > 0) {
@@ -29,6 +30,9 @@ session_rows() {
         }
         {
           name = $1
+          is_bg = (index(name, "_bg_") == 1)
+          if (bg_filter == "hide" && is_bg) next
+          if (bg_filter == "only" && !is_bg) next
           last_attached = $2 + 0
           activity = $3 + 0
           last_seen = (name in recency) ? recency[name] : 0
@@ -60,7 +64,7 @@ all_dir_rows() {
 case "${1:-sessions}" in
   sessions)
     session_rows
-    zoxide_rows
+    [[ "${TMUX_SESSION_BG_FILTER:-hide}" == "only" ]] || zoxide_rows
     ;;
   dirs)
     all_dir_rows

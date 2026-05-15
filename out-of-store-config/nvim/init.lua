@@ -30,10 +30,3 @@ vim.api.nvim_create_autocmd('PackChanged', {
 require 'custom.ai-prompt-completion-blink.prompt-file'
 require 'config.spelling'
 
--- Defer blink-dependent setup until after plugin/ files load
-vim.api.nvim_create_autocmd('VimEnter', {
-  once = true,
-  callback = function()
-    require('custom.ai-prompt-completion-blink').setup()
-  end,
-})

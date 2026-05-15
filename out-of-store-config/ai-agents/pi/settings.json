@@ -43,9 +43,9 @@
     "~/code/pi-extensions/main/extensions/sub-pi-skill",
     "~/code/pi-extensions/main/extensions/file-collector",
     "~/code/pi-extensions/main/extensions/extra-context-files",
-    "~/code/pi-extensions/main/extensions/bash-timeout-guard",
+    "~/code/pi-extensions/main/extensions/tmux-bash",
+    "~/code/pi-extensions/main/extensions/task-context",
     "npm:@calesennett/pi-codex-fast",
-    "npm:@romansix/pi-tmux",
     "npm:pi-codex-status",
     {
       "source": "npm:@normful/picadillo",

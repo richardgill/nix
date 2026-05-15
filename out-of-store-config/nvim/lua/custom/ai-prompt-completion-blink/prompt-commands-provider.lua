@@ -5,30 +5,33 @@ local source = {}
 local trigger_characters = { '/' }
 local query_pattern = '[%w%-%._:]*'
 
-local resolve_pi_path = function()
-  local lines = vim.fn.systemlist({ 'which', 'pi' })
-  local pi_path = lines[1]
-  if not pi_path or pi_path == '' then
-    return nil
+local add_path = function(paths, path)
+  if not path or path == '' then
+    return
   end
-  if pi_path:match('/mise/shims/pi$') and vim.fn.executable('mise') == 1 then
-    local resolved = vim.fn.systemlist({ 'mise', 'which', 'pi' })[1]
-    if resolved and resolved ~= '' then
-      return resolved
-    end
-  end
-  return pi_path
+  paths[#paths + 1] = path
 end
 
-local resolve_skills_module = function()
-  local pi_path = resolve_pi_path()
-  if not pi_path or pi_path == '' then
-    return nil
+local resolve_pi_paths = function()
+  local paths = {}
+  if vim.fn.executable('mise') == 1 then
+    add_path(paths, vim.fn.systemlist({ 'mise', 'which', 'pi' })[1])
   end
-  local base_dir = vim.fn.fnamemodify(pi_path, ':h:h')
-  local skills_module = base_dir .. '/lib/node_modules/@mariozechner/pi-coding-agent/dist/core/skills.js'
-  if vim.fn.filereadable(skills_module) == 1 then
-    return skills_module
+  add_path(paths, vim.fn.systemlist({ 'which', 'pi' })[1])
+  return paths
+end
+
+local package_scopes = { '@earendil-works', '@mariozechner' }
+
+local resolve_skills_module = function()
+  for _, pi_path in ipairs(resolve_pi_paths()) do
+    local base_dir = vim.fn.fnamemodify(pi_path, ':h:h')
+    for _, scope in ipairs(package_scopes) do
+      local skills_module = base_dir .. '/lib/node_modules/' .. scope .. '/pi-coding-agent/dist/core/skills.js'
+      if vim.fn.filereadable(skills_module) == 1 then
+        return skills_module
+      end
+    end
   end
   return nil
 end
@@ -52,7 +55,7 @@ local get_query_data = function(line, cursor_col)
   -- // Only match slash commands at line start or after whitespace to avoid @path segments.
   local query = before:match('^(/' .. query_pattern .. ')$')
   if query then
-    return { query = query, start_col = 1 }
+    return { start_col = 1 }
   end
 
   query = before:match('.*%s(/' .. query_pattern .. ')$')
@@ -65,7 +68,7 @@ local get_query_data = function(line, cursor_col)
     return nil
   end
 
-  return { query = query, start_col = space_start + 1 }
+  return { start_col = space_start + 1 }
 end
 
 local get_text_edit_range = function(ctx, start_col)
@@ -97,8 +100,13 @@ local load_skills = function(callback)
   skill_state.loading = true
   local script = [[
 const { loadSkills } = await import(process.argv[1]);
-const { skills } = loadSkills();
-console.log(JSON.stringify(skills.map((skill) => skill.name)));
+let result;
+try {
+  result = loadSkills({ cwd: process.cwd(), skillPaths: [], includeDefaults: true });
+} catch (_error) {
+  result = loadSkills();
+}
+console.log(JSON.stringify(result.skills.map((skill) => skill.name)));
 ]]
 
   local handle
@@ -137,20 +145,6 @@ local build_commands = function(skills)
     commands[#commands + 1] = { label = '/skill:' .. name, detail = 'Run ' .. name }
   end
   return commands
-end
-
-local filter_commands = function(commands, query)
-  if query == '' or query == '/' then
-    return commands
-  end
-  local normalized = query:lower()
-  local filtered = {}
-  for _, command in ipairs(commands) do
-    if command.label:lower():find(normalized, 1, true) then
-      filtered[#filtered + 1] = command
-    end
-  end
-  return filtered
 end
 
 local build_items = function(commands, range)
@@ -199,9 +193,8 @@ function source:get_completions(ctx, callback)
 
   return load_skills(function(skills)
     local commands = build_commands(skills)
-    local filtered = filter_commands(commands, query_data.query)
     local range = get_text_edit_range(ctx, query_data.start_col)
-    local items = build_items(filtered, range)
+    local items = build_items(commands, range)
     callback { items = items, is_incomplete_forward = false, is_incomplete_backward = false }
   end)
 end

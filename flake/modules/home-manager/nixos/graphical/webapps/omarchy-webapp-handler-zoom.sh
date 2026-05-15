@@ -20,14 +20,21 @@ fi
 
 compositor="$($HOME/Scripts/nixos/compositor)"
 if [[ "$compositor" == "niri" ]]; then
+  existing_zoom=$(niri msg --json windows \
+    | jq -r '.[] | select(.app_id | startswith("chrome-app.zoom")) | .pid' \
+    | head -1)
   niri msg action focus-workspace zoom
 else
-  hyprctl dispatch workspace 19
-
   existing_zoom=$(hyprctl clients -j | jq -r '.[] | select(.class | test("chrome-app.zoom")) | .pid')
-  if [[ -n "$existing_zoom" ]]; then
-    kill "$existing_zoom"
-  fi
+  hyprctl dispatch workspace 19
 fi
 
-exec omarchy-launch-webapp "$web_url"
+if [[ -n "$existing_zoom" ]]; then
+  kill "$existing_zoom"
+  for _ in 1 2 3 4 5 6 7 8 9 10; do
+    kill -0 "$existing_zoom" 2>/dev/null || break
+    sleep 0.1
+  done
+fi
+
+exec omarchy-launch-webapp "$web_url" --user-data-dir="${ZOOM_USER_DATA_DIR:-$HOME/.config/chromium-zoom}"

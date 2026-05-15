@@ -5,6 +5,7 @@ export BROWSER="tunnel-browser-open"
 export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 export PUPPETEER_EXECUTABLE_PATH=`which chromium`
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
+export PI_EXTENSION_CONFIG_DIR="$HOME/.pi/agent/extension-config"
 
 if [ "$(uname)" = "Darwin" ]; then
   export JAVA_HOME="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"

@@ -7,6 +7,8 @@
 {{> usage-signature-flow }}
 {{> file-reference-format }}
 {{> manual-testing }}
+{{> ssh-reverse-hosts }}
+{{> link-opening }}
 
 {{#if (eq agent "pi")}}
 {{> parrot }}

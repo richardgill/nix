@@ -79,6 +79,38 @@ What **not** to include:
 
 When referencing files use a format like this from the project dir: ./folder/file.txt or ./folder/file.txt:5 or ./folder/file.txt:4-7
 Manual testing means running commands to test something like a human would. But by default, unless asked otherwise, you will do it
+## SSH reverse hosts
+
+Detect SSH context with `source ~/Scripts/lib/ssh && is_ssh_session`. Probe reverse tunnel:
+
+```bash
+ssh -o BatchMode=yes -o ConnectTimeout=2 -p ${TUNNEL_PORT:-1999} localhost hostname
+```
+
+If it works, SSH back with `ssh -p ${TUNNEL_PORT:-1999} localhost`; one-offs: `tunnel-exec <command>`.
+
+```bash
+# remote -> originating machine
+scp -P ${TUNNEL_PORT:-1999} ./file localhost:~/Downloads/
+scp -P ${TUNNEL_PORT:-1999} ./screenshot.png localhost:~/Screenshots/
+
+# originating machine -> remote
+scp -P ${TUNNEL_PORT:-1999} localhost:~/Downloads/file ./
+scp -P ${TUNNEL_PORT:-1999} localhost:~/Screenshots/screenshot.png ./
+```
+## Opening links vs browser automation
+
+When the user asks to open/show/launch a URL or link on their machine, use:
+
+```bash
+open '<url>'
+```
+
+Do not use the browser skill for plain link opening.
+
+Use the browser skill only when the assistant needs to inspect, automate, or interact with the page: click, fill, login, scrape, extract data, test UI, take screenshots, or report what is visible.
+
+If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 
 ## Parrot output
 

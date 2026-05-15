@@ -1,18 +1,20 @@
 #!/usr/bin/env bash
 
 HOME_DIR="$HOME"
-SESSION_LIST="$HOME_DIR/Scripts/tmux-session-list sessions"
+BG_FILTER_FILE=$(mktemp)
+printf '%s' "hide" > "$BG_FILTER_FILE"
+SESSION_LIST="TMUX_SESSION_BG_FILTER=\$(cat \"$BG_FILTER_FILE\") $HOME_DIR/Scripts/tmux-session-list sessions"
 DIR_LIST="$HOME_DIR/Scripts/tmux-session-list dirs"
 MODE_SESSIONS="sessions"
 MODE_DIRS="all dirs"
-HEADER_BASE='  mode: %s | ^a toggle %s | ^q kill | F12/§ prefix'
+HEADER_BASE='  mode: %s | ^a toggle %s | ^q kill | ^b _bg_ | F12/§ prefix'
 HEADER_SESSIONS=$(printf "$HEADER_BASE" "$MODE_SESSIONS" "$MODE_DIRS")
 HEADER_DIRS=$(printf "$HEADER_BASE" "$MODE_DIRS" "$MODE_SESSIONS")
 MODE_FILE=$(mktemp)
 PREFIX_FILE=$(mktemp)
 printf '%s' "$MODE_SESSIONS" > "$MODE_FILE"
 rm -f "$PREFIX_FILE"
-trap 'rm -f "$MODE_FILE" "$PREFIX_FILE"' EXIT
+trap 'rm -f "$MODE_FILE" "$PREFIX_FILE" "$BG_FILTER_FILE"' EXIT
 
 selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --no-sort --border-label ' sessions ' --prompt '' \
@@ -21,6 +23,7 @@ selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --bind 'tab:down,btab:up' \
   --bind "ctrl-a:transform:[[ \"\$(cat \"$MODE_FILE\")\" == \"$MODE_DIRS\" ]] && echo \"execute-silent(printf '%s' '$MODE_SESSIONS' > '$MODE_FILE')+change-header($HEADER_SESSIONS)+reload($SESSION_LIST)\" || echo \"execute-silent(printf '%s' '$MODE_DIRS' > '$MODE_FILE')+change-header($HEADER_DIRS)+reload($DIR_LIST)\"" \
   --bind "ctrl-q:transform:[[ {1} == tmux ]] && echo \"execute-silent($HOME_DIR/Scripts/tmux-kill-session --yes {2})+reload($SESSION_LIST)\" || echo \"refresh-preview\"" \
+  --bind "ctrl-b:transform:[[ \"\$(cat \"$MODE_FILE\")\" != \"$MODE_SESSIONS\" ]] && echo refresh-preview || { cur=\$(cat \"$BG_FILTER_FILE\"); next=hide; [[ \"\$cur\" == hide ]] && next=only; printf '%s' \"\$next\" > \"$BG_FILTER_FILE\"; echo \"reload($SESSION_LIST)\"; }" \
   --bind "w:become($HOME_DIR/Scripts/ai-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \

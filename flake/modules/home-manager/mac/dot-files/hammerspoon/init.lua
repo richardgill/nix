@@ -63,8 +63,50 @@ hs.hotkey.bind(hyper, "i", function()
 	end
 end)
 
+local function focusSpotify()
+	local app = hs.application.get("Spotify")
+	if not app then
+		return false
+	end
+
+	app:activate()
+	return true
+end
+
+local function focusCmusWindow()
+	for _, win in ipairs(hs.window.allWindows()) do
+		local title = string.lower(win:title() or "")
+		if string.find(title, "cmus", 1, true) then
+			win:focus()
+			return true
+		end
+	end
+
+	return false
+end
+
+local function launchCmus()
+	hs.task
+		.new("/Applications/Ghostty.app/Contents/MacOS/ghostty", nil, function()
+			return true
+		end, { "--title=cmus", "-e", "/bin/zsh", "-lc", "exec cmus" })
+		:start()
+end
+
 hs.hotkey.bind(hyper, "g", function()
 	hs.application.launchOrFocus("Ghostty")
+end)
+
+hs.hotkey.bind(hyper, "m", function()
+	if focusSpotify() then
+		return
+	end
+
+	if focusCmusWindow() then
+		return
+	end
+
+	launchCmus()
 end)
 
 hs.hotkey.bind(hyper, "h", function()

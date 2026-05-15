@@ -25,7 +25,7 @@ require('blink.cmp').setup {
   },
 
   enabled = function()
-    return not vim.tbl_contains({ 'markdown' }, vim.bo.filetype)
+    return not vim.tbl_contains({ 'markdown', 'prompt' }, vim.bo.filetype)
   end,
   -- experimental signature help support
   signature = { enabled = false },

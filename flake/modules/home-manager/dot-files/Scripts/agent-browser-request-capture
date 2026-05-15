@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage:
+  agent-browser-request-capture attach
+  agent-browser-request-capture attach --session <name>
+  agent-browser-request-capture attach --cdp <ws-url>
+  agent-browser-request-capture stop <run-dir>
+USAGE
+}
+
+resolve_cdp_url() {
+  case "${1:-}" in
+    "") agent-browser get cdp-url ;;
+    --session) agent-browser --session "${2:?missing session name}" get cdp-url ;;
+    --cdp) printf '%s\n' "${2:?missing CDP URL}" ;;
+    *) usage >&2; exit 1 ;;
+  esac
+}
+
+run_dir_name() {
+  date -u +"agent-browser-request-capture-%Y-%m-%dT%H-%M-%SZ"
+}
+
+attach() {
+  if [[ $# -gt 2 ]]; then
+    usage >&2
+    exit 1
+  fi
+
+  local cdp_url run_dir script_dir
+  cdp_url="$(resolve_cdp_url "$@")"
+  run_dir="$(mktemp -d "/tmp/$(run_dir_name)-XXXXXX")"
+  chmod 700 "$run_dir"
+  script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+
+  bun "$script_dir/lib/agent-browser-request-capture.ts" record "$run_dir" "$cdp_url" \
+    > "$run_dir/recorder.log" 2>&1 &
+
+  local pid=$!
+  printf '%s\n' "$pid" > "$run_dir/pid"
+
+  for _ in {1..50}; do
+    [[ -e "$run_dir/ready" ]] && break
+    if ! kill -0 "$pid" 2>/dev/null; then
+      cat "$run_dir/recorder.log" >&2
+      exit 1
+    fi
+    sleep 0.1
+  done
+
+  if [[ ! -e "$run_dir/ready" ]]; then
+    cat "$run_dir/recorder.log" >&2
+    echo "Timed out waiting for recorder to attach" >&2
+    exit 1
+  fi
+
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_DIR=$run_dir"
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_PID=$pid"
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_LOG=$run_dir/recorder.log"
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_STOP=agent-browser-request-capture stop $run_dir"
+}
+
+stop_capture() {
+  local run_dir="${1:?missing run dir}"
+  local pid
+  pid="$(cat "$run_dir/pid")"
+
+  kill -TERM "$pid" 2>/dev/null || true
+  for _ in {1..50}; do
+    kill -0 "$pid" 2>/dev/null || break
+    sleep 0.1
+  done
+  kill -KILL "$pid" 2>/dev/null || true
+
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_DIR=$run_dir"
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_FILES_INDEX=$run_dir/files.txt"
+  echo "AGENT_BROWSER_REQUEST_CAPTURE_LOG=$run_dir/recorder.log"
+}
+
+case "${1:-}" in
+  attach) shift; attach "$@" ;;
+  stop) shift; stop_capture "$@" ;;
+  -h|--help|"") usage ;;
+  *) usage >&2; exit 1 ;;
+esac

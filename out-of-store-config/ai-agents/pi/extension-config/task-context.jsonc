@@ -1,0 +1,18 @@
+{
+  "outputPath": "./overlay/branch/task-context.jsonl",
+  "currentOutputPath": "./overlay/branch/task-context.json",
+  "maxSnapshots": 20,
+  "model": {
+    "provider": "openai-codex",
+    "id": "gpt-5.3-codex",
+    "thinkingLevel": "medium"
+  },
+  "customCommands": [
+    {
+      "command": "~/Scripts/git-pr-diff",
+      "title": "git-pr-diff"
+    }
+  ],
+  "updaterPrompt": "You update a task-context JSON snapshot after one Pi turn.\n\nReturn exactly one JSON object and no markdown. Do not include unknown keys. The output must validate against this shape:\n{{jsonShape}}\n\nUpdate rules:\n- Preserve durable context needed to resume the task.\n- Prefer concrete implementation state over conversation summary.\n- Keep entries concise and specific.\n- Only set fields when you are sure the value is helpful for task context.\n- It is OK to leave arrays empty when unsure.\n- For novelUserContext, capture durable user-provided preferences, constraints, decisions, corrections, and intent that are not obvious from reading files, running commands, git status, or normal repo conventions.\n\nnovelCommands gate:\n- Leave novelCommands empty by default.\n- Only include commands whose exact invocation is novel, non-obvious, or hard to reconstruct.\n- Do not include generic commands like git status, git diff, pnpm test, pnpm typecheck, or package scripts unless their exact flags/env/path encode important task-specific knowledge.\n- Include a command only if losing it would make resuming/debugging materially harder.\n- notes must explain the non-obvious reason this exact command matters; if notes would be generic, omit the command.\n\nRelevant files:\n- For relevantFiles, include only files that matter for resuming the task; prefer ranges when a whole file is unnecessary.\n\nNovelty filter:\n- Prefer durable context from the user that is not obvious from reading files, running commands, git status, or normal repo conventions.\n- Include discovered facts only when they explain a non-obvious constraint, decision, failure, workaround, or current implementation state.\n- Exclude generic facts that can be cheaply rediscovered from the repo.\n- Keep a fact only if losing it would make resuming the task materially harder.\n\nUser-context priority:\n- User-provided preferences, constraints, decisions, corrections, and intent are highest value.\n- Do not record routine observations from tool output unless they changed the plan or reveal hidden state.\n\nEvidence handling:\n- Treat previousSnapshot as the starting point, not as ground truth if contradicted by the latest turn.\n- Use assistantText for intent, decisions, and status.\n- Use toolResults and fileEvents for concrete evidence about files and commands.\n- Do not copy large tool output into the snapshot.\n\nUser instructions:\n{{updateInstructions}}",
+  "updateInstructions": "Keep entries concise. Preserve useful existing context. Only include files that matter for resuming the task."
+}

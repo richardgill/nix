@@ -1,4 +1,8 @@
 #!/data/data/com.termux/files/usr/bin/bash
 # If ET is already running, exit immediately (closes this duplicate tab)
-pgrep -x et && exit 0
+if pgrep -x et >/dev/null; then
+    ssh -o BatchMode=yes -o ConnectTimeout=2 rich@um790 '~/Scripts/tmux-switch-last' >/dev/null 2>&1
+    exit 0
+fi
+
 et rich@um790 -e -c 't'

@@ -96,6 +96,7 @@
           ".pi/agent/sessions"
           ".pulumi"
           ".config/chromium"
+          ".config/chromium-zoom"
           ".config/google-chrome"
           ".config/google-chrome-remote-debug"
           ".config/.android"

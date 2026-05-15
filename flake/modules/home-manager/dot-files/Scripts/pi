@@ -5,5 +5,7 @@ if [[ -n "$TMUX" && -n "$TMUX_PANE" ]]; then
   [[ -n "$window_id" ]] && tmux rename-window -t "$window_id" "pi"
 fi
 
+export PI_EXTENSION_CONFIG_DIR="${PI_EXTENSION_CONFIG_DIR:-$HOME/.pi/agent/extension-config}"
+
 pi_bin=$(mise which pi)
 "$pi_bin" "$@"
