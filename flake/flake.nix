@@ -4,6 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-firefox-wayland-context-menu-fix.url = "github:nixos/nixpkgs/daf6dc47aa4b44791372d6139ab7b25269184d55";
 
     impermanence.url = "github:nix-community/impermanence";
 
@@ -153,8 +154,8 @@
             path
             {
               nixpkgs.overlays = [
+                (import ./overlays/pins.nix { inherit inputs; })
                 (import ./overlays/bambu-studio.nix)
-                (import ./overlays/mise.nix)
               ];
             }
           ];

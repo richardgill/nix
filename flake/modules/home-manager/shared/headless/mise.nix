@@ -14,13 +14,21 @@ let
   };
 
   # Import shared templates
-  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  templates = import ./templates.nix {
+    inherit
+      lib
+      pkgs
+      config
+      osConfig
+      vars
+      ;
+  };
   inherit (templates) builtTemplates;
 in
 {
   # we use unstable to get slightly more up-to-date deps
   home.packages = [
-    pkgs.mise
+    unstable.mise
   ];
 
   # Mise configuration file (from built templates in Nix store)
@@ -32,7 +40,7 @@ in
     # Make all nix-installed programs available (git, curl, etc needed by mise backends)
     export PATH="$HOME/.nix-profile/bin:/etc/profiles/per-user/$USER/bin:/nix/var/nix/profiles/default/bin:/run/current-system/sw/bin:/usr/bin:/bin:$PATH"
     # Initialize mise shims so npm/pipx backends can find their tools
-    eval "$(${pkgs.mise}/bin/mise activate bash)"
-    ${pkgs.mise}/bin/mise install
+    eval "$(${unstable.mise}/bin/mise activate bash)"
+    ${unstable.mise}/bin/mise install
   '';
 }

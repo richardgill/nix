@@ -17,6 +17,8 @@ We prefer keeping them as text files on disk with handlebar templating when need
 When adding new persistence directories/files for impermanence, they need to be added in:
 - `flake/modules/system/nixos/headless/impermanence.nix`
 
+Temporary package pins belong in `flake/overlays/pins.nix`. Include a comment above each pin explaining why it is pinned, when to remove/revisit it, and any relevant upstream/Nixpkgs links.
+
 If build fails with "Path X already exists", move conflicting files to persistence first:
 `sudo mkdir -p /persistent/home/$USER/<folder>; sudo mv /home/$USER/<file> /persistent/home/$USER/<folder>/; sudo chown -R $USER:users /persistent/home/$USER/<folder>`
 
