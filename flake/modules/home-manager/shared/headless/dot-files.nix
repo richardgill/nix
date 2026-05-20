@@ -154,7 +154,8 @@ in
       ".config/btop/btop.conf".source = ../../dot-files/btop/btop.conf;
       ".config/oh-my-posh".source = ../../dot-files/oh-my-posh;
       ".ssh/config".source = ../../dot-files/ssh/config;
-      ".config/yazi".source = ../../dot-files/yazi;
+      ".config/yazi".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/flake/modules/home-manager/dot-files/yazi";
 
       ".config/ai-agent".text = templateData.defaultAiAgent;
 

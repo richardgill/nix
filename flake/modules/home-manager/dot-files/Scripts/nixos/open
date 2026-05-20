@@ -9,8 +9,10 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 
-if [[ "$1" =~ ^https?:// ]]; then
-  exec tunnel-browser-open "$1"
+target="$1"
+
+if [[ "$target" =~ ^https?:// ]]; then
+  exec tunnel-browser-open "$target"
 fi
 
-exec xdg-open "$1"
+exec xdg-open "$target"

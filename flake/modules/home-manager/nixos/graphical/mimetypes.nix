@@ -2,6 +2,17 @@
   ...
 }:
 {
+  xdg.desktopEntries.browser-open = {
+    name = "Browser Open";
+    exec = "/home/rich/Scripts/tunnel-browser-open %U";
+    terminal = false;
+    mimeType = [
+      "x-scheme-handler/http"
+      "x-scheme-handler/https"
+      "text/html"
+    ];
+  };
+
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
@@ -47,9 +58,9 @@
       "application/x-shellscript" = "nvim.desktop";
 
       # Web → firefox (or your preferred browser)
-      "x-scheme-handler/http" = "firefox.desktop";
-      "x-scheme-handler/https" = "firefox.desktop";
-      "text/html" = "firefox.desktop";
+      "x-scheme-handler/http" = "browser-open.desktop";
+      "x-scheme-handler/https" = "browser-open.desktop";
+      "text/html" = "browser-open.desktop";
 
       # Directories → nautilus
       "inode/directory" = "org.gnome.Nautilus.desktop";

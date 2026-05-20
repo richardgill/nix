@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# aliased to t
+# Starts tmux
+
 if ! tmux list-sessions &>/dev/null; then
   # Temp session to bootstrap server + load config
   tmux new-session -d -s _temp
@@ -14,4 +17,4 @@ tmux has-session -t code 2>/dev/null || tmux new-session -d -s code -c ~/code
 tmux kill-session -t _temp 2>/dev/null
 
 # The fallback should never trigger since "code" is created above
-~/Scripts/tmux-last || tmux new -s code -c ~/code
+~/Scripts/tmux-attach-last || tmux new -s code -c ~/code

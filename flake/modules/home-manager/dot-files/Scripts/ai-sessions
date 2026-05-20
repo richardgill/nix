@@ -5,6 +5,7 @@ source ~/Scripts/lib/ai-sessions/claude-sessions
 source ~/Scripts/lib/ai-sessions/pi-sessions
 
 AI_SESSIONS_FZF_LISTEN_PORT=51779
+AI_SESSIONS_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ai-sessions"
 
 ai_sessions_normalize_agent() {
   case "${1:-}" in
@@ -74,6 +75,42 @@ ai_sessions_render_list() {
     (if .agent == "claude" then "cl" else "pi" end) as $agent |
     "\(.pid)\t\(.tmux_target)\t\(.session_id)\t\(.agent)\t\($dim)\($indicator)  \(.tmux_target | . + (" " * (24 - length))[:24])  \($agent)  \($display)\($suffix)\($reset)"
   '
+}
+
+ai_sessions_cache_file() {
+  local agent="${1:-all}"
+  mkdir -p "$AI_SESSIONS_CACHE_DIR"
+  echo "$AI_SESSIONS_CACHE_DIR/$agent.tsv"
+}
+
+ai_sessions_loading_list() {
+  printf '\t\t\t\t… loading sessions\n'
+}
+
+ai_sessions_cached_list() {
+  local cache_file
+  cache_file=$(ai_sessions_cache_file "$1")
+  if [[ -s "$cache_file" ]]; then
+    cat "$cache_file"
+  else
+    ai_sessions_loading_list
+  fi
+}
+
+ai_sessions_refresh_list() {
+  local agent="$1"
+  local cache_file
+  cache_file=$(ai_sessions_cache_file "$agent")
+  local tmp_file
+  tmp_file=$(mktemp "$cache_file.XXXXXX") || return 1
+
+  if ai_sessions_render_list "$(ai_sessions_list_json "$agent")" > "$tmp_file"; then
+    mv "$tmp_file" "$cache_file"
+    cat "$cache_file"
+  else
+    rm -f "$tmp_file"
+    return 1
+  fi
 }
 
 ai_sessions_debug_lines() {
@@ -265,12 +302,10 @@ ai_sessions_run() {
   local reload_pid=$!
   trap "kill $reload_pid 2>/dev/null" EXIT
 
-  local list_json
-  list_json=$(ai_sessions_list_json "$agent")
   local list
-  list=$(ai_sessions_render_list "$list_json")
+  list=$(ai_sessions_cached_list "$agent")
   local list_count
-  list_count=$(echo "$list_json" | jq 'length')
+  list_count=$(printf '%s\n' "$list" | wc -l)
   local height
   height=$(ai_sessions_get_pane_height)
   local preview_window
@@ -303,17 +338,17 @@ ai_sessions_run() {
     --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
     --bind 'alt-shift-left:abort' \
     --bind 'alt-shift-right:abort' \
-    --bind 'start:first+unbind(a,r,s,t,g,m)' \
+    --bind "start:first+unbind(a,r,s,t,g,m)+reload:$list_command" \
     --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --preview-window "$preview_window" \
     --layout=reverse \
-    --preview 'tmux capture-pane -ep -t {2} -S - | tail -n $FZF_PREVIEW_LINES')
+    --preview 'target={2}; [[ -n "$target" ]] && tmux capture-pane -ep -t "$target" -S -${FZF_PREVIEW_LINES:-200}')
 
   if [[ -n "$selected" ]]; then
     local target
     target=$(echo "$selected" | cut -f2)
-    tmux switch-client -t "$target"
+    [[ -n "$target" ]] && tmux switch-client -t "$target"
   fi
 }
 
@@ -342,7 +377,7 @@ done
 
 case "$action" in
   list)
-    ai_sessions_render_list "$(ai_sessions_list_json "$agent")"
+    ai_sessions_refresh_list "$agent"
     ;;
   debug)
     ai_sessions_debug_lines "$(ai_sessions_list_json "$agent")"

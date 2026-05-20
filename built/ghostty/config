@@ -13,9 +13,9 @@ clipboard-write = allow
 
 # Linux configuration
 font-size = 13
-# override alt+left and alt+right for word navigation
-keybind = alt+left=text:\x1bB
-keybind = alt+right=text:\x1bF
+# Send CSI modified arrows instead of ESC B/F so pi sees Alt+Left/Right when Kitty keyboard mode is active.
+keybind = alt+left=text:\x1b[1;3D
+keybind = alt+right=text:\x1b[1;3C
 # Override ghostty's built-in tab navigation to allow tmux pane navigation
 keybind = ctrl+shift+left=text:\x1b[1;6D
 keybind = ctrl+shift+right=text:\x1b[1;6C

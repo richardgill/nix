@@ -12,6 +12,7 @@ end, { desc = '[F]ind [F]iles' })
 vim.keymap.set('n', '<leader>fs', function()
   picker.grep {
     regex = false,
+    ignored = true,
   }
 end, { desc = '[F]ind by [S]earch Livegrep' })
 

@@ -11,8 +11,8 @@ PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --json number --jq length)
 if [ "$PR_EXISTS" -eq 0 ]; then
     echo "No existing PR found. Creating draft pull request..."
 
-    # Create draft PR with auto-filled title/body from commits
-    PR_URL=$(gh pr create --draft --fill-first)
+    # Create draft PR with auto-filled title and empty body
+    PR_URL=$(gh pr create --draft --fill-first --body "")
     echo "Draft pull request created: $PR_URL"
 
     # Open in browser

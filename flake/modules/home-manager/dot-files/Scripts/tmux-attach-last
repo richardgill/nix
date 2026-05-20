@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Attaches to the most recently used tmux session and window.
+
 last_session=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' | sort -rn | head -1 | cut -d' ' -f2-)
 
 if [[ -z "$last_session" ]]; then

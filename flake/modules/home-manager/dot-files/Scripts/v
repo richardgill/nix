@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+# start nvim listening on a socket
+
 socket_live() {
   [[ -n "${NVIM_SOCKET:-}" ]] && [[ -n "$(ss -lxH src "$NVIM_SOCKET" 2>/dev/null)" ]]
 }

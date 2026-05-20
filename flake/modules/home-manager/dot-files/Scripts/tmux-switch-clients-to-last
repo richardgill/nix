@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Switches existing tmux clients to the most recently used session/window.
+# Used by one-off commands, such as Termux shortcuts, that should control an already-attached tmux client.
+
 last_session=$(tmux list-sessions -F '#{session_last_attached} #{session_name}' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2-)
 
 if [[ -z "$last_session" ]]; then
