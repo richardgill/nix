@@ -1,0 +1,246 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Temporary local carry for https://github.com/earendil-works/pi/pull/2375
+# Also track tmux-native Kitty image work: https://github.com/tmux/tmux/issues/4902
+# Remove this script once Pi or tmux ships robust tmux + Kitty image support upstream.
+
+pi_bin="${1:-}"
+if [[ -z "$pi_bin" ]]; then
+  pi_bin=$(mise which pi)
+fi
+
+node_bin=$(mise which node 2>/dev/null || command -v node)
+"$node_bin" --input-type=module - "$pi_bin" <<'EOF'
+import fs from "node:fs";
+import path from "node:path";
+
+const patchVersion = "rich-pi-tmux-images-v2";
+const upstreamPr = "https://github.com/earendil-works/pi/pull/2375";
+const tmuxNativeTracking = "https://github.com/tmux/tmux/issues/4902";
+const piBin = process.argv[2];
+
+const fail = (message) => {
+  throw new Error(`[${patchVersion}] ${message}\nPi upstream reference: ${upstreamPr}\ntmux native tracking: ${tmuxNativeTracking}`);
+};
+
+const replaceOnce = (source, oldText, newText, label) => {
+  if (source.includes(newText)) return source;
+  const count = source.split(oldText).length - 1;
+  if (count !== 1) fail(`Could not apply ${label}; expected one match, found ${count}.`);
+  return source.replace(oldText, newText);
+};
+
+const writeIfChanged = (file, previous, next) => {
+  if (previous === next) return false;
+  fs.writeFileSync(file, next);
+  return true;
+};
+
+const getPackageRoot = () => {
+  const realPiBin = fs.realpathSync(piBin);
+  const packageRoot = path.dirname(path.dirname(realPiBin));
+  if (!fs.existsSync(path.join(packageRoot, "package.json"))) {
+    fail(`Could not resolve Pi package root from ${piBin} -> ${realPiBin}`);
+  }
+  return packageRoot;
+};
+
+const isSupported = (terminalImage, imageComponent) => {
+  return terminalImage.includes("encodeKittyPlaceholder")
+    && terminalImage.includes("maybeWrapTmuxPassthrough")
+    && terminalImage.includes("PI_TMUX_IMAGES && hasKittyImages")
+    && imageComponent.includes("result.placeholderLines");
+};
+
+const patchTerminalImage = (source) => {
+  let next = source;
+  next = replaceOnce(
+    next,
+    `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+    `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+    "Ghostty/Kitty capability detection inside tmux",
+  );
+  next = replaceOnce(
+    next,
+    `    if (inTmuxOrScreen) {\n        const trueColor = colorTerm === "truecolor" || colorTerm === "24bit";\n        return { images: null, trueColor, hyperlinks: false };\n    }\n`,
+    `    if (inTmuxOrScreen) {\n        const trueColor = hasKittyImages || colorTerm === "truecolor" || colorTerm === "24bit";\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: false };\n    }\n`,
+    "tmux image capability opt-in",
+  );
+  next = replaceOnce(
+    next,
+    `const KITTY_PREFIX = "\\x1b_G";\nconst ITERM2_PREFIX = "\\x1b]1337;File=";\nexport function isImageLine(line) {\n`,
+    `const KITTY_PREFIX = "\\x1b_G";\nconst ITERM2_PREFIX = "\\x1b]1337;File=";\nfunction maybeWrapTmuxPassthrough(sequence) {\n    if (!process.env.TMUX || !process.env.PI_TMUX_IMAGES) {\n        return sequence;\n    }\n    return \`\\x1bPtmux;\${sequence.replaceAll("\\x1b", "\\x1b\\x1b")}\\x1b\\\\\`;\n}\nconst PLACEHOLDER_CHAR = String.fromCodePoint(0x10eeee);\nexport function isImageLine(line) {\n`,
+    "tmux DCS passthrough helper",
+  );
+  next = replaceOnce(
+    next,
+    `    // Slow path: sequence elsewhere (multi-row images have cursor-up prefix)\n    return line.includes(KITTY_PREFIX) || line.includes(ITERM2_PREFIX);\n}\n`,
+    `    // Slow path: sequence elsewhere (multi-row images have cursor-up prefix)\n    if (line.includes(KITTY_PREFIX) || line.includes(ITERM2_PREFIX)) {\n        return true;\n    }\n    return line.includes(PLACEHOLDER_CHAR);\n}\n`,
+    "image-line detection for Kitty placeholders",
+  );
+  next = replaceOnce(
+    next,
+    `export function allocateImageId() {\n    // Use random ID in range [1, 0xffffffff] to avoid collisions\n    return Math.floor(Math.random() * 0xfffffffe) + 1;\n}\n`,
+    `export function allocateImageId() {\n    return Math.floor(Math.random() * 0xffffff) + 1;\n}\n`,
+    "24-bit Kitty image IDs for placeholders",
+  );
+  next = replaceOnce(
+    next,
+    `    if (base64Data.length <= CHUNK_SIZE) {\n        return \`\\x1b_G\${params.join(",")};\${base64Data}\\x1b\\\\\`;\n    }\n`,
+    `    if (base64Data.length <= CHUNK_SIZE) {\n        return maybeWrapTmuxPassthrough(\`\\x1b_G\${params.join(",")};\${base64Data}\\x1b\\\\\`);\n    }\n`,
+    "single-chunk Kitty passthrough wrapping",
+  );
+  next = replaceOnce(
+    next,
+    `        if (isFirst) {\n            chunks.push(\`\\x1b_G\${params.join(",")},m=1;\${chunk}\\x1b\\\\\`);\n            isFirst = false;\n        }\n        else if (isLast) {\n            chunks.push(\`\\x1b_Gm=0;\${chunk}\\x1b\\\\\`);\n        }\n        else {\n            chunks.push(\`\\x1b_Gm=1;\${chunk}\\x1b\\\\\`);\n        }\n`,
+    `        if (isFirst) {\n            chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_G\${params.join(",")},m=1;\${chunk}\\x1b\\\\\`));\n            isFirst = false;\n        }\n        else if (isLast) {\n            chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_Gm=0;\${chunk}\\x1b\\\\\`));\n        }\n        else {\n            chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_Gm=1;\${chunk}\\x1b\\\\\`));\n        }\n`,
+    "multi-chunk Kitty passthrough wrapping",
+  );
+  next = replaceOnce(
+    next,
+    `export function deleteKittyImage(imageId) {\n    return \`\\x1b_Ga=d,d=I,i=\${imageId},q=2\\x1b\\\\\`;\n}\n`,
+    `export function deleteKittyImage(imageId) {\n    return maybeWrapTmuxPassthrough(\`\\x1b_Ga=d,d=I,i=\${imageId},q=2\\x1b\\\\\`);\n}\n`,
+    "Kitty image deletion passthrough wrapping",
+  );
+  next = replaceOnce(
+    next,
+    `export function deleteAllKittyImages() {\n    return "\\x1b_Ga=d,d=A,q=2\\x1b\\\\";\n}\n`,
+    `export function deleteAllKittyImages() {\n    return maybeWrapTmuxPassthrough("\\x1b_Ga=d,d=A,q=2\\x1b\\\\");\n}\n`,
+    "Kitty delete-all passthrough wrapping",
+  );
+  next = replaceOnce(
+    next,
+    `export function encodeITerm2(base64Data, options = {}) {\n`,
+    `${placeholderSupport}\nexport function encodeITerm2(base64Data, options = {}) {\n`,
+    "Kitty Unicode placeholder support",
+  );
+  next = replaceOnce(
+    next,
+    `    if (caps.images === "kitty") {\n        const sequence = encodeKitty(base64Data, {\n            columns: size.columns,\n            rows: size.rows,\n            imageId: options.imageId,\n            moveCursor: options.moveCursor,\n        });\n        return { sequence, rows: size.rows, imageId: options.imageId };\n    }\n`,
+    `    if (caps.images === "kitty") {\n        if (process.env.PI_TMUX_IMAGES && !getPngDimensions(base64Data)) {\n            return null;\n        }\n        if (process.env.TMUX && process.env.PI_TMUX_IMAGES && options.imageId) {\n            const { uploadSequence, placeholderLines } = encodeKittyPlaceholder(base64Data, {\n                columns: size.columns,\n                rows: size.rows,\n                imageId: options.imageId,\n            });\n            return { sequence: uploadSequence, rows: size.rows, imageId: options.imageId, placeholderLines };\n        }\n        const sequence = encodeKitty(base64Data, {\n            columns: size.columns,\n            rows: size.rows,\n            imageId: options.imageId,\n            moveCursor: options.moveCursor,\n        });\n        return { sequence, rows: size.rows, imageId: options.imageId };\n    }\n`,
+    "renderImage tmux placeholder path",
+  );
+  return next;
+};
+
+const patchImageComponent = (source) => {
+  return replaceOnce(
+    source,
+    `                if (caps.images === "kitty") {\n                    // For Kitty: C=1 prevents cursor movement.\n                    // Don't need the cursor movement.\n                    lines = [result.sequence];\n                    // Return \`rows\` lines so TUI accounts for image height.\n                    for (let i = 0; i < result.rows - 1; i++) {\n                        lines.push("");\n                    }\n                }\n`,
+    `                if (caps.images === "kitty") {\n                    if (result.placeholderLines) {\n                        lines = [result.sequence + result.placeholderLines[0], ...result.placeholderLines.slice(1)];\n                    }\n                    else {\n                        // For Kitty: C=1 prevents cursor movement.\n                        // Don't need the cursor movement.\n                        lines = [result.sequence];\n                        // Return \`rows\` lines so TUI accounts for image height.\n                        for (let i = 0; i < result.rows - 1; i++) {\n                            lines.push("");\n                        }\n                    }\n                }\n`,
+    "Image component placeholder-line rendering",
+  );
+};
+
+const placeholderSupport = `const KITTY_DIACRITICS = [
+    0x0305, 0x030d, 0x030e, 0x0310, 0x0312, 0x033d, 0x033e, 0x033f, 0x0346, 0x034a, 0x034b, 0x034c, 0x0350, 0x0351,
+    0x0352, 0x0357, 0x035b, 0x0363, 0x0364, 0x0365, 0x0366, 0x0367, 0x0368, 0x0369, 0x036a, 0x036b, 0x036c, 0x036d,
+    0x036e, 0x036f, 0x0483, 0x0484, 0x0485, 0x0486, 0x0487, 0x0592, 0x0593, 0x0594, 0x0595, 0x0597, 0x0598, 0x0599,
+    0x059c, 0x059d, 0x059e, 0x059f, 0x05a0, 0x05a1, 0x05a8, 0x05a9, 0x05ab, 0x05ac, 0x05af, 0x05c4, 0x0610, 0x0611,
+    0x0612, 0x0613, 0x0614, 0x0615, 0x0616, 0x0617, 0x0657, 0x0658, 0x0659, 0x065a, 0x065b, 0x065d, 0x065e, 0x06d6,
+    0x06d7, 0x06d8, 0x06d9, 0x06da, 0x06db, 0x06dc, 0x06df, 0x06e0, 0x06e1, 0x06e2, 0x06e4, 0x06e7, 0x06e8, 0x06eb,
+    0x06ec, 0x0730, 0x0732, 0x0733, 0x0735, 0x0736, 0x073a, 0x073d, 0x073f, 0x0740, 0x0741, 0x0743, 0x0745, 0x0747,
+    0x0749, 0x074a, 0x07eb, 0x07ec, 0x07ed, 0x07ee, 0x07ef, 0x07f0, 0x07f1, 0x07f3, 0x0816, 0x0817, 0x0818, 0x0819,
+    0x081b, 0x081c, 0x081d, 0x081e, 0x081f, 0x0820, 0x0821, 0x0822, 0x0823, 0x0825, 0x0826, 0x0827, 0x0829, 0x082a,
+    0x082b, 0x082c, 0x082d, 0x0951, 0x0953, 0x0954, 0x0f82, 0x0f83, 0x0f86, 0x0f87, 0x135d, 0x135e, 0x135f, 0x17dd,
+    0x193a, 0x1a17, 0x1a75, 0x1a76, 0x1a77, 0x1a78, 0x1a79, 0x1a7a, 0x1a7b, 0x1a7c, 0x1b6b, 0x1b6d, 0x1b6e, 0x1b6f,
+    0x1b70, 0x1b71, 0x1b72, 0x1b73, 0x1cd0, 0x1cd1, 0x1cd2, 0x1cda, 0x1cdb, 0x1ce0, 0x1dc0, 0x1dc1, 0x1dc3, 0x1dc4,
+    0x1dc5, 0x1dc6, 0x1dc7, 0x1dc8, 0x1dc9, 0x1dcb, 0x1dcc, 0x1dd1, 0x1dd2, 0x1dd3, 0x1dd4, 0x1dd5, 0x1dd6, 0x1dd7,
+    0x1dd8, 0x1dd9, 0x1dda, 0x1ddb, 0x1ddc, 0x1ddd, 0x1dde, 0x1ddf, 0x1de0, 0x1de1, 0x1de2, 0x1de3, 0x1de4, 0x1de5,
+    0x1de6, 0x1dfe, 0x20d0, 0x20d1, 0x20d4, 0x20d5, 0x20d6, 0x20d7, 0x20db, 0x20dc, 0x20e1, 0x20e7, 0x20e9, 0x20f0,
+    0x2cef, 0x2cf0, 0x2cf1, 0x2de0, 0x2de1, 0x2de2, 0x2de3, 0x2de4, 0x2de5, 0x2de6, 0x2de7, 0x2de8, 0x2de9, 0x2dea,
+    0x2deb, 0x2dec, 0x2ded, 0x2dee, 0x2def, 0x2df0, 0x2df1, 0x2df2, 0x2df3, 0x2df4, 0x2df5, 0x2df6, 0x2df7, 0x2df8,
+    0x2df9, 0x2dfa, 0x2dfb, 0x2dfc, 0x2dfd, 0x2dfe, 0x2dff, 0xa66f, 0xa67c, 0xa67d, 0xa6f0, 0xa6f1, 0xa8e0, 0xa8e1,
+    0xa8e2, 0xa8e3, 0xa8e4, 0xa8e5, 0xa8e6, 0xa8e7, 0xa8e8, 0xa8e9, 0xa8ea, 0xa8eb, 0xa8ec, 0xa8ed, 0xa8ee, 0xa8ef,
+    0xa8f0, 0xa8f1, 0xaab0, 0xaab2, 0xaab3, 0xaab7, 0xaab8, 0xaabe, 0xaabf, 0xaac1, 0xfe20, 0xfe21, 0xfe22, 0xfe23,
+    0xfe24, 0xfe25, 0xfe26, 0x10a0f, 0x10a38, 0x1d185, 0x1d186, 0x1d187, 0x1d188, 0x1d189, 0x1d1aa, 0x1d1ab, 0x1d1ac,
+    0x1d1ad, 0x1d242, 0x1d243, 0x1d244,
+].map((cp) => String.fromCodePoint(cp));
+const buildPlaceholderRow = (imageId, row, columns) => {
+    const r = (imageId >> 16) & 0xff;
+    const g = (imageId >> 8) & 0xff;
+    const b = imageId & 0xff;
+    const rowDiac = KITTY_DIACRITICS[row] ?? KITTY_DIACRITICS[0];
+    const highByteDiac = KITTY_DIACRITICS[(imageId >> 24) & 0xff] ?? KITTY_DIACRITICS[0];
+    let line = \`\\x1b[38;2;\${r};\${g};\${b}m\`;
+    for (let c = 0; c < columns; c++) {
+        const columnDiac = KITTY_DIACRITICS[c] ?? KITTY_DIACRITICS[0];
+        line += \`\${PLACEHOLDER_CHAR}\${rowDiac}\${columnDiac}\${highByteDiac}\`;
+    }
+    line += "\\x1b[39m";
+    return line;
+};
+export function encodeKittyPlaceholder(base64Data, options) {
+    const CHUNK_SIZE = 4096;
+    const params = ["a=T", "U=1", "f=100", "q=2", \`i=\${options.imageId}\`, \`c=\${options.columns}\`, \`r=\${options.rows}\`];
+    let uploadSequence;
+    if (base64Data.length <= CHUNK_SIZE) {
+        uploadSequence = maybeWrapTmuxPassthrough(\`\\x1b_G\${params.join(",")};\${base64Data}\\x1b\\\\\`);
+    }
+    else {
+        const chunks = [];
+        let offset = 0;
+        let isFirst = true;
+        while (offset < base64Data.length) {
+            const chunk = base64Data.slice(offset, offset + CHUNK_SIZE);
+            const isLast = offset + CHUNK_SIZE >= base64Data.length;
+            if (isFirst) {
+                chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_G\${params.join(",")},m=1;\${chunk}\\x1b\\\\\`));
+                isFirst = false;
+            }
+            else if (isLast) {
+                chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_Gm=0;\${chunk}\\x1b\\\\\`));
+            }
+            else {
+                chunks.push(maybeWrapTmuxPassthrough(\`\\x1b_Gm=1;\${chunk}\\x1b\\\\\`));
+            }
+            offset += CHUNK_SIZE;
+        }
+        uploadSequence = chunks.join("");
+    }
+    const placeholderLines = [];
+    for (let row = 0; row < options.rows; row++) {
+        placeholderLines.push(buildPlaceholderRow(options.imageId, row, options.columns));
+    }
+    return { uploadSequence, placeholderLines };
+}`;
+
+const packageRoot = getPackageRoot();
+const terminalImagePath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/terminal-image.js");
+const imageComponentPath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/components/image.js");
+const markerPath = path.join(packageRoot, `.${patchVersion}.json`);
+
+if (fs.existsSync(markerPath)) process.exit(0);
+if (!fs.existsSync(terminalImagePath) || !fs.existsSync(imageComponentPath)) {
+  fail(`Could not find pi-tui files under ${packageRoot}`);
+}
+
+const terminalBefore = fs.readFileSync(terminalImagePath, "utf8");
+const imageBefore = fs.readFileSync(imageComponentPath, "utf8");
+
+let status = "already-supported";
+let terminalAfter = terminalBefore;
+let imageAfter = imageBefore;
+if (!isSupported(terminalBefore, imageBefore)) {
+  status = "patched";
+  terminalAfter = patchTerminalImage(terminalBefore);
+  imageAfter = patchImageComponent(imageBefore);
+}
+
+writeIfChanged(terminalImagePath, terminalBefore, terminalAfter);
+writeIfChanged(imageComponentPath, imageBefore, imageAfter);
+fs.writeFileSync(markerPath, JSON.stringify({
+  patchVersion,
+  status,
+  upstreamPr,
+  tmuxNativeTracking,
+  packageRoot,
+  files: [terminalImagePath, imageComponentPath],
+  appliedAt: new Date().toISOString(),
+}, null, 2) + "\n");
+
+if (status === "patched") {
+  console.error(`[${patchVersion}] patched Pi tmux image support in ${packageRoot}`);
+}
+EOF

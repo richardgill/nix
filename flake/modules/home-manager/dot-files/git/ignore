@@ -7,3 +7,5 @@ AGENTS.local.md
 local-ci.sh
 lefthook-local.yml
 pi-session-*
+overlay/
+overlay

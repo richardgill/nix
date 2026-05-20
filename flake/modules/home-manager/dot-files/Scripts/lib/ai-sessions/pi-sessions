@@ -36,8 +36,7 @@ pi_get_idle_secs() {
 }
 
 pi_normalize_tty() {
-  local tty
-  tty=$(echo "$1" | awk '{print $1}')
+  local tty="${1%%[[:space:]]*}"
   [[ -z "$tty" || "$tty" == "?" ]] && return
   if [[ "$tty" == /dev/* ]]; then
     echo "$tty"
@@ -46,12 +45,18 @@ pi_normalize_tty() {
   fi
 }
 
-pi_pid_tty() {
-  local pid="$1"
-  [[ -z "$pid" ]] && return
-  local tty
-  tty=$(ps -o tty= -p "$pid" 2>/dev/null)
-  pi_normalize_tty "$tty"
+pi_load_pid_ttys() {
+  local -n target="$1"
+  shift
+  (( $# == 0 )) && return
+
+  local pid_csv
+  pid_csv=$(IFS=,; echo "$*")
+  while read -r pid tty; do
+    local normalized_tty
+    normalized_tty=$(pi_normalize_tty "$tty")
+    [[ -n "$pid" && -n "$normalized_tty" ]] && target["$pid"]="$normalized_tty"
+  done < <(ps -o pid= -o tty= -p "$pid_csv" 2>/dev/null)
 }
 
 pi_get_ignored_at() {
@@ -109,6 +114,10 @@ pi_toggle_ignore_session() {
 pi_parse_session_file() {
   local session_file="$1"
   jq -rn '
+    def epoch:
+      if . == "" then "0"
+      else try (sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601 | tostring) catch "0"
+      end;
     reduce inputs as $line (
       {
         session_id: "",
@@ -151,7 +160,7 @@ pi_parse_session_file() {
           end
         else . end
     )
-    | [.session_id, .cwd, (.pid | tostring), .pane, .tmux_session, .status, (.is_idle | tostring), (.has_pending | tostring), .last_ts, .last_process_ts, .last_switch_ts, .first_user]
+    | [.session_id, .cwd, (.pid | tostring), .pane, .tmux_session, .status, (.is_idle | tostring), (.has_pending | tostring), .last_ts, (.last_ts | epoch), .last_process_ts, (.last_process_ts | epoch), .last_switch_ts, (.last_switch_ts | epoch), .first_user]
     | map(tostring)
     | join("\u001f")
   ' "$session_file"
@@ -239,6 +248,9 @@ pi_sessions_list_json() {
   mapfile -t pids < <(pgrep -x pi 2>/dev/null || true)
   (( ${#pids[@]} == 0 )) && { echo "[]"; return; }
 
+  declare -A pid_tty
+  pi_load_pid_ttys pid_tty "${pids[@]}"
+
   declare -A pane_target
   declare -A pane_tty_target
   declare -A pane_tty_id
@@ -282,20 +294,16 @@ pi_sessions_list_json() {
     row=$(pi_parse_session_file "$session_file")
     [[ -z "$row" ]] && continue
 
-    local session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_process_ts last_switch_ts first_user
-    IFS="$row_delim" read -r session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_process_ts last_switch_ts first_user <<< "$row"
+    local session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_epoch last_process_ts last_process_epoch last_switch_ts last_switch_epoch first_user
+    IFS="$row_delim" read -r session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_epoch last_process_ts last_process_epoch last_switch_ts last_switch_epoch first_user <<< "$row"
 
     [[ -z "$session_id" ]] && session_id=$(pi_session_id_from_path "$session_file")
     [[ "$pane" == "null" ]] && pane=""
     [[ "$pid_value" == "null" ]] && pid_value=""
 
-    local switch_epoch
-    local process_epoch
     if [[ -n "$last_switch_ts" ]]; then
-      switch_epoch=$(pi_timestamp_to_epoch "$last_switch_ts")
-      process_epoch=$(pi_timestamp_to_epoch "$last_process_ts")
-      [[ -z "$process_epoch" ]] && continue
-      [[ -n "$switch_epoch" && "$switch_epoch" -gt "$process_epoch" ]] && continue
+      [[ "$last_process_epoch" == "0" ]] && continue
+      [[ "$last_switch_epoch" != "0" && "$last_switch_epoch" -gt "$last_process_epoch" ]] && continue
     fi
 
     local key
@@ -307,14 +315,12 @@ pi_sessions_list_json() {
       key="session:$session_id"
     fi
 
-    local epoch
-    epoch=$(pi_timestamp_to_epoch "$last_ts")
-    epoch="${epoch:-0}"
+    local epoch="${last_epoch:-0}"
 
     local prev_epoch="${session_epochs[$key]:-}"
     if [[ -z "$prev_epoch" || "$epoch" -ge "$prev_epoch" ]]; then
       session_epochs["$key"]="$epoch"
-      session_rows["$key"]="$session_id${row_delim}$cwd${row_delim}$pid_value${row_delim}$pane${row_delim}$tmux_session${row_delim}$status${row_delim}$is_idle${row_delim}$has_pending${row_delim}$last_ts${row_delim}$first_user"
+      session_rows["$key"]="$session_id${row_delim}$cwd${row_delim}$pid_value${row_delim}$pane${row_delim}$tmux_session${row_delim}$status${row_delim}$is_idle${row_delim}$has_pending${row_delim}$last_ts${row_delim}$last_epoch${row_delim}$first_user"
     fi
   done
 
@@ -323,17 +329,16 @@ pi_sessions_list_json() {
 
   local key
   for key in "${!session_rows[@]}"; do
-    local session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts first_user
-    IFS="$row_delim" read -r session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts first_user <<< "${session_rows[$key]}"
+    local session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_epoch first_user
+    IFS="$row_delim" read -r session_id cwd pid_value pane tmux_session status is_idle has_pending last_ts last_epoch first_user <<< "${session_rows[$key]}"
 
     local tmux_target=""
     local tmux_pane=""
     if [[ -n "$pid_value" ]]; then
-      local pid_tty
-      pid_tty=$(pi_pid_tty "$pid_value")
-      if [[ -n "$pid_tty" ]]; then
-        tmux_target="${pane_tty_target[$pid_tty]:-}"
-        tmux_pane="${pane_tty_id[$pid_tty]:-}"
+      local pid_tty_value="${pid_tty[$pid_value]:-}"
+      if [[ -n "$pid_tty_value" ]]; then
+        tmux_target="${pane_tty_target[$pid_tty_value]:-}"
+        tmux_pane="${pane_tty_id[$pid_tty_value]:-}"
       fi
     fi
 
@@ -357,8 +362,10 @@ pi_sessions_list_json() {
       state="stopped"
     fi
 
-    local idle_secs
-    idle_secs=$(pi_get_idle_secs "$last_ts" "$now")
+    local idle_secs=0
+    if [[ "$last_epoch" =~ ^[0-9]+$ && "$last_epoch" -gt 0 ]]; then
+      idle_secs=$((now - last_epoch))
+    fi
 
     local ignored_at=0
     if [[ "$state" == "stopped" || "$state" == "unknown" ]]; then

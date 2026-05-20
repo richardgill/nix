@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Gracefully kills a tmux session and ensures all pane processes are killed properly.
+
 LOG_FILE="$HOME/Library/Logs/tmux-scripts/tmux-kill-session.log"
 mkdir -p "$(dirname "$LOG_FILE")"
 

@@ -4,7 +4,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    nixpkgs-firefox-wayland-context-menu-fix.url = "github:nixos/nixpkgs/daf6dc47aa4b44791372d6139ab7b25269184d55";
+    nixpkgs-firefox-wayland-context-menu-fix.url = "github:nixos/nixpkgs/4590696c8693fea477850fe379a01544293ca4e2";
 
     impermanence.url = "github:nix-community/impermanence";
 

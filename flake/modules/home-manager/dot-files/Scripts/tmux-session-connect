@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Connects to an existing tmux session or creates/switches to one for a directory.
+# Accepted forms: tmux-session-connect tmux <session>, tmux-session-connect dir <path>
+
 source "$(dirname "$0")/tmux-setup-windows"
 
 connect_tmux_session() {

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Lists nearby home-directory folders for directory/session pickers, with common work folders ranked first.
 fd -H -t d -d 4 \
   --exclude '.Trash' \
   --exclude 'Downloads' \

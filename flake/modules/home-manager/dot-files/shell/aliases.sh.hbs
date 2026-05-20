@@ -31,6 +31,8 @@ alias pr-diff='~/Scripts/git-pr-diff'
 alias pull="source ~/Scripts/git-pull"
 alias push="source ~/Scripts/git-push"
 alias fetch="source ~/Scripts/git-fetch"
+alias wait-for-pull="~/Scripts/git-wait-for-pull"
+
 
 add() {
   if [ $# -eq 0 ]; then
