@@ -59,27 +59,36 @@ done
 # -N tunneling
 # -R reverse tunnel (for tunnel-open / beep from remote)
 # -L forward tunnels (for localhost:PORT → remote dev servers)
-if command -v autossh &> /dev/null; then
-  echo "Starting reverse SSH tunnel with autossh..."
-  echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
-  echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
-  [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
-  [ -n "$LOOPBACK_FORWARD_PORTS" ] && echo "Forward loopback: $LOOPBACK_FORWARD_PORTS"
-  autossh -M $((TUNNEL_PORT - 1)) -f -N \
-    -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
-    "${forward_args[@]}" \
-    "$REMOTE_USER@$REMOTE_HOST"
-else
-  echo "autossh not found, using plain ssh..."
-  echo "Remote:  $REMOTE_USER@$REMOTE_HOST"
-  echo "Reverse: $TUNNEL_PORT:localhost:$SSH_PORT"
-  [ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
-  [ -n "$LOOPBACK_FORWARD_PORTS" ] && echo "Forward loopback: $LOOPBACK_FORWARD_PORTS"
-  ssh -f -N \
-    -R "$TUNNEL_PORT:localhost:$SSH_PORT" \
-    "${forward_args[@]}" \
-    "$REMOTE_USER@$REMOTE_HOST"
-fi
+remote="$REMOTE_USER@$REMOTE_HOST"
+
+run_tunnel() {
+  if command -v autossh &> /dev/null; then
+    autossh -M 0 -f "$@"
+  else
+    ssh -f "$@"
+  fi
+}
+
+echo "Starting reverse SSH tunnel..."
+echo "Remote:  $remote"
+echo "Reverse: 127.0.0.1:$TUNNEL_PORT:127.0.0.1:$SSH_PORT"
+[ -n "$FORWARD_PORTS" ] && echo "Forward: $FORWARD_PORTS"
+[ -n "$LOOPBACK_FORWARD_PORTS" ] && echo "Forward loopback: $LOOPBACK_FORWARD_PORTS"
+
+run_tunnel \
+  -N \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=2 \
+  -o ExitOnForwardFailure=yes \
+  -R "127.0.0.1:$TUNNEL_PORT:127.0.0.1:$SSH_PORT" \
+  "$remote" || exit $?
+
+[ "${#forward_args[@]}" -gt 0 ] && run_tunnel \
+  -N \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=2 \
+  "${forward_args[@]}" \
+  "$remote"
 
 echo ""
 echo "Tunnel established! On the remote host, set environment variable:"
