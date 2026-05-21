@@ -15,7 +15,7 @@ node_bin=$(mise which node 2>/dev/null || command -v node)
 import fs from "node:fs";
 import path from "node:path";
 
-const patchVersion = "rich-pi-tmux-images-v2";
+const patchVersion = "rich-pi-tmux-images-v3";
 const upstreamPr = "https://github.com/earendil-works/pi/pull/2375";
 const tmuxNativeTracking = "https://github.com/tmux/tmux/issues/4902";
 const piBin = process.argv[2];
@@ -29,6 +29,22 @@ const replaceOnce = (source, oldText, newText, label) => {
   const count = source.split(oldText).length - 1;
   if (count !== 1) fail(`Could not apply ${label}; expected one match, found ${count}.`);
   return source.replace(oldText, newText);
+};
+
+const replaceOnceOf = (source, replacements, label) => {
+  const patched = replacements.find(({ newText }) => source.includes(newText));
+  if (patched) return source;
+
+  const matches = replacements
+    .map((replacement) => ({ ...replacement, count: source.split(replacement.oldText).length - 1 }))
+    .filter(({ count }) => count > 0);
+
+  if (matches.length !== 1 || matches[0].count !== 1) {
+    const counts = replacements.map(({ oldText }) => source.split(oldText).length - 1).join(", ");
+    fail(`Could not apply ${label}; expected one variant with one match, found counts [${counts}].`);
+  }
+
+  return source.replace(matches[0].oldText, matches[0].newText);
 };
 
 const writeIfChanged = (file, previous, next) => {
@@ -46,25 +62,42 @@ const getPackageRoot = () => {
   return packageRoot;
 };
 
-const isSupported = (terminalImage, imageComponent) => {
+const isSupported = (terminalImage, imageComponent, imageResize) => {
   return terminalImage.includes("encodeKittyPlaceholder")
     && terminalImage.includes("maybeWrapTmuxPassthrough")
     && terminalImage.includes("PI_TMUX_IMAGES && hasKittyImages")
-    && imageComponent.includes("result.placeholderLines");
+    && imageComponent.includes("result.placeholderLines")
+    && imageResize.includes("shouldPreserveOriginalImage");
 };
 
 const patchTerminalImage = (source) => {
   let next = source;
-  next = replaceOnce(
+  next = replaceOnceOf(
     next,
-    `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
-    `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+    [
+      {
+        oldText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+        newText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+      },
+      {
+        oldText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+        newText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
+      },
+    ],
     "Ghostty/Kitty capability detection inside tmux",
   );
-  next = replaceOnce(
+  next = replaceOnceOf(
     next,
-    `    if (inTmuxOrScreen) {\n        const trueColor = colorTerm === "truecolor" || colorTerm === "24bit";\n        return { images: null, trueColor, hyperlinks: false };\n    }\n`,
-    `    if (inTmuxOrScreen) {\n        const trueColor = hasKittyImages || colorTerm === "truecolor" || colorTerm === "24bit";\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: false };\n    }\n`,
+    [
+      {
+        oldText: `    if (inTmuxOrScreen) {\n        return { images: null, trueColor: hasTrueColorHint, hyperlinks: false };\n    }\n`,
+        newText: `    if (inTmuxOrScreen) {\n        const trueColor = hasKittyImages || hasTrueColorHint;\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: false };\n    }\n`,
+      },
+      {
+        oldText: `    if (inTmuxOrScreen) {\n        const trueColor = colorTerm === "truecolor" || colorTerm === "24bit";\n        return { images: null, trueColor, hyperlinks: false };\n    }\n`,
+        newText: `    if (inTmuxOrScreen) {\n        const trueColor = hasKittyImages || colorTerm === "truecolor" || colorTerm === "24bit";\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: false };\n    }\n`,
+      },
+    ],
     "tmux image capability opt-in",
   );
   next = replaceOnce(
@@ -131,6 +164,17 @@ const patchImageComponent = (source) => {
     `                if (caps.images === "kitty") {\n                    if (result.placeholderLines) {\n                        lines = [result.sequence + result.placeholderLines[0], ...result.placeholderLines.slice(1)];\n                    }\n                    else {\n                        // For Kitty: C=1 prevents cursor movement.\n                        // Don't need the cursor movement.\n                        lines = [result.sequence];\n                        // Return \`rows\` lines so TUI accounts for image height.\n                        for (let i = 0; i < result.rows - 1; i++) {\n                            lines.push("");\n                        }\n                    }\n                }\n`,
     "Image component placeholder-line rendering",
   );
+};
+
+const patchImageResize = (source) => {
+  let next = source;
+  next = replaceOnce(
+    next,
+    `        const format = img.mimeType?.split("/")[1] ?? "png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+    `        const format = img.mimeType?.split("/")[1] ?? "png";\n        const shouldPreserveOriginalImage = !process.env.TMUX || !process.env.PI_TMUX_IMAGES || img.mimeType === "image/png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (shouldPreserveOriginalImage && originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+    "force non-PNG read images through PNG conversion inside tmux",
+  );
+  return next;
 };
 
 const placeholderSupport = `const KITTY_DIACRITICS = [
@@ -209,34 +253,39 @@ export function encodeKittyPlaceholder(base64Data, options) {
 const packageRoot = getPackageRoot();
 const terminalImagePath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/terminal-image.js");
 const imageComponentPath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/components/image.js");
+const imageResizePath = path.join(packageRoot, "dist/utils/image-resize.js");
 const markerPath = path.join(packageRoot, `.${patchVersion}.json`);
 
 if (fs.existsSync(markerPath)) process.exit(0);
-if (!fs.existsSync(terminalImagePath) || !fs.existsSync(imageComponentPath)) {
-  fail(`Could not find pi-tui files under ${packageRoot}`);
+if (!fs.existsSync(terminalImagePath) || !fs.existsSync(imageComponentPath) || !fs.existsSync(imageResizePath)) {
+  fail(`Could not find Pi image files under ${packageRoot}`);
 }
 
 const terminalBefore = fs.readFileSync(terminalImagePath, "utf8");
 const imageBefore = fs.readFileSync(imageComponentPath, "utf8");
+const imageResizeBefore = fs.readFileSync(imageResizePath, "utf8");
 
 let status = "already-supported";
 let terminalAfter = terminalBefore;
 let imageAfter = imageBefore;
-if (!isSupported(terminalBefore, imageBefore)) {
+let imageResizeAfter = imageResizeBefore;
+if (!isSupported(terminalBefore, imageBefore, imageResizeBefore)) {
   status = "patched";
   terminalAfter = patchTerminalImage(terminalBefore);
   imageAfter = patchImageComponent(imageBefore);
+  imageResizeAfter = patchImageResize(imageResizeBefore);
 }
 
 writeIfChanged(terminalImagePath, terminalBefore, terminalAfter);
 writeIfChanged(imageComponentPath, imageBefore, imageAfter);
+writeIfChanged(imageResizePath, imageResizeBefore, imageResizeAfter);
 fs.writeFileSync(markerPath, JSON.stringify({
   patchVersion,
   status,
   upstreamPr,
   tmuxNativeTracking,
   packageRoot,
-  files: [terminalImagePath, imageComponentPath],
+  files: [terminalImagePath, imageComponentPath, imageResizePath],
   appliedAt: new Date().toISOString(),
 }, null, 2) + "\n");
 

@@ -34,7 +34,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.75.3",
+  "lastChangelogVersion": "0.75.4",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -44,7 +44,6 @@
     "~/code/pi-extensions/main/extensions/file-collector",
     "~/code/pi-extensions/main/extensions/extra-context-files",
     "~/code/pi-extensions/main/extensions/tmux-bash",
-    "~/code/pi-extensions/main/extensions/task-context",
     "npm:@calesennett/pi-codex-fast",
     "npm:pi-codex-status",
     {

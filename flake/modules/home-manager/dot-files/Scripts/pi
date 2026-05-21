@@ -14,7 +14,7 @@ pi_bin=$(mise which pi)
 if [[ -n "$TMUX" && -z "${PI_SKIP_TMUX_IMAGE_PATCH:-}" ]]; then
   pi_real=$(readlink -f "$pi_bin")
   pi_root=$(dirname "$(dirname "$pi_real")")
-  patch_marker="$pi_root/.rich-pi-tmux-images-v2.json"
+  patch_marker="$pi_root/.rich-pi-tmux-images-v3.json"
   if [[ ! -f "$patch_marker" && -x "$HOME/Scripts/pi-patch-tmux-images" ]]; then
     "$HOME/Scripts/pi-patch-tmux-images" "$pi_bin" || true
   fi
