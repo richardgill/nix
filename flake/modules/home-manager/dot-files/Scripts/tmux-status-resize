@@ -2,24 +2,17 @@
 
 set -euo pipefail
 
-width=$(tmux display-message -p '#{client_width}')
-threshold=120
-
-status_modules="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
+desktop_status="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
+mobile_status="#[fg=#{?client_prefix,#{E:@thm_red},#{E:@thm_green}}] #[fg=#cdd6f4]#{=/28/...:session_name}"
+responsive_status="#{?#{e|<:#{client_width},120},$mobile_status,$desktop_status}"
 
 # tmux-continuum prepends a #(...) interpolation to status-right for periodic saves;
-# preserve it so auto-saving survives resize/session-change events
+# preserve it so auto-saving survives status setup
 current_right=$(tmux show-option -gqv status-right)
 continuum_prefix=""
 if [[ "$current_right" == '#('* ]]; then
   continuum_prefix="${current_right%%')'*})"
 fi
 
-if (( width < threshold )); then
-  tmux set -g status 2
-  tmux set -g 'status-format[1]' "#[align=right]$status_modules"
-  tmux set -g status-right "$continuum_prefix"
-else
-  tmux set -g status on
-  tmux set -g status-right "${continuum_prefix}${status_modules}"
-fi
+tmux set -g status on
+tmux set -g status-right "${continuum_prefix}${responsive_status}"

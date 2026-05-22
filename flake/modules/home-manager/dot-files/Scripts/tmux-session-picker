@@ -20,6 +20,7 @@ selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --no-sort --border-label ' sessions ' --prompt '' \
   --delimiter=$'\t' --with-nth=3.. \
   --header "$HEADER_SESSIONS" \
+  --listen \
   --bind 'tab:down,btab:up' \
   --bind "ctrl-a:transform:[[ \"\$(cat \"$MODE_FILE\")\" == \"$MODE_DIRS\" ]] && echo \"execute-silent(printf '%s' '$MODE_SESSIONS' > '$MODE_FILE')+change-header($HEADER_SESSIONS)+reload($SESSION_LIST)\" || echo \"execute-silent(printf '%s' '$MODE_DIRS' > '$MODE_FILE')+change-header($HEADER_DIRS)+reload($DIR_LIST)\"" \
   --bind "ctrl-q:transform:[[ {1} == tmux ]] && echo \"execute-silent($HOME_DIR/Scripts/tmux-kill-session --yes {2})+reload($SESSION_LIST)\" || echo \"refresh-preview\"" \
@@ -31,10 +32,10 @@ selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --bind 't:abort+execute-silent(tmux select-window -t :4)' \
   --bind 'g:abort+execute-silent(tmux select-window -t :5)' \
   --bind 'b:abort+execute-silent(tmux select-window -t :6)' \
-  --bind 'start:unbind(w,a,r,s,t,g,b)' \
+  --bind 'start:unbind(w,a,r,s,t,g,b)+execute-silent(while sleep "${TMUX_SESSION_PREVIEW_REFRESH_INTERVAL:-1}"; do curl -fsS "localhost:$FZF_PORT" -d refresh-preview >/dev/null || exit; done &)' \
   --bind "f12:transform:[[ -f \"$PREFIX_FILE\" ]] && echo \"execute-silent(rm -f '$PREFIX_FILE')+unbind(w,a,r,s,t,g,b)\" || echo \"execute-silent(touch '$PREFIX_FILE')+rebind(w,a,r,s,t,g,b)\"" \
   --bind "§:transform:[[ -f \"$PREFIX_FILE\" ]] && echo \"execute-silent(rm -f '$PREFIX_FILE')+unbind(w,a,r,s,t,g,b)\" || echo \"execute-silent(touch '$PREFIX_FILE')+rebind(w,a,r,s,t,g,b)\"" \
-  --preview-window 'right:55%,<65(down,75%)' \
+  --preview-window 'right:55%,<65(down,75%),follow' \
   --layout=reverse \
   --preview "$HOME_DIR/Scripts/tmux-session-preview {1} {2}")
 

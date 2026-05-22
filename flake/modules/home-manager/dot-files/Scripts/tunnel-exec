@@ -1,14 +1,36 @@
 #!/usr/bin/env bash
 # Execute a command on the local machine via reverse SSH tunnel
-# Usage: tunnel-exec "command to run"
+# Usage: tunnel-exec [--tty|--no-tty] "command to run"
 #
 # Configuration (environment variables):
 #   TUNNEL_USER - SSH user on local machine (default: $USER)
 #   TUNNEL_HOST - Local hostname (default: localhost)
 #   TUNNEL_PORT - Tunnel port (default: 1999, set by tunnel-setup)
 
+source ~/Scripts/lib/ai-agent
+
 user=${TUNNEL_USER-$USER}
 host=${TUNNEL_HOST-"localhost"}
 port=${TUNNEL_PORT-1999}
+tty_flag=""
 
-ssh -t -o LogLevel=ERROR -o ConnectTimeout=1 -l $user -p $port $host "$@"
+case "${1:-}" in
+  --tty)
+    tty_flag="-t"
+    shift
+    ;;
+  --no-tty)
+    tty_flag="-T"
+    shift
+    ;;
+esac
+
+if [[ -z "$tty_flag" ]]; then
+  if is_ai_agent; then
+    tty_flag="-T"
+  else
+    tty_flag="-t"
+  fi
+fi
+
+ssh "$tty_flag" -o LogLevel=ERROR -o ConnectTimeout=1 -l "$user" -p "$port" "$host" "$@"

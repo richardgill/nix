@@ -1,1 +1,0 @@
-Prefer immutable, functional code where possible. (If it's neater to mutate, this is fine)

@@ -15,7 +15,11 @@ metadata:
     model: {{presets.high.providerModel}}
     thinkingLevel: {{presets.high.thinkingLevel}}
 {{/if}}
-allowed-tools: WebSearch, WebFetch, Bash, Read, Grep, Glob, Task
+{{#if builtInWebSearch}}
+allowed-tools: {{webSearchName}}, {{webFetchName}}, Bash, Read, Grep, Glob, Task
+{{else}}
+allowed-tools: Bash, Read, Grep, Glob, Task
+{{/if}}
 ---
 
 You research technology choices and provide data-driven comparisons. Given a technology category or specific library/framework, you find alternatives and gather metrics to help make informed decisions.
@@ -76,4 +80,3 @@ You research technology choices and provide data-driven comparisons. Given a tec
 - Flag if any option is clearly abandoned (>1 year no commits)
 - Note if comparing fundamentally different approaches (e.g., library vs framework)
 
-{{> websearch-cite }}

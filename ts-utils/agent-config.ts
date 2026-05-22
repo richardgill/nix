@@ -14,9 +14,23 @@ export type AgentPresets = {
   xhigh: AgentPreset;
 };
 
+export type WebSearchProvider = {
+  id: string;
+  displayName: string;
+  skill: string;
+  searchCommand: string;
+  fetchCommand: string;
+  focusedFetchCommand: string;
+  quickAnswerCommand: string;
+  prerequisites: readonly string[];
+};
+
 export type AgentConfig = {
   sharedSkills: boolean;
   excludeSkills?: readonly string[];
+  builtInWebSearch: boolean;
+  webSearchName: string;
+  webFetchName: string;
   sharedAgents: boolean;
   commands: boolean;
   commandsFolder: string;
@@ -28,16 +42,45 @@ export type AgentConfig = {
 const isCodexPro = false;
 const mediumModel = isCodexPro ? "gpt-5.3-codex-spark" : "gpt-5.3-codex";
 const mediumProvider = `openai-codex/${mediumModel}`;
-const webSearchSkills = ["web-search-exa", "web-search-kagi"];
-const activeWebSearchSkill = "web-search-kagi";
-const inactiveWebSearchSkills = webSearchSkills.filter(
-  (skill) => skill !== activeWebSearchSkill,
-);
+const webSearchSkill = "web-search";
+const webSearchProviders = {
+  exa: {
+    id: "exa",
+    displayName: "Exa",
+    skill: webSearchSkill,
+    searchCommand: 'exa-search.js "<query>"',
+    fetchCommand: "exa-contents.js <url> --text",
+    focusedFetchCommand: 'exa-contents.js <url> --highlights "<query>"',
+    quickAnswerCommand: 'exa-search.js "<question>" --num 5',
+    prerequisites: [
+      "`exa-search.js`, `exa-contents.js`, and `exa-similar.js` must be available in PATH.",
+      "The Exa API key must be configured.",
+    ],
+  },
+  kagi: {
+    id: "kagi",
+    displayName: "Kagi",
+    skill: webSearchSkill,
+    searchCommand: 'kagi search "<query>"',
+    fetchCommand: 'kagi ask-page <url> "<question>"',
+    focusedFetchCommand: 'kagi ask-page <url> "Extract excerpts relevant to: <query>"',
+    quickAnswerCommand: 'kagi quick "<question>"',
+    prerequisites: [
+      "`kagi` must be installed and available in PATH.",
+      "Run `kagi auth` once before first use.",
+    ],
+  },
+} as const satisfies Record<string, WebSearchProvider>;
+export const activeWebSearchProvider = webSearchProviders.kagi;
+const webSearchSkillExclusion = [activeWebSearchProvider.skill];
 
 export const agents = {
   claude: {
     sharedSkills: true,
-    excludeSkills: webSearchSkills,
+    excludeSkills: webSearchSkillExclusion,
+    builtInWebSearch: true,
+    webSearchName: "WebSearch",
+    webFetchName: "WebFetch",
     sharedAgents: true,
     commands: true,
     commandsFolder: "commands",
@@ -46,7 +89,9 @@ export const agents = {
   },
   codex: {
     sharedSkills: true,
-    excludeSkills: webSearchSkills,
+    builtInWebSearch: false,
+    webSearchName: activeWebSearchProvider.displayName,
+    webFetchName: activeWebSearchProvider.fetchCommand,
     sharedAgents: false,
     commands: true,
     commandsFolder: "commands",
@@ -55,7 +100,9 @@ export const agents = {
   },
   ampcode: {
     sharedSkills: true,
-    excludeSkills: webSearchSkills,
+    builtInWebSearch: false,
+    webSearchName: activeWebSearchProvider.displayName,
+    webFetchName: activeWebSearchProvider.fetchCommand,
     sharedAgents: false,
     commands: true,
     commandsFolder: "commands",
@@ -64,7 +111,10 @@ export const agents = {
   },
   opencode: {
     sharedSkills: true,
-    excludeSkills: inactiveWebSearchSkills,
+    excludeSkills: webSearchSkillExclusion,
+    builtInWebSearch: true,
+    webSearchName: "kagi",
+    webFetchName: "webfetch",
     sharedAgents: false,
     commands: true,
     commandsFolder: "command",
@@ -73,7 +123,9 @@ export const agents = {
   },
   pi: {
     sharedSkills: true,
-    excludeSkills: inactiveWebSearchSkills,
+    builtInWebSearch: false,
+    webSearchName: activeWebSearchProvider.displayName,
+    webFetchName: activeWebSearchProvider.fetchCommand,
     sharedAgents: false,
     commands: false,
     commandsFolder: "",

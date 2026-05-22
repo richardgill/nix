@@ -5,7 +5,7 @@ target="$2"
 
 preview_tmux_session() {
   local session="$1"
-  tmux capture-pane -ep -t "$session:" -S - 2>/dev/null || echo "No tmux session: $session"
+  tmux capture-pane -ep -t "$session:" -S -${FZF_PREVIEW_LINES:-200} 2>/dev/null || echo "No tmux session: $session"
 }
 
 preview_dir() {

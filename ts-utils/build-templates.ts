@@ -14,11 +14,13 @@ import Handlebars from "handlebars";
 import { z } from "zod";
 import { directories, rootTemplates, DOT_FILES_PATH } from "./template-config";
 import {
+  activeWebSearchProvider,
   agents,
   type AgentConfig,
   type AgentName,
   type AgentPresets,
   type ModelFamily,
+  type WebSearchProvider,
 } from "./agent-config";
 
 Handlebars.registerHelper("eq", (a, b) => a === b);
@@ -55,6 +57,10 @@ type RenderContext = TemplateData & {
   binary: string;
   modelFamily?: ModelFamily;
   presets?: AgentPresets;
+  builtInWebSearch?: boolean;
+  webSearchName?: string;
+  webFetchName?: string;
+  webSearchProvider?: WebSearchProvider;
 };
 
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
@@ -115,9 +121,11 @@ const copyFile = (sourcePath: string, outputPath: string) => {
 const registerPartialsFromDir = (partialsPath: string) => {
   if (!existsSync(partialsPath)) return;
 
-  const files = readdirSync(partialsPath).filter((f) => f.endsWith(".md"));
+  const files = readdirSync(partialsPath).filter(
+    (f) => f.endsWith(".md") || f.endsWith(".md.hbs"),
+  );
   for (const file of files) {
-    const name = basename(file, ".md");
+    const name = file.replace(/\.md(?:\.hbs)?$/, "");
     const content = readFileSync(join(partialsPath, file), "utf-8");
     Handlebars.registerPartial(name, content);
     console.log(`Registered partial: ${name}`);
@@ -166,6 +174,10 @@ const processSharedContent = (
       binary: getAgentBinary(agent),
       modelFamily: getAgentModelFamily(agent),
       presets: getAgentPresets(agent),
+      builtInWebSearch: config.builtInWebSearch,
+      webSearchName: config.webSearchName,
+      webFetchName: config.webFetchName,
+      webSearchProvider: activeWebSearchProvider,
     };
     const excludeSkills: readonly string[] =
       "excludeSkills" in config ? config.excludeSkills : [];
@@ -232,12 +244,17 @@ const processDirectory = (
         let subContext = context;
         if (isAiAgents && entry.name in agents) {
           const agentName = entry.name as AgentName;
+          const agentConfig = agents[agentName];
           subContext = {
             ...context,
             agent: agentName,
             binary: getAgentBinary(agentName),
             modelFamily: getAgentModelFamily(agentName),
             presets: getAgentPresets(agentName),
+            builtInWebSearch: agentConfig.builtInWebSearch,
+            webSearchName: agentConfig.webSearchName,
+            webFetchName: agentConfig.webFetchName,
+            webSearchProvider: activeWebSearchProvider,
           };
         }
 
