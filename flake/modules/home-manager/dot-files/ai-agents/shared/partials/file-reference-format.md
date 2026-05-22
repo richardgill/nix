@@ -1,1 +1,0 @@
-When referencing files use a format like this from the project dir: ./folder/file.txt or ./folder/file.txt:5 or ./folder/file.txt:4-7
