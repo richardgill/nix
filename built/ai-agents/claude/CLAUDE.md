@@ -41,9 +41,6 @@
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.
 - Watch gh checks by running `gh pr checks --watch --fail-fast || gh run view --log-failed | tail -n 200` in background
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
-
-## Web research
-
 - To retrieve page content from a URL, use WebFetch.
 
 ## Overlay and scratch work

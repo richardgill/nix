@@ -66,26 +66,32 @@ fi
 
 short_sha=$(cd "$source_dir" && git rev-parse --short HEAD)
 
-if [[ "$force" == "true" ]]; then
+publish_to_main() {
   git commit -m "nix-private sha: $short_sha"
   git checkout main
   git merge "$branch_name"
   git push origin main
   echo "Changes pushed directly to main!"
   rm -rf "$github_repo_dir"
+}
+
+create_pr() {
+  git commit -m "nix-private sha: $short_sha"
+  git push origin "$branch_name"
+  echo ""
+  echo "Changes pushed successfully!"
+
+  pr_url=$(gh pr create --title "nix-private sha: $short_sha" --body "" --head "$branch_name" --base main)
+  open "$pr_url/files"
+}
+
+if [[ "$force" == "true" ]]; then
+  publish_to_main
   exit 0
 fi
 
 # echo "=== AI Agent is checking for secrets/sensitive data ==="
 # claude -p /check-secrets
-
-echo ""
-read -p "Continue to diff? (y/n): " -n 1 -r
-echo ""
-if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-  echo "Publish cancelled. Repository at: $github_repo_dir"
-  exit 0
-fi
 
 echo ""
 echo "=== Changes to be published ==="
@@ -94,17 +100,13 @@ git diff --cached
 echo ""
 echo "Repository prepared at: $github_repo_dir"
 echo ""
-read -p "Push these changes to GitHub? (y/n): " -n 1 -r
+read -p "Choose: [c]ancel, create [p]r, or [f]orce publish to main: " -n 1 -r action
 echo ""
 
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-  git commit -m "nix-private sha: $short_sha"
-  git push origin "$branch_name"
-  echo ""
-  echo "Changes pushed successfully!"
-
-  pr_url=$(gh pr create --title "nix-private sha: $short_sha" --body "" --head "$branch_name" --base main)
-  open "$pr_url/files"
+if [[ $action =~ ^[Pp]$ ]]; then
+  create_pr
+elif [[ $action =~ ^[Ff]$ ]]; then
+  publish_to_main
 else
-  echo "Push cancelled. You can manually inspect the repository at: $github_repo_dir"
+  echo "Publish cancelled. You can manually inspect the repository at: $github_repo_dir"
 fi
