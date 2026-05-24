@@ -63,6 +63,7 @@ Avoid putting large, generated, vendored, or external trees in overlay/. Use `~/
 {{/if}}
 
 {{#if (eq modelFamily "openai")}}
+{{! Low conviction }}
 ### Brevity and response style
 
 Default to terse, high-signal responses.
@@ -77,6 +78,7 @@ If you must exceed these limits for correctness, say so in one short sentence an
 {{/if}}
 
 ### Proposed Code-change review format
+{{! Low conviction }}
 
 For quick comprehension you must present code changes outside-in, showing new code / code changes in context with surrounding existing code:
 You need to show me the code as a 'sketch' of the 'shape' of the code whilst being brief.
