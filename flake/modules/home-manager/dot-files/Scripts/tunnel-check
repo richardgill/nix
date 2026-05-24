@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+source ~/Scripts/lib/ssh
+
+user=${TUNNEL_USER-$USER}
+host=${TUNNEL_HOST-"localhost"}
+port=${TUNNEL_PORT-1999}
+
+if ! is_ssh_session; then
+  echo "Not in an SSH session"
+  exit 1
+fi
+
+client_hostname=$(ssh -T -o BatchMode=yes -o ConnectTimeout=2 -o LogLevel=ERROR -l "$user" -p "$port" "$host" hostname)
+if [[ -z "$client_hostname" ]]; then
+  echo "Reverse tunnel unavailable at $host:$port"
+  exit 1
+fi
+
+echo "SSH session detected"
+echo "Reverse tunnel: $user@$host:$port -> $client_hostname"

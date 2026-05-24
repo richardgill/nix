@@ -2,18 +2,33 @@
 
 set -euo pipefail
 
-# start nvim listening on a socket
+# One Neovim per tmux session owns NVIM_SOCKET.
+# Other windows should open their own Neovim instead of stealing that UI.
 
 socket_live() {
   [[ -n "${NVIM_SOCKET:-}" ]] && [[ -n "$(ss -lxH src "$NVIM_SOCKET" 2>/dev/null)" ]]
 }
 
-if socket_live && [[ $# -gt 0 ]]; then
-  exec nvim --server "$NVIM_SOCKET" --remote "$@"
+open_without_session_socket() {
+  exec env -u NVIM_SOCKET nvim "$@"
+}
+
+if [[ -z "${NVIM_SOCKET:-}" ]]; then
+  exec nvim "$@"
 fi
 
-if [[ -n "${NVIM_SOCKET:-}" ]] && ! socket_live; then
-  exec nvim --listen "$NVIM_SOCKET" "$@"
+if socket_live; then
+  open_without_session_socket "$@"
 fi
 
-exec nvim "$@"
+# Avoid a startup race where two windows both try to claim the session socket.
+exec 9>"$NVIM_SOCKET.lock"
+if ! flock -n 9; then
+  open_without_session_socket "$@"
+fi
+
+if socket_live; then
+  open_without_session_socket "$@"
+fi
+
+exec nvim --listen "$NVIM_SOCKET" "$@"

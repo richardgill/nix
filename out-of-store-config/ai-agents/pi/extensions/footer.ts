@@ -29,8 +29,13 @@ const formatContextUsage = (usage: ContextUsage | undefined) => {
 };
 
 const hiddenStatusKeys = new Set(["codex-status"]);
+const backgroundBashStatusKey = "backgroundBashTmuxCommands";
+
+const formatBackgroundBashStatus = (value: string) =>
+	`${value} background proc${value === "1" ? "" : "s"}`;
 
 const formatStatus = (key: string, value: string) => {
+	if (key === backgroundBashStatusKey) return formatBackgroundBashStatus(value);
 	// if (key === "fast-priority") return value.replace("OpenAI fast mode", "Fast mode");
 	return value;
 };

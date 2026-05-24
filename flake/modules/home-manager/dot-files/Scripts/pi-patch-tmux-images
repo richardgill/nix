@@ -168,10 +168,18 @@ const patchImageComponent = (source) => {
 
 const patchImageResize = (source) => {
   let next = source;
-  next = replaceOnce(
+  next = replaceOnceOf(
     next,
-    `        const format = img.mimeType?.split("/")[1] ?? "png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
-    `        const format = img.mimeType?.split("/")[1] ?? "png";\n        const shouldPreserveOriginalImage = !process.env.TMUX || !process.env.PI_TMUX_IMAGES || img.mimeType === "image/png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (shouldPreserveOriginalImage && originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+    [
+      {
+        oldText: `        const format = mimeType.split("/")[1] ?? "png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+        newText: `        const format = mimeType.split("/")[1] ?? "png";\n        const shouldPreserveOriginalImage = !process.env.TMUX || !process.env.PI_TMUX_IMAGES || mimeType === "image/png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (shouldPreserveOriginalImage && originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+      },
+      {
+        oldText: `        const format = img.mimeType?.split("/")[1] ?? "png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+        newText: `        const format = img.mimeType?.split("/")[1] ?? "png";\n        const shouldPreserveOriginalImage = !process.env.TMUX || !process.env.PI_TMUX_IMAGES || img.mimeType === "image/png";\n        // Check if already within all limits (dimensions AND encoded size)\n        if (shouldPreserveOriginalImage && originalWidth <= opts.maxWidth && originalHeight <= opts.maxHeight && inputBase64Size < opts.maxBytes) {\n`,
+      },
+    ],
     "force non-PNG read images through PNG conversion inside tmux",
   );
   return next;
@@ -253,7 +261,9 @@ export function encodeKittyPlaceholder(base64Data, options) {
 const packageRoot = getPackageRoot();
 const terminalImagePath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/terminal-image.js");
 const imageComponentPath = path.join(packageRoot, "node_modules/@earendil-works/pi-tui/dist/components/image.js");
-const imageResizePath = path.join(packageRoot, "dist/utils/image-resize.js");
+const imageResizePath = fs.existsSync(path.join(packageRoot, "dist/utils/image-resize-core.js"))
+  ? path.join(packageRoot, "dist/utils/image-resize-core.js")
+  : path.join(packageRoot, "dist/utils/image-resize.js");
 const markerPath = path.join(packageRoot, `.${patchVersion}.json`);
 
 if (fs.existsSync(markerPath)) process.exit(0);

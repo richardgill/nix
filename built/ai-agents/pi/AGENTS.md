@@ -89,17 +89,7 @@ What **not** to include:
 
 ## SSH to local client with reverse tunnel
 
-To check whether this is an SSH session:
-
-```bash
-source ~/Scripts/lib/ssh && is_ssh_session
-```
-
-Test the reverse tunnel to the local client:
-
-```bash
-ssh -o BatchMode=yes -o ConnectTimeout=2 -p ${TUNNEL_PORT:-1999} localhost hostname
-```
+To check whether this is an SSH session and the reverse tunnel to the local client is available run the `tunnel-check` command.
 
 If the reverse tunnel is available, use `tunnel-exec <command>` to run one-off commands on the local client.
 
