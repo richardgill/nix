@@ -19,10 +19,8 @@
     package = pkgs.xremap;
     # Needed to detect currently active application
     withWlroots = true;
-    # This didn't work and needed to use wlroots
-    # withHypr = true;
     enable = true;
-    userName = vars.userName;
+    inherit (vars) userName;
     serviceMode = "user";
     debug = false;
     config = {

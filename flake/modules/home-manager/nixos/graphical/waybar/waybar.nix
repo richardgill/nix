@@ -1,10 +1,6 @@
-{
-  vars,
-  ...
-}:
+_:
 let
-  compositor = vars.waylandCompositor or "hyprland";
-  logoutCommand = if compositor == "niri" then "niri msg action quit" else "uwsm stop";
+  logoutCommand = "niri msg action quit";
   # Workaround: bar height in config.jsonc aligns with fractional scaling to avoid 1px gaps.
   baseWaybarConfig = builtins.fromJSON (builtins.readFile ./config.jsonc);
   powerModule = baseWaybarConfig."custom/power";

@@ -33,7 +33,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
 
 4. **Identify breaking changes** that affect this config:
    - Scan modules for services/packages that might be affected
-   - Key areas: Hyprland, Docker, Steam, Secure Boot, impermanence
+   - Key areas: Niri, Docker, Steam, Secure Boot, impermanence
 
 5. **Create upgrade plan** (use creating-plans skill):
    - Save to `overlay/issues/NN-nixos-<version>-upgrade/plan.md`
@@ -55,7 +55,7 @@ Upgrade NixOS to a new stable release version. This involves updating version-pi
    nix --version
    docker --version
    systemctl status docker tailscaled
-   hyprctl version
+   niri --version
    ```
 
 ## What stays pinned (don't change)

@@ -18,16 +18,10 @@ if [[ $url =~ ^zoom(mtg|us):// ]]; then
   fi
 fi
 
-compositor="$($HOME/Scripts/nixos/compositor)"
-if [[ "$compositor" == "niri" ]]; then
-  existing_zoom=$(niri msg --json windows \
-    | jq -r '.[] | select(.app_id | startswith("chrome-app.zoom")) | .pid' \
-    | head -1)
-  niri msg action focus-workspace zoom
-else
-  existing_zoom=$(hyprctl clients -j | jq -r '.[] | select(.class | test("chrome-app.zoom")) | .pid')
-  hyprctl dispatch workspace 19
-fi
+existing_zoom=$(niri msg --json windows \
+  | jq -r '.[] | select(.app_id | startswith("chrome-app.zoom")) | .pid' \
+  | head -1)
+niri msg action focus-workspace zoom
 
 if [[ -n "$existing_zoom" ]]; then
   kill "$existing_zoom"

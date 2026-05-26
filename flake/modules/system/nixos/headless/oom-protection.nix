@@ -26,7 +26,7 @@
       # Safe because GUI apps launch in isolated UWSM app scopes/process groups instead of Niri's process group.
       "-g"
       "--avoid"
-      "^(Hyprland|niri|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|xwayland-satellite|kitty)$"
+      "^(niri|waybar|systemd|systemd-.*|dbus-.*|pipewire|wireplumber|Xwayland|xwayland-satellite|kitty)$"
     ];
   };
 

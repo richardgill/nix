@@ -15,12 +15,8 @@ cycle = true
 [search]
 placeholder = " Search..."
 
-[builtins.hyprland_keybinds]
-path = "~/.config/hypr/hyprland.conf"
-hidden = true
-
 [builtins.applications]
-launch_prefix = "~/.config/walker/launch-app.sh 1 "
+launch_prefix = "~/Scripts/nixos/launch-in-app-scope "
 placeholder = " Search..."
 prioritize_new = false
 context_aware = false

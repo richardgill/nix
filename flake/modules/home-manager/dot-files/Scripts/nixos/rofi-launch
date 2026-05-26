@@ -1,5 +1,20 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-compositor="$($HOME/Scripts/nixos/compositor)"
-exec "$HOME/Scripts/nixos/$compositor/rofi-launch" "$@"
+source "$HOME/Scripts/nixos/workspace-map"
+source "$HOME/Scripts/nixos/niri/lib-wm"
+
+cmd="${1:-}"
+if [[ -z "$cmd" ]]; then
+  echo "Usage: rofi-launch <command>" >&2
+  exit 1
+fi
+
+app_key="$($HOME/Scripts/nixos/rofi-app-map "$cmd")"
+workspace="$(workspace_for_key "$app_key")"
+
+if [[ -n "$workspace" ]]; then
+  wm_focus_workspace "$workspace"
+fi
+
+exec "$HOME/Scripts/nixos/launch-in-app-scope" sh -c "$cmd"

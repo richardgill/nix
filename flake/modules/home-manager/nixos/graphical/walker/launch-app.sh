@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
-workspace="$1"
-app="$2"
-
-hyprctl dispatch exec "[workspace $workspace] uwsm app -- $app"
+exec "$HOME/Scripts/nixos/launch-in-app-scope" "$@"

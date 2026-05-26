@@ -74,7 +74,7 @@
     "menu": "on-click",
     "menu-file": "$HOME/.config/waybar/power_menu.xml",
     "menu-actions": {
-      "logout": "uwsm stop",
+      "logout": "niri msg action quit",
       "shutdown": "shutdown now",
       "reboot": "reboot",
       "suspend": "systemctl suspend",

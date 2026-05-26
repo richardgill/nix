@@ -54,11 +54,6 @@
 
     xremap-flake.url = "github:xremap/nix-flake";
 
-    hyprpaper = {
-      url = "github:hyprwm/hyprpaper";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
     stylix = {
       url = "github:danth/stylix/release-25.11";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -209,10 +204,10 @@
       templateConfig = nixpkgs.lib.mapAttrs (
         name: nixosConfig:
         import ./utils/template-config.nix {
-          lib = nixpkgs.lib;
-          pkgs = nixosConfig.pkgs;
-          config = nixosConfig.config;
-          userName = vars.userName;
+          inherit (nixpkgs) lib;
+          inherit (nixosConfig) pkgs;
+          inherit (nixosConfig) config;
+          inherit (vars) userName;
         }
       ) self.nixosConfigurations;
     };

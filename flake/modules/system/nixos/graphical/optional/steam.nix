@@ -12,9 +12,10 @@
       mangohud
     ];
     # login to steam from gdm (cog in bottow right)
-    # Alternative: If running Steam normally in Hyprland instead of gamescopeSession,
+    # Alternative: If running Steam normally instead of gamescopeSession,
     # use these per-game launch options in Steam:
-    #   gamescope -w 3840 -h 2160 -W 3840 -H 2160 --mangoapp -f -- %command% -dx11
+    #     gamescope -w 3840 -h 2160 -W 3840 -H 2160 -f -- %command% -dx11
+    # or  gamescope -w 3840 -h 2160 -W 3840 -H 2160 --mangoapp -f -- %command% -dx11
     gamescopeSession = {
       enable = true;
       args = [

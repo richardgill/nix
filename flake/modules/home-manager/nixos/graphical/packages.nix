@@ -6,16 +6,14 @@
   pkgs,
   nixpkgs-unstable,
   inputs,
-  vars,
   ...
 }:
 let
   unstable = import nixpkgs-unstable {
-    system = pkgs.stdenv.hostPlatform.system;
+    inherit (pkgs.stdenv.hostPlatform) system;
     config.allowUnfree = true;
   };
   isAarch64Linux = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
-  isNiri = (vars.waylandCompositor or "hyprland") == "niri";
 in
 {
   home.sessionVariables = {
@@ -39,9 +37,6 @@ in
       evince
       file-roller
       glib
-      hyprpolkitagent
-      hyprpaper
-      hyprshot
       grim
       firefox
       imv
@@ -50,6 +45,7 @@ in
       p7zip
       satty
       slurp
+      swaybg
       swayidle
       telegram-desktop
       swaylock
@@ -63,6 +59,8 @@ in
       wl-clipboard
       unstable.wl-screenrec
       unstable.wiremix
+      xsettingsd
+      xwayland-satellite
       xournalpp
       inputs.voxtype.packages.${pkgs.stdenv.hostPlatform.system}.vulkan
     ]
@@ -81,10 +79,5 @@ in
       todoist-electron
       unstable._1password-gui
       unstable.code-cursor
-    ]
-    ++ lib.optionals isNiri [
-      swaybg
-      xsettingsd
-      xwayland-satellite
     ];
 }

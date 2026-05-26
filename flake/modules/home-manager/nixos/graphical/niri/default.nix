@@ -23,14 +23,14 @@
     };
   };
 
-  systemd.user.services.hyprpolkitagent = {
+  systemd.user.services.polkit-gnome-authentication-agent = {
     Unit = {
       Description = "Polkit Authentication Agent";
       PartOf = [ "graphical-session.target" ];
       After = [ "graphical-session.target" ];
     };
     Service = {
-      ExecStart = "${pkgs.hyprpolkitagent}/libexec/hyprpolkitagent";
+      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
       Slice = "session.slice";
       TimeoutStopSec = "5sec";
       Restart = "on-failure";

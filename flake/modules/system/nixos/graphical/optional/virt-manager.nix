@@ -1,6 +1,6 @@
 { pkgs, vars, ... }:
 {
-  # needed for graphics in VMs, which hyprland guests need.
+  # needed for graphics in VMs.
   hardware.graphics.enable = true;
 
   virtualisation.libvirtd = {
@@ -30,8 +30,8 @@
 
   systemd.services.libvirt-default-network = {
     description = "Start libvirt default network";
-    after = ["libvirtd.service"];
-    wantedBy = ["multi-user.target"];
+    after = [ "libvirtd.service" ];
+    wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;

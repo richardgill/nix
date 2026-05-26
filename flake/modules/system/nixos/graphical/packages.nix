@@ -1,8 +1,6 @@
 {
-  config,
   lib,
   pkgs,
-  nixpkgs-unstable,
   ...
 }:
 {
@@ -14,7 +12,6 @@
       xdg-utils
       libsecret
       mako
-      hypridle
       swayosd
       sound-theme-freedesktop
       playerctl

@@ -44,17 +44,9 @@
     "~/code/pi-extensions/main/extensions/file-collector",
     "~/code/pi-extensions/main/extensions/extra-context-files",
     "~/code/pi-extensions/main/extensions/tmux-bash",
+    "~/code/pi-extensions/main/extensions/parrot",
     "npm:@calesennett/pi-codex-fast",
-    "npm:pi-codex-status",
-    {
-      "source": "npm:@normful/picadillo",
-      "extensions": [
-        "extensions/parrot.ts"
-      ],
-      "skills": [],
-      "prompts": [],
-      "themes": []
-    }
+    "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
     "enabled": true
