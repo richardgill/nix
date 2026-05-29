@@ -17,6 +17,7 @@
     ../../../../modules/system/nixos/graphical
     ../../../../modules/system/nixos/graphical/optional/bambu-studio.nix
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
+    ../../../../modules/system/nixos/graphical/optional/dolphin-emu.nix
     ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../../../modules/system/nixos/graphical/optional/steam.nix
     ../../../../modules/system/nixos/graphical/optional/virt-manager.nix

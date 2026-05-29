@@ -11,6 +11,7 @@ in
     android-tools
     autossh
     eternal-terminal
+    mosh
     cargo
     coreutils
     curl

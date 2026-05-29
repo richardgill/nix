@@ -156,7 +156,7 @@ window-rule {
 }
 
 window-rule {
-    match app-id=r#"^Beeper$|^beeper$"#
+    match app-id=r#"^Beeper$|^beeper$|^BeeperTexts$"#
     open-on-workspace "beeper"
     open-maximized-to-edges true
 }

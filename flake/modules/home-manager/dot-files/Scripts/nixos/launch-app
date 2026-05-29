@@ -40,7 +40,7 @@ elif [[ "$workspace_key" == "password" ]]; then
 elif [[ "$workspace_key" == "slack" ]]; then
   focus_or_launch "slack" '^Slack$|^slack$' '' '' slack
 elif [[ "$workspace_key" == "beeper" ]]; then
-  focus_or_launch "beeper" '^Beeper$|^beeper$' '' '' beeper
+  focus_or_launch "beeper" '^Beeper$|^beeper$|^BeeperTexts$' '' '' beeper
 elif [[ "$workspace_key" == "music" ]]; then
   wm_focus_oldest_window "music" '(?i)^spotify$' '' '' \
     || wm_focus_oldest_window "music" '' '^cmus$' '' \

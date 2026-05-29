@@ -1,0 +1,8 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# If Mosh is already running, exit immediately (closes this duplicate tab)
+if pgrep -x mosh-client >/dev/null || pgrep -f "mosh.*rich@um790" >/dev/null; then
+    ssh -o BatchMode=yes -o ConnectTimeout=2 rich@um790 '~/Scripts/tmux-switch-clients-to-last' >/dev/null 2>&1
+    exit 0
+fi
+
+mosh rich@um790 -- t

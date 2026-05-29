@@ -13,9 +13,14 @@
     ];
     # login to steam from gdm (cog in bottow right)
     # Alternative: If running Steam normally instead of gamescopeSession,
-    # use these per-game launch options in Steam:
-    #     gamescope -w 3840 -h 2160 -W 3840 -H 2160 -f -- %command% -dx11
-    # or  gamescope -w 3840 -h 2160 -W 3840 -H 2160 --mangoapp -f -- %command% -dx11
+    # use per-game launch options in Steam.
+    # Rocket League on Radeon 780M, 1080p target:
+    #     mangohud gamemoderun gamescope -w 1920 -h 1080 -W 1920 -H 1080 -f -- %command% -dx11
+    # Rocket League fallback if 1080p is not stable, 900p upscaled to 1080p:
+    #     mangohud gamemoderun gamescope -w 1600 -h 900 -W 1920 -H 1080 -F fsr -f -- %command% -dx11
+    # Rocket League in-game settings: Fullscreen, VSync off, AA off or FXAA low,
+    # Render Quality/Detail, World Detail, Particle Detail = Performance,
+    # Effect Intensity low, Ambient Occlusion/Dynamic Shadows/Bloom/DoF/Motion Blur/Weather/Light Shafts/Lens Flare off.
     gamescopeSession = {
       enable = true;
       args = [

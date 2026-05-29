@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+threshold_gb="${WAYBAR_MEMORY_FREE_THRESHOLD_GB:-10}"
+read -r total_kb avail_kb < <(awk '
+  /MemTotal:/ { total = $2 }
+  /MemAvailable:/ { available = $2 }
+  END { print total, available }
+' /proc/meminfo)
+
+if [[ -z "$total_kb" || -z "$avail_kb" ]]; then
+  printf '{"text":""}\n'
+  exit 0
+fi
+
+show=$(awk -v kb="$avail_kb" -v threshold="$threshold_gb" 'BEGIN { print ((kb / 1024 / 1024) < threshold) ? 1 : 0 }')
+
+if [[ "$show" -eq 1 ]]; then
+  awk -v total="$total_kb" -v avail="$avail_kb" 'BEGIN {
+    used_gb = (total - avail) / 1024 / 1024
+    total_gb = total / 1024 / 1024
+    printf "{\"text\":\"%.0fG/%.0fG\",\"tooltip\":\"Memory used: %.1f GiB / %.1f GiB; available: %.1f GiB\"}\n", used_gb, total_gb, used_gb, total_gb, avail / 1024 / 1024
+  }'
+else
+  printf '{"text":""}\n'
+fi

@@ -11,6 +11,7 @@
   "modules-right": [
     "custom/voxtype",
     "custom/screenrecord",
+    "custom/memory-free",
     "network",
     "clock",
     "custom/power"
@@ -67,6 +68,14 @@
     "return-type": "json",
     "on-click": "$HOME/Scripts/nixos/screen-record",
     "interval": 1
+  },
+  "custom/memory-free": {
+    "exec": "$HOME/Scripts/nixos/waybar-memory-free-threshold",
+    "return-type": "json",
+    "format": "{}",
+    "hide-empty-text": true,
+    "interval": 2,
+    "tooltip": true
   },
   "custom/power": {
     "format": "⏻",

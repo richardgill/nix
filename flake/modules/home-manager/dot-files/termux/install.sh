@@ -15,6 +15,13 @@ else
     echo "  Eternal Terminal already installed"
 fi
 
+if ! command -v mosh &> /dev/null; then
+    echo "  Installing Mosh..."
+    pkg install -y mosh
+else
+    echo "  Mosh already installed"
+fi
+
 # Create directories
 mkdir -p ~/.termux
 mkdir -p ~/.ssh
@@ -101,7 +108,7 @@ fi
 termux-reload-settings
 echo "Settings reloaded!"
 
-# Reminder about SSH key (still needed for ET initial auth)
+# Reminder about SSH key (still needed for ET and Mosh initial auth)
 if [[ ! -f ~/.ssh/id_ed25519 ]]; then
     echo ""
     echo "No SSH key found. Generate one with:"
@@ -110,4 +117,4 @@ if [[ ! -f ~/.ssh/id_ed25519 ]]; then
 fi
 
 echo ""
-echo "Done! Connect with: et <host>"
+echo "Done! Connect with: mosh <host> or et <host>"
