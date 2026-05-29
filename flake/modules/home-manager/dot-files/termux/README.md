@@ -34,7 +34,7 @@ ssh-copy-id rich@hostname
 ## Connect
 
 ```bash
-mosh rich@hostname -- t
+mosh rich@hostname /home/rich/Scripts/tmux-start
 et rich@hostname
 ```
 

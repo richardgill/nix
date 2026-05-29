@@ -5,4 +5,4 @@ if pgrep -x mosh-client >/dev/null || pgrep -f "mosh.*rich@um790" >/dev/null; th
     exit 0
 fi
 
-mosh rich@um790 -- t
+mosh rich@um790 /home/rich/Scripts/tmux-start
