@@ -86,6 +86,7 @@ in
       ".config/ripgrep/.rgignore".source = "${builtTemplates}/ripgrep/rgignore";
       ".config/shell/aliases.sh".source = "${builtTemplates}/shell/aliases.sh";
       ".config/shell/env.sh".source = "${builtTemplates}/shell/env.sh";
+      ".config/shell/env-shell-loader.sh".source = ../../dot-files/shell/env-shell-loader.sh;
       # Note: .config/mise/config.toml is managed by mise.nix
       # Note: .zshrc is managed by programs.zsh in zsh.nix
 
@@ -136,8 +137,8 @@ in
       ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
       ".config/amp/commands".source = "${builtTemplates}/ai-agents/ampcode/commands";
 
-      ".config/mcp2cli/baked.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcp2cli/baked.json";
+      ".config/mcpc/mcp.json".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcpc/mcp.json";
 
       # Static files (not templated)
       ".config/obs-studio".source =

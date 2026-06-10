@@ -24,6 +24,8 @@
 - New comments: Always single line // comments
 - Existing comments: Keep comment style that was there before
 - Prefer immutable, functional code where possible. (If it's neater to mutate, this is fine)
+- Prefer not embedding inline code of other languages in .sh files (unless it's very short, or exceptional circumstance)
+- If you copy code from a source you think is a good reference please link to a url in a comment
 
 ## Dev environment
 
@@ -37,6 +39,7 @@
 ## Workflow
 
 - Only do git commits when I explicitly ask.
+- Never force push unless I explicitly ask.
 - PR descriptions should be empty by default, unless asked otherwise.
 - Always read PR desc first before editing it so you can amend.
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.

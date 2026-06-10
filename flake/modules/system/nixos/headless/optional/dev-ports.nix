@@ -13,6 +13,8 @@
       4321 # Astro
       5432 # PostgreSQL
       6379 # Redis
+      8118 # Privoxy
+      8120 # PAC files
       8888 # Jupyter notebooks
       9000 # PHP-FPM, various services
       27017 # MongoDB

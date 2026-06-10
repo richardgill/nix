@@ -1,5 +1,6 @@
 .DS_Store
 mise.local.toml
+.env.shell
 .claude/settings.local.json
 CLAUDE.local.md
 AGENTS.local.md

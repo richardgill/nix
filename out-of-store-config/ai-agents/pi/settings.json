@@ -4,7 +4,6 @@
   "defaultModel": "gpt-5.5",
   "defaultThinkingLevel": "high",
   "enabledModels": [
-    "openai-codex/gpt-5.3-codex",
     "openai-codex/gpt-5.3-codex-spark",
     "github-copilot/claude-opus-4.6",
     "github-copilot/claude-sonnet-4.5",
@@ -23,7 +22,7 @@
   "excludeSkills": [],
   "retry": {
     "enabled": true,
-    "maxRetries": 3,
+    "maxRetries": 5,
     "baseDelayMs": 2000
   },
   "terminal": {
@@ -34,7 +33,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.77.0",
+  "lastChangelogVersion": "0.79.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -47,7 +46,8 @@
     "~/code/pi-extensions/main/extensions/parrot",
     "~/code/pi-extensions/main/extensions/pi-up-history",
     "npm:@calesennett/pi-codex-fast",
-    "npm:pi-codex-status"
+    "npm:pi-codex-status",
+    "npm:@ironin/pi-cascading-skills"
   ],
   "pi-codex-fast": {
     "enabled": true

@@ -1,22 +1,23 @@
 ---
 name: notion
-description: Use the baked Notion MCP via mcp2cli.
+description: Use the Notion MCP via mcpc.
 ---
 
-Use `mcp2cli @notion` for Notion operations.
+Use `mcpc @notion` for Notion operations.
+
+If the session is missing or unauthorized, ask Richard to run:
+
+```bash
+mcpc login https://mcp.notion.com/mcp
+mcpc connect ~/.config/mcpc/mcp.json:notion @notion
+```
 
 To discover what the Notion MCP can do:
 
-- best for exploration:
-
 ```bash
-mcp2cli @notion --list --verbose
+mcpc @notion tools-list --full
+mcpc @notion grep <term>
+mcpc @notion tools-get <tool>
 ```
 
-- best for focused lookup:
-
-```bash
-mcp2cli @notion --search <term>
-```
-
-When you need to perform a Notion task, first use the discovery commands above to find the right tool, then call it with `mcp2cli @notion ...`.
+When you need to perform a Notion task, first use discovery to find the right tool, then call it with `mcpc @notion tools-call <tool> ...`.

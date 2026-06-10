@@ -4,7 +4,6 @@ source ~/Scripts/lib/ai-agent
 source ~/Scripts/lib/ai-sessions/claude-sessions
 source ~/Scripts/lib/ai-sessions/pi-sessions
 
-AI_SESSIONS_FZF_LISTEN_PORT=51779
 AI_SESSIONS_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ai-sessions"
 
 ai_sessions_normalize_agent() {
@@ -95,6 +94,10 @@ ai_sessions_cached_list() {
   else
     ai_sessions_loading_list
   fi
+}
+
+ai_sessions_refresh_cache() {
+  ai_sessions_refresh_list "$1" >/dev/null
 }
 
 ai_sessions_refresh_list() {
@@ -291,16 +294,9 @@ ai_sessions_run() {
   local agent_arg
   agent_arg=$(ai_sessions_agent_arg "$agent")
   local list_command="$script_path list$agent_arg"
-
-  (
-    sleep "$refresh_interval"
-    while true; do
-      curl -s "localhost:$AI_SESSIONS_FZF_LISTEN_PORT" -d "reload($list_command)" >/dev/null 2>&1 || break
-      sleep "$refresh_interval"
-    done
-  ) &
-  local reload_pid=$!
-  trap "kill $reload_pid 2>/dev/null" EXIT
+  local cached_command="$script_path cached$agent_arg"
+  local refresh_command="$script_path refresh$agent_arg"
+  local background_refresh_command="while true; do $refresh_command >/dev/null 2>&1; curl -fsS \"localhost:\$FZF_PORT\" -d \"reload($cached_command)\" >/dev/null || exit; sleep \"$refresh_interval\"; done &"
 
   local list
   list=$(ai_sessions_cached_list "$agent")
@@ -318,7 +314,7 @@ ai_sessions_run() {
     --no-separator \
     --pointer='' \
     --no-input \
-    --listen "$AI_SESSIONS_FZF_LISTEN_PORT" \
+    --listen \
     --with-nth=5.. \
     --header "c=clear  ^q=quit  n=new  f=fork  i=ignore" \
     --bind 'tab:down,btab:up' \
@@ -338,7 +334,7 @@ ai_sessions_run() {
     --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
     --bind 'alt-shift-left:abort' \
     --bind 'alt-shift-right:abort' \
-    --bind "start:first+unbind(a,r,s,t,g,m)+reload:$list_command" \
+    --bind "start:first+unbind(a,r,s,t,g,m)+execute-silent($background_refresh_command)" \
     --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --preview-window "$preview_window" \
@@ -365,7 +361,7 @@ while (( $# > 0 )); do
       shift
       agent=$(ai_sessions_normalize_agent "${1:-}") || { echo "invalid agent: ${1:-}" >&2; exit 1; }
       ;;
-    run|list|debug|new|fork|ignore|clear|send)
+    run|cached|list|refresh|debug|new|fork|ignore|clear|send)
       action="$1"
       ;;
     *)
@@ -376,8 +372,14 @@ while (( $# > 0 )); do
 done
 
 case "$action" in
+  cached)
+    ai_sessions_cached_list "$agent"
+    ;;
   list)
     ai_sessions_refresh_list "$agent"
+    ;;
+  refresh)
+    ai_sessions_refresh_cache "$agent"
     ;;
   debug)
     ai_sessions_debug_lines "$(ai_sessions_list_json "$agent")"

@@ -18,11 +18,8 @@ rust = "latest"
 "npm:kagi-cli" = "0.3.3"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 "npm:pi-pack" = "latest"
-# Known issue: Slack mcp2cli OAuth access tokens expire, but the upstream MCP Python SDK may reload persisted tokens without usable expiry/metadata and force browser re-auth instead of refresh.
-# https://github.com/modelcontextprotocol/python-sdk/issues/1318
-# https://github.com/modelcontextprotocol/python-sdk/pull/1784
-# https://github.com/modelcontextprotocol/python-sdk/pull/2492
-"pipx:mcp2cli" = "3.0.2"
+# Slack re-auth needs localhost callback support: https://github.com/apify/mcpc/issues/269
+"npm:@apify/mcpc" = "0.3.1"
 
 [settings]
 idiomatic_version_file_enable_tools = ["node", "pnpm"]

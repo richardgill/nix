@@ -1,0 +1,198 @@
+#!/usr/bin/env bash
+
+# Generic app visibility criteria:
+#
+# - The app may always be running, but when access is blocked it lives on __hidden.
+# - Pressing the app shortcut moves you to the app workspace and starts an 8s gate.
+# - During the 8s gate, the app stays on __hidden / not visible.
+# - If the app is not running when the gate starts, launch it, but it should open onto __hidden.
+# - If you leave the app workspace before 8s completes, the gate is cancelled and the app stays on __hidden.
+# - If you stay on the app workspace for the full 8s, the app moves from __hidden to the app workspace and is focused.
+# - When you leave the app workspace after the app was visible, the app moves back to __hidden and a 180s grace window starts.
+# - If you return to the app workspace within 180s, the app moves back from __hidden to the app workspace immediately.
+# - If you return after 180s, the app stays on __hidden; you must press the app shortcut and wait 8s again.
+# - Re-pressing the app shortcut while an 8s gate is already pending should not create duplicate gates.
+
+[[ "$(type -t wm_focus_workspace || true)" == "function" ]] || source "$HOME/Scripts/nixos/niri/lib-wm"
+
+HIDDEN_WORKSPACE="__hidden"
+VISIBILITY_STATE_DIR="${XDG_RUNTIME_DIR:-/tmp}/delayed-workspace-visibility"
+declare -A visibility_app_id_patterns=( ["slack"]='^Slack$|^slack$' )
+declare -A visibility_grace_seconds=( ["slack"]=180 )
+
+visibility_state_file() {
+  echo "$VISIBILITY_STATE_DIR/$1-left-at"
+}
+
+visibility_mark_left() {
+  mkdir -p "$VISIBILITY_STATE_DIR"
+  date +%s >"$(visibility_state_file "$1")"
+}
+
+visibility_recently_left() {
+  local state_file
+  state_file="$(visibility_state_file "$1")"
+  [[ -f "$state_file" ]] || return 1
+
+  local left_at
+  left_at="$(<"$state_file")"
+  [[ "$left_at" =~ ^[0-9]+$ ]] || return 1
+
+  (( $(date +%s) - left_at <= $2 ))
+}
+
+visibility_window_ids() {
+  niri msg --json windows | jq -r --arg app "$1" '.[] | select((.app_id // "") | test($app)) | .id'
+}
+
+visibility_workspace_id() {
+  niri msg --json workspaces | jq -r --arg name "$1" 'first(.[] | select(.name == $name) | .id) // empty'
+}
+
+visibility_has_window_on_workspace() {
+  local workspace_id
+  workspace_id="$(visibility_workspace_id "$1")"
+  [[ -n "$workspace_id" ]] || return 1
+
+  niri msg --json windows | jq -e --argjson ws "$workspace_id" --arg app "$2" '
+    any(.[]; (.workspace_id == $ws) and ((.app_id // "") | test($app)))
+  ' >/dev/null
+}
+
+visibility_move() {
+  local workspace_name="$1"
+  local app_id_pattern="$2"
+  local -a window_ids
+  mapfile -t window_ids < <(visibility_window_ids "$app_id_pattern")
+  ((${#window_ids[@]} > 0)) || return 1
+
+  local window_id
+  for window_id in "${window_ids[@]}"; do
+    niri msg action move-window-to-workspace --window-id "$window_id" --focus false "$workspace_name" >/dev/null
+  done
+}
+
+visibility_show() {
+  local workspace_name="$1"
+  local app_id_pattern="$2"
+  local title_pattern="${3:-}"
+  local exclude_title_pattern="${4:-}"
+
+  visibility_move "$workspace_name" "$app_id_pattern" || return 1
+  wm_focus_workspace "$workspace_name"
+  wm_focus_oldest_window "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern"
+}
+
+visibility_wait_on_workspace() {
+  local workspace_name="$1"
+  local delay_seconds="$2"
+
+  wm_focus_workspace "$workspace_name"
+
+  for _ in $(seq 1 "$((delay_seconds * 10))"); do
+    sleep 0.1
+    [[ "$(wm_focused_workspace_name)" == "$workspace_name" ]] || return 1
+  done
+}
+
+visibility_wait_for_window() {
+  for _ in $(seq 1 50); do
+    visibility_window_ids "$1" | grep -q . && return 0
+    sleep 0.1
+  done
+
+  return 1
+}
+
+visibility_ensure_hidden() {
+  local app_id_pattern="$1"
+  shift
+
+  visibility_move "$HIDDEN_WORKSPACE" "$app_id_pattern" && return 0
+  "$HOME/Scripts/nixos/launch-in-app-scope" "$@"
+  visibility_wait_for_window "$app_id_pattern" || return 1
+  visibility_move "$HIDDEN_WORKSPACE" "$app_id_pattern" || true
+}
+
+visibility_show_or_launch() {
+  local workspace_name="$1"
+  local app_id_pattern="$2"
+  local title_pattern="$3"
+  local exclude_title_pattern="$4"
+  shift 4
+
+  visibility_show "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern" && return 0
+  visibility_ensure_hidden "$app_id_pattern" "$@" || return 1
+  visibility_show "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern"
+}
+
+visibility_open_delayed() {
+  local workspace_name="$1"
+  local app_id_pattern="$2"
+  local title_pattern="$3"
+  local exclude_title_pattern="$4"
+  local delay_seconds="$5"
+  local grace_seconds="$6"
+  local lock_fd
+  shift 6
+
+  if visibility_recently_left "$workspace_name" "$grace_seconds"; then
+    visibility_show_or_launch "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern" "$@"
+    return 0
+  fi
+
+  exec {lock_fd}>>"/tmp/launch-app-${workspace_name}.lock"
+  flock -n "$lock_fd" || return 1
+
+  (exec {lock_fd}>&-; visibility_ensure_hidden "$app_id_pattern" "$@") || return 1
+  visibility_wait_on_workspace "$workspace_name" "$delay_seconds" || return 1
+  visibility_show "$workspace_name" "$app_id_pattern" "$title_pattern" "$exclude_title_pattern"
+}
+
+visibility_is_tracked() {
+  local workspace_name="$1"
+  [[ -n "${visibility_app_id_patterns[$workspace_name]:-}" ]]
+}
+
+visibility_focused_workspace_from_event() {
+  if jq -e '.WorkspaceActivated.focused == true' >/dev/null; then
+    wm_focused_workspace_name
+    return 0
+  fi
+
+  jq -r '(.WorkspacesChanged.workspaces // []) | first(.[] | select(.is_focused == true) | .name) // empty'
+}
+
+visibility_on_workspace_change() {
+  local previous_workspace="$1"
+  local current_workspace="$2"
+  [[ -n "$current_workspace" ]] || return 0
+
+  if [[ "$current_workspace" != "$previous_workspace" ]] && visibility_is_tracked "$previous_workspace"; then
+    if visibility_has_window_on_workspace "$previous_workspace" "${visibility_app_id_patterns[$previous_workspace]}"; then
+      visibility_mark_left "$previous_workspace"
+    fi
+    visibility_move "$HIDDEN_WORKSPACE" "${visibility_app_id_patterns[$previous_workspace]}" || true
+  fi
+
+  if visibility_is_tracked "$current_workspace"; then
+    visibility_recently_left "$current_workspace" "${visibility_grace_seconds[$current_workspace]}" \
+      && visibility_show "$current_workspace" "${visibility_app_id_patterns[$current_workspace]}" || true
+  fi
+}
+
+visibility_daemon() {
+  local previous_workspace
+  previous_workspace="$(wm_focused_workspace_name || true)"
+
+  niri msg --json event-stream | while read -r event; do
+    local current_workspace
+    current_workspace="$(visibility_focused_workspace_from_event <<<"$event")"
+    visibility_on_workspace_change "$previous_workspace" "$current_workspace"
+    [[ -n "$current_workspace" ]] && previous_workspace="$current_workspace"
+  done
+}
+
+if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
+  "visibility_${1:-daemon}"
+fi

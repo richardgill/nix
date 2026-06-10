@@ -40,7 +40,7 @@ export type AgentConfig = {
 };
 
 const isCodexPro = false;
-const mediumModel = isCodexPro ? "gpt-5.3-codex-spark" : "gpt-5.3-codex";
+const mediumModel = isCodexPro ? "gpt-5.3-codex-spark" : "gpt-5.5";
 const mediumProvider = `openai-codex/${mediumModel}`;
 const webSearchSkill = "web-search";
 const webSearchProviders = {
@@ -63,7 +63,8 @@ const webSearchProviders = {
     skill: webSearchSkill,
     searchCommand: 'kagi search "<query>"',
     fetchCommand: 'kagi ask-page <url> "<question>"',
-    focusedFetchCommand: 'kagi ask-page <url> "Extract excerpts relevant to: <query>"',
+    focusedFetchCommand:
+      'kagi ask-page <url> "Extract excerpts relevant to: <query>"',
     quickAnswerCommand: 'kagi quick "<question>"',
     prerequisites: [
       "`kagi` must be installed and available in PATH.",

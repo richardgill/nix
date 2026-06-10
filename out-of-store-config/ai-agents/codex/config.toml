@@ -101,8 +101,20 @@ trust_level = "trusted"
 [projects."/home/rich/code/xata/gtm/main"]
 trust_level = "trusted"
 
+[projects."/home/rich/code/mario-golf-toadstool-route-textures"]
+trust_level = "trusted"
+
+[projects."/home/rich/code/mario-golf-toadstool-tour-mods"]
+trust_level = "trusted"
+
+[projects."/home/rich/code/limit/main"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-5.5"
 
 [plugins."github@openai-curated"]
 enabled = true
+
+[tui.model_availability_nux]
+"gpt-5.5" = 3

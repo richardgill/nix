@@ -1,0 +1,20 @@
+{
+  "mcpServers": {
+    "notion": {
+      "url": "https://mcp.notion.com/mcp"
+    },
+    "slack": {
+      "url": "https://mcp.slack.com/mcp"
+    },
+    "discord-search": {
+      "url": "https://www.answeroverflow.com/mcp"
+    },
+    "neon": {
+      "url": "https://mcp.neon.tech/mcp?readonly=true&category=querying&category=schema&category=branches&category=docs"
+    },
+    "shadcnblocks": {
+      "command": "pnpm",
+      "args": ["dlx", "shadcn@latest", "mcp"]
+    }
+  }
+}

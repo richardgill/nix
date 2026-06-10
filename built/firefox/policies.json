@@ -13,6 +13,11 @@
         "default_area": "navbar",
         "install_url": "https://addons.mozilla.org/firefox/downloads/latest/1password-x-password-manager/latest.xpi",
         "installation_mode": "force_installed"
+      },
+      "{8a2d3f3a-6e5e-4f1d-9b6b-1c8e5f0c1234}": {
+        "default_area": "navbar",
+        "install_url": "https://addons.mozilla.org/firefox/downloads/latest/fullpage-screenshotter/latest.xpi",
+        "installation_mode": "force_installed"
       }
     },
     "Certificates": {

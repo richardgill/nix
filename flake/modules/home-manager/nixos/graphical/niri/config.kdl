@@ -82,6 +82,7 @@ workspace "music"
 workspace "zoom"
 workspace "todoist"
 workspace "chrome"
+workspace "__hidden"
 
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "waybar"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "mako"
@@ -91,6 +92,7 @@ spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "voxtype" "daemo
 spawn-sh-at-startup "systemctl --user restart xremap"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "swayidle" "-w" "timeout" "300" "/home/rich/Scripts/nixos/lock-screen" "timeout" "360" "niri msg action power-off-monitors" "before-sleep" "/home/rich/Scripts/nixos/lock-screen"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "/home/rich/Scripts/nixos/niri/launch-wallpaper"
+spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "/home/rich/Scripts/nixos/delayed-workspace-visibility" "daemon"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "1" "firefox"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "2" "/home/rich/Scripts/nixos/launch-ghostty"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "--delay" "3" "1password"
@@ -151,7 +153,7 @@ window-rule {
 
 window-rule {
     match app-id=r#"^Slack$|^slack$"#
-    open-on-workspace "slack"
+    open-on-workspace "__hidden"
     open-maximized-to-edges true
 }
 
@@ -224,7 +226,7 @@ binds {
     Super+4 { focus-workspace "discord"; }
     Super+5 { focus-workspace "music"; }
     Super+6 { focus-workspace "todoist"; }
-    Super+7 { focus-workspace "slack"; }
+    Super+7 repeat=false { spawn "~/Scripts/nixos/launch-app" "slack"; }
     Super+8 { focus-workspace "beeper"; }
     Super+9 { focus-workspace "zoom"; }
 

@@ -167,7 +167,8 @@
     "pyright-lsp@claude-plugins-official": false,
     "slack@claude-plugins-official": true,
     "notion@claude-plugins-official": false,
-    "posthog@claude-plugins-official": false
+    "posthog@claude-plugins-official": false,
+    "vercel@claude-plugins-official": true
   },
   "sandbox": {
     "enabled": false,

@@ -18,6 +18,7 @@ in
     stateVersion = "23.11";
 
     sessionVariables = {
+      COLORTERM = "truecolor";
       SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
       JAVA_HOME = pkgs.jdk17.home;
       ANDROID_HOME = androidHome;

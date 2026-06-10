@@ -2,17 +2,37 @@
 
 set -euo pipefail
 
-desktop_status="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
-mobile_status="#[fg=#{?client_prefix,#{E:@thm_red},#{E:@thm_green}}] #[fg=#cdd6f4]#{=/28/...:session_name}"
-responsive_status="#{?#{e|<:#{client_width},120},$mobile_status,$desktop_status}"
+width="${1:-}"
+[[ -n "$width" ]] || width=$(tmux display-message -p '#{client_width}' 2>/dev/null || echo 999)
+[[ "$width" =~ ^[0-9]+$ ]] || width=999
+
+threshold=120
+
+status_modules="#{?#{SSH_CONNECTION},#{E:@catppuccin_status_host} ,}#{E:@catppuccin_status_session} #{E:@catppuccin_status_application}"
 
 # tmux-continuum prepends a #(...) interpolation to status-right for periodic saves;
-# preserve it so auto-saving survives status setup
+# preserve it so auto-saving survives resize/session-change events
 current_right=$(tmux show-option -gqv status-right)
 continuum_prefix=""
 if [[ "$current_right" == '#('* ]]; then
   continuum_prefix="${current_right%%')'*})"
 fi
 
-tmux set -g status on
-tmux set -g status-right "${continuum_prefix}${responsive_status}"
+target_layout=$([[ "$width" -lt "$threshold" ]] && echo narrow || echo wide)
+current_layout=$(tmux show-option -gqv @status-layout)
+
+# Avoid repainting the whole client on every focus/resize event, which is noisy over Mosh.
+if [[ "$current_layout" == "$target_layout" ]]; then
+  exit 0
+fi
+
+tmux set -g @status-layout "$target_layout"
+
+if [[ "$target_layout" == narrow ]]; then
+  tmux set -g status 2
+  tmux set -g 'status-format[1]' "#[align=right]$status_modules"
+  tmux set -g status-right "$continuum_prefix"
+else
+  tmux set -g status on
+  tmux set -g status-right "${continuum_prefix}${status_modules}"
+fi

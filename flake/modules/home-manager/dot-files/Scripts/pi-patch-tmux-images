@@ -76,6 +76,10 @@ const patchTerminalImage = (source) => {
     next,
     [
       {
+        oldText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    // Emit OSC 8 hyperlinks only when tmux confirms it forwards.\n`,
+        newText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // Emit OSC 8 hyperlinks only when tmux confirms it forwards.\n`,
+      },
+      {
         oldText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
         newText: `    const colorTerm = process.env.COLORTERM?.toLowerCase() || "";\n    const hasTrueColorHint = colorTerm === "truecolor" || colorTerm === "24bit";\n    const hasKittyImages = Boolean(process.env.KITTY_WINDOW_ID) || termProgram === "kitty" || termProgram === "ghostty" || term.includes("ghostty") || Boolean(process.env.GHOSTTY_RESOURCES_DIR) || Boolean(process.env.WEZTERM_PANE) || termProgram === "wezterm";\n    // tmux and screen swallow OSC 8 by default (passthrough is opt-in and wraps\n`,
       },
@@ -89,6 +93,10 @@ const patchTerminalImage = (source) => {
   next = replaceOnceOf(
     next,
     [
+      {
+        oldText: `    // Emit OSC 8 hyperlinks only when tmux confirms it forwards.\n    // Image protocols are unreliable under tmux, so leave \`images: null\`.\n    if (process.env.TMUX || term.startsWith("tmux")) {\n        return { images: null, trueColor: hasTrueColorHint, hyperlinks: tmuxForwardsHyperlink() };\n    }\n`,
+        newText: `    // Emit OSC 8 hyperlinks only when tmux confirms it forwards.\n    if (process.env.TMUX || term.startsWith("tmux")) {\n        const trueColor = hasKittyImages || hasTrueColorHint;\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: tmuxForwardsHyperlink() };\n    }\n`,
+      },
       {
         oldText: `    if (inTmuxOrScreen) {\n        return { images: null, trueColor: hasTrueColorHint, hyperlinks: false };\n    }\n`,
         newText: `    if (inTmuxOrScreen) {\n        const trueColor = hasKittyImages || hasTrueColorHint;\n        const images = process.env.PI_TMUX_IMAGES && hasKittyImages ? "kitty" : null;\n        return { images, trueColor, hyperlinks: false };\n    }\n`,

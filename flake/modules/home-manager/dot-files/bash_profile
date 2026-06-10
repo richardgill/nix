@@ -11,3 +11,8 @@ fi
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   source "$HOME/.config/shell/aliases.sh"
 fi
+
+# BASH_ENV sources this for non-interactive agent shells, so load .env.shell for their starting PWD
+if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
+  source "$HOME/.config/shell/env-shell-loader.sh"
+fi

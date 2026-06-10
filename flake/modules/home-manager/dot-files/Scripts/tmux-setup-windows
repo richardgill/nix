@@ -15,13 +15,11 @@ create_worktree_session() {
   local session_name
   session_name=$(session_name_for_path "$expanded_path")
   tmux new-session -d -s "$session_name" -c "$expanded_path"
+  # Detached creation must not switch clients; agent background tmux panes can otherwise move the user's visible client.
   if [[ -z "$detached" ]]; then
     tmux switch-client -t "$session_name"
-  elif [[ -n "$TMUX" ]]; then
-    local prev_session
-    prev_session=$(tmux display-message -p "#{session_name}")
-    tmux switch-client -t "$session_name"
-    tmux switch-client -t "$prev_session"
+  else
+    "$HOME/Scripts/tmux-session-recency" "$session_name"
   fi
   echo "$session_name"
 }

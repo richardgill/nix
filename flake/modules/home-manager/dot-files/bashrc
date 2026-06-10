@@ -5,3 +5,8 @@ fi
 if [ -f "$HOME/.config/shell/aliases.sh" ]; then
   source "$HOME/.config/shell/aliases.sh"
 fi
+
+# Dynamically loads .env.shell files by traversing up parent directories
+if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
+  source "$HOME/.config/shell/env-shell-loader.sh"
+fi

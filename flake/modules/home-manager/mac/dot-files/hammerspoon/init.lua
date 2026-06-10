@@ -2,6 +2,14 @@ hs.window.animationDuration = 0 -- Disable animations globally
 
 -- Define hyper key (all modifiers)
 local hyper = { "cmd", "alt", "ctrl", "shift" }
+local delayedAppVisibility = require("delayed-app-visibility")
+
+delayedAppVisibility.register("slack", {
+	appName = "Slack",
+	bundleID = "com.tinyspeck.slackmacgap",
+	gateSeconds = 8,
+	graceSeconds = 180,
+})
 
 -- Requires Hammerspoon to have Privacy -> Screen Recording permissions
 hs.hotkey.bind({ "cmd", "shift" }, "4", function()
@@ -118,7 +126,7 @@ hs.hotkey.bind(hyper, "t", function()
 end)
 
 hs.hotkey.bind(hyper, "s", function()
-	hs.application.launchOrFocus("Slack.app")
+	delayedAppVisibility.open("slack")
 end)
 
 hs.hotkey.bind(hyper, "w", function()

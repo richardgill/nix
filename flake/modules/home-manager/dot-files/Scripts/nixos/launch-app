@@ -3,6 +3,7 @@ set -euo pipefail
 
 source "$HOME/Scripts/nixos/workspace-map"
 source "$HOME/Scripts/nixos/niri/lib-wm"
+source "$HOME/Scripts/nixos/delayed-workspace-visibility"
 
 workspace_key="$(workspace_key_from_input "${1:-}")"
 workspace="$(workspace_for_key "$workspace_key")"
@@ -38,7 +39,7 @@ elif [[ "$workspace_key" == "discord" ]]; then
 elif [[ "$workspace_key" == "password" ]]; then
   focus_or_launch "password" '^1password$|^1Password$' '' '' 1password
 elif [[ "$workspace_key" == "slack" ]]; then
-  focus_or_launch "slack" '^Slack$|^slack$' '' '' slack
+  visibility_open_delayed "slack" '^Slack$|^slack$' '' '' 8 300 slack || exit 0
 elif [[ "$workspace_key" == "beeper" ]]; then
   focus_or_launch "beeper" '^Beeper$|^beeper$|^BeeperTexts$' '' '' beeper
 elif [[ "$workspace_key" == "music" ]]; then

@@ -1,23 +1,26 @@
 ---
 name: slack
-description: Use the baked Slack MCP via mcp2cli.
+description: Use the Slack MCP via mcpc.
 ---
 
-Use `mcp2cli @slack` for Slack operations.
+Use `mcpc @slack` for Slack operations.
 
+
+If the session is missing or unauthorized, ask Richard to run:
+
+```bash
+mcpc login https://mcp.slack.com/mcp --client-id 1601185624273.8899143856786 --callback-port 3118
+mcpc connect ~/.config/mcpc/mcp.json:slack @slack
+```
+
+Note: re-auth may need `localhost` callback support in mcpc: https://github.com/apify/mcpc/issues/269
 
 To discover what the Slack MCP can do:
 
-- best for exploration:
-
 ```bash
-mcp2cli @slack --list --verbose
+mcpc @slack tools-list --full
+mcpc @slack grep <term>
+mcpc @slack tools-get <tool>
 ```
 
-- best for focused lookup:
-
-```bash
-mcp2cli @slack --search <term>
-```
-
-When you need to perform a Slack task, first use the discovery commands above to find the right tool, then call it with `mcp2cli @slack ...`.
+When you need to perform a Slack task, first use discovery to find the right tool, then call it with `mcpc @slack tools-call <tool> ...`.

@@ -194,3 +194,8 @@ if backlog version >/dev/null 2>&1; then
   fi
   fpath=("$HOME/.zsh/completions" $fpath)
 fi
+
+# Dynamically loads .env.shell files by traversing up parent directories
+if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
+  source "$HOME/.config/shell/env-shell-loader.sh"
+fi
