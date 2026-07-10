@@ -1,30 +1,27 @@
 #!/usr/bin/env bash
 
 HOME_DIR="$HOME"
-BG_FILTER_FILE=$(mktemp)
-printf '%s' "hide" > "$BG_FILTER_FILE"
-SESSION_LIST="TMUX_SESSION_BG_FILTER=\$(cat \"$BG_FILTER_FILE\") $HOME_DIR/Scripts/tmux-session-list sessions"
+SESSION_LIST="$HOME_DIR/Scripts/tmux-session-list sessions"
 DIR_LIST="$HOME_DIR/Scripts/tmux-session-list dirs"
 MODE_SESSIONS="sessions"
-MODE_DIRS="all dirs"
-HEADER_BASE='  mode: %s | ^a toggle %s | ^q kill | ^b _bg_ | F12/§ prefix'
+MODE_DIRS="zoxide dirs"
+HEADER_BASE='  mode: %s | ^a toggle %s | ^q kill | F12/§ prefix'
 HEADER_SESSIONS=$(printf "$HEADER_BASE" "$MODE_SESSIONS" "$MODE_DIRS")
 HEADER_DIRS=$(printf "$HEADER_BASE" "$MODE_DIRS" "$MODE_SESSIONS")
 MODE_FILE=$(mktemp)
 PREFIX_FILE=$(mktemp)
 printf '%s' "$MODE_SESSIONS" > "$MODE_FILE"
 rm -f "$PREFIX_FILE"
-trap 'rm -f "$MODE_FILE" "$PREFIX_FILE" "$BG_FILTER_FILE"' EXIT
+trap 'rm -f "$MODE_FILE" "$PREFIX_FILE"' EXIT
 
 selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --no-sort --border-label ' sessions ' --prompt '' \
-  --delimiter=$'\t' --with-nth=3.. \
+  --delimiter=$'\t' --with-nth=3 \
   --header "$HEADER_SESSIONS" \
   --listen \
   --bind 'tab:down,btab:up' \
   --bind "ctrl-a:transform:[[ \"\$(cat \"$MODE_FILE\")\" == \"$MODE_DIRS\" ]] && echo \"execute-silent(printf '%s' '$MODE_SESSIONS' > '$MODE_FILE')+change-header($HEADER_SESSIONS)+reload($SESSION_LIST)\" || echo \"execute-silent(printf '%s' '$MODE_DIRS' > '$MODE_FILE')+change-header($HEADER_DIRS)+reload($DIR_LIST)\"" \
   --bind "ctrl-q:transform:[[ {1} == tmux ]] && echo \"execute-silent($HOME_DIR/Scripts/tmux-kill-session --yes {2})+reload($SESSION_LIST)\" || echo \"refresh-preview\"" \
-  --bind "ctrl-b:transform:[[ \"\$(cat \"$MODE_FILE\")\" != \"$MODE_SESSIONS\" ]] && echo refresh-preview || { cur=\$(cat \"$BG_FILTER_FILE\"); next=hide; [[ \"\$cur\" == hide ]] && next=only; printf '%s' \"\$next\" > \"$BG_FILTER_FILE\"; echo \"reload($SESSION_LIST)\"; }" \
   --bind "w:become($HOME_DIR/Scripts/ai-sessions)" \
   --bind 'a:abort+execute-silent(tmux select-window -t :1)' \
   --bind 'r:abort+execute-silent(tmux select-window -t :2)' \
@@ -37,9 +34,9 @@ selected=$(eval "$SESSION_LIST" | fzf --ansi \
   --bind "§:transform:[[ -f \"$PREFIX_FILE\" ]] && echo \"execute-silent(rm -f '$PREFIX_FILE')+unbind(w,a,r,s,t,g,b)\" || echo \"execute-silent(touch '$PREFIX_FILE')+rebind(w,a,r,s,t,g,b)\"" \
   --preview-window 'right:55%,<65(down,75%),follow' \
   --layout=reverse \
-  --preview "$HOME_DIR/Scripts/tmux-session-preview {1} {2}")
+  --preview "$HOME_DIR/Scripts/tmux-session-preview {1} {2} {4}")
 
 if [[ -n "$selected" ]]; then
-  IFS=$'\t' read -r selected_type selected_target _ <<< "$selected"
-  "$HOME_DIR/Scripts/tmux-session-connect" "$selected_type" "$selected_target"
+  IFS=$'\t' read -r selected_type selected_target _ selected_path <<< "$selected"
+  "$HOME_DIR/Scripts/tmux-session-connect" "$selected_type" "$selected_target" "$selected_path"
 fi

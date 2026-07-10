@@ -42,6 +42,10 @@
             "xwayland-native-scaling"
           ];
         };
+        "org/gnome/desktop/input-sources" = {
+          # Prevent CapsLock from doing anything if it is toggled before xremap starts.
+          xkb-options = [ "caps:none" ];
+        };
       };
     }
   ];

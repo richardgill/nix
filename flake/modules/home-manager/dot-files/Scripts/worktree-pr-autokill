@@ -1,0 +1,224 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(dirname "$0")/lib/tmux-state"
+
+QUARANTINE_FILE=$(tmux_quarantine_file)
+dry_run=0
+quiet=0
+merged_within_seconds="${WORKTREE_PR_AUTOKILL_MERGED_WITHIN_SECONDS:-120}"
+kill_after_seconds="${WORKTREE_PR_AUTOKILL_KILL_AFTER_SECONDS:-7200}"
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dry-run) dry_run=1; shift ;;
+    --quiet) quiet=1; shift ;;
+    --merged-within-seconds) merged_within_seconds="${2:?missing seconds}"; shift 2 ;;
+    --kill-after-seconds) kill_after_seconds="${2:?missing seconds}"; shift 2 ;;
+    *) echo "Unknown argument: $1" >&2; exit 1 ;;
+  esac
+done
+
+say() {
+  (( quiet )) || printf '%s\n' "$*"
+}
+
+session_exists() {
+  tmux has-session -t "$1" 2>/dev/null
+}
+
+worktree_root() {
+  git -C "$1" rev-parse --show-toplevel 2>/dev/null || true
+}
+
+is_linked_worktree() {
+  local root="$1"
+  local git_dir common_dir
+  git_dir=$(git -C "$root" rev-parse --path-format=absolute --git-dir 2>/dev/null || true)
+  common_dir=$(git -C "$root" rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)
+  [[ -n "$git_dir" && -n "$common_dir" && "$git_dir" != "$common_dir" ]]
+}
+
+branch_name() {
+  git -C "$1" branch --show-current 2>/dev/null || true
+}
+
+repo_key() {
+  local path="$1"
+  (cd "$path" && gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null) \
+    || git -C "$path" remote get-url origin 2>/dev/null \
+    || true
+}
+
+pr_for_head() {
+  local path="$1"
+  local branch="$2"
+  local head="$3"
+  { (cd "$path" && gh pr list --head "$branch" --state merged --limit 20 \
+    --json number,mergedAt,headRefOid \
+    --jq ".[] | select(.headRefOid == \"$head\") | [.number, .mergedAt, .headRefOid] | @tsv" 2>/dev/null) || true; } \
+    | head -n 1
+}
+
+is_recent_merge() {
+  local merged_at="$1"
+  local merged_epoch now
+  merged_epoch=$(date -d "$merged_at" +%s 2>/dev/null || true)
+  [[ -n "$merged_epoch" ]] || return 1
+  now=$(date +%s)
+  (( now - merged_epoch >= 0 && now - merged_epoch <= merged_within_seconds ))
+}
+
+is_clean() {
+  [[ -z "$(git -C "$1" status --porcelain 2>/dev/null)" ]]
+}
+
+is_quarantined_session() {
+  local id="$1"
+  local created="$2"
+  local session="$3"
+  [[ -f "$QUARANTINE_FILE" ]] || return 1
+  awk -F '\t' -v id="$id" -v created="$created" -v session="$session" '
+    NF == 8 && $3 == id && $4 == created && $5 == session { found = 1 }
+    END { exit !found }
+  ' "$QUARANTINE_FILE"
+}
+
+record_quarantine() {
+  local quarantine_at="$1"
+  local kill_after="$2"
+  local id="$3"
+  local created="$4"
+  local session="$5"
+  local path="$6"
+  local repo="$7"
+  local pr="$8"
+  local tmp
+
+  mkdir -p "$(dirname "$QUARANTINE_FILE")"
+  tmp=$(mktemp)
+  if [[ -f "$QUARANTINE_FILE" ]]; then
+    awk -F '\t' -v id="$id" -v created="$created" -v session="$session" '
+      NF == 8 && !($3 == id && $4 == created && $5 == session)
+    ' "$QUARANTINE_FILE" > "$tmp"
+  fi
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$quarantine_at" "$kill_after" "$id" "$created" "$session" "$path" "$repo" "$pr" >> "$tmp"
+  mv "$tmp" "$QUARANTINE_FILE"
+}
+
+clear_quarantine_session() {
+  local id="$1"
+  local created="$2"
+  local session="$3"
+  local tmp
+  [[ -f "$QUARANTINE_FILE" ]] || return 0
+  tmp=$(mktemp)
+  awk -F '\t' -v id="$id" -v created="$created" -v session="$session" '
+    NF == 8 && !($3 == id && $4 == created && $5 == session)
+  ' "$QUARANTINE_FILE" > "$tmp"
+  mv "$tmp" "$QUARANTINE_FILE"
+}
+
+pane_has_protected_process() {
+  local tty="$1"
+  ps -o comm= -t "$tty" 2>/dev/null | grep -Eq '^(pi|claude|codex|nvim)$'
+}
+
+quarantine_session_processes() {
+  local session="$1"
+  tmux list-panes -t "$session:" -s -F '#{pane_id}'$'\t''#{pane_tty}' 2>/dev/null \
+    | while IFS=$'\t' read -r pane tty; do
+        [[ -n "$pane" && -n "$tty" ]] || continue
+        if pane_has_protected_process "$tty"; then
+          say "skip protected pane: $session $pane"
+        elif (( dry_run )); then
+          say "would kill pane processes: $session $pane"
+        else
+          "$HOME/Scripts/tmux-kill-pane-processes" "$pane"
+        fi
+      done
+}
+
+maybe_quarantine_session() {
+  local session="$1"
+  local path root branch head pr_row pr merged_at pr_head repo id created now kill_after
+
+  path=$(tmux display-message -p -t "$session:" '#{session_path}' 2>/dev/null || true)
+  [[ -n "$path" && -d "$path" ]] || return 0
+
+  root=$(worktree_root "$path")
+  [[ -n "$root" && -d "$root" ]] || return 0
+  is_linked_worktree "$root" || return 0
+
+  id=$(tmux display-message -p -t "$session:" '#{session_id}' 2>/dev/null || true)
+  created=$(tmux display-message -p -t "$session:" '#{session_created}' 2>/dev/null || true)
+  [[ -n "$id" && -n "$created" ]] || return 0
+  is_quarantined_session "$id" "$created" "$session" && return 0
+
+  branch=$(branch_name "$root")
+  [[ -n "$branch" ]] || return 0
+
+  head=$(git -C "$root" rev-parse HEAD 2>/dev/null || true)
+  [[ -n "$head" ]] || return 0
+
+  pr_row=$(pr_for_head "$root" "$branch" "$head")
+  [[ -n "$pr_row" ]] || return 0
+
+  IFS=$'\t' read -r pr merged_at pr_head <<< "$pr_row"
+  [[ -n "$merged_at" && "$pr_head" == "$head" ]] || return 0
+  is_recent_merge "$merged_at" || return 0
+
+  repo=$(repo_key "$root")
+  [[ -n "$repo" ]] || return 0
+
+  if ! is_clean "$root"; then
+    say "skip dirty: $session PR #$pr"
+    return 0
+  fi
+
+  now=$(date +%s)
+  kill_after=$((now + kill_after_seconds))
+
+  if (( dry_run )); then
+    say "would quarantine: $session PR #$pr ($repo@$head, merged $merged_at)"
+  else
+    record_quarantine "$now" "$kill_after" "$id" "$created" "$session" "$root" "$repo" "$pr"
+    say "quarantined: $session PR #$pr ($repo@$head, merged $merged_at)"
+  fi
+  quarantine_session_processes "$session"
+}
+
+cleanup_quarantine_rows() {
+  local now
+  now=$(date +%s)
+  [[ -f "$QUARANTINE_FILE" ]] || return 0
+
+  while IFS=$'\t' read -r quarantine_at kill_after id created session path repo pr; do
+    [[ -n "$session" && -n "$id" && -n "$created" ]] || continue
+    session_exists "$session" || continue
+
+    local current_id current_created current_attached
+    current_id=$(tmux display-message -p -t "$session:" '#{session_id}' 2>/dev/null || true)
+    current_created=$(tmux display-message -p -t "$session:" '#{session_created}' 2>/dev/null || true)
+    [[ "$current_id" == "$id" && "$current_created" == "$created" ]] || continue
+    current_attached=$(tmux display-message -p -t "$session:" '#{?session_last_attached,#{session_last_attached},0}' 2>/dev/null || true)
+    if [[ "$current_attached" =~ ^[0-9]+$ && "$current_attached" -gt "$quarantine_at" ]]; then
+      say "unquarantine reattached: $session PR #$pr"
+      (( dry_run )) || clear_quarantine_session "$id" "$created" "$session"
+    elif [[ "$kill_after" =~ ^[0-9]+$ && "$now" -ge "$kill_after" ]]; then
+      say "final kill quarantined: $session PR #$pr"
+      (( dry_run )) || "$HOME/Scripts/tmux-kill-session" --yes "$session"
+    fi
+  done < "$QUARANTINE_FILE"
+}
+
+main() {
+  cleanup_quarantine_rows
+  tmux list-sessions -F '#{session_name}' 2>/dev/null | while IFS= read -r session; do
+    [[ -n "$session" ]] || continue
+    maybe_quarantine_session "$session"
+  done
+}
+
+main

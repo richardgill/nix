@@ -8,10 +8,8 @@ in
 {
   packages = with pkgs; [
     _1password-cli
-    android-tools
     autossh
     eternal-terminal
-    mosh
     cargo
     coreutils
     curl
@@ -26,7 +24,6 @@ in
     gnused
     gnumake
     jq
-    jdk17
     just
     # Needed for Firefox build tooling (pkg-config).
     pkg-config

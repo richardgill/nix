@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+LOG_FILE="$HOME/Library/Logs/tmux-scripts/tmux-kill-pane-processes.log"
+mkdir -p "$(dirname "$LOG_FILE")"
+
+log() {
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOG_FILE"
+}
+
+get_descendants() {
+  local parent="$1"
+  local children
+  children=$(pgrep -P "$parent" 2>/dev/null || true)
+  for child in $children; do
+    get_descendants "$child"
+  done
+  printf '%s\n' $children
+}
+
+kill_pids() {
+  local signal="$1"
+  shift
+  [[ $# -gt 0 ]] || return 0
+  kill "-$signal" "$@" 2>/dev/null || true
+}
+
+pane_target="${1:-%}"
+pane_pid=$(tmux display-message -t "$pane_target" -p '#{pane_pid}' 2>/dev/null || true)
+pane_tty=$(tmux display-message -t "$pane_target" -p '#{pane_tty}' 2>/dev/null || true)
+if [[ -z "$pane_pid" || -z "$pane_tty" ]]; then
+  log "Could not find pane: $pane_target"
+  exit 1
+fi
+
+# Self-protection: don't signal our own TTY
+self_tty="$(tty 2>/dev/null || true)"
+if [[ "$pane_tty" == "$self_tty" ]]; then
+  log "Skipping own TTY: $pane_target ($pane_tty)"
+  exit 0
+fi
+
+mapfile -t pids < <(get_descendants "$pane_pid" | awk 'NF && !seen[$1]++')
+if (( ${#pids[@]} == 0 )); then
+  log "No child processes to kill for pane $pane_target ($pane_tty)"
+  exit 0
+fi
+
+log "Killing pane child processes $pane_target ($pane_tty): ${pids[*]}"
+
+# SIGTERM to all child processes for the pane
+kill_pids TERM "${pids[@]}"
+
+# Brief wait for graceful shutdown
+sleep 0.3
+
+# SIGKILL any survivors
+kill_pids KILL "${pids[@]}"

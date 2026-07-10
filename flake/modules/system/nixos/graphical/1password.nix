@@ -3,7 +3,7 @@
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
-    # Required for CLI integration and system authentication support
-    polkitPolicyOwners = [ vars.userName ];
+    # Enable this if we use a fingerprint reader for 1Password CLI integration or Linux system authentication in future.
+    # polkitPolicyOwners = [ vars.userName ];
   };
 }

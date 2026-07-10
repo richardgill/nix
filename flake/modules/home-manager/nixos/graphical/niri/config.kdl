@@ -1,5 +1,9 @@
 input {
     keyboard {
+        // Prevent CapsLock from doing anything if it is toggled before xremap starts.
+        xkb {
+            options "caps:none"
+        }
         repeat-delay 300
         repeat-rate 25
         numlock
@@ -82,6 +86,7 @@ workspace "music"
 workspace "zoom"
 workspace "todoist"
 workspace "chrome"
+workspace "emulator"
 workspace "__hidden"
 
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "waybar"
@@ -193,6 +198,12 @@ window-rule {
     open-maximized-to-edges true
 }
 
+window-rule {
+    match app-id=r#"^Emulator$"#
+    open-on-workspace "emulator"
+    open-maximized-to-edges true
+}
+
 recent-windows {
     binds {
     }
@@ -244,6 +255,7 @@ binds {
     Ctrl+Alt+Shift+Super+B repeat=false { spawn "~/Scripts/nixos/launch-app" "files"; }
     Ctrl+Alt+Shift+Super+C repeat=false { spawn-sh "niri msg action focus-workspace browser; exec $HOME/Scripts/nixos/launch-in-app-scope firefox https://chatgpt.com"; }
     Ctrl+Alt+Shift+Super+D repeat=false { spawn "~/Scripts/nixos/launch-app" "discord"; }
+    Ctrl+Alt+Shift+Super+E repeat=false { spawn "~/Scripts/nixos/launch-app" "emulator"; }
     Ctrl+Alt+Shift+Super+F repeat=false { spawn "~/Scripts/nixos/launch-app" "browser"; }
     Ctrl+Alt+Shift+Super+G repeat=false { spawn "~/Scripts/nixos/launch-app" "terminal"; }
     Ctrl+Alt+Shift+Super+H repeat=false { spawn "~/Scripts/nixos/launch-app" "password"; }

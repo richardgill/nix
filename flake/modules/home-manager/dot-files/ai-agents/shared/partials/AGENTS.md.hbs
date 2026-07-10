@@ -8,6 +8,9 @@
 - Push side effects to the edges: fetch, transform (pure), emit. Don't interleave I/O with logic.
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
 - New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
+- Prefer less indirection unless it helps DRY or readability
+- Prefer table-driven tests when covering multiple similar cases.
+
 {{#if (eq modelFamily "openai")}}
 - Unless explicitly asked, prefer clean breaks over backwards compatibility; if unsure, ask instead of hedging with legacy paths, shims, or fallback layers.
 {{/if}}
@@ -27,7 +30,9 @@
 - Existing comments: Keep comment style that was there before
 - Prefer immutable, functional code where possible. (If it's neater to mutate, this is fine)
 - Prefer not embedding inline code of other languages in .sh files (unless it's very short, or exceptional circumstance)
+- Prefer `testCases.each` over `it.each` / `test.each` for table-driven tests.
 - If you copy code from a source you think is a good reference please link to a url in a comment
+
 
 ## Dev environment
 
@@ -41,7 +46,8 @@
 ## Workflow
 
 - Only do git commits when I explicitly ask.
-- Never force push unless I explicitly ask.
+- Never force push or ammend commits unless I explicitly ask. 
+- PR's should be created in draft status unless I explicitly ask.
 - PR descriptions should be empty by default, unless asked otherwise.
 - Always read PR desc first before editing it so you can amend.
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.

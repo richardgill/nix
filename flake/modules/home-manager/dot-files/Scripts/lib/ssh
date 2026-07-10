@@ -1,34 +1,57 @@
 #!/usr/bin/env bash
 
-# Detects if the current shell is running in an SSH session.
-# Uses SSH_CONNECTION environment variable which contains:
-# client_ip client_port server_ip server_port
-#
-# When inside tmux, queries the session environment to get the current
-# SSH_CONNECTION (which updates on reattach), not the stale shell value
-#
-# Excludes tunnel-back connections (where both client and server are localhost)
-is_ssh_session() {
+is_loopback_address() {
+  local address="$1"
+
+  [[ "$address" == "localhost" || "$address" == "::1" || "$address" == "0:0:0:0:0:0:0:1" || "$address" =~ ^127\. ]]
+}
+
+is_port_number() {
+  [[ "$1" =~ ^[0-9]+$ ]]
+}
+
+is_ssh_connection_value() {
+  local value="$1"
+  local client_ip client_port server_ip server_port extra
+
+  # OpenSSH documents SSH_CONNECTION as: client IP, client port, server IP, server port.
+  # https://man.openbsd.org/ssh#SSH_CONNECTION
+  read -r client_ip client_port server_ip server_port extra <<< "$value"
+
+  [[ -n "$client_ip" && -n "$client_port" && -n "$server_ip" && -n "$server_port" && -z "$extra" ]] || return 1
+  is_port_number "$client_port" || return 1
+  is_port_number "$server_port" || return 1
+
+  # Reverse tunnels back to the local machine also set SSH_CONNECTION, but both ends are loopback.
+  if is_loopback_address "$client_ip" && is_loopback_address "$server_ip"; then
+    return 1
+  fi
+
+  return 0
+}
+
+current_ssh_connection() {
   if [[ -n "${TMUX:-}" ]]; then
-    # Inside tmux: check tmux's session environment (always up to date)
-    local ssh_env=$(tmux show-environment SSH_CONNECTION 2>/dev/null)
-    # Check if variable exists and is not unset (starts with -)
-    [[ -n "$ssh_env" && "$ssh_env" != -* && "$ssh_env" == *=* ]]
-  else
-    # Not in tmux: check shell environment
-    [[ -z "$SSH_CONNECTION" ]] && return 1
+    local ssh_env
+    ssh_env=$(tmux show-environment SSH_CONNECTION 2>/dev/null) || return 1
 
-    # Parse SSH_CONNECTION: client_ip client_port server_ip server_port
-    local client_ip=$(echo "$SSH_CONNECTION" | awk '{print $1}')
-    local server_ip=$(echo "$SSH_CONNECTION" | awk '{print $3}')
-
-    # Exclude tunnel-back: both client and server are localhost
-    if [[ "$client_ip" == "127.0.0.1" || "$client_ip" == "::1" ]]; then
-      if [[ "$server_ip" == "127.0.0.1" || "$server_ip" == "::1" ]]; then
-        return 1
-      fi
-    fi
-
+    # update-environment updates tmux's session env on attach; show-environment reads it.
+    # Removed variables are prefixed with -VAR, so only VAR=value is a real value.
+    # https://github.com/tmux/tmux/blob/master/tmux.1
+    # With multiple attached clients, tmux's session env is attach/refreshed state, not a per-pane physical-client truth.
+    # https://superuser.com/questions/1476226/how-to-identify-the-connected-client-pid-tty-from-inside-tmux
+    [[ "$ssh_env" == SSH_CONNECTION=* ]] || return 1
+    printf '%s\n' "${ssh_env#SSH_CONNECTION=}"
     return 0
   fi
+
+  [[ -n "${SSH_CONNECTION:-}" ]] || return 1
+  printf '%s\n' "$SSH_CONNECTION"
+}
+
+is_ssh_session() {
+  local ssh_connection
+  ssh_connection=$(current_ssh_connection) || return 1
+
+  is_ssh_connection_value "$ssh_connection"
 }

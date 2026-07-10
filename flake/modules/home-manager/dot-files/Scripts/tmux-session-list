@@ -1,25 +1,25 @@
 #!/usr/bin/env bash
 
+source "$(dirname "$0")/lib/tmux-state"
+
 recency_file() {
-  local file="${XDG_STATE_HOME:-$HOME/.local/state}/tmux/session-recency.tsv"
+  local file
+  file=$(tmux_recency_file)
   [[ -f "$file" ]] && echo "$file"
 }
 
-home_path() {
-  local path="$1"
-  case "$path" in
-    "$HOME") echo "~" ;;
-    "$HOME"/*) echo "~${path#$HOME}" ;;
-    *) echo "$path" ;;
-  esac
+quarantine_file() {
+  local file
+  file=$(tmux_quarantine_file)
+  [[ -f "$file" ]] && echo "$file"
 }
 
-session_rows() {
-  local file
+existing_session_rows() {
+  local file q_file
   file=$(recency_file)
-  local bg_filter="${TMUX_SESSION_BG_FILTER:-hide}"
-  tmux list-sessions -F '#{session_name}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
-    | awk -F '\t' -v recency_file="$file" -v bg_filter="$bg_filter" '
+  q_file=$(quarantine_file)
+  tmux list-sessions -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
+    | awk -F '\t' -v recency_file="$file" -v quarantine_file="$q_file" '
         BEGIN {
           if (recency_file != "") {
             while ((getline line < recency_file) > 0) {
@@ -27,14 +27,21 @@ session_rows() {
               if (parts[2] != "" && !(parts[2] in recency)) recency[parts[2]] = parts[1] + 0
             }
           }
+          if (quarantine_file != "") {
+            while ((getline line < quarantine_file) > 0) {
+              count = split(line, parts, "\t")
+              if (count == 8 && parts[3] != "" && parts[4] != "" && parts[5] != "") quarantined[parts[3] SUBSEP parts[4] SUBSEP parts[5]] = 1
+            }
+          }
         }
         {
           name = $1
-          is_bg = (index(name, "_bg_") == 1)
-          if (bg_filter == "hide" && is_bg) next
-          if (bg_filter == "only" && !is_bg) next
-          last_attached = $2 + 0
-          activity = $3 + 0
+          id = $2
+          created = $3
+          if ((id SUBSEP created SUBSEP name) in quarantined) next
+          if (name ~ /^(code|pi-background)$/) next
+          last_attached = $4 + 0
+          activity = $5 + 0
           last_seen = (name in recency) ? recency[name] : 0
           printf "%d\t%d\t%d\t%s\n", last_seen, last_attached, activity, name
         }
@@ -46,28 +53,87 @@ session_rows() {
       done
 }
 
-zoxide_rows() {
-  zoxide query -l 2>/dev/null \
-    | while IFS= read -r path; do
-        [[ -d "$path" ]] && printf 'dir\t%s\t\033[36m\033[39m %s\n' "$path" "$(home_path "$path")"
+pinned_session_rows() {
+  for session in code pi-background; do
+    if tmux has-session -t "$session" 2>/dev/null; then
+      printf 'tmux\t%s\t\033[34m\033[39m %s\n' "$session" "$session"
+    fi
+  done
+}
+
+quarantined_inactive_rows() {
+  local file
+  file=$(quarantine_file)
+  [[ -n "$file" ]] || return
+  awk -F '\t' '
+      FNR == NR {
+        active[$2 SUBSEP $3 SUBSEP $1] = 1
+        next
+      }
+      {
+        quarantine_at = $1
+        id = $3
+        created = $4
+        session = $5
+        path = $6
+        if (NF != 8 || quarantine_at == "" || id == "" || created == "" || session == "" || path == "") next
+        if ((id SUBSEP created SUBSEP session) in active) print quarantine_at "\t" session "\t" path
+      }
+    ' <(tmux list-sessions -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}' 2>/dev/null) "$file"
+}
+
+recent_inactive_rows() {
+  local file
+  file=$(recency_file)
+  [[ -n "$file" ]] || return
+  awk -F '\t' '
+      FNR == NR {
+        existing[$1] = 1
+        next
+      }
+      NF >= 3 {
+        last_seen = $1 + 0
+        name = $2
+        path = $3
+        if (name == "" || path == "" || name in existing) next
+        print last_seen "\t" name "\t" path
+      }
+    ' <(tmux list-sessions -F '#{session_name}' 2>/dev/null) "$file"
+}
+
+inactive_session_rows() {
+  { quarantined_inactive_rows; recent_inactive_rows; } \
+    | sort -t $'\t' -k1,1nr -k2,2 \
+    | while IFS=$'\t' read -r _ session path; do
+        [[ -d "$path" ]] && printf 'recent\t%s\t\033[90m\033[39m %s\t%s\n' "$session" "$session" "$path"
       done
 }
 
-all_dir_rows() {
-  "$HOME/Scripts/find-dirs" \
+session_rows() {
+  existing_session_rows
+  pinned_session_rows
+  inactive_session_rows
+}
+
+zoxide_rows() {
+  local label
+  zoxide query -l 2>/dev/null \
     | while IFS= read -r path; do
-        local expanded_path="${path/#\~/$HOME}"
-        [[ -d "$expanded_path" ]] && printf 'dir\t%s\t\033[36m\033[39m %s\n' "$expanded_path" "$path"
+        case "$path" in
+          "$HOME") label="~" ;;
+          "$HOME"/*) label="~${path#$HOME}" ;;
+          *) label="$path" ;;
+        esac
+        [[ -d "$path" ]] && printf 'dir\t%s\t\033[36m\033[39m %s\n' "$path" "$label"
       done
 }
 
 case "${1:-sessions}" in
   sessions)
     session_rows
-    [[ "${TMUX_SESSION_BG_FILTER:-hide}" == "only" ]] || zoxide_rows
     ;;
   dirs)
-    all_dir_rows
+    zoxide_rows
     ;;
   *)
     echo "Usage: $0 {sessions|dirs}" >&2

@@ -25,6 +25,8 @@ workspace_key_from_input() {
     echo "todoist"
   elif [[ "$input" == "21" || "$input" == "chrome" ]]; then
     echo "chrome"
+  elif [[ "$input" == "22" || "$input" == "emulator" ]]; then
+    echo "emulator"
   else
     echo "$input"
   fi

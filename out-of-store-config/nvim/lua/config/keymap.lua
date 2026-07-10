@@ -5,6 +5,8 @@ local yank = require 'custom.yank'
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+require('custom.move-lines').setup()
+
 -- Set highlight on search, but clear on pressing <Esc> in normal mode
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 vim.keymap.set('n', '<Esc><Esc>', function()
@@ -57,8 +59,8 @@ vim.keymap.set('n', '<leader>do', function()
   local remotes_output = vim.fn.system 'git remote'
   local upstream_exists = remotes_output:find 'upstream' ~= nil
   local remote = upstream_exists and 'upstream' or 'origin'
-  vim.cmd(':CodeDiff ' .. remote .. '/main HEAD')
-end, { desc = 'Git [d]iff against upstream/main or origin/main' })
+  vim.cmd(':CodeDiff ' .. remote .. '/main...')
+end, { desc = 'Git [d]iff against upstream/main or origin/main, including local changes' })
 
 -- stop ctrl-z from suspending
 vim.api.nvim_set_keymap('n', '<c-z>', '<nop>', { noremap = true, silent = true })

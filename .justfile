@@ -61,6 +61,10 @@ update:
       exit 1
     fi
 
+    if [ "$(uname)" = "Darwin" ]; then
+      sudo -v
+    fi
+
     just _update-inner
 
 _update-inner:

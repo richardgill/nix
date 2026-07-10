@@ -1,14 +1,31 @@
 #!/usr/bin/env bash
 
 # Connects to an existing tmux session or creates/switches to one for a directory.
-# Accepted forms: tmux-session-connect tmux <session>, tmux-session-connect dir <path>
+# Accepted forms: tmux-session-connect tmux <session>, tmux-session-connect dir <path>, tmux-session-connect recent <session> <path>
 
 source "$(dirname "$0")/tmux-setup-windows"
+source "$(dirname "$0")/lib/tmux-state"
 
-connect_tmux_session() {
+unquarantine() {
+  local session="$1"
+  local file
+  file=$(tmux_quarantine_file)
+  local tmp
+  [[ -n "$session" && -f "$file" ]] || return 0
+  tmp=$(mktemp)
+  awk -F '\t' -v session="$session" 'NF == 8 && $5 != session' "$file" > "$tmp"
+  mv "$tmp" "$file"
+}
+
+connect_session() {
   local session="$1"
   [[ -n "$session" ]] || return 1
+  unquarantine "$session"
   tmux switch-client -t "$session"
+}
+
+connect_tmux_session() {
+  connect_session "$1"
 }
 
 connect_dir() {
@@ -20,11 +37,24 @@ connect_dir() {
   local session_name
   session_name=$(session_name_for_path "$expanded_path")
   if tmux has-session -t "$session_name" 2>/dev/null; then
-    tmux switch-client -t "$session_name"
+    connect_session "$session_name"
     return
   fi
 
   create_session_for_path "$expanded_path" >/dev/null
+}
+
+connect_recent_session() {
+  local session="$1"
+  local path="$2"
+  local expanded_path="${path/#\~/$HOME}"
+  [[ -n "$session" && -d "$expanded_path" ]] || return 1
+
+  zoxide add "$expanded_path"
+  if ! tmux has-session -t "$session" 2>/dev/null; then
+    tmux new-session -d -s "$session" -c "$expanded_path"
+  fi
+  connect_session "$session"
 }
 
 case "${1:-}" in
@@ -34,8 +64,11 @@ case "${1:-}" in
   dir)
     connect_dir "${2:-}"
     ;;
+  recent)
+    connect_recent_session "${2:-}" "${3:-}"
+    ;;
   *)
-    echo "Usage: $0 {tmux <session>|dir <path>}" >&2
+    echo "Usage: $0 {tmux <session>|dir <path>|recent <session> <path>}" >&2
     exit 1
     ;;
 esac

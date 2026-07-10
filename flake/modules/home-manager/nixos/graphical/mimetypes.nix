@@ -57,10 +57,10 @@
       "text/plain" = "nvim.desktop";
       "application/x-shellscript" = "nvim.desktop";
 
-      # Web → firefox (or your preferred browser)
-      "x-scheme-handler/http" = "browser-open.desktop";
-      "x-scheme-handler/https" = "browser-open.desktop";
-      "text/html" = "browser-open.desktop";
+      # Web defaults resolve directly to Firefox; browser-open.desktop delegates to tunnel-browser-open and would recurse through xdg-open here.
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "text/html" = "firefox.desktop";
 
       # Directories → nautilus
       "inode/directory" = "org.gnome.Nautilus.desktop";

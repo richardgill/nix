@@ -15,11 +15,9 @@ else
     echo "  Eternal Terminal already installed"
 fi
 
-if ! command -v mosh &> /dev/null; then
-    echo "  Installing Mosh..."
-    pkg install -y mosh
-else
-    echo "  Mosh already installed"
+if command -v mosh &> /dev/null; then
+    echo "  Removing Mosh..."
+    pkg uninstall -y mosh
 fi
 
 # Create directories
@@ -34,6 +32,7 @@ echo "  Copied termux.properties and colors.properties"
 # Install widget shortcuts (for Termux:Widget from F-Droid)
 mkdir -p ~/.shortcuts
 rm -rf ~/.shortcuts/scripts ~/.shortcuts/tasks
+rm -f ~/.shortcuts/um790-mosh
 cp "$SCRIPT_DIR/shortcuts/"* ~/.shortcuts/
 chmod +x ~/.shortcuts/*
 echo "  Installed widget shortcuts"
@@ -108,7 +107,7 @@ fi
 termux-reload-settings
 echo "Settings reloaded!"
 
-# Reminder about SSH key (still needed for ET and Mosh initial auth)
+# Reminder about SSH key (still needed for ET initial auth)
 if [[ ! -f ~/.ssh/id_ed25519 ]]; then
     echo ""
     echo "No SSH key found. Generate one with:"
@@ -117,4 +116,4 @@ if [[ ! -f ~/.ssh/id_ed25519 ]]; then
 fi
 
 echo ""
-echo "Done! Connect with: mosh <host> or et <host>"
+echo "Done! Connect with: et <host>"

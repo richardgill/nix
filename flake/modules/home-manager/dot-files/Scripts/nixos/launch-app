@@ -61,6 +61,8 @@ elif [[ "$workspace_key" == "todoist" ]]; then
   focus_or_launch "todoist" '^Todoist$|^todoist-electron$' '' '' todoist-electron
 elif [[ "$workspace_key" == "chrome" ]]; then
   focus_or_launch "chrome" 'google-chrome|chromium|Chromium' '' '' google-chrome-stable
+elif [[ "$workspace_key" == "emulator" ]]; then
+  focus_or_launch "emulator" '^Emulator$' '^Android Emulator' '' "$HOME/Android/Sdk/emulator/emulator" -avd limit_proxy_api36
 else
   wm_focus_workspace "$workspace"
 fi

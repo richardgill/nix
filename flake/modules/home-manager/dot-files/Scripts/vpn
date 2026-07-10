@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_dir="${VPN_CONFIG_DIR:-$HOME/.config/openvpn}"
+
+if [[ ! -d "$config_dir" ]]; then
+  echo "No VPN config directory found: $config_dir" >&2
+  exit 1
+fi
+
+selection=$(find "$config_dir" -type f -name '*.ovpn' -print \
+  | sort \
+  | sed "s#^$config_dir/##" \
+  | fzf --prompt='VPN> ' --header='Select an OpenVPN profile')
+
+if [[ -z "$selection" ]]; then
+  exit 1
+fi
+
+config_file="$config_dir/$selection"
+
+echo "Connecting to $selection"
+exec sudo openvpn --config "$config_file" --auth-nocache

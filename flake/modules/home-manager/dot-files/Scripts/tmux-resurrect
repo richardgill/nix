@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source "$(dirname "$0")/lib/tmux-state"
+
+quarantine_file=$(tmux_quarantine_file)
+[[ -f "$quarantine_file" ]] || exit 0
+
+resurrect_dir=$(tmux show-option -gqv @resurrect-dir 2>/dev/null || true)
+resurrect_dir=${resurrect_dir:-~/.tmux/resurrect}
+resurrect_dir=$(printf '%s\n' "$resurrect_dir" | sed "s,\$HOME,$HOME,g; s,~,$HOME,g")
+restore_link="$resurrect_dir/last"
+[[ -e "$restore_link" ]] || exit 0
+
+restore_file=$(readlink -f "$restore_link" 2>/dev/null || printf '%s\n' "$restore_link")
+[[ -f "$restore_file" ]] || exit 0
+
+tmp=$(mktemp)
+awk -F '\t' '
+  FNR == NR {
+    if (NF == 8 && $5 != "") quarantined[$5] = 1
+    next
+  }
+  $1 == "pane" && ($2 in quarantined) { next }
+  $1 == "window" && ($2 in quarantined) { next }
+  $1 == "grouped_session" && (($2 in quarantined) || ($3 in quarantined)) { next }
+  $1 == "state" && (($2 in quarantined) || ($3 in quarantined)) { next }
+  { print }
+' "$quarantine_file" "$restore_file" > "$tmp"
+mv "$tmp" "$restore_file"

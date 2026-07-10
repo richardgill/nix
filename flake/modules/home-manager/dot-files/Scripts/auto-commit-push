@@ -1,7 +1,29 @@
 #!/usr/bin/env bash
 
 # Exit on any error
-set -e
+set -euo pipefail
 
-~/Scripts/auto-commit "$@"
-git push
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+log() {
+  printf '[%s] auto-commit-push: %s\n' "$(date '+%H:%M:%S')" "$*" >&2
+}
+
+elapsed() {
+  local start="$1"
+  local end
+  end=$(date +%s)
+  printf '%ss' "$((end - start))"
+}
+
+"$SCRIPT_DIR/auto-commit" "$@"
+
+PUSH_START=$(date +%s)
+log "Running git push"
+if git push; then
+  log "git push done in $(elapsed "$PUSH_START")"
+else
+  status=$?
+  log "git push failed after $(elapsed "$PUSH_START") (exit $status)"
+  exit "$status"
+fi

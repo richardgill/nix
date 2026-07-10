@@ -24,7 +24,7 @@ vim.opt.number = true
 vim.opt.showmode = false
 
 vim.opt.clipboard = 'unnamedplus'
-require('config.clipboard').setup({ force_plus = false })
+require('config.clipboard').setup { force_plus = false }
 
 -- Enable break indent
 vim.opt.breakindent = true
@@ -66,6 +66,10 @@ vim.opt.updatetime = 250
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
 vim.opt.timeoutlen = 300
+-- Give terminal keycodes a longer timeout.
+-- This was causing issues with snacks.picker and get references.
+-- If this happens again: lengthen to 500 or 1000 only when snacks picker is open
+vim.opt.ttimeoutlen = 50
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true

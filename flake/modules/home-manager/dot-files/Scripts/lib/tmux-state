@@ -1,0 +1,11 @@
+tmux_state_dir() {
+  echo "${XDG_STATE_HOME:-$HOME/.local/state}/tmux"
+}
+
+tmux_quarantine_file() {
+  echo "$(tmux_state_dir)/worktree-pr-quarantine.tsv"
+}
+
+tmux_recency_file() {
+  echo "$(tmux_state_dir)/session-recency.tsv"
+}

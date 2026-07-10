@@ -13,6 +13,7 @@
 
     ../../../../modules/system/mac/default.nix
     ../../../../modules/system/mac/optional/bambu-studio.nix
+    ../../../../modules/system/shared/headless/optional/vpn.nix
   ];
   # needed with nix determinate package
   nix.enable = false;

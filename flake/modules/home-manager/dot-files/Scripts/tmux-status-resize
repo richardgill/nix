@@ -21,7 +21,7 @@ fi
 target_layout=$([[ "$width" -lt "$threshold" ]] && echo narrow || echo wide)
 current_layout=$(tmux show-option -gqv @status-layout)
 
-# Avoid repainting the whole client on every focus/resize event, which is noisy over Mosh.
+# Avoid repainting the whole client on every focus/resize event.
 if [[ "$current_layout" == "$target_layout" ]]; then
   exit 0
 fi

@@ -2,10 +2,14 @@
 
 type="$1"
 target="$2"
+path="${3:-}"
 
 preview_tmux_session() {
   local session="$1"
-  tmux capture-pane -ep -t "$session:" -S -${FZF_PREVIEW_LINES:-200} 2>/dev/null || echo "No tmux session: $session"
+  local capture
+  capture=$(tmux capture-pane -ep -t "$session:" -S -${FZF_PREVIEW_LINES:-200} 2>/dev/null) || return 0
+  # fzf follow scrolls to the bottom, so trim blank pane rows that hide short sessions.
+  printf '%s\n' "$capture" | awk '{ lines[NR]=$0 } NF { last=NR } END { for (i=1; i<=last; i++) print lines[i] }'
 }
 
 preview_dir() {
@@ -24,6 +28,8 @@ case "$type" in
     ;;
   dir)
     preview_dir "$target"
+    ;;
+  recent)
     ;;
   *)
     echo "No preview"

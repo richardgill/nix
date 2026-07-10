@@ -4,6 +4,20 @@ set -euo pipefail
 
 trap 'echo "Error on line $LINENO" >&2; exit 1' ERR
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMIT_MESSAGE_MODEL="gpt-5.3-codex-spark"
+
+log() {
+  printf '[%s] auto-commit: %s\n' "$(date '+%H:%M:%S')" "$*" >&2
+}
+
+elapsed() {
+  local start="$1"
+  local end
+  end=$(date +%s)
+  printf '%ss' "$((end - start))"
+}
+
 ADD_ALL=false
 for arg in "$@"; do
   if [ "$arg" = "--add-all" ]; then
@@ -11,12 +25,16 @@ for arg in "$@"; do
   fi
 done
 
-if [ "$ADD_ALL" = true ]; then
+if [ "$ADD_ALL" = true ] || [ -z "$(git diff --cached --name-only)" ]; then
+    ADD_START=$(date +%s)
     echo "$ git add ."
-    git add .
-elif [ -z "$(git diff --cached --name-only)" ]; then
-    echo "$ git add ."
-    git add .
+    if git add .; then
+        log "git add . done in $(elapsed "$ADD_START")"
+    else
+        status=$?
+        log "git add . failed after $(elapsed "$ADD_START") (exit $status)"
+        exit "$status"
+    fi
 else
     echo "Using existing staged changes"
 fi
@@ -26,9 +44,9 @@ if [ -z "$(git status --porcelain)" ]; then
     exit 0
 fi
 
-echo -e "\nGenerating commit message with AI..."
-
-DIFF_LINES=$(git diff --cached | wc -l)
+printf '\n' >&2
+DIFF_LINES=$(git diff --cached | wc -l | tr -d ' ')
+log "Generating commit message with $COMMIT_MESSAGE_MODEL (diff: $DIFF_LINES lines)"
 
 PROMPT_BASE=$(cat <<EOF
 Generate a succinct commit message for these changes. Output ONLY the commit message, no explanation. Do not use prefixes like [chore], [billing], etc. Keep it simple and brief for PR review.
@@ -59,20 +77,28 @@ else
 $(git diff --cached)"
 fi
 
-if ! COMMIT_MSG_OUTPUT=$(AI_PROMPT_MODEL=gpt-5.3-codex-spark ~/Scripts/ai-prompt "$PROMPT" 2>&1); then
-  printf '%s\n' "$COMMIT_MSG_OUTPUT" >&2
-  echo "Error generating commit message" >&2
+COMMIT_MSG_START=$(date +%s)
+COMMIT_MSG=$(AI_PROMPT_MODEL="$COMMIT_MESSAGE_MODEL" "$SCRIPT_DIR/ai-prompt" "$PROMPT") || {
+  status=$?
+  log "Commit message generation failed after $(elapsed "$COMMIT_MSG_START") (exit $status)"
+  exit "$status"
+}
+
+if [ -z "$COMMIT_MSG" ]; then
+  log "Commit message generation failed: empty response"
   exit 1
 fi
 
-COMMIT_MSG="$COMMIT_MSG_OUTPUT"
-echo -e "\nCommit message generated: $COMMIT_MSG"
+printf '\n' >&2
+log "Commit message generated in $(elapsed "$COMMIT_MSG_START"): $COMMIT_MSG"
 
-if ! COMMIT_OUTPUT=$(git commit -m "$COMMIT_MSG" 2>&1); then
-  printf '%s\n' "$COMMIT_OUTPUT" >&2
-  echo "Error: git commit failed" >&2
-  exit 1
+COMMIT_START=$(date +%s)
+log "Running git commit"
+if git commit -m "$COMMIT_MSG"; then
+  log "git commit done in $(elapsed "$COMMIT_START")"
+else
+  status=$?
+  log "git commit failed after $(elapsed "$COMMIT_START") (exit $status)"
+  exit "$status"
 fi
-
-printf '%s\n' "$COMMIT_OUTPUT"
 

@@ -503,11 +503,11 @@
     "homebrew-cask": {
       "flake": false,
       "locked": {
-        "lastModified": 1778305419,
-        "narHash": "sha256-rLhdCs7o3hwqA0r4whIS5YExGDH9lY4jezzu0c5Rt3M=",
+        "lastModified": 1782051566,
+        "narHash": "sha256-hui8205BHjchT9WlHiQUrzKMxA65sNycp/rXiz4IHQU=",
         "owner": "homebrew",
         "repo": "homebrew-cask",
-        "rev": "12e219da1b1aa1bffee0ae5b6bf8cc905db7885c",
+        "rev": "bb1c46eb40027b34384494da2faf819feef74fa9",
         "type": "github"
       },
       "original": {
@@ -690,19 +690,19 @@
         "type": "github"
       }
     },
-    "nixpkgs-firefox-wayland-context-menu-fix": {
+    "nixpkgs-firefox-151-stable": {
       "locked": {
-        "lastModified": 1774244481,
-        "narHash": "sha256-4XfMXU0DjN83o6HWZoKG9PegCvKvIhNUnRUI19vzTcQ=",
+        "lastModified": 1780952837,
+        "narHash": "sha256-Fwd1+spDtQ0hDyBwme6ufG3n4mY0UrjjFdYHv+G/Hds=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4590696c8693fea477850fe379a01544293ca4e2",
+        "rev": "e820eb4a444b46a19b2e03e8dfd2359439ff30fe",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "4590696c8693fea477850fe379a01544293ca4e2",
+        "rev": "e820eb4a444b46a19b2e03e8dfd2359439ff30fe",
         "type": "github"
       }
     },
@@ -739,11 +739,11 @@
     },
     "nixpkgs-unstable": {
       "locked": {
-        "lastModified": 1777954456,
-        "narHash": "sha256-hGdgeU2Nk87RAuZyYjyDjFL6LK7dAZN5RE9+hrDTkDU=",
+        "lastModified": 1782723713,
+        "narHash": "sha256-oPXCU/SSUokcGaJREHibG1CBX3+s/W7orDWQOZDsEeQ=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "549bd84d6279f9852cae6225e372cc67fb91a4c1",
+        "rev": "b5aa0fbd538984f6e3d201be0005b4463d8b09f8",
         "type": "github"
       },
       "original": {
@@ -888,7 +888,7 @@
         "nix-homebrew": "nix-homebrew",
         "nixarr": "nixarr",
         "nixpkgs": "nixpkgs_3",
-        "nixpkgs-firefox-wayland-context-menu-fix": "nixpkgs-firefox-wayland-context-menu-fix",
+        "nixpkgs-firefox-151-stable": "nixpkgs-firefox-151-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "playwright": "playwright",
         "sops-nix": "sops-nix",

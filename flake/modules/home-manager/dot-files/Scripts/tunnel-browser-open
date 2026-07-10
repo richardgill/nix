@@ -18,7 +18,9 @@ source ~/Scripts/lib/ssh
 remote_hostname=${REMOTE_HOSTNAME-`hostname`}
 
 if ! is_ssh_session; then
-  "$HOME/Scripts/nixos/launch-in-app-scope" --delay 0.5 firefox --new-tab "$1"
+  # xdg-open may stay attached to Firefox, but opening a URL should not block the shell.
+  setsid --fork xdg-open "$1" >/dev/null 2>&1
+  exit 0
 else
   if [[ "$1" =~ ^https?:// ]]; then
     url="$1"

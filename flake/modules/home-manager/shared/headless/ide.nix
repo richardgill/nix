@@ -34,6 +34,7 @@ in
 
     # Formatters
     gofumpt
+    ktfmt
     nodePackages.prettier
     prettierd
     stylua

@@ -1,10 +1,10 @@
-{ pkgs, vars, ... }:
+{ pkgs, ... }:
 {
+  imports = [
+    ../headless/android.nix
+  ];
+
   environment.systemPackages = with pkgs; [
     android-studio
   ];
-
-  programs.adb.enable = true;
-
-  users.users.${vars.userName}.extraGroups = [ "adbusers" "kvm" ];
 }

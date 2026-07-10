@@ -13,7 +13,7 @@ delayedAppVisibility.register("slack", {
 
 -- Requires Hammerspoon to have Privacy -> Screen Recording permissions
 hs.hotkey.bind({ "cmd", "shift" }, "4", function()
-	hs.task.new("/Applications/flameshot.app/Contents/MacOS/flameshot", function() end, { "gui" }):start()
+	hs.task.new("/Applications/ksnip.app/Contents/MacOS/ksnip", function() end, { "--rectarea" }):start()
 end)
 
 -- Application bindings

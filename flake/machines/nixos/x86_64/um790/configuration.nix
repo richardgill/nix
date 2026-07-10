@@ -15,10 +15,10 @@
     })
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/android.nix
     ../../../../modules/system/nixos/graphical/optional/bambu-studio.nix
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
     ../../../../modules/system/nixos/graphical/optional/dolphin-emu.nix
-    ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../../../modules/system/nixos/graphical/optional/steam.nix
     ../../../../modules/system/nixos/graphical/optional/virt-manager.nix
     ../../../../modules/system/nixos/graphical/optional/wifi.nix
@@ -33,6 +33,7 @@
   home-manager.users.${vars.userName} = {
     imports = [
       ../../../../modules/home-manager/nixos/graphical
+      ../../../../modules/home-manager/nixos/graphical/optional/react-native-debugger.nix
       ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
     ];
   };
@@ -49,6 +50,11 @@
   boot.kernelParams = [
     "processor.max_cstate=1"
     "idle=nowait"
+
+    # UM790/Linux NVMe dropouts: disable NVMe APST to avoid storage link wake failures.
+    # This it to mitigate weird crashes where the machine was no longer working
+    # BTRFS error (device dm-0 state EA): bdev /dev/mapper/cryptroot errs: wr 831, rd 412xxx, flush 1, corrupt 0, gen 0
+    "nvme_core.default_ps_max_latency_us=0"
   ];
 
   # WiFi/Bluetooth firmware support for UM790

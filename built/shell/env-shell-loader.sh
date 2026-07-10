@@ -1,4 +1,4 @@
-# Dynamically loads .env.shell files by traversing up parent directories
+# Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
 # Pattern inspired by https://gist.github.com/krzyzanowskim/07450322713433af08798a6ab0c0ce8f
 __env_shell_state_file="${XDG_RUNTIME_DIR:-/tmp}/env-shell-loader.$$"
 __env_shell_last_pwd=""
@@ -11,7 +11,7 @@ __env_shell_trim() {
 }
 
 __env_shell_restore_previous() {
-  [ -f "$__env_shell_state_file" ] || return
+  [ -f "$__env_shell_state_file" ] || return 0
   source "$__env_shell_state_file"
   : > "$__env_shell_state_file"
 }
@@ -90,7 +90,7 @@ __env_shell_load_file() {
   local had_allexport=""
   local load_status
 
-  [ -r "$file" ] || return
+  [ -r "$file" ] || return 0
   # Source the file instead of parsing lines so multiline shell-quoted env vars work.
   __env_shell_record_file_names "$file"
 
@@ -113,7 +113,7 @@ __env_shell_reload() {
   __env_shell_restore_previous
   __env_shell_loaded_names=$'\n'
 
-  [ "$dir" = "$HOME" ] || [ "${dir#"$HOME/"}" != "$dir" ] || return
+  [ "$dir" = "$HOME" ] || [ "${dir#"$HOME/"}" != "$dir" ] || return 0
 
   while true; do
     dirs=("$dir" "${dirs[@]}")
@@ -123,6 +123,9 @@ __env_shell_reload() {
 
   for env_dir in "${dirs[@]}"; do
     __env_shell_load_file "$env_dir/.env.shell"
+    while IFS= read -r env_file; do
+      __env_shell_load_file "$env_file"
+    done < <(find "$env_dir" -maxdepth 1 -name '.env.*.shell' -print | sort)
   done
 }
 

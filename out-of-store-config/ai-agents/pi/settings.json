@@ -1,13 +1,11 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.5",
+  "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
   "enabledModels": [
     "openai-codex/gpt-5.3-codex-spark",
-    "github-copilot/claude-opus-4.6",
-    "github-copilot/claude-sonnet-4.5",
-    "openai-codex/gpt-5.5"
+    "openai-codex/gpt-5.6-sol"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
@@ -33,7 +31,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.79.1",
+  "lastChangelogVersion": "0.80.6",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -45,7 +43,7 @@
     "~/code/pi-extensions/main/extensions/tmux-bash",
     "~/code/pi-extensions/main/extensions/parrot",
     "~/code/pi-extensions/main/extensions/pi-up-history",
-    "npm:@calesennett/pi-codex-fast",
+    "git:github.com/richardgill/pi-codex-fast@93d47d2984401c46b2761de22b4800a1abe426cd",
     "npm:pi-codex-status",
     "npm:@ironin/pi-cascading-skills"
   ],
@@ -53,3 +51,4 @@
     "enabled": true
   }
 }
+

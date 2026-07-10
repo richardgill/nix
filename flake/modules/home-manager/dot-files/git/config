@@ -10,6 +10,7 @@
 	colorMoved = default
 [push]
 	default = current
+	autoSetupRemote = true
 [filter "lfs"]
 	smudge = git-lfs smudge -- %f
 	process = git-lfs filter-process
@@ -27,9 +28,20 @@
 [column]
 	ui = auto
 [maintenance]
+[fetch]
+	# Remove local remote-tracking branches when they are deleted upstream
+	prune = true
+[pull]
+	ff = true
 [merge]
 	ff = true
-	conflictstyle = diff3
+	# Use Git's generated merge commit message without opening the editor
+	autoEdit = false
+	# Show changed-file summary after merges and non-fast-forward pulls
+	stat = true
+	conflictStyle = zdiff3
+[rerere]
+	enabled = true
 [cinnabar]
 	version-check = 1748500785
 [core]

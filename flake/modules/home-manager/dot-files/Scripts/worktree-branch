@@ -35,11 +35,17 @@ if is_ai_agent && [[ -z "$argc_no_switch" ]]; then
 fi
 
 if [[ -n "$argc_prompt_file" ]]; then
-  argc_cmd="$argc_binary \"\$(cat '$(realpath "$argc_prompt_file")')\""
+  if [[ ! -f "$argc_prompt_file" ]]; then
+    echo "Error: --prompt-file does not exist or is not a file: $argc_prompt_file" >&2
+    exit 1
+  fi
+
+  prompt_file_path=$(realpath "$argc_prompt_file")
+  argc_cmd="$argc_binary \"@$prompt_file_path\""
 elif [[ -n "$argc_prompt" ]]; then
   PROMPT_FILE=$(mktemp /tmp/worktree-prompt-XXXXXX)
   printf '%s' "$argc_prompt" > "$PROMPT_FILE"
-  argc_cmd="$argc_binary \"\$(cat '$PROMPT_FILE')\""
+  argc_cmd="$argc_binary \"@$PROMPT_FILE\""
 fi
 
 source "$(dirname "$0")/tmux-setup-windows"

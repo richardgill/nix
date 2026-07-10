@@ -15,6 +15,7 @@ require('conform').setup {
   formatters_by_ft = {
     lua = { 'stylua' },
     go = { lsp_format = 'prefer' },
+    kotlin = { 'ktfmt' },
     typescript = { 'biome', 'prettierd' },
     typescriptreact = { 'biome', 'prettierd' },
     javascriptreact = { 'biome', 'prettierd' },

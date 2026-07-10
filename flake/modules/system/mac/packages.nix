@@ -56,7 +56,7 @@ in
       "docker-desktop"
       "figma"
       "firefox"
-      "flameshot"
+      "ksnip"
       "ghostty"
       "google-chrome"
       "hammerspoon"

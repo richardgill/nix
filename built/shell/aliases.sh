@@ -68,7 +68,6 @@ alias cato="/nix/store/hqkszxk2c0cxvd04xa4gsaqs182dw8l2-coreutils-9.8/bin/cat"
 alias as="open -a \"Android Studio\""
 alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
 alias ett="et-with-tunnel"
-alias mt="mosh-with-tunnel"
 
 alias sound="wiremix"
 alias bluetooth="blueberry"

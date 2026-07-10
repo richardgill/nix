@@ -19,7 +19,6 @@
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix
-    ../../../../modules/system/nixos/graphical/optional/fingerprint.nix
     ../../../../modules/system/nixos/graphical/optional/wifi.nix
     ../../../../modules/system/nixos/headless/optional/btrbk.nix
   ];

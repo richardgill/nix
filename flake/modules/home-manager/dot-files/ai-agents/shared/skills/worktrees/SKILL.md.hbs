@@ -12,6 +12,10 @@ description: |
 
 Create a git worktree in a new tmux session with an AI agent running a specific prompt.
 
+## Base branch
+
+By default everything should have a base branch of `main` unless you're explicitly told otherwise.
+
 ## Choosing the prompt file
 
 Pick the best option based on what's available:
@@ -19,6 +23,8 @@ Pick the best option based on what's available:
 A) **Issue or markdown file** — if the work references an issue, plan, design doc, or spec, use `--prompt-file` with that path
 B) **Text prompt** — write the prompt text to a timestamped file in `/tmp` and pass that path via `--prompt-file`
 C) **No prompt** — if you want to continue working in your current session you can omit `--prompt-file` and continue modifying the created worktree in the current session
+
+Prefer B) by default.
 
 ## Command
 

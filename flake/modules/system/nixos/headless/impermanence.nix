@@ -78,11 +78,9 @@
           "Downloads"
           "Backups"
           "Screenshots"
-          "Android/Sdk"
           (lib.removePrefix "/home/${vars.userName}/" config.customDirs.music)
           "go"
           ".alchemy"
-          ".android"
           ".aws"
           ".cargo"
           ".claude/file-history"
@@ -100,7 +98,6 @@
           ".config/chromium-zoom"
           ".config/google-chrome"
           ".config/google-chrome-remote-debug"
-          ".config/.android"
           ".config/cmus"
           ".config/dconf" # GNOME application settings database
           ".config/gtk-3.0"
@@ -124,7 +121,6 @@
           ".config/sops"
           ".config/secrets"
           ".config/op"
-          ".java"
           ".gmcli"
           ".gccli"
           ".zoom"
@@ -168,6 +164,7 @@
           ".claude/history.jsonl"
           ".codex/auth.json"
           ".codex/history.jsonl"
+          ".expo/state.json"
           ".pi/agent/auth.json"
         ];
       };

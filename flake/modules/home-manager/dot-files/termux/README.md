@@ -1,6 +1,6 @@
 # Termux Setup
 
-Connecting to NixOS from Android Termux app via Mosh or Eternal Terminal.
+Connecting to NixOS from Android Termux app via Eternal Terminal.
 
 Install Termux from f-droid, not play store.
 
@@ -34,12 +34,11 @@ ssh-copy-id rich@hostname
 ## Connect
 
 ```bash
-mosh rich@hostname /home/rich/Scripts/tmux-start
 et rich@hostname
 ```
 
 ## Files
 
-- `install.sh` — installs Mosh, ET, fonts, and termux config
+- `install.sh` — installs ET, fonts, and termux config
 - `termux.properties` — extra keys optimized for tmux
 - `colors.properties` — Tokyo Night color scheme

@@ -10,7 +10,6 @@
     ./eternal-terminal-server.nix
     ./crash-capture.nix
     ./impermanence.nix
-    ./mosh.nix
     ./networking.nix
     ./oom-protection.nix
     ./packages.nix

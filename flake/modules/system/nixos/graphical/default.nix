@@ -3,7 +3,6 @@
   imports = [
     ../headless
     ./1password.nix
-    ./android.nix
     ./devices.nix
     ./firefox.nix
     ./fonts.nix

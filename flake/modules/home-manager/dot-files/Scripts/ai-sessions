@@ -116,6 +116,42 @@ ai_sessions_refresh_list() {
   fi
 }
 
+ai_sessions_listen_socket() {
+  local dir="${XDG_RUNTIME_DIR:-/tmp}/ai-sessions"
+  mkdir -p "$dir"
+  mktemp -u "$dir/fzf.XXXXXXXXXX.sock"
+}
+
+ai_sessions_shell_quote() {
+  printf '%q' "$1"
+}
+
+ai_sessions_command() {
+  local command="$1"
+  local agent="$2"
+  local script_path
+  script_path=$(realpath "$0")
+
+  local result
+  result="$(ai_sessions_shell_quote "$script_path") $command"
+  [[ -n "$agent" ]] && result="$result --agent=$(ai_sessions_shell_quote "$agent")"
+  echo "$result"
+}
+
+ai_sessions_watch_cache() {
+  local agent="$1" socket="$2" interval="$3"
+  [[ -n "$socket" ]] || return 1
+
+  local cached_command
+  cached_command=$(ai_sessions_command cached "$agent")
+
+  while true; do
+    ai_sessions_refresh_cache "$agent" >/dev/null 2>&1
+    curl -fsS --unix-socket "$socket" http://localhost -d "reload($cached_command)" >/dev/null || return
+    sleep "$interval"
+  done
+}
+
 ai_sessions_debug_lines() {
   local list_json="$1"
   echo "$list_json" | jq -r '
@@ -242,10 +278,12 @@ ai_sessions_new() {
 ai_sessions_fork() {
   local agent
   agent=$(ai_sessions_effective_agent "$1")
+  local target="$2"
+  local session_id="$3"
 
   case "$agent" in
-    claude) claude_sessions_fork "$2" ;;
-    pi) pi_sessions_fork "$2" ;;
+    claude) claude_sessions_fork "$target" ;;
+    pi) pi_sessions_fork "${session_id:-$target}" ;;
     *) return 1 ;;
   esac
 }
@@ -294,9 +332,11 @@ ai_sessions_run() {
   local agent_arg
   agent_arg=$(ai_sessions_agent_arg "$agent")
   local list_command="$script_path list$agent_arg"
-  local cached_command="$script_path cached$agent_arg"
-  local refresh_command="$script_path refresh$agent_arg"
-  local background_refresh_command="while true; do $refresh_command >/dev/null 2>&1; curl -fsS \"localhost:\$FZF_PORT\" -d \"reload($cached_command)\" >/dev/null || exit; sleep \"$refresh_interval\"; done &"
+  local listen_socket
+  listen_socket=$(ai_sessions_listen_socket)
+  local watch_command
+  watch_command=$(ai_sessions_command watch "$agent")
+  watch_command="$watch_command --socket=$(ai_sessions_shell_quote "$listen_socket") --interval=$(ai_sessions_shell_quote "$refresh_interval") &"
 
   local list
   list=$(ai_sessions_cached_list "$agent")
@@ -314,14 +354,14 @@ ai_sessions_run() {
     --no-separator \
     --pointer='' \
     --no-input \
-    --listen \
+    --listen="$listen_socket" \
     --with-nth=5.. \
     --header "c=clear  ^q=quit  n=new  f=fork  i=ignore" \
     --bind 'tab:down,btab:up' \
     --bind 'focus:refresh-preview' \
     --bind 'load:refresh-preview' \
     --bind "ctrl-r:reload:$list_command" \
-    --bind "f:execute($script_path fork --agent={4} {3})+abort" \
+    --bind "f:execute($script_path fork --agent={4} {2} {3})+abort" \
     --bind "n:execute($script_path new$agent_arg)" \
     --bind "i:execute-silent($script_path ignore --agent={4} {3})+reload:$list_command" \
     --bind "c:execute($script_path clear --agent={4} {2})+reload:$list_command" \
@@ -334,12 +374,14 @@ ai_sessions_run() {
     --bind 'm:abort+execute-silent(tmux select-window -t :6)' \
     --bind 'alt-shift-left:abort' \
     --bind 'alt-shift-right:abort' \
-    --bind "start:first+unbind(a,r,s,t,g,m)+execute-silent($background_refresh_command)" \
+    --bind "start:first+unbind(a,r,s,t,g,m)+execute-silent($watch_command)" \
     --bind 'f12:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --bind '§:transform:[[ "$FZF_PROMPT" == "§ "* ]] && echo "change-prompt(⚡  )+unbind(a,r,s,t,g,m)" || echo "change-prompt(§ )+rebind(a,r,s,t,g,m)"' \
     --preview-window "$preview_window" \
     --layout=reverse \
     --preview 'target={2}; [[ -n "$target" ]] && tmux capture-pane -ep -t "$target" -S -${FZF_PREVIEW_LINES:-200}')
+
+  rm -f "$listen_socket"
 
   if [[ -n "$selected" ]]; then
     local target
@@ -350,6 +392,8 @@ ai_sessions_run() {
 
 action="run"
 agent=""
+interval="${REFRESH_INTERVAL:-4}"
+socket=""
 declare -a positionals=()
 
 while (( $# > 0 )); do
@@ -361,7 +405,21 @@ while (( $# > 0 )); do
       shift
       agent=$(ai_sessions_normalize_agent "${1:-}") || { echo "invalid agent: ${1:-}" >&2; exit 1; }
       ;;
-    run|cached|list|refresh|debug|new|fork|ignore|clear|send)
+    --interval=*)
+      interval="${1#*=}"
+      ;;
+    --interval)
+      shift
+      interval="${1:-}"
+      ;;
+    --socket=*)
+      socket="${1#*=}"
+      ;;
+    --socket)
+      shift
+      socket="${1:-}"
+      ;;
+    run|cached|list|refresh|watch|debug|new|fork|ignore|clear|send)
       action="$1"
       ;;
     *)
@@ -381,6 +439,9 @@ case "$action" in
   refresh)
     ai_sessions_refresh_cache "$agent"
     ;;
+  watch)
+    ai_sessions_watch_cache "$agent" "$socket" "$interval"
+    ;;
   debug)
     ai_sessions_debug_lines "$(ai_sessions_list_json "$agent")"
     ;;
@@ -388,7 +449,7 @@ case "$action" in
     ai_sessions_new "$agent"
     ;;
   fork)
-    ai_sessions_fork "$agent" "${positionals[0]:-}"
+    ai_sessions_fork "$agent" "${positionals[0]:-}" "${positionals[1]:-}"
     ;;
   ignore)
     ai_sessions_ignore "$agent" "${positionals[0]:-}"

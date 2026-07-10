@@ -63,12 +63,4 @@ _:
     '';
   };
 
-  home.activation.copyFlameshotConfig = {
-    after = [ "writeBoundary" ];
-    before = [ ];
-    data = ''
-      mkdir -p "$HOME/.config/flameshot"
-      cp -f "${./dot-files}/.config/flameshot/flameshot.ini" "$HOME/.config/flameshot/flameshot.ini"
-    '';
-  };
 }

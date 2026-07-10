@@ -90,9 +90,11 @@ if [ -n "$TMUX" ]; then
   bindkey  "^[[3~"  delete-char
 
   # Keep environment variables in sync when switching between local/SSH tmux sessions
-  # Runs every new command in the terminal
+  # Existing shell processes cannot be updated by tmux, so each prompt pulls from tmux's session env.
+  # https://raimue.blog/2013/01/30/tmux-update-environment/
+  # https://me.micahrl.com/blog/ssh-tmux-agent/
   precmd_update_tmux_env() {
-    eval $(tmux show-environment -s 2>/dev/null)
+    eval "$(tmux show-environment -s 2>/dev/null)"
   }
   precmd_functions+=(precmd_update_tmux_env)
 fi
@@ -195,7 +197,7 @@ if backlog version >/dev/null 2>&1; then
   fpath=("$HOME/.zsh/completions" $fpath)
 fi
 
-# Dynamically loads .env.shell files by traversing up parent directories
+# Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
 if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
   source "$HOME/.config/shell/env-shell-loader.sh"
 fi

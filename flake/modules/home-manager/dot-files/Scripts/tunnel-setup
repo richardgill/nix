@@ -10,7 +10,7 @@ TUNNEL_PORT="${4:-1999}"
 # reverse tunnel, so `localhost:PORT` in a local browser hits the remote's
 # dev server. Set FORWARD_PORTS="" to disable. Failures are non-fatal, so
 # ports already bound locally just get skipped.
-FORWARD_PORTS="${FORWARD_PORTS-3000 3001 3002 3003 4000 4001 4002 4003 4004 4005 4006 4321 5173 5174 8000 8080 8787 8888}"
+FORWARD_PORTS="${FORWARD_PORTS-3000 3001 3002 3003 4000 4001 4002 4003 4004 4005 4006 4100 4101 4102 4103 4104 4200 4201 4202 4203 4204 4300 4301 4302 4303 4304 4400 4401 4402 4403 4404 4321 5173 5174 8000 8080 8787 8888}"
 LOOPBACK_FORWARD_PORTS="${LOOPBACK_FORWARD_PORTS-3118}"
 
 if [ -z "$REMOTE_HOST" ]; then
@@ -29,6 +29,8 @@ if [ -z "$REMOTE_HOST" ]; then
   echo "Environment:"
   echo "  FORWARD_PORTS    Space-separated dev ports to forward (default: 3000"
   echo "                   3001 3002 3003 4000 4001 4002 4003 4004 4005 4006"
+  echo "                   4100 4101 4102 4103 4104 4200 4201 4202 4203 4204"
+  echo "                   4300 4301 4302 4303 4304 4400 4401 4402 4403 4404"
   echo "                   4321 5173 5174 8000 8080 8787 8888). Set to empty string"
   echo "                   to disable forward tunnels."
   echo "  LOOPBACK_FORWARD_PORTS"
