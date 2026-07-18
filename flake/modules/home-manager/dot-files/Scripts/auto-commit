@@ -5,7 +5,6 @@ set -euo pipefail
 trap 'echo "Error on line $LINENO" >&2; exit 1' ERR
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-COMMIT_MESSAGE_MODEL="gpt-5.3-codex-spark"
 
 log() {
   printf '[%s] auto-commit: %s\n' "$(date '+%H:%M:%S')" "$*" >&2
@@ -46,7 +45,7 @@ fi
 
 printf '\n' >&2
 DIFF_LINES=$(git diff --cached | wc -l | tr -d ' ')
-log "Generating commit message with $COMMIT_MESSAGE_MODEL (diff: $DIFF_LINES lines)"
+log "Generating commit message (diff: $DIFF_LINES lines)"
 
 PROMPT_BASE=$(cat <<EOF
 Generate a succinct commit message for these changes. Output ONLY the commit message, no explanation. Do not use prefixes like [chore], [billing], etc. Keep it simple and brief for PR review.
@@ -78,7 +77,7 @@ $(git diff --cached)"
 fi
 
 COMMIT_MSG_START=$(date +%s)
-COMMIT_MSG=$(AI_PROMPT_MODEL="$COMMIT_MESSAGE_MODEL" "$SCRIPT_DIR/ai-prompt" "$PROMPT") || {
+COMMIT_MSG=$("$SCRIPT_DIR/ai-prompt" "$PROMPT") || {
   status=$?
   log "Commit message generation failed after $(elapsed "$COMMIT_MSG_START") (exit $status)"
   exit "$status"

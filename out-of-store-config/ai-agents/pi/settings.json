@@ -31,7 +31,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.80.6",
+  "lastChangelogVersion": "0.80.10",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -43,7 +43,7 @@
     "~/code/pi-extensions/main/extensions/tmux-bash",
     "~/code/pi-extensions/main/extensions/parrot",
     "~/code/pi-extensions/main/extensions/pi-up-history",
-    "git:github.com/richardgill/pi-codex-fast@93d47d2984401c46b2761de22b4800a1abe426cd",
+    "npm:@calesennett/pi-codex-fast",
     "npm:pi-codex-status",
     "npm:@ironin/pi-cascading-skills"
   ],
@@ -51,4 +51,3 @@
     "enabled": true
   }
 }
-

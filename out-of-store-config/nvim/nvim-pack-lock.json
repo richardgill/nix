@@ -4,6 +4,10 @@
       "rev": "e30b7f2008e52442154b66f7c519bfd2f1e32acb",
       "src": "https://github.com/numToStr/Comment.nvim"
     },
+    "async.nvim": {
+      "rev": "46adf61a022d5c923f981d527443f406e7d0f63e",
+      "src": "https://github.com/lewis6991/async.nvim"
+    },
     "blink.cmp": {
       "rev": "78336bc89ee5365633bcf754d93df01678b5c08f",
       "src": "https://github.com/saghen/blink.cmp",
@@ -106,6 +110,11 @@
       "rev": "f422cb5c6855f150e2ddcfaf44e7157b98b34f6a",
       "src": "https://github.com/MeanderingProgrammer/render-markdown.nvim"
     },
+    "screenkey.nvim": {
+      "rev": "16390931d847b1d5d77098daccac4e55654ac9e2",
+      "src": "https://github.com/NStefan002/screenkey.nvim",
+      "version": "'v2.4.2'"
+    },
     "snacks.nvim": {
       "rev": "882c996cf28183f4d63640de0b4c02ec886d01f2",
       "src": "https://github.com/folke/snacks.nvim"
@@ -122,6 +131,14 @@
     "undotree": {
       "rev": "6fa6b57cda8459e1e4b2ca34df702f55242f4e4d",
       "src": "https://github.com/mbbill/undotree"
+    },
+    "vclib.nvim": {
+      "rev": "24c36d22ddd28c8d001d85e1fb69fcd2e38a8858",
+      "src": "https://github.com/algmyr/vclib.nvim"
+    },
+    "vcsigns.nvim": {
+      "rev": "40fb52b35d5402740b83642ac53dcc3e29552ac2",
+      "src": "https://github.com/algmyr/vcsigns.nvim"
     },
     "vim-sleuth": {
       "rev": "be69bff86754b1aa5adcbb527d7fcd1635a84080",

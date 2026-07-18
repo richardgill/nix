@@ -7,7 +7,9 @@ set -euo pipefail
 
 TIMEOUT_SECS="${AI_PROMPT_TIMEOUT:-30}"
 MAX_RETRIES="${AI_PROMPT_RETRIES:-3}"
-MODEL="${AI_PROMPT_MODEL:-gpt-5.1-codex-mini}"
+MODEL="${AI_PROMPT_MODEL:-gpt-5.6-luna}"
+REASONING_EFFORT="${AI_PROMPT_REASONING_EFFORT:-low}"
+SERVICE_TIER="${AI_PROMPT_SERVICE_TIER:-fast}"
 
 # Read prompt from argument or stdin
 if [[ $# -gt 0 && "$1" != "-" ]]; then
@@ -36,9 +38,9 @@ run_prompt() {
   stderr_file=$(mktemp)
   start=$(date +%s)
 
-  log "attempt $attempt/$MAX_RETRIES started (model: $MODEL, timeout: ${TIMEOUT_SECS}s)"
+  log "attempt $attempt/$MAX_RETRIES started (model: $MODEL, effort: $REASONING_EFFORT, service tier: $SERVICE_TIER, timeout: ${TIMEOUT_SECS}s)"
 
-  if timeout "$TIMEOUT_SECS" codex exec -m "$MODEL" "$PROMPT" >"$stdout_file" 2>"$stderr_file"; then
+  if timeout "$TIMEOUT_SECS" codex exec -m "$MODEL" -c model_reasoning_effort="$REASONING_EFFORT" -c service_tier="$SERVICE_TIER" "$PROMPT" >"$stdout_file" 2>"$stderr_file"; then
     exit_code=0
   else
     exit_code=$?

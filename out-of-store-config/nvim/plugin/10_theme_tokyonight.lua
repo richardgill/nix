@@ -5,7 +5,7 @@ require('tokyonight').setup {
   -- `:InspectTree` or `:Inspect` with your cursor over an element
   on_colors = function(colors)
     local util = require 'tokyonight.util'
-    colors.comment = util.lighten(colors.comment, 0.7)
+    colors.comment = util.lighten(colors.comment, 0.6)
     colors.bg_visual = util.lighten(colors.bg_visual, 0.8)
     colors.fg_gutter = util.lighten(colors.fg_gutter, 0.7)
     colors.git.add = '#9ece6a'
@@ -22,21 +22,30 @@ require('tokyonight').setup {
     -- GitHub-style diff colors (carefully matched to GitHub's diff UI)
     local gh_green = '#3fb950'
     local gh_red = '#f85149'
-    local gh_blue = '#58a6ff'
+    local diff_fg = util.blend('#ffffff', 0.35, colors.fg)
+    hl['RemoteGitSignAdd'] = { fg = util.blend(hl['GitSignsAdd'].fg, 0.55, colors.bg) }
+    hl['RemoteGitSignChange'] = { fg = util.blend(hl['GitSignsChange'].fg, 0.55, colors.bg) }
+    hl['RemoteGitSignDelete'] = { fg = util.blend(hl['GitSignsDelete'].fg, 0.55, colors.bg) }
     -- Line backgrounds
-    hl['DiffAdd'] = { bg = util.blend(gh_green, 0.20, colors.bg) }
+    hl['DiffAdd'] = { bg = util.blend(gh_green, 0.13, colors.bg) }
     hl['DiffDelete'] = { bg = util.blend(colors.fg_gutter, 0.08, colors.bg) }
-    hl['DiffChange'] = { bg = util.blend(gh_blue, 0.12, colors.bg) }
+    hl['DiffChange'] = { bg = util.blend(gh_green, 0.13, colors.bg) }
     -- Word-level changes (fg + nocombine disables syntax highlighting)
-    hl['DiffText'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
+    hl['DiffText'] = { bg = util.blend(gh_green, 0.32, colors.bg), fg = diff_fg, nocombine = true }
+    hl['LeftPaneAdd'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
+    hl['LeftPaneText'] = { bg = util.blend(gh_red, 0.31, colors.bg), fg = diff_fg, nocombine = true }
     -- vscode-diff.nvim highlight groups (left pane = deletions/red, right pane = insertions/green)
-    local codediff_filler_bg = util.blend(colors.fg_gutter, 0.08, colors.bg)
-    hl['CodeDiffLineInsert'] = { bg = util.blend(gh_green, 0.20, colors.bg) }
-    hl['CodeDiffLineChange'] = { bg = util.blend(gh_blue, 0.12, colors.bg) }
+    local codediff_filler_bg = util.blend(colors.fg_gutter, 0.11, colors.bg)
+    hl['CodeDiffLineInsert'] = { bg = util.blend(gh_green, 0.13, colors.bg) }
+    hl['CodeDiffLineChange'] = { bg = util.blend(gh_green, 0.13, colors.bg) }
     hl['CodeDiffLineDelete'] = { bg = util.blend(gh_red, 0.12, colors.bg) }
-    hl['CodeDiffCharInsert'] = { bg = util.blend(gh_green, 0.50, colors.bg), fg = colors.fg, nocombine = true }
-    hl['CodeDiffCharDelete'] = { bg = util.blend(gh_red, 0.42, colors.bg), fg = colors.fg, nocombine = true }
-    hl['CodeDiffFiller'] = { fg = codediff_filler_bg, bg = codediff_filler_bg }
+    hl['CodeDiffGutterInsert'] = { bg = util.blend(gh_green, 0.13, colors.bg), fg = diff_fg }
+    hl['CodeDiffGutterDelete'] = { bg = util.blend(gh_red, 0.12, colors.bg), fg = diff_fg }
+    hl['CodeDiffGutterInsertNumber'] = { bg = util.blend(gh_green, 0.32, colors.bg), fg = diff_fg }
+    hl['CodeDiffGutterDeleteNumber'] = { bg = util.blend(gh_red, 0.31, colors.bg), fg = diff_fg }
+    hl['CodeDiffCharInsert'] = { bg = util.blend(gh_green, 0.32, colors.bg), fg = diff_fg, nocombine = true }
+    hl['CodeDiffCharDelete'] = { bg = util.blend(gh_red, 0.31, colors.bg), fg = diff_fg, nocombine = true }
+    hl['CodeDiffFiller'] = { bg = codediff_filler_bg }
 
     -- highlighting for multi cursor plugin
     hl['MultiCursor'] = hl['IncSearch']

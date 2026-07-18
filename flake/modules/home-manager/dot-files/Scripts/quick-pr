@@ -3,21 +3,26 @@
 # Exit on any error
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
 # Check for existing PR
 echo "Checking for existing pull request..."
 CURRENT_BRANCH=$(git branch --show-current)
-PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --json number --jq length)
+BASE_REMOTE=$(get_default_remote main)
+BASE_REPOSITORY=$(git remote get-url "$BASE_REMOTE")
+PR_URL=$(gh pr list --repo "$BASE_REPOSITORY" --head "$CURRENT_BRANCH" --json url --jq '.[0].url // empty')
 
-if [ "$PR_EXISTS" -eq 0 ]; then
+if [ -z "$PR_URL" ]; then
     echo "No existing PR found. Creating draft pull request..."
+    git push --set-upstream origin "$CURRENT_BRANCH"
 
     # Create draft PR with auto-filled title and empty body
-    PR_URL=$(gh pr create --draft --fill-first --body "")
+    PR_URL=$(gh pr create --repo "$BASE_REPOSITORY" --draft --fill-first --body "")
     echo "Draft pull request created: $PR_URL"
-
-    # Open in browser
-    gh pr view --web
 else
     echo "Pull request already exists for branch '$CURRENT_BRANCH'"
-    gh pr view --web
 fi
+
+# Open in browser
+gh pr view "$PR_URL" --web

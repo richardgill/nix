@@ -1,11 +1,26 @@
 local M = {}
 
+local get_codediff_path = function()
+  local buffer_path = vim.api.nvim_buf_get_name(0)
+  if not vim.startswith(buffer_path, 'codediff://') then
+    return nil
+  end
+
+  local git_root, _, relative_path = require('codediff.core.virtual_file').parse_url(buffer_path)
+  return git_root and vim.fs.joinpath(git_root, relative_path) or nil
+end
+
 M.get_buffer_absolute = function()
-  return vim.fn.expand '%:p'
+  return get_codediff_path() or vim.fn.expand '%:p'
 end
 
 M.get_buffer_cwd_relative = function()
-  return vim.fn.expand '%:.'
+  local path = get_codediff_path()
+  local relative_path = path and vim.fn.fnamemodify(path, ':.') or vim.fn.expand '%:.'
+  if relative_path == '' or relative_path == '..' or vim.startswith(relative_path, '../') or vim.startswith(relative_path, './') then
+    return relative_path
+  end
+  return './' .. relative_path
 end
 
 M.get_visual_bounds = function()

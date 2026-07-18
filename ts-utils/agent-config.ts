@@ -39,9 +39,10 @@ export type AgentConfig = {
   presets?: AgentPresets;
 };
 
-const isCodexPro = false;
-const mediumModel = isCodexPro ? "gpt-5.3-codex-spark" : "gpt-5.5";
+const mediumModel = "gpt-5.6-sol";
 const mediumProvider = `openai-codex/${mediumModel}`;
+const highModel = "gpt-5.6-sol";
+const highProvider = `openai-codex/${highModel}`;
 const webSearchSkill = "web-search";
 const webSearchProviders = {
   exa: {
@@ -147,14 +148,14 @@ export const agents = {
       },
       high: {
         provider: "openai-codex",
-        model: "gpt-5.5",
-        providerModel: "openai-codex/gpt-5.5",
+        model: highModel,
+        providerModel: highProvider,
         thinkingLevel: "high",
       },
       xhigh: {
         provider: "openai-codex",
-        model: "gpt-5.5",
-        providerModel: "openai-codex/gpt-5.5",
+        model: highModel,
+        providerModel: highProvider,
         thinkingLevel: "xhigh",
       },
     },

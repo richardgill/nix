@@ -1,7 +1,17 @@
 -- Adds git related signs to the gutter, as well as utilities for managing changes
-vim.pack.add({ 'https://github.com/lewis6991/gitsigns.nvim' })
+vim.pack.add { 'https://github.com/lewis6991/gitsigns.nvim' }
+
+local git_sign_symbols = require 'config.git-sign-symbols'
 
 require('gitsigns').setup {
+  signs = {
+    add = { text = git_sign_symbols.add },
+    change = { text = git_sign_symbols.change },
+    delete = { text = git_sign_symbols.delete },
+    topdelete = { text = git_sign_symbols.topdelete },
+    changedelete = { text = git_sign_symbols.changedelete },
+    untracked = { text = git_sign_symbols.untracked },
+  },
   on_attach = function(bufnr)
     local gitsigns = require 'gitsigns'
 

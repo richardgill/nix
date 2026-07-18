@@ -59,6 +59,7 @@ vim.opt.smartcase = true
 
 -- Keep signcolumn on by default
 vim.opt.signcolumn = 'yes'
+vim.opt.statuscolumn = '%C%=%l %s'
 
 -- Reduce updatetime to 250ms for responsive LSP hover, git gutter, and file change detection
 vim.opt.updatetime = 250

@@ -1,15 +1,17 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 
+const thinkingLevels = ["high", "xhigh", "max"] as const;
+
 const toggleThinkingLevel = (pi: ExtensionAPI) => {
-	const current = pi.getThinkingLevel();
-	const next = current === "xhigh" ? "high" : "xhigh";
+	const currentIndex = thinkingLevels.findIndex((level) => level === pi.getThinkingLevel());
+	const next = thinkingLevels[(currentIndex + 1) % thinkingLevels.length];
 	pi.setThinkingLevel(next);
 	return next;
 };
 
 export default function (pi: ExtensionAPI) {
 	pi.registerShortcut("shift+tab", {
-		description: "Toggle thinking high/xhigh",
+		description: "Cycle thinking high/xhigh/max",
 		handler: (ctx) => {
 			const level = toggleThinkingLevel(pi);
 			ctx.ui.notify(`Thinking level: ${level}`, "info");
@@ -17,7 +19,7 @@ export default function (pi: ExtensionAPI) {
 	});
 
 	pi.registerCommand("toggle-thinking", {
-		description: "Toggle thinking between high and xhigh",
+		description: "Cycle thinking between high, xhigh, and max",
 		handler: (_args, ctx) => {
 			const level = toggleThinkingLevel(pi);
 			ctx.ui.notify(`Thinking level: ${level}`, "info");

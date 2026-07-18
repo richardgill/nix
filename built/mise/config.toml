@@ -8,12 +8,11 @@ pkl = "0.28.2"
 python = "3.13.4"
 uv = "latest"
 rust = "latest"
-"npm:@openai/codex" = "latest"
+"npm:@openai/codex" = { version = "latest", minimum_release_age = "0s" }
 "npm:vercel" = "latest"
 "npm:opencode-ai" = "1.0.191"
 "npm:@anthropic-ai/claude-code" = "2.1.133"
 "npm:@sourcegraph/amp" = "0.0.1768035453-g894cb5"
-"npm:backlog.md" = "1.40.0"
 "npm:agent-browser" = "latest"
 "npm:kagi-cli" = "0.3.3"
 "npm:@earendil-works/pi-coding-agent" = { version = "latest", minimum_release_age = "0s" }
