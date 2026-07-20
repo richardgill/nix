@@ -1,9 +1,10 @@
 local use_official = vim.env.CODEDIFF_OFFICIAL == '1'
+local line_matcher_strategy = vim.env.CODEDIFF_LINE_MATCHER or 'similarity'
 
 if use_official then
   vim.pack.add { 'https://github.com/esmuellert/codediff.nvim' }
 else
-  local codediff_path = vim.fn.expand '~/code/codediff/runtime'
+  local codediff_path = vim.env.CODEDIFF_PATH or vim.fn.expand '~/code/codediff/runtime'
   vim.opt.runtimepath:prepend(codediff_path)
   vim.cmd.runtime 'plugin/codediff.lua'
   vim.cmd.runtime 'plugin/vscode-diff.lua'
@@ -57,6 +58,9 @@ local fork_config = {
     cycle_hunks_across_files = true,
     filler_text = ' ',
     wrap = true,
+    line_matcher = {
+      strategy = line_matcher_strategy,
+    },
     gutter_signs = {
       insert_text = ' ',
       delete_text = ' ',
