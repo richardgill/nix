@@ -192,16 +192,12 @@ list_claude_sessions() {
     pane_tty["$target"]="$tty"
   done < <(tmux list-panes -a -F '#{session_name}:#{window_index}'$'\t''#{pane_tty}' 2>/dev/null)
 
-  # Build tmux target -> last_selected map (falls back to window_activity)
+  # Build tmux target -> last_selected map
   declare -A last_selected
-  while IFS=$'\t' read -r target selected activity; do
-    # Use @last_selected if it's a valid number, otherwise fall back to window_activity
-    if [[ "$selected" =~ ^[0-9]+$ ]]; then
-      last_selected["$target"]="$selected"
-    else
-      last_selected["$target"]="${activity:-0}"
-    fi
-  done < <(tmux list-windows -a -F '#{session_name}:#{window_index}'$'\t''#{@last_selected}'$'\t''#{window_activity}' 2>/dev/null)
+  while IFS=$'\t' read -r target selected; do
+    [[ "$selected" =~ ^[0-9]+$ ]] || selected=0
+    last_selected["$target"]="$selected"
+  done < <(tmux list-windows -a -F '#{session_name}:#{window_index}'$'\t''#{@last_selected}' 2>/dev/null)
 
   # Process each window
   local first=true

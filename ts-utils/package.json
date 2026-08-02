@@ -2,7 +2,7 @@
   "name": "nix-private-templates",
   "type": "module",
   "scripts": {
-    "build": "bun run templates/build.ts",
+    "build": "bun run prepare-template-bundle.ts --outfile ../flake/template-builder/build-templates.bundle.js",
     "typecheck": "tsc --noEmit --project tsconfig.json"
   },
   "dependencies": {

@@ -102,12 +102,10 @@ vim.opt.guicursor = {
 -- Disable netrw
 vim.g.loaded_netrwPlugin = 1
 vim.g.loaded_netrw = 1
+vim.g.loaded_nvim_dir_plugin = 1
 
 -- Highlight search results
 vim.opt.hlsearch = true
-
--- Automatically reload files when changed outside of Neovim (if buffer not modified)
-vim.opt.autoread = true
 
 -- folds are defaulted to 'indent' mode. Treesitter will take over if loaded for filetype
 vim.opt.foldmethod = 'indent'

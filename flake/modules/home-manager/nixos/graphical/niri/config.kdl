@@ -92,7 +92,6 @@ workspace "__hidden"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "waybar"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "mako"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "wl-clip-persist" "--clipboard" "both"
-spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "wl-paste" "--watch" "cliphist" "store"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "voxtype" "daemon"
 spawn-sh-at-startup "systemctl --user restart xremap"
 spawn-at-startup "/home/rich/Scripts/nixos/launch-in-app-scope" "swayidle" "-w" "timeout" "300" "/home/rich/Scripts/nixos/lock-screen" "timeout" "360" "niri msg action power-off-monitors" "before-sleep" "/home/rich/Scripts/nixos/lock-screen"
@@ -210,8 +209,8 @@ recent-windows {
 }
 
 binds {
-    Super+Space repeat=false { spawn "rofi" "-show" "drun"; }
-    Super+Alt+V repeat=false { spawn-sh "cliphist list | rofi -dmenu -display-columns 2 -sort -window-title \"\" | cliphist decode | wl-copy"; }
+    Super+Space repeat=false { spawn "walker"; }
+    Super+Alt+V repeat=false { spawn "walker" "--provider" "clipboard"; }
     // Voxtype key handling is in xremap because niri has no bindr/on-release binding.
 
     Ctrl+Super+Q repeat=false { spawn "~/Scripts/nixos/lock-screen"; }

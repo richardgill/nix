@@ -28,8 +28,11 @@ set-option -g update-environment "DISPLAY SSH_ASKPASS SSH_AUTH_SOCK SSH_AGENT_PI
 # This ensures SSH variables stay current after reconnections (used in status line)
 set-hook -g client-detached 'run-shell "{{ homeDir }}/Scripts/tmux-refresh"'
 
-# Track when each window was last selected (used by claude-sessions for sorting)
-set-hook -g pane-focus-in 'run-shell "tmux set-option -w @last_selected $(date +%s)"'
+# Track when each window was last selected for AI session sorting
+set-hook -g pane-focus-in 'run-shell "tmux set-option -w -t #{q:window_id} @last_selected $(date +%s)"'
+set-hook -g session-window-changed 'run-shell "tmux set-option -w -t #{q:window_id} @last_selected $(date +%s)"'
+set-hook -g 'client-attached[1]' 'run-shell "tmux set-option -w -t #{q:window_id} @last_selected $(date +%s)"'
+set-hook -g 'client-session-changed[1]' 'run-shell "tmux set-option -w -t #{q:window_id} @last_selected $(date +%s)"'
 
 # https://www.reddit.com/r/neovim/comments/11usepy/comment/jcpp596
 set -g default-terminal 'tmux-256color'

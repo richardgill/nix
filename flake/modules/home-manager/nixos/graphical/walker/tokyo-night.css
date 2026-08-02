@@ -1,173 +1,138 @@
-/* Tokyo Night Color Scheme */
-@define-color base #1a1b26;
-@define-color text #a9b1d6;
-@define-color border #33ccff;
-@define-color selected-text #ffffff;
-
-/* Reset all elements */
-#window,
-#box,
-#search,
-#password,
-#input,
-#prompt,
-#clear,
-#typeahead,
-#list,
-child,
-scrollbar,
-slider,
-#item,
-#text,
-#label,
-#sub,
-#activationlabel {
-  all: unset;
-}
+@define-color window_bg_color #1a1b26;
+@define-color accent_bg_color #33ccff;
+@define-color theme_fg_color #a9b1d6;
+@define-color selected_fg_color #ffffff;
+@define-color error_bg_color #f7768e;
+@define-color error_fg_color #1a1b26;
 
 * {
+  all: unset;
   font-family: "Hack Nerd Font", monospace;
   font-size: 18px;
 }
 
-/* Window */
-#window {
-  background: transparent;
-  color: @text;
-}
-
-/* Main box container */
-#box {
-  background: alpha(@base, 0.97);
-  padding: 20px;
-  border: 2px solid @border;
-  border-radius: 0px;
-}
-
-/* Search container */
-#search {
-  background: @base;
+popover {
+  background: @window_bg_color;
+  border: 2px solid @accent_bg_color;
   padding: 10px;
-  margin-bottom: 0;
 }
 
-/* Hide prompt icon */
-#prompt {
-  opacity: 0;
-  min-width: 0;
-  margin: 0;
+.normal-icons {
+  -gtk-icon-size: 16px;
 }
 
-/* Hide clear button */
-#clear {
-  opacity: 0;
-  min-width: 0;
+.large-icons {
+  -gtk-icon-size: 32px;
 }
 
-/* Input field */
-#input {
-  background: none;
-  color: @text;
-  padding: 0;
-}
-
-#input placeholder {
-  opacity: 0.5;
-  color: @text;
-}
-
-/* Hide typeahead */
-#typeahead {
-  opacity: 0;
-}
-
-/* List */
-#list {
-  background: transparent;
-}
-
-/* List items */
-child {
-  padding: 0px 12px;
-  background: transparent;
-  border-radius: 0;
-}
-
-child:selected,
-child:hover {
-  background: transparent;
-}
-
-/* Item layout */
-#item {
-  padding: 0;
-}
-
-#item.active {
-  font-style: italic;
-}
-
-/* Icon */
-#icon {
-  margin-right: 10px;
-  -gtk-icon-transform: scale(0.7);
-}
-
-/* Text */
-#text {
-  color: @text;
-  padding: 14px 0;
-}
-
-#label {
-  font-weight: normal;
-}
-
-/* Selected state */
-child:selected #text,
-child:selected #label,
-child:hover #text,
-child:hover #label {
-  color: @selected-text;
-}
-
-/* Hide sub text */
-#sub {
-  opacity: 0;
-  font-size: 0;
-  min-height: 0;
-}
-
-/* Hide activation label */
-#activationlabel {
-  opacity: 0;
-  min-width: 0;
-}
-
-/* Scrollbar styling */
 scrollbar {
   opacity: 0;
 }
 
-/* Hide spinner */
-#spinner {
-  opacity: 0;
+.box-wrapper {
+  background: alpha(@window_bg_color, 0.97);
+  border: 2px solid @accent_bg_color;
+  padding: 20px;
+  min-width: 760px;
 }
 
-/* Hide AI elements */
-#aiScroll,
-#aiList,
-.aiItem {
-  opacity: 0;
-  min-height: 0;
+.preview-box,
+.elephant-hint,
+.placeholder,
+.list {
+  color: @theme_fg_color;
 }
 
-/* Bar entry (switcher) */
-#bar {
-  opacity: 0;
-  min-height: 0;
+.search-container {
+  background: @window_bg_color;
 }
 
-.barentry {
-  opacity: 0;
+.input {
+  background: lighter(@window_bg_color);
+  caret-color: @theme_fg_color;
+  color: @theme_fg_color;
+  padding: 12px;
+}
+
+.input placeholder {
+  color: alpha(@theme_fg_color, 0.5);
+}
+
+.input selection {
+  background: alpha(@accent_bg_color, 0.35);
+}
+
+.item-box {
+  padding: 11px 12px;
+}
+
+child:selected .item-box,
+row:selected .item-box {
+  background: alpha(@accent_bg_color, 0.2);
+}
+
+child:selected .item-text,
+row:selected .item-text {
+  color: @selected_fg_color;
+}
+
+.item-text-box {
+  color: @theme_fg_color;
+}
+
+.item-subtext {
+  font-size: 12px;
+  opacity: 0.55;
+}
+
+.item-image-text {
+  font-size: 28px;
+}
+
+.item-quick-activation {
+  background: alpha(@accent_bg_color, 0.2);
+  padding: 6px;
+}
+
+.preview {
+  border: 1px solid alpha(@accent_bg_color, 0.3);
+  color: @theme_fg_color;
+}
+
+.preview .large-icons {
+  -gtk-icon-size: 64px;
+}
+
+.keybinds {
+  border-top: 1px solid alpha(@accent_bg_color, 0.25);
+  color: @theme_fg_color;
+  font-size: 12px;
+  padding-top: 10px;
+}
+
+.keybind-button {
+  opacity: 0.6;
+}
+
+.keybind-label {
+  border: 1px solid @theme_fg_color;
+  padding: 2px 4px;
+}
+
+.keybind-bind {
+  opacity: 0.4;
+}
+
+.error {
+  background: @error_bg_color;
+  color: @error_fg_color;
+  padding: 10px;
+}
+
+:not(.calc).current {
+  font-style: italic;
+}
+
+.calc .item-text {
+  font-size: 24px;
 }

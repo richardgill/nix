@@ -33,7 +33,6 @@ in
           "--disable-features=WaylandWpColorManagerV1"
         ];
       })
-      cliphist
       evince
       file-roller
       glib
@@ -52,7 +51,6 @@ in
       swayosd
       brightnessctl
       vscode
-      walker
       wayland
       wf-recorder
       wl-clip-persist

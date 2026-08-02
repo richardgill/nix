@@ -6,6 +6,25 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-firefox-151-stable.url = "github:nixos/nixpkgs/e820eb4a444b46a19b2e03e8dfd2359439ff30fe";
 
+    # Pin until the clipboard clear deadlock fix is merged and released.
+    # https://github.com/abenz1267/elephant/issues/282
+    # https://github.com/abenz1267/elephant/commit/c9cc79b0b149f7f3045d6d2e27db00c52077a631
+    elephant = {
+      url = "github:abenz1267/elephant/c9cc79b0b149f7f3045d6d2e27db00c52077a631";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    walker = {
+      url = "github:abenz1267/walker";
+      inputs.elephant.follows = "elephant";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Use a commit SHA from https://github.com/nix-community/neovim-nightly-overlay/commits/master;
+    # each commit pins a matching Neovim nightly source and build dependencies.
+    neovim-nightly-overlay.url =
+      "github:nix-community/neovim-nightly-overlay/4795f73d45458c015d1997ece7867d9341f0f6cd";
+
     impermanence.url = "github:nix-community/impermanence";
 
     disko = {
@@ -164,7 +183,14 @@
             inherit (inputs) nixpkgs-unstable;
             inherit hostName;
           };
-          modules = [ path ];
+          modules = [
+            path
+            {
+              nixpkgs.overlays = [
+                (import ./overlays/pins.nix { inherit inputs; })
+              ];
+            }
+          ];
         };
 
     in

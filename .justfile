@@ -21,6 +21,7 @@ _rebuild action machine='' extra_flags='':
     fi
 
 build machine='':
+    @just template-bundle
     @just _rebuild build "{{ machine }}"
 
 switch machine='':
@@ -74,6 +75,8 @@ _update-inner:
 check all="false":
     #!/usr/bin/env bash
     set -euo pipefail
+
+    just template-bundle
 
     if [ "{{ all }}" = "true" ]; then
       systems="x86_64-linux aarch64-linux"
@@ -178,4 +181,4 @@ template-bundle:
     fi
 
     mkdir -p ../flake/template-builder
-    "${bun_cmd[@]}" build build-templates.ts --target bun --outfile ../flake/template-builder/build-templates.bundle.js
+    "${bun_cmd[@]}" run prepare-template-bundle.ts --outfile ../flake/template-builder/build-templates.bundle.js

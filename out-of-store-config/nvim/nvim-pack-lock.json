@@ -14,7 +14,7 @@
       "version": "'1.*'"
     },
     "codediff.nvim": {
-      "rev": "7608f3b436ce1f84a4888f75e53079caa981a2e9",
+      "rev": "2253030fc17c8356a2ff1026f25cb9b570bdd91f",
       "src": "https://github.com/esmuellert/codediff.nvim"
     },
     "conform.nvim": {
@@ -93,10 +93,6 @@
     "nvim-ts-context-commentstring": {
       "rev": "6141a40173c6efa98242dc951ed4b6f892c97027",
       "src": "https://github.com/JoosepAlviste/nvim-ts-context-commentstring"
-    },
-    "nvim-vtsls": {
-      "rev": "0b5f73c9e50ce95842ea07bb3f05c7d66d87d14a",
-      "src": "https://github.com/yioneko/nvim-vtsls"
     },
     "nvim-web-devicons": {
       "rev": "dfbfaa967a6f7ec50789bead7ef87e336c1fa63c",

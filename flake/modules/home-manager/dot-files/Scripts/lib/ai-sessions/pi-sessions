@@ -266,14 +266,11 @@ pi_sessions_list_json() {
   done < <(tmux list-panes -a -F '#{pane_id}'$'\t''#{session_name}:#{window_index}'$'\t''#{pane_tty}' 2>/dev/null)
 
   declare -A last_selected
-  while IFS=$'\t' read -r target selected activity; do
+  while IFS=$'\t' read -r target selected; do
     [[ -z "$target" ]] && continue
-    if [[ "$selected" =~ ^[0-9]+$ ]]; then
-      last_selected["$target"]="$selected"
-    else
-      last_selected["$target"]="${activity:-0}"
-    fi
-  done < <(tmux list-windows -a -F '#{session_name}:#{window_index}'$'\t''#{@last_selected}'$'\t''#{window_activity}' 2>/dev/null)
+    [[ "$selected" =~ ^[0-9]+$ ]] || selected=0
+    last_selected["$target"]="$selected"
+  done < <(tmux list-windows -a -F '#{session_name}:#{window_index}'$'\t''#{@last_selected}' 2>/dev/null)
 
   local -a rg_args
   rg_args=(-l -F --glob '*.jsonl')

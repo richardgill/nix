@@ -63,6 +63,8 @@ type RenderContext = TemplateData & {
   webSearchProvider?: WebSearchProvider;
 };
 
+export type RemoteSkillContents = Readonly<Record<string, string>>;
+
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
 const getAgentModelFamily = (agent: AgentName) => agents[agent].modelFamily;
 const getAgentPresets = (agent: AgentName) =>
@@ -161,6 +163,7 @@ const processSharedContent = (
   rootDir: string,
   outDir: string,
   data: TemplateData,
+  remoteSkills: RemoteSkillContents,
 ) => {
   const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
 
@@ -185,8 +188,8 @@ const processSharedContent = (
     // Process shared/skills/
     if (config.sharedSkills && existsSync(sharedPath)) {
       const sharedSkillsPath = join(sharedPath, "skills");
+      const targetSkillsPath = join(outDir, "ai-agents", agent, "skills");
       if (existsSync(sharedSkillsPath)) {
-        const targetSkillsPath = join(outDir, "ai-agents", agent, "skills");
         console.log(`\nProcessing shared/skills/ for ${agent}`);
 
         const entries = readdirSync(sharedSkillsPath, { withFileTypes: true });
@@ -205,6 +208,22 @@ const processSharedContent = (
             processFileOrDir(sourcePath, destPath, agentData);
           }
         }
+      }
+
+      for (const [skillName, content] of Object.entries(remoteSkills)) {
+        if (excludeSkills.includes(skillName)) {
+          console.log(`  Skipping excluded remote skill: ${skillName}`);
+          continue;
+        }
+
+        const outputPath = join(targetSkillsPath, skillName, "SKILL.md");
+        if (existsSync(outputPath)) {
+          throw new Error(`Remote skill conflicts with local skill: ${skillName}`);
+        }
+
+        ensureDir(outputPath);
+        writeFileSync(outputPath, content);
+        console.log(`Downloaded skill: ${skillName} for ${agent}`);
       }
     }
   }
@@ -283,7 +302,7 @@ const processDirectory = (
   processRecursively(sourceDir, outputDir, { ...data, binary: "" });
 };
 
-const build = () => {
+export const buildTemplates = (remoteSkills: RemoteSkillContents = {}) => {
   const { dataFile, outDir } = parseCliArgs();
 
   const repoRoot = dirname(import.meta.dir);
@@ -315,7 +334,7 @@ const build = () => {
   }
 
   // Process shared content (skills, agents) for each target agent
-  processSharedContent(rootDir, outDir, data);
+  processSharedContent(rootDir, outDir, data, remoteSkills);
 
   // Process root-level templates
   console.log("\nProcessing root templates");
@@ -329,5 +348,3 @@ const build = () => {
 
   console.log("\nBuild complete!");
 };
-
-build();

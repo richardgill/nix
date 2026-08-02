@@ -7,7 +7,6 @@ local max_items = 200
 local file_state = { cache = nil, loading = false, waiters = {} }
 local skill_state = { cache = nil, loading = false, waiters = {} }
 local trigger_generation = 0
-local package_scopes = { '@earendil-works', '@mariozechner' }
 
 local feed = function(keys)
   local termcodes = vim.api.nvim_replace_termcodes(keys, true, false, true)
@@ -47,29 +46,17 @@ local add_path = function(paths, path)
   paths[#paths + 1] = path
 end
 
-local resolve_pi_paths = function()
-  local paths = {}
-  if vim.fn.executable('mise') == 1 then
-    add_path(paths, vim.fn.systemlist({ 'mise', 'which', 'pi' })[1])
-  end
-  add_path(paths, vim.fn.systemlist({ 'which', 'pi' })[1])
-  return paths
-end
-
-local resolve_skills_module = function()
-  for _, pi_path in ipairs(resolve_pi_paths()) do
-    local base_dir = vim.fn.fnamemodify(pi_path, ':h:h')
-    for _, scope in ipairs(package_scopes) do
-      local skills_module = base_dir .. '/lib/node_modules/' .. scope .. '/pi-coding-agent/dist/core/skills.js'
-      if vim.fn.filereadable(skills_module) == 1 then
-        return skills_module
-      end
+local resolve_pi_path = function()
+  if vim.fn.executable 'mise' == 1 then
+    local mise_path = vim.fn.systemlist({ 'mise', 'which', 'pi' })[1]
+    if mise_path and mise_path ~= '' then
+      return mise_path
     end
   end
-  return nil
+  return vim.fn.systemlist({ 'which', 'pi' })[1]
 end
 
-local skills_module = resolve_skills_module()
+local pi_path = resolve_pi_path()
 
 local parse_token = function()
   local cursor = vim.api.nvim_win_get_cursor(0)
@@ -137,7 +124,7 @@ local boundary_bonus = function(value, index)
     return -12
   end
   local previous = value:sub(index - 1, index - 1)
-  if previous:match('[/_%-%.]') then
+  if previous:match '[/_%-%.]' then
     return -8
   end
   return 0
@@ -166,7 +153,7 @@ local fuzzy_score = function(query, value)
 end
 
 local overlay_score_offset = function(path)
-  return path:match('^overlay/') and 7 or 0
+  return path:match '^overlay/' and 7 or 0
 end
 
 local normalized_path_parts = function(path, query)
@@ -237,25 +224,14 @@ local filter_paths = function(paths, query)
   return paths_from_matches(sort_path_matches(collect_path_matches(paths, fuzzy_candidate_score, query)))
 end
 
-local file_item_word = function(path, query)
-  if query ~= '' then
-    return '@' .. query .. ' '
-  end
-  return '@' .. path
-end
-
-local item_data = function(kind, text)
-  return vim.json.encode({ kind = kind, text = text })
-end
-
-local build_file_items = function(paths, query)
+local build_file_items = function(paths)
   local items = {}
   for _, path in ipairs(paths) do
     items[#items + 1] = {
-      word = file_item_word(path, query),
+      word = '@' .. path,
       abbr = path,
-      dup = 1,
-      user_data = item_data('file', '@' .. path),
+      equal = 1,
+      preselect = #items == 0 and 1 or nil,
     }
     if #items >= max_items then
       return items
@@ -264,14 +240,37 @@ local build_file_items = function(paths, query)
   return items
 end
 
+local parse_skill_names = function(stdout)
+  local names = {}
+  for line in (stdout or ''):gmatch '[^\n]+' do
+    local ok, message = pcall(vim.json.decode, line)
+    if ok and message.command == 'get_commands' and message.success then
+      for _, command in ipairs(message.data.commands) do
+        local name = command.source == 'skill' and command.name:match '^skill:(.+)$' or nil
+        if name then
+          names[#names + 1] = name
+        end
+      end
+    end
+  end
+  table.sort(names)
+  return names
+end
+
+local finish_loading_skills = function(names)
+  skill_state.cache = names
+  skill_state.loading = false
+  local waiters = skill_state.waiters
+  skill_state.waiters = {}
+  vim.schedule(function()
+    for _, waiter in ipairs(waiters) do
+      waiter(skill_state.cache)
+    end
+  end)
+end
+
 local load_skills = function(callback)
   if skill_state.cache then
-    callback(skill_state.cache)
-    return
-  end
-
-  if not skills_module then
-    skill_state.cache = {}
     callback(skill_state.cache)
     return
   end
@@ -282,39 +281,15 @@ local load_skills = function(callback)
   end
 
   skill_state.loading = true
-  local script = [[
-const { loadSkills } = await import(process.argv[1]);
-let result;
-try {
-  result = loadSkills({ cwd: process.cwd(), skillPaths: [], includeDefaults: true });
-} catch (_error) {
-  result = loadSkills();
-}
-console.log(JSON.stringify(result.skills.map((skill) => skill.name)));
-]]
+  if not pi_path or pi_path == '' then
+    finish_loading_skills {}
+    return
+  end
 
-  vim.system({ 'node', '--input-type=module', '-e', script, skills_module }, { text = true }, function(result)
-    local names = {}
-    if result.code == 0 and result.stdout then
-      local ok, decoded = pcall(vim.json.decode, result.stdout)
-      if ok and type(decoded) == 'table' then
-        for _, name in ipairs(decoded) do
-          if type(name) == 'string' and name ~= '' then
-            names[#names + 1] = name
-          end
-        end
-      end
-    end
-    table.sort(names)
-    skill_state.cache = names
-    skill_state.loading = false
-    local waiters = skill_state.waiters
-    skill_state.waiters = {}
-    vim.schedule(function()
-      for _, waiter in ipairs(waiters) do
-        waiter(skill_state.cache)
-      end
-    end)
+  local command = { pi_path, '--mode', 'rpc', '--no-session', '--offline' }
+  local options = { text = true, cwd = get_cwd(), stdin = '{"type":"get_commands"}\n' }
+  vim.system(command, options, function(result)
+    finish_loading_skills(result.code == 0 and parse_skill_names(result.stdout) or {})
   end)
 end
 
@@ -341,14 +316,19 @@ local build_command_items = function(skills, query)
   for _, skill in ipairs(skills) do
     local label = '/skill:' .. skill
     if fuzzy_match(query, label) then
-      items[#items + 1] = { word = label, abbr = label, user_data = item_data('command', label) }
+      items[#items + 1] = {
+        word = label,
+        abbr = label,
+        equal = 1,
+        preselect = #items == 0 and 1 or nil,
+      }
     end
   end
   return items
 end
 
 local complete = function(token, items)
-  if vim.api.nvim_get_mode().mode ~= 'i' or not token_still_current(token) then
+  if vim.api.nvim_get_mode().mode:sub(1, 1) ~= 'i' or not token_still_current(token) then
     return
   end
   if #items == 0 then
@@ -361,7 +341,7 @@ end
 local complete_files = function(token)
   list_files(get_cwd(), function(files)
     local paths = filter_paths(files, token.query)
-    complete(token, build_file_items(paths, token.query))
+    complete(token, build_file_items(paths))
   end)
 end
 
@@ -394,25 +374,6 @@ M.trigger_deferred = function()
   end, 25)
 end
 
-M.completefunc = function(findstart, base)
-  local token = parse_token()
-  if not token then
-    return findstart == 1 and -1 or {}
-  end
-  if findstart == 1 then
-    return token.start_col - 1
-  end
-  if token.kind == 'file' and file_state.cache then
-    return build_file_items(filter_paths(file_state.cache.files, base), base)
-  end
-  if token.kind == 'command' and skill_state.cache then
-    return build_command_items(skill_state.cache, base)
-  end
-  return {}
-end
-
-_G.ai_prompt_complete = M.completefunc
-
 M.select_next = function()
   if vim.fn.pumvisible() == 1 then
     return vim.api.nvim_replace_termcodes('<C-n>', true, false, true)
@@ -427,46 +388,9 @@ M.select_prev = function()
   return vim.api.nvim_replace_termcodes('<S-Tab>', true, false, true)
 end
 
-local decode_item_data = function(item)
-  if not item or not item.user_data or item.user_data == '' then
-    return nil
-  end
-  local ok, decoded = pcall(vim.json.decode, item.user_data)
-  if not ok or type(decoded) ~= 'table' or type(decoded.text) ~= 'string' then
-    return nil
-  end
-  return decoded
-end
-
-local selected_completion_item = function()
-  local info = vim.fn.complete_info({ 'items', 'selected' })
-  local index = info.selected == -1 and 1 or info.selected + 1
-  return info.items and info.items[index] or nil
-end
-
-local replace_token_with_text = function(text)
-  local token = parse_token()
-  if not token then
-    return
-  end
-  local cursor = vim.api.nvim_win_get_cursor(0)
-  local row = cursor[1] - 1
-  local start_col = token.start_col - 1
-  local end_col = cursor[2]
-  vim.api.nvim_buf_set_text(0, row, start_col, row, end_col, { text })
-  vim.api.nvim_win_set_cursor(0, { cursor[1], start_col + #text })
-end
-
 M.accept_or_newline = function()
   if vim.fn.pumvisible() == 1 then
-    local data = decode_item_data(selected_completion_item())
-    close_completion()
-    if data then
-      vim.schedule(function()
-        replace_token_with_text(data.text .. ' ')
-      end)
-    end
-    return ''
+    return vim.api.nvim_replace_termcodes('<C-y> ', true, false, true)
   end
   return vim.api.nvim_replace_termcodes('<CR>', true, false, true)
 end
@@ -474,15 +398,9 @@ end
 M.setup_buffer = function(bufnr)
   list_files(get_cwd(), function() end)
   load_skills(function() end)
-  vim.bo[bufnr].completefunc = 'v:lua.ai_prompt_complete'
-  vim.opt_local.completeopt = { 'menuone', 'noselect', 'noinsert' }
+  vim.opt_local.completeopt = { 'menuone', 'noselect', 'noinsert', 'preselect' }
   local group = vim.api.nvim_create_augroup('ai-prompt-native-completion', { clear = false })
-  vim.api.nvim_create_autocmd('InsertCharPre', {
-    group = group,
-    buffer = bufnr,
-    callback = close_completion,
-  })
-  vim.api.nvim_create_autocmd('TextChangedI', {
+  vim.api.nvim_create_autocmd({ 'TextChangedI', 'TextChangedP' }, {
     group = group,
     buffer = bufnr,
     callback = M.trigger_deferred,

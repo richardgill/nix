@@ -6,6 +6,9 @@
     "slack": {
       "url": "https://mcp.slack.com/mcp"
     },
+    "buffer": {
+      "url": "https://mcp.buffer.com/mcp"
+    },
     "discord-search": {
       "url": "https://www.answeroverflow.com/mcp"
     },

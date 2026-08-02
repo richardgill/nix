@@ -3,7 +3,7 @@ name: simplify
 description: Review implementation for simplification opportunities
 ---
 
-Run /skill:pr-diff.
+Run `~/Scripts/git-pr-diff`.
 
 Are there any ways you can simplify the implementation? I want the implementation to be as clean, readable and understandable as possible. Try to avoid:
 

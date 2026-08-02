@@ -1,0 +1,15 @@
+{
+  "commands": [
+    {
+      "name": "diff",
+      "description": "Load local changes into context",
+      "command": "~/Scripts/git-local-diff"
+    },
+    {
+      "name": "pr-diff",
+      "description": "Load PR and local changes into context",
+      "command": "~/Scripts/git-pr-diff",
+      "timeoutMs": 120000
+    }
+  ]
+}

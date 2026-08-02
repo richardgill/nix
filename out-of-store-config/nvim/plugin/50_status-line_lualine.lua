@@ -3,6 +3,8 @@ vim.pack.add({
   'https://github.com/nvim-tree/nvim-web-devicons',
 })
 
+vim.o.showtabline = 0
+
 require('lualine').setup {
   options = {
     icons_enabled = true,

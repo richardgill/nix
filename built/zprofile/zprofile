@@ -1,8 +1,3 @@
-# Fall back to xterm-256color if terminfo not found (e.g., xterm-ghostty over SSH)
-if ! infocmp "$TERM" &>/dev/null 2>&1; then
-  export TERM=xterm-256color
-fi
-
 
 # Mise shims for non-interactive shells (scripts, CI)
 # Needed to pick up correct installed versions in bash scripts

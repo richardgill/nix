@@ -2,7 +2,7 @@ local group = vim.api.nvim_create_augroup('prompt-filetype', { clear = true })
 
 vim.api.nvim_create_autocmd({ 'BufRead', 'BufNewFile' }, {
   group = group,
-  pattern = { '*.agent', '*.prompt', '/tmp/pi-editor-*.pi.md', '/tmp/pi-parrot-*.md', '/tmp/claude-tmp/claude-prompt-*.md' },
+  pattern = { '*.agent', '*.prompt', '/tmp/pi-editor-*/prompt.md', '/tmp/pi-parrot-*.md', '/tmp/claude-tmp/claude-prompt-*.md' },
   callback = function(event)
     vim.bo[event.buf].filetype = 'prompt'
     vim.opt_local.number = false

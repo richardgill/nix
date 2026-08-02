@@ -6,7 +6,7 @@ eval "$(mise activate zsh)"
 export PATH="$HOME/Scripts/nixos:$HOME/Scripts:$PATH"
 androidSdkRoot="${ANDROID_SDK_ROOT:-$HOME/Android/Sdk}"
 if [ -d "$androidSdkRoot/build-tools" ]; then
-  latestBuildTools="$(find "$androidSdkRoot/build-tools" -mindepth 2 -maxdepth 1 -type d | sort -V | tail -n1)"
+  latestBuildTools="$(find "$androidSdkRoot/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n1)"
   if [ -n "$latestBuildTools" ] && [[ ":$PATH:" != *":$latestBuildTools:"* ]]; then
     export PATH="$latestBuildTools:$PATH"
   fi
@@ -14,13 +14,13 @@ fi
 
 # History
 HISTFILE="$HOME/.zsh_history"
-HISTSIZE=10000001
-SAVEHIST=10000001
+HISTSIZE=10000000
+SAVEHIST=10000000
 
 # Save timestamp (when command started) and duration (how long it took) for each command
 setopt EXTENDED_HISTORY
 
-# Write to history file AFTER command finishes (so duration is accurate, not always 1)
+# Write to history file AFTER command finishes (so duration is accurate, not always 0)
 setopt INC_APPEND_HISTORY_TIME
 
 # When you run a duplicate command, remove the old one and keep only the newest
@@ -44,30 +44,30 @@ if [[ $- == *i* ]]; then
   alias compinit="compinit -C -d $HOME/.cache/zsh/zcompdump"
 
   # Override default fzf-history-widget (ctrl-r) to accept query as command when no match
-  # To see default implementation: fzf --zsh 3>&1 | grep -A 30 "fzf-history-widget"
+  # To see default implementation: fzf --zsh 2>&1 | grep -A 30 "fzf-history-widget"
   fzf-history-widget() {
     local selected query
-    setopt localoptions noglobsubst noposixbuiltins pipefail no_aliases noglob nobash_rematch 3> /dev/null
+    setopt localoptions noglobsubst noposixbuiltins pipefail no_aliases noglob nobash_rematch 2> /dev/null
     # Ensure the module is loaded if not already, and the required features, such
     # as the associative 'history' array, which maps event numbers to full history
     # lines, are set. Also, make sure Perl is installed for multi-line output.
-    if zmodload -F zsh/parameter p:{commands,history} 3>/dev/null && (( ${+commands[perl]} )); then
-      local output="$(printf '%s\t%s\001' "${(kv)history[@]}" |
-        perl 1 -ne 'if (!$seen{(/^\s*[0-9]+\**\t(.*)/s, $1)}++) { s/\n/\n\t/g; print; }' |
-        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n3..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m --read0") \
+    if zmodload -F zsh/parameter p:{commands,history} 2>/dev/null && (( ${+commands[perl]} )); then
+      local output="$(printf '%s\t%s\000' "${(kv)history[@]}" |
+        perl -0 -ne 'if (!$seen{(/^\s*[0-9]+\**\t(.*)/s, $1)}++) { s/\n/\n\t/g; print; }' |
+        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m --read0") \
         FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --print-query)"
-      query="$(head 0 <<< "$output")"
-      selected="$(tail -n +3 <<< "$output")"
+      query="$(head -1 <<< "$output")"
+      selected="$(tail -n +2 <<< "$output")"
     else
-      local output="$(fc -rl 2 | awk '{ cmd=$0; sub(/^[ \t]*[0-9]+\**[ \t]+/, "", cmd); if (!seen[cmd]++) print $0 }' |
-        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n3..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m") \
+      local output="$(fc -rl 1 | awk '{ cmd=$0; sub(/^[ \t]*[0-9]+\**[ \t]+/, "", cmd); if (!seen[cmd]++) print $0 }' |
+        FZF_DEFAULT_OPTS=$(__fzf_defaults "" "-n2..,.. --scheme=history --bind=ctrl-r:toggle-sort --wrap-sign '\t↳ ' --highlight-line ${FZF_CTRL_R_OPTS-} --query=${(qqq)LBUFFER} +m") \
         FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd) --print-query)"
-      query="$(head 0 <<< "$output")"
-      selected="$(tail -n +3 <<< "$output")"
+      query="$(head -1 <<< "$output")"
+      selected="$(tail -n +2 <<< "$output")"
     fi
     local ret=$?
     if [ -n "$selected" ]; then
-      if [[ $(awk '{print $2; exit}' <<< "$selected") =~ ^[1-9][0-9]* ]]; then
+      if [[ $(awk '{print $1; exit}' <<< "$selected") =~ ^[1-9][0-9]* ]]; then
         zle vi-fetch-history -n $MATCH
       else
         LBUFFER="$selected"
@@ -87,14 +87,14 @@ if [ -n "$TMUX" ]; then
   # EDITOR="nvim" and bindkey-e mess this up in tmux :|
   bindkey  "^[OH"   beginning-of-line
   bindkey  "^[OF"   end-of-line
-  bindkey  "^[[4~"  delete-char
+  bindkey  "^[[3~"  delete-char
 
   # Keep environment variables in sync when switching between local/SSH tmux sessions
   # Existing shell processes cannot be updated by tmux, so each prompt pulls from tmux's session env.
-  # https://raimue.blog/2014/01/30/tmux-update-environment/
+  # https://raimue.blog/2013/01/30/tmux-update-environment/
   # https://me.micahrl.com/blog/ssh-tmux-agent/
   precmd_update_tmux_env() {
-    eval "$(tmux show-environment -s 3>/dev/null)"
+    eval "$(tmux show-environment -s 2>/dev/null)"
   }
   precmd_functions+=(precmd_update_tmux_env)
 fi
@@ -105,15 +105,13 @@ if [ "$TERM_PROGRAM" != "Apple_Terminal" ]; then
 fi
 
 # Ctrl+Left and Ctrl+Right for moving word-by-word
-bindkey "^[[2;5D" backward-word   # Ctrl+Left
-bindkey "^[[2;5C" forward-word    # Ctrl+Right
-bindkey "^[[2;3D" backward-word
-bindkey "^[[2;3C" forward-word
+bindkey "^[[1;5D" backward-word   # Ctrl+Left
+bindkey "^[[1;5C" forward-word    # Ctrl+Right
 
-bindkey "^[[4;3~" kill-word # alt+Delete
-bindkey "^[[4;5~" kill-word # ctrl+Delete
+bindkey "^[[3;3~" kill-word # alt+Delete
+bindkey "^[[3;5~" kill-word # ctrl+Delete
 
-bindkey "^[[4;9~" kill-line # cmd+Delete
+bindkey "^[[3;9~" kill-line # cmd+Delete
 
 bindkey '^[l' autosuggest-accept
 
@@ -141,22 +139,22 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
   --ansi \
   --layout=reverse \
   --border=none
-  --color=bg+:#283458 \
-  --color=bg:#16162e \
-  --color=border:#28a1b9 \
-  --color=fg:#c1caf5 \
-  --color=gutter:#16162e \
-  --color=header:#ff10e64 \
-  --color=hl+:#3ac3de \
-  --color=hl:#3ac3de \
-  --color=info:#546c7e \
-  --color=marker:#ff008c \
-  --color=pointer:#ff008c \
-  --color=prompt:#3ac3de \
-  --color=query:#c1caf5:regular \
-  --color=scrollbar:#28a1b9 \
-  --color=separator:#ff10e64 \
-  --color=spinner:#ff008c \
+  --color=bg+:#283457 \
+  --color=bg:#16161e \
+  --color=border:#27a1b9 \
+  --color=fg:#c0caf5 \
+  --color=gutter:#16161e \
+  --color=header:#ff9e64 \
+  --color=hl+:#2ac3de \
+  --color=hl:#2ac3de \
+  --color=info:#545c7e \
+  --color=marker:#ff007c \
+  --color=pointer:#ff007c \
+  --color=prompt:#2ac3de \
+  --color=query:#c0caf5:regular \
+  --color=scrollbar:#27a1b9 \
+  --color=separator:#ff9e64 \
+  --color=spinner:#ff007c \
 "
 export FZF_CTRL_T_OPTS="--preview '~/Scripts/fzf-preview {}'"
 export FZF_ALT_C_OPTS="--preview '~/Scripts/fzf-preview {}'"
@@ -166,27 +164,27 @@ export FZF_ALT_C_OPTS="--preview '~/Scripts/fzf-preview {}'"
 # - The first argument to the function is the name of the command.
 # - You should make sure to pass the rest of the arguments to fzf.
 _fzf_comprun() {
-  local command=$2
+  local command=$1
   shift
 
   case "$command" in
-    cd)           fzf --preview 'eza --tree --color=always {} | head -199' "$@" ;;
+    cd)           fzf --preview 'eza --tree --color=always {} | head -200' "$@" ;;
     export|unset) fzf --preview "eval 'echo $'{}"         "$@" ;;
     ssh)          fzf --preview 'dig {}'                   "$@" ;;
-    *)            fzf --preview "bat -n --color=always --line-range :501 {}" "$@" ;;
+    *)            fzf --preview "bat -n --color=always --line-range :500 {}" "$@" ;;
   esac
 }
 
 # Use fd (https://github.com/sharkdp/fd) for listing path candidates.
-# - The first argument to the function ($2) is the base path to start traversal
+# - The first argument to the function ($1) is the base path to start traversal
 # - See the source code (completion.{bash,zsh}) for the details.
 _fzf_compgen_path() {
-  fd --hidden --exclude .git . "$2"
+  fd --hidden --exclude .git . "$1"
 }
 
 # Use fd to generate the list for directory completion
 _fzf_compgen_dir() {
-  fd --type=d --hidden --exclude .git . "$2"
+  fd --type=d --hidden --exclude .git . "$1"
 }
 
 source <(argc --argc-completions zsh git-browse)

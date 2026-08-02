@@ -54,6 +54,7 @@ in
       "cursor"
       "discord"
       "docker-desktop"
+      "dolphin"
       "figma"
       "firefox"
       "ksnip"

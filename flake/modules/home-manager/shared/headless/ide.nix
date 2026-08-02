@@ -1,9 +1,13 @@
 {
   pkgs,
+  nixpkgs-unstable,
   ...
 }:
 let
-  treesitter-parsers = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [
+  unstable = import nixpkgs-unstable {
+    inherit (pkgs.stdenv.hostPlatform) system;
+  };
+  treesitter = unstable.vimPlugins.nvim-treesitter.withPlugins (p: [
     p.bash
     p.diff
     p.html
@@ -15,9 +19,15 @@ let
     p.vim
     p.vimdoc
   ]);
+  treesitter-runtime = unstable.symlinkJoin {
+    name = "nvim-treesitter-runtime";
+    paths = treesitter.dependencies;
+  };
 in
 {
   home.packages = with pkgs; [
+    neovim
+
     # LSP servers
     astro-language-server
     biome
@@ -27,10 +37,9 @@ in
     nixd
     nodePackages.vscode-langservers-extracted
     nodePackages."@tailwindcss/language-server"
-    nodePackages.typescript-language-server
     pyright
     ruff
-    vtsls
+    unstable.typescript-go
 
     # Formatters
     gofumpt
@@ -40,5 +49,9 @@ in
     stylua
   ];
 
-  home.file.".local/share/nvim/nix-treesitter/parser".source = "${treesitter-parsers}/parser";
+  home.file = {
+    ".local/share/nvim/nix-treesitter/parser".source = "${treesitter-runtime}/parser";
+    ".local/share/nvim/nix-treesitter/queries".source =
+      "${unstable.vimPlugins.nvim-treesitter}/runtime/queries";
+  };
 }

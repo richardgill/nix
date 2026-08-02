@@ -82,6 +82,11 @@ in
 {
   firefox = firefox151Pkgs.firefox;
 
+  # Neovim is pinned to a 0.13 nightly commit for OS watcher-driven 'autoread'.
+  # Remove the pin when Neovim 0.13 is stable and available in Nixpkgs.
+  # Upstream: https://github.com/neovim/neovim/pull/37971
+  neovim = inputs.neovim-nightly-overlay.packages.${prev.stdenv.hostPlatform.system}.default;
+
   # kotlin-language-server 1.3.13 bundles Kotlin compiler 2.1.0, which reports false
   # INCOMPATIBLE_CLASS diagnostics for Android projects using Kotlin 2.3 metadata.
   # Revisit when fwcd/kotlin-language-server releases a compiler bump or JetBrains

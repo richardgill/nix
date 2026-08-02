@@ -9,6 +9,7 @@
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
 - New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
 - Prefer less indirection unless it helps DRY or readability
+- Follow existing code patterns when deciding whether and how to add tests; otherwise, test useful behavior and prioritize readability over test volume.
 - Prefer table-driven tests when covering multiple similar cases.
 
 - Unless explicitly asked, prefer clean breaks over backwards compatibility; if unsure, ask instead of hedging with legacy paths, shims, or fallback layers.
@@ -48,6 +49,7 @@
 - PR's should be created in draft status unless I explicitly ask.
 - PR descriptions should be empty by default, unless asked otherwise.
 - Always read PR desc first before editing it so you can amend.
+- Keep each review-comment fix in its own commit when practical, then reply warmly with a short acknowledgement and the commit SHA, for example: `Good catch! Fixed in <sha> 👍`
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.
 - Watch gh checks by running `gh pr checks --watch --fail-fast || gh run view --log-failed | tail -n 200` in background
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
@@ -63,6 +65,7 @@ Avoid putting large, generated, vendored, or external trees in overlay/. Use `~/
 
 ## Response conventions
 
+- Use `-` instead of an em dash; never use em dashes.
 - When referencing files, use repo-relative paths: `./folder/file.txt`, `./folder/file.txt:5`, or `./folder/file.txt:4-7`.
 - Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "interfaces" / code seams before implementation details.
 

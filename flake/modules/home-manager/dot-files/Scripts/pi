@@ -7,5 +7,5 @@ fi
 
 export PI_EXTENSION_CONFIG_DIR="${PI_EXTENSION_CONFIG_DIR:-$HOME/.pi/agent/extension-config}"
 
-pi_bin=$(mise which pi)
-"$pi_bin" "$@"
+pi_bin="$(mise which pi)"
+exec "$pi_bin" "$@"
