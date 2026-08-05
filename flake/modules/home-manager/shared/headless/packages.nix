@@ -1,6 +1,7 @@
 # Shared packages for macOS and NixOS
 # Platform-specific packages: modules/home-manager/nixos/ and modules/home-manager/mac/
 {
+  config,
   lib,
   pkgs,
   nixpkgs-unstable,
@@ -13,12 +14,17 @@ let
   };
 in
 {
-  home.activation.installGhStack = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    extension_dir="$HOME/.local/share/gh/extensions/gh-stack"
-    if ! ${pkgs.gnugrep}/bin/grep -qx 'tag: v0.1.0' "$extension_dir/manifest.yml" 2>/dev/null || ! ${pkgs.gnugrep}/bin/grep -qx 'ispinned: true' "$extension_dir/manifest.yml" 2>/dev/null; then
-      ${unstable.gh}/bin/gh extension install github/gh-stack --force --pin v0.1.0
+  home.activation.removeMutableGhStack = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
+    stack_dir="${config.xdg.dataHome}/gh/extensions/gh-stack"
+    if [[ -e "$stack_dir" && ! -L "$stack_dir" ]]; then
+      run rm -rf "$stack_dir"
+    fi
+    if [[ -e "$stack_dir.backup" ]]; then
+      run rm -rf "$stack_dir.backup"
     fi
   '';
+
+  xdg.dataFile."gh/extensions/gh-stack".source = "${pkgs.gh-stack}/bin";
 
   home.packages = with pkgs; [
     argc
@@ -31,6 +37,7 @@ in
     file # yazi uses this for mime type detection (previews)
     fzf
     unstable.gh
+    gh-stack
     lefthook
     nixfmt-rfc-style
     ncdu

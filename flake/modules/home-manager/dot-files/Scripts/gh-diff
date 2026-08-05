@@ -1,13 +1,20 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
 current_branch=$(git symbolic-ref --short HEAD)
+position=$(gh_stack_branch_position "$current_branch") || exit 1
+base_branch=$(get_pr_base_branch "$current_branch") || exit 1
 remote=$(git remote | grep -q upstream && echo "upstream" || echo "origin")
 username=$(grep "user:" ~/.config/gh/hosts.yml | head -1 | awk '{print $2}')
 
-if [ "$remote" = "upstream" ]; then
+if [[ "$position" != "none" ]]; then
+    branch_ref="$current_branch"
+elif [ "$remote" = "upstream" ]; then
     branch_ref="$username:$current_branch"
 else
     branch_ref="$current_branch"
 fi
 
-${BROWSER:-open} "$(gh browse --no-browser)/compare/main...$branch_ref?expand=1"
+${BROWSER:-open} "$(gh browse --no-browser)/compare/$base_branch...$branch_ref?expand=1"

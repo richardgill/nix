@@ -4,11 +4,21 @@
   config,
   osConfig,
   vars,
+  inputs,
   ...
 }:
 let
   # Import shared templates
-  templates = import ./templates.nix { inherit lib pkgs config osConfig vars; };
+  templates = import ./templates.nix {
+    inherit
+      lib
+      pkgs
+      config
+      osConfig
+      vars
+      inputs
+      ;
+  };
   inherit (templates) builtTemplates;
 in
 {

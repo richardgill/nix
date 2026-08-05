@@ -11,6 +11,23 @@ let
     config.allowUnfree = true;
   };
 
+  ghStackVersion = "0.1.0";
+  ghStackRelease = {
+    aarch64-darwin = {
+      asset = "darwin-arm64";
+      hash = "sha256-XKmCQaJl1t4BgJXNrl88QNpcp4JFDuwOqRqo4+sYMQM=";
+    };
+    aarch64-linux = {
+      asset = "linux-arm64";
+      hash = "sha256-p5ZJ4SGEW3QEEJ3iHWVgHAnIxtAh2Tc4o0KNI5hqiEE=";
+    };
+    x86_64-linux = {
+      asset = "linux-amd64";
+      hash = "sha256-NYVS3X3OCkbOFT/hlicM7EgrhPCAlHiQqtQGGo1EvAs=";
+    };
+  };
+  ghStackAsset = ghStackRelease.${prev.stdenv.hostPlatform.system};
+
   kotlinVersion = "2.2.21";
   kotlinJar =
     artifactId: hash:
@@ -81,6 +98,28 @@ let
 in
 {
   firefox = firefox151Pkgs.firefox;
+
+  # gh-stack 0.1.0 requires Go 1.26, which is not yet available in this Nixpkgs revision.
+  # Remove this release-binary pin when Nixpkgs packages version 0.1.0 or newer.
+  # Upstream: https://github.com/github/gh-stack, https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/gh/gh-stack/package.nix
+  gh-stack = prev.stdenvNoCC.mkDerivation {
+    pname = "gh-stack";
+    version = ghStackVersion;
+    src = prev.fetchurl {
+      url = "https://github.com/github/gh-stack/releases/download/v${ghStackVersion}/${ghStackAsset.asset}";
+      inherit (ghStackAsset) hash;
+    };
+    dontUnpack = true;
+    installPhase = ''
+      install -Dm755 $src $out/bin/gh-stack
+    '';
+    meta = {
+      description = "GitHub CLI extension to use stacked PRs";
+      homepage = "https://github.github.com/gh-stack/";
+      license = prev.lib.licenses.mit;
+      mainProgram = "gh-stack";
+    };
+  };
 
   # Neovim is pinned to a 0.13 nightly commit for OS watcher-driven 'autoread'.
   # Remove the pin when Neovim 0.13 is stable and available in Nixpkgs.

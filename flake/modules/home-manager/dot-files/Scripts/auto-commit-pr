@@ -5,6 +5,10 @@ set -e
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
+CURRENT_BRANCH=$(git branch --show-current)
+require_not_gh_stack_branch "auto-commit-pr" "$CURRENT_BRANCH"
 
 "$SCRIPT_DIR/auto-commit" "$@"
 git push

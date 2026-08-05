@@ -30,6 +30,7 @@
 - Prefer not embedding inline code of other languages in .sh files (unless it's very short, or exceptional circumstance)
 - Prefer `testCases.each` over `it.each` / `test.each` for table-driven tests.
 - If you copy code from a source you think is a good reference please link to a url in a comment
+- With zod schemas by default use z.infer rather than duplicating types, unless there is a good reason.
 
 
 ## Dev environment
@@ -48,7 +49,7 @@
 - PR's should be created in draft status unless I explicitly ask.
 - PR descriptions should be empty by default, unless asked otherwise.
 - Always read PR desc first before editing it so you can amend.
-- Keep each review-comment fix in its own commit when practical, then reply warmly with a short acknowledgement and the commit SHA, for example: `Good catch! Fixed in <sha> 👍`
+- Keep each review-comment fix in its own commit when practical, then reply warmly with a short acknowledgement and the commit SHA, for example: `Fixed in <sha>`. Be sure to have commited and pushed the sha before the comment which includes it. 
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.
 - Watch gh checks by running `gh pr checks --watch --fail-fast || gh run view --log-failed | tail -n 200` in background
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”

@@ -6,6 +6,11 @@
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-firefox-151-stable.url = "github:nixos/nixpkgs/e820eb4a444b46a19b2e03e8dfd2359439ff30fe";
 
+    gh-stack = {
+      url = "github:github/gh-stack";
+      flake = false;
+    };
+
     # Pin until the clipboard clear deadlock fix is merged and released.
     # https://github.com/abenz1267/elephant/issues/282
     # https://github.com/abenz1267/elephant/commit/c9cc79b0b149f7f3045d6d2e27db00c52077a631
@@ -195,6 +200,8 @@
 
     in
     {
+      ghStackSkill = "${inputs.gh-stack}/skills/gh-stack/SKILL.md";
+
       # Enables `nix fmt` at root of repo to format all nix files
       formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);
 

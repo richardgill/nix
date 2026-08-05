@@ -36,7 +36,10 @@
   "enableSkillCommands": true,
   "packages": [
     "~/code/pi-extensions/main/extensions/preset",
-    "~/code/pi-extensions/main/extensions/project-resources",
+    "~/code/pi-extensions/main/extensions/sub-pi",
+    "~/code/pi-extensions/main/extensions/sub-pi-skill",
+    "~/code/pi-extensions/main/extensions/file-collector",
+    "~/code/pi-extensions/main/extensions/extra-context-files",
     "~/code/pi-extensions/main/extensions/tmux-bash",
     "~/code/pi-extensions/main/extensions/parrot",
     "~/code/pi-extensions/main/extensions/pi-up-history",

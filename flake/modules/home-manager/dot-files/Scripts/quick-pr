@@ -7,13 +7,15 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/git"
 
 # Check for existing PR
-echo "Checking for existing pull request..."
 CURRENT_BRANCH=$(git branch --show-current)
+
+echo "Checking for existing pull request..."
 BASE_REMOTE=$(get_default_remote main)
 BASE_REPOSITORY=$(git remote get-url "$BASE_REMOTE")
 PR_URL=$(gh pr list --repo "$BASE_REPOSITORY" --head "$CURRENT_BRANCH" --json url --jq '.[0].url // empty')
 
 if [ -z "$PR_URL" ]; then
+    require_not_gh_stack_branch "quick-pr" "$CURRENT_BRANCH" || exit 1
     echo "No existing PR found. Creating draft pull request..."
     git push --set-upstream origin "$CURRENT_BRANCH"
 

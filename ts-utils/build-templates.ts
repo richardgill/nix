@@ -29,6 +29,7 @@ const templateDataSchema = z
   .object({
     isDarwin: z.boolean(),
     isLinux: z.boolean(),
+    isAarch64Linux: z.boolean(),
     homeDir: z.string(),
     homeDirectory: z.string(),
     zshPath: z.string(),
@@ -63,7 +64,7 @@ type RenderContext = TemplateData & {
   webSearchProvider?: WebSearchProvider;
 };
 
-export type RemoteSkillContents = Readonly<Record<string, string>>;
+export type ExternalSkillContents = Readonly<Record<string, string>>;
 
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
 const getAgentModelFamily = (agent: AgentName) => agents[agent].modelFamily;
@@ -75,6 +76,7 @@ const parseCliArgs = () => {
     options: {
       "data-file": { type: "string", short: "d" },
       outDir: { type: "string", short: "o" },
+      "external-skill": { type: "string", multiple: true },
     },
   });
 
@@ -88,6 +90,7 @@ const parseCliArgs = () => {
   return {
     dataFile: values["data-file"],
     outDir: values.outDir,
+    externalSkillSpecs: values["external-skill"] ?? [],
   };
 };
 
@@ -95,6 +98,33 @@ const loadData = (dataPath: string): TemplateData => {
   const content = readFileSync(dataPath, "utf-8");
   return templateDataSchema.parse(JSON.parse(content));
 };
+
+const readSkillName = (content: string) => {
+  const frontmatter = content.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/)?.[1];
+  const name = frontmatter?.match(/^name:\s*["']?([^"'\s]+)["']?\s*$/m)?.[1];
+  if (!name) {
+    throw new Error("external skill does not contain a skill name");
+  }
+  return name;
+};
+
+const loadExternalSkills = (specs: readonly string[]): ExternalSkillContents =>
+  Object.fromEntries(
+    specs.map((spec) => {
+      const separator = spec.indexOf("=");
+      if (separator < 1) {
+        throw new Error(`invalid external skill spec: ${spec}`);
+      }
+
+      const name = spec.slice(0, separator);
+      const content = readFileSync(spec.slice(separator + 1), "utf-8");
+      const skillName = readSkillName(content);
+      if (skillName !== name) {
+        throw new Error(`${name}: external skill is named ${skillName}`);
+      }
+      return [name, content];
+    }),
+  );
 
 const ensureDir = (path: string) => {
   mkdirSync(dirname(path), { recursive: true });
@@ -163,7 +193,7 @@ const processSharedContent = (
   rootDir: string,
   outDir: string,
   data: TemplateData,
-  remoteSkills: RemoteSkillContents,
+  externalSkills: ExternalSkillContents,
 ) => {
   const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
 
@@ -210,20 +240,20 @@ const processSharedContent = (
         }
       }
 
-      for (const [skillName, content] of Object.entries(remoteSkills)) {
+      for (const [skillName, content] of Object.entries(externalSkills)) {
         if (excludeSkills.includes(skillName)) {
-          console.log(`  Skipping excluded remote skill: ${skillName}`);
+          console.log(`  Skipping excluded external skill: ${skillName}`);
           continue;
         }
 
         const outputPath = join(targetSkillsPath, skillName, "SKILL.md");
         if (existsSync(outputPath)) {
-          throw new Error(`Remote skill conflicts with local skill: ${skillName}`);
+          throw new Error(`External skill conflicts with local skill: ${skillName}`);
         }
 
         ensureDir(outputPath);
         writeFileSync(outputPath, content);
-        console.log(`Downloaded skill: ${skillName} for ${agent}`);
+        console.log(`Copied external skill: ${skillName} for ${agent}`);
       }
     }
   }
@@ -302,8 +332,9 @@ const processDirectory = (
   processRecursively(sourceDir, outputDir, { ...data, binary: "" });
 };
 
-export const buildTemplates = (remoteSkills: RemoteSkillContents = {}) => {
-  const { dataFile, outDir } = parseCliArgs();
+export const buildTemplates = () => {
+  const { dataFile, outDir, externalSkillSpecs } = parseCliArgs();
+  const externalSkills = loadExternalSkills(externalSkillSpecs);
 
   const repoRoot = dirname(import.meta.dir);
   const rootDir = existsSync(join(repoRoot, "flake"))
@@ -334,7 +365,7 @@ export const buildTemplates = (remoteSkills: RemoteSkillContents = {}) => {
   }
 
   // Process shared content (skills, agents) for each target agent
-  processSharedContent(rootDir, outDir, data, remoteSkills);
+  processSharedContent(rootDir, outDir, data, externalSkills);
 
   // Process root-level templates
   console.log("\nProcessing root templates");

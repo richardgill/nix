@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 
+source ~/Scripts/lib/git
+
 # determine current branch name
 current_branch=$(git symbolic-ref --short HEAD)
 
 # initialize
 remote=""
+remote_explicit=false
 branch=""
 opts=()
 
@@ -26,6 +29,7 @@ else
   if [[ $# -gt 0 && "$1" != -* ]]; then
     arg2="$1"; shift
     remote="$arg1"
+    remote_explicit=true
     branch="$arg2"
     opts=("$@")
   # otherwise treat the one positional as branch (remote defaults to origin)
@@ -34,6 +38,17 @@ else
     branch="$arg1"
     opts=("$@")
   fi
+fi
+
+if ! position=$(gh_stack_branch_position "$branch"); then
+  echo "push: unable to read local gh stack state" >&2
+  return 1 2>/dev/null || exit 1
+fi
+if ! require_gh_stack_top_or_unstacked "push" "$branch"; then
+  return 1 2>/dev/null || exit 1
+fi
+if [[ "$position" == "top" && "$remote_explicit" == false ]]; then
+  remote=$(get_push_remote)
 fi
 
 # build the command array

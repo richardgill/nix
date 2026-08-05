@@ -1,4 +1,6 @@
 # Git aliases
+source ~/Scripts/lib/git
+
 alias s="git status"
 alias d="git-local-diff"
 alias hard="git reset --hard"
@@ -43,6 +45,9 @@ add() {
 }
 
 branch() {
+  local current_branch
+  current_branch=$(git branch --show-current)
+  require_not_gh_stack_branch "branch" "$current_branch" || return 1
   git checkout -b "$1"
 }
 
@@ -51,7 +56,10 @@ branches() {
 }
 
 resetTo() {
-  target_branch="${1:-main}"
+  local current_branch
+  local target_branch="${1:-main}"
+  current_branch=$(git branch --show-current)
+  require_not_gh_stack_branch "resetTo" "$current_branch" || return 1
   git reset $(git merge-base origin/"$target_branch" $(git rev-parse --abbrev-ref origin/HEAD))
   git status
 }

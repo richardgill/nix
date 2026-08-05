@@ -25,16 +25,6 @@ export type WebSearchProvider = {
   prerequisites: readonly string[];
 };
 
-export type RemoteSkill = {
-  url: string;
-};
-
-export const remoteSkills = {
-  "gh-stack": {
-    url: "https://github.com/github/gh-stack/blob/main/skills/gh-stack/SKILL.md",
-  },
-} as const satisfies Record<string, RemoteSkill>;
-
 export type AgentConfig = {
   sharedSkills: boolean;
   excludeSkills?: readonly string[];

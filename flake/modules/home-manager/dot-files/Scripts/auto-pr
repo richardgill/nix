@@ -3,9 +3,14 @@
 # Exit on any error
 set -e
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
 # Check for existing PR
-echo "Checking for existing pull request..."
 CURRENT_BRANCH=$(git branch --show-current)
+require_not_gh_stack_branch "auto-pr" "$CURRENT_BRANCH"
+
+echo "Checking for existing pull request..."
 PR_EXISTS=$(gh pr list --head "$CURRENT_BRANCH" --json number --jq length)
 
 if [ "$PR_EXISTS" -eq 0 ]; then

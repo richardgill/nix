@@ -5,6 +5,7 @@
   config,
   osConfig,
   vars,
+  inputs,
   ...
 }:
 let
@@ -21,6 +22,7 @@ let
       config
       osConfig
       vars
+      inputs
       ;
   };
   inherit (templates) builtTemplates;

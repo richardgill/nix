@@ -18,6 +18,9 @@ pi = { version = "latest", minimum_release_age = "0s" }
 "npm:pi-pack" = "latest"
 # Slack re-auth needs localhost callback support: https://github.com/apify/mcpc/issues/269
 "npm:@apify/mcpc" = "0.3.1"
+{{#unless isAarch64Linux}}
+"github:mtford90/revue" = { version = "latest", minimum_release_age = "0s" }
+{{/unless}}
 
 [settings]
 idiomatic_version_file_enable_tools = ["node", "pnpm"]

@@ -10,3 +10,95 @@ get_default_remote() {
     echo "origin"
   fi
 }
+
+get_push_remote() {
+  git config --get remote.pushDefault || echo "origin"
+}
+
+get_gh_stack_branch_info() {
+  local branch="$1"
+  local git_dir
+  local stack_file
+
+  if [[ -z "$branch" ]] || ! git_dir=$(git rev-parse --git-dir 2>/dev/null); then
+    printf 'none\tmain\n'
+    return
+  fi
+
+  stack_file="$git_dir/gh-stack"
+  if [[ ! -f "$stack_file" ]]; then
+    printf 'none\tmain\n'
+    return
+  fi
+
+  jq -er --arg branch "$branch" '
+    [
+      .stacks[]?
+      | . as $stack
+      | (.branches | map(.branch) | index($branch)) as $index
+      | select($index != null)
+      | {
+          position: if $index == (($stack.branches | length) - 1) then "top" else "lower" end,
+          base: if $index == 0 then $stack.trunk.branch
+            else (
+              [$stack.branches[0:$index][] | select(.pullRequest.merged != true) | .branch]
+              | last
+            ) // $stack.trunk.branch
+            end
+        }
+    ]
+    | if length == 0 then ["none", "main"]
+      elif length == 1 then [.[0].position, .[0].base]
+      else error("branch belongs to multiple stacks")
+      end
+    | @tsv
+  ' "$stack_file"
+}
+
+gh_stack_branch_position() {
+  local info
+  info=$(get_gh_stack_branch_info "$1") || return 1
+  echo "${info%%$'\t'*}"
+}
+
+get_pr_base_branch() {
+  local info
+  info=$(get_gh_stack_branch_info "$1") || return 1
+  echo "${info#*$'\t'}"
+}
+
+require_gh_stack_top_or_unstacked() {
+  local command="$1"
+  local branch="$2"
+  local position
+
+  if ! position=$(gh_stack_branch_position "$branch"); then
+    echo "$command: unable to read local gh stack state" >&2
+    return 1
+  fi
+
+  if [[ "$position" == "none" || "$position" == "top" ]]; then
+    return
+  fi
+
+  echo "$command: '$branch' is not the top stack branch. Ask AI to rebase and push the stack." >&2
+  return 1
+}
+
+require_not_gh_stack_branch() {
+  local command="$1"
+  local branch="$2"
+  local position
+
+  if ! position=$(gh_stack_branch_position "$branch"); then
+    echo "$command: unable to read local gh stack state" >&2
+    return 1
+  fi
+
+  if [[ "$position" == "none" ]]; then
+    return
+  fi
+
+  echo "$command: '$branch' belongs to a stack. Ask AI to manage the stack." >&2
+  return 1
+}

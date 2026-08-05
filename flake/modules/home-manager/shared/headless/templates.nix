@@ -6,6 +6,7 @@
   config,
   osConfig,
   vars,
+  inputs,
 }:
 let
   flakeRoot = ../../../../.;
@@ -36,7 +37,10 @@ let
 
     buildPhase = ''
       cd template-builder
-      bun ./build-templates.bundle.js --data-file $dataJsonPath --outDir $out
+      bun ./build-templates.bundle.js \
+        --data-file $dataJsonPath \
+        --outDir $out \
+        --external-skill gh-stack=${inputs.gh-stack}/skills/gh-stack/SKILL.md
     '';
 
     # buildPhase writes directly to $out, no installPhase needed

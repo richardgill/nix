@@ -42,6 +42,7 @@ in
 {
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
+  isAarch64Linux = pkgs.stdenv.isLinux && pkgs.stdenv.hostPlatform.isAarch64;
   inherit homeDir;
   homeDirectory = homeDir;
   zshPath = "${pkgs.zsh}/bin/zsh";

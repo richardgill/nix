@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
+CURRENT_BRANCH=$(git branch --show-current)
+require_not_gh_stack_branch "wait-for-pull" "$CURRENT_BRANCH" || exit 1
+
 BRANCH=${1:-main}
 
 # upstream if upstream remote present in git

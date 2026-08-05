@@ -4,6 +4,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
 
 log() {
   printf '[%s] auto-commit-push: %s\n' "$(date '+%H:%M:%S')" "$*" >&2
@@ -15,6 +16,9 @@ elapsed() {
   end=$(date +%s)
   printf '%ss' "$((end - start))"
 }
+
+CURRENT_BRANCH=$(git branch --show-current)
+require_gh_stack_top_or_unstacked "auto-commit-push" "$CURRENT_BRANCH"
 
 "$SCRIPT_DIR/auto-commit" "$@"
 

@@ -26,6 +26,7 @@ current_branch=$(git symbolic-ref --short HEAD)
 
 # initialize
 remote=""
+remote_explicit=false
 branch=""
 opts=()
 
@@ -47,6 +48,7 @@ else
   if [[ $# -gt 0 && "$1" != -* ]]; then
     arg2="$1"; shift
     remote="$arg1"
+    remote_explicit=true
     branch="$arg2"
     opts=("$@")
   # otherwise treat the one positional as branch (remote defaults to default_remote)
@@ -55,6 +57,24 @@ else
     remote=$(get_default_remote "$branch")
     opts=("$@")
   fi
+fi
+
+if ! position=$(gh_stack_branch_position "$current_branch"); then
+  echo "pull: unable to read local gh stack state" >&2
+  return 1 2>/dev/null || exit 1
+fi
+if ! require_gh_stack_top_or_unstacked "pull" "$current_branch"; then
+  return 1 2>/dev/null || exit 1
+fi
+if [[ "$position" == "top" && "$branch" != "$current_branch" ]]; then
+  echo "pull: a top stack branch can only pull its matching remote branch" >&2
+  return 1 2>/dev/null || exit 1
+fi
+if [[ "$position" == "top" ]]; then
+  if [[ "$remote_explicit" == false ]]; then
+    remote=$(get_push_remote)
+  fi
+  opts=("${opts[@]}" --ff-only)
 fi
 
 # build the command array

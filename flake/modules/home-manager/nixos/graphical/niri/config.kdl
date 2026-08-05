@@ -266,7 +266,7 @@ binds {
     Ctrl+Alt+Shift+Super+Z repeat=false { spawn "~/Scripts/nixos/launch-app" "zoom"; }
 
     Super+Shift+0 repeat=false { spawn-sh "exec $HOME/Scripts/nixos/launch-in-app-scope nautilus ~/Screenshots --new-window"; }
-    Super+Shift+3 repeat=false { spawn-sh "grim -g \"$(slurp -o)\" - | satty --filename -"; }
+    Super+Shift+3 repeat=false { spawn-sh "grim -o \"$(niri msg -j focused-output | jq -r .name)\" - | satty --filename -"; }
     Super+Shift+4 repeat=false { spawn-sh "grim -g \"$(slurp)\" - | satty --filename -"; }
     Super+Shift+5 repeat=false { spawn "~/Scripts/nixos/screen-record" "output"; }
     Super+Shift+6 repeat=false { spawn "~/Scripts/nixos/screen-record"; }

@@ -161,9 +161,14 @@ template machine='':
 
     echo "data_file written to: $data_file"
 
+    gh_stack_skill=$(nix eval --raw path:./flake#ghStackSkill)
+
     # Run the template builder
     cd flake/template-builder
-    nix shell nixpkgs#bun --command bun ./build-templates.bundle.js --data-file "$data_file" --outDir ../../built
+    nix shell nixpkgs#bun --command bun ./build-templates.bundle.js \
+      --data-file "$data_file" \
+      --outDir ../../built \
+      --external-skill "gh-stack=$gh_stack_skill"
 
     rm -f "$data_file"
     echo "Templates built to: built/"

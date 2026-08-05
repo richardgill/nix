@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/git"
+
+mode="${1:-base}"
+current_branch=$(git branch --show-current)
+
+if [[ "$mode" == "main" ]]; then
+  base_branch="main"
+  remote=$(get_default_remote "$base_branch")
+elif [[ "$mode" == "base" ]]; then
+  position=$(gh_stack_branch_position "$current_branch")
+  base_branch=$(get_pr_base_branch "$current_branch")
+  if [[ "$position" == "none" ]]; then
+    remote=$(get_default_remote "$base_branch")
+  else
+    remote=$(get_push_remote)
+  fi
+else
+  echo "usage: git-diff-base-ref [base|main]" >&2
+  exit 1
+fi
+
+printf '%s/%s\n' "$remote" "$base_branch"
