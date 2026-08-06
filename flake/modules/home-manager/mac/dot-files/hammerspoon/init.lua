@@ -3,6 +3,9 @@ hs.window.animationDuration = 0 -- Disable animations globally
 -- Define hyper key (all modifiers)
 local hyper = { "cmd", "alt", "ctrl", "shift" }
 local delayedAppVisibility = require("delayed-app-visibility")
+local emojiMode = require("emoji-mode")
+
+emojiMode.start()
 
 delayedAppVisibility.register("slack", {
 	appName = "Slack",

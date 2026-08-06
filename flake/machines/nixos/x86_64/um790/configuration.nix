@@ -33,6 +33,7 @@
   home-manager.users.${vars.userName} = {
     imports = [
       ../../../../modules/home-manager/nixos/graphical
+      ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
       ../../../../modules/home-manager/nixos/graphical/optional/react-native-debugger.nix
       ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
     ];

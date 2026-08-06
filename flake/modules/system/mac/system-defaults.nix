@@ -18,6 +18,7 @@
     defaults = {
       loginwindow.LoginwindowText = "If lost, contact ${vars.userEmail}";
       screencapture.location = "~/Screenshots";
+      hitoolbox.AppleFnUsageType = "Do Nothing";
 
       dock = {
         autohide = false;

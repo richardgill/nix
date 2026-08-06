@@ -39,7 +39,7 @@ existing_session_rows() {
           id = $2
           created = $3
           if ((id SUBSEP created SUBSEP name) in quarantined) next
-          if (name ~ /^(code|pi-background)$/) next
+          if (name ~ /^(code|background)$/) next
           last_attached = $4 + 0
           activity = $5 + 0
           last_seen = (name in recency) ? recency[name] : 0
@@ -54,7 +54,7 @@ existing_session_rows() {
 }
 
 pinned_session_rows() {
-  for session in code pi-background; do
+  for session in code background; do
     if tmux has-session -t "$session" 2>/dev/null; then
       printf 'tmux\t%s\t\033[34m\033[39m %s\n' "$session" "$session"
     fi

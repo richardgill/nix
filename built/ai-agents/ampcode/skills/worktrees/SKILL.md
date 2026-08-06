@@ -71,6 +71,7 @@ EOF
 
 - The new worktree session is created and marked recent, but not switched to
 - The AI agent starts automatically in the 4th tmux window with the given prompt
+- Inspect the 4th tmux window after creation to confirm the agent started successfully and received the prompt
 - Do not use `main my-feature` to create a branch from main; use `my-feature` unless you intentionally need an explicit source ref
 
 $ARGUMENTS

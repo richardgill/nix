@@ -28,6 +28,7 @@
       ${vars.userName} = {
         imports = [
           ../../../../modules/home-manager/mac
+          ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
           ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
         ];
       };

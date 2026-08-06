@@ -28,6 +28,33 @@ let
   };
   ghStackAsset = ghStackRelease.${prev.stdenv.hostPlatform.system};
 
+  # Nixpkgs Azahar currently fails to build on Darwin in both 25.11 and unstable.
+  # Remove this pin when the Nixpkgs package builds on Darwin again.
+  # Upstream: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/az/azahar/package.nix
+  azaharMacos = prev.stdenvNoCC.mkDerivation {
+    pname = "azahar";
+    version = "2125.1.3";
+    src = prev.fetchurl {
+      url = "https://github.com/azahar-emu/azahar/releases/download/2125.1.3/azahar-macos-arm64-2125.1.3.zip";
+      hash = "sha256-vsDiikWSsHPsKFUQk1wkNTva4ou0Q5YdRBq3aNZv/aw=";
+    };
+    nativeBuildInputs = [ prev.unzip ];
+    sourceRoot = "azahar-macos-arm64-2125.1.3";
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/Applications
+      cp -R Azahar.app $out/Applications/
+      runHook postInstall
+    '';
+    dontFixup = true;
+    meta = {
+      description = "Open-source 3DS emulator project based on Citra";
+      homepage = "https://azahar-emu.org";
+      license = prev.lib.licenses.gpl2Plus;
+      platforms = [ "aarch64-darwin" ];
+    };
+  };
+
   kotlinVersion = "2.2.21";
   kotlinJar =
     artifactId: hash:
@@ -98,6 +125,7 @@ let
 in
 {
   firefox = firefox151Pkgs.firefox;
+  azahar = if prev.stdenv.isDarwin then azaharMacos else prev.azahar;
 
   # gh-stack 0.1.0 requires Go 1.26, which is not yet available in this Nixpkgs revision.
   # Remove this release-binary pin when Nixpkgs packages version 0.1.0 or newer.

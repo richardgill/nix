@@ -42,20 +42,35 @@
 - You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
 - Use `~/code/noisy-files/` for persistent bulky scratch files or generated/reference material that should not live in a repo.
 - Only use `/tmp/` for truly ephemeral files that do not need to survive reboot.
+- My tmux sessions normally correspond to one repository or worktree, with separate windows for the editor, short and long-running shells, and AI agents.
+- If a command needs a PTY or interactive input, run it in tmux.
 
 ## Workflow
 
 - Only do git commits when I explicitly ask.
-- Never force push or ammend commits unless I explicitly ask. 
+- Treat these standalone messages as explicit authorization to run the corresponding command:
+  - `ci`: run `auto-commit`
+  - `cip`: run `auto-commit-push`
+  - `cipr`: run `auto-commit-pr`
+- Never amend commits unless I explicitly ask.
+- Never force push unless I explicitly ask or it is required by a stacked PR workflow. Always use `--force-with-lease`, never `--force`.
 - PR's should be created in draft status unless I explicitly ask.
 - PR descriptions should be empty by default, unless asked otherwise.
 - Always read PR desc first before editing it so you can amend.
 - Keep each review-comment fix in its own commit when practical, then reply warmly with a short acknowledgement and the commit SHA, for example: `Fixed in <sha>`. Be sure to have commited and pushed the sha before the comment which includes it. 
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.
 - Watch gh checks by running `gh pr checks --watch --fail-fast || gh run view --log-failed | tail -n 200` in background
+  - “✅”, “baby”, or “babysit” means: watch the gh checks until they're successful, make any small fixes, and rerun any transient failures until all checks are green. If the issue needs my input, Telegram me.
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use kagi ask-page <url> "<question>".
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
+
+## Pi orchestration
+
+- Delegate work to another Pi instance in the current tmux session or an existing worktree/repository session, or use the worktrees skill to create a new worktree and session.
+  - Launch Pi and give its window a task name of at most 20 characters: `window_id=$(tmux new-window -d -P -F '#{window_id}' -t '<session>:' -c '<repo-or-worktree>' 'pi @/absolute/path/to/prompt.md') && sleep 1 && tmux rename-window -t "$window_id" 'auth-research'`.
+- Delegation is not fire-and-forget. Give each delegated Pi a unique `tmux wait-for` channel and instruct it to signal when finished or blocked. Wait on the channel with a background command so completion triggers a new turn, then inspect its pane and changes, follow up and wait again as needed. Do not respond finally while delegated work remains unless explicitly asked not to wait.
+
 
 ## Overlay and scratch work
 

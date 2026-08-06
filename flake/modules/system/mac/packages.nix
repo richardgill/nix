@@ -51,6 +51,7 @@ in
       "android-studio"
       "beeper"
       "blender"
+      "chatgpt"
       "cursor"
       "discord"
       "docker-desktop"
