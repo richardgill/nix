@@ -37,6 +37,7 @@
 ## Dev environment
 
 - I work on Mac or NixOS and the filesystem is case sensitive
+- My macOS and NixOS systems are configured declaratively with Nix in /home/rich/code/nix-private; edit that configuration when system changes are needed (do not commit though).
 - To run software without installing it, prefer `nix shell nixpkgs#<pkg> -c <cmd>`; fall back to `mise` for specific tool versions.
 - Prefer not to use npx or bunx for anything where package.json has it. Rely on pnpm exec
 - You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
@@ -64,13 +65,6 @@
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use kagi ask-page <url> "<question>".
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
-
-## Pi orchestration
-
-- Delegate work to another Pi instance in the current tmux session or an existing worktree/repository session, or use the worktrees skill to create a new worktree and session.
-  - Launch Pi and give its window a task name of at most 20 characters: `window_id=$(tmux new-window -d -P -F '#{window_id}' -t '<session>:' -c '<repo-or-worktree>' 'pi @/absolute/path/to/prompt.md') && sleep 1 && tmux rename-window -t "$window_id" 'auth-research'`.
-- Delegation is not fire-and-forget. Give each delegated Pi a unique `tmux wait-for` channel and instruct it to signal when finished or blocked. Wait on the channel with a background command so completion triggers a new turn, then inspect its pane and changes, follow up and wait again as needed. Do not respond finally while delegated work remains unless explicitly asked not to wait.
-
 
 ## Overlay and scratch work
 

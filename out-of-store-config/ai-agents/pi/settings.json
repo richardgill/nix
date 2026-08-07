@@ -3,6 +3,7 @@
   "defaultProvider": "openai-codex",
   "defaultModel": "gpt-5.6-sol",
   "defaultThinkingLevel": "high",
+  "tuiMode": "fullscreen",
   "enabledModels": [
     "openai-codex/gpt-5.3-codex-spark",
     "openai-codex/gpt-5.6-sol"
@@ -31,7 +32,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.83.0",
+  "lastChangelogVersion": "0.84.0",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -41,6 +42,12 @@
     "~/code/pi-extensions/main/extensions/parrot",
     "~/code/pi-extensions/main/extensions/pi-up-history",
     "~/code/pi-extensions/main/extensions/context-commands",
+    "~/code/pi-extensions/main/extensions/footer",
+    "~/code/pi-extensions/main/extensions/handoff",
+    "~/code/pi-extensions/main/extensions/notify",
+    "~/code/pi-extensions/main/extensions/process-info",
+    "~/code/pi-extensions/main/extensions/thinking-toggle",
+    "~/code/pi-extensions/main/extensions/trust-all-projects",
     "npm:@calesennett/pi-codex-fast",
     "npm:pi-codex-status"
   ],

@@ -36,6 +36,7 @@
 ## Dev environment
 
 - I work on Mac or NixOS and the filesystem is case sensitive
+- My macOS and NixOS systems are configured declaratively with Nix in /home/rich/code/nix-private; edit that configuration when system changes are needed (do not commit though).
 - To run software without installing it, prefer `nix shell nixpkgs#<pkg> -c <cmd>`; fall back to `mise` for specific tool versions.
 - Prefer not to use npx or bunx for anything where package.json has it. Rely on pnpm exec
 - You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
@@ -62,7 +63,6 @@
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use WebFetch.
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
-
 
 ## Overlay and scratch work
 

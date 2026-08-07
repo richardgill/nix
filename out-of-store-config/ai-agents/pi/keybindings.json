@@ -3,5 +3,7 @@
   "app.model.cycleBackward": "ctrl+shift+alt+0",
   "app.session.togglePath": "ctrl+shift+alt+8",
   "app.thinking.cycle": [],
-  "app.models.toggleProvider": []
+  "app.models.toggleProvider": [],
+  "tui.altScreen.top": [],
+  "tui.altScreen.bottom": []
 }

@@ -129,8 +129,6 @@ in
       ".pi/agent/extension-config".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extension-config";
       ".pi/agent/skills".source = "${builtTemplates}/ai-agents/pi/skills";
-      ".pi/agent/extensions".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extensions";
       ".pi/agent/themes".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/themes";
 
