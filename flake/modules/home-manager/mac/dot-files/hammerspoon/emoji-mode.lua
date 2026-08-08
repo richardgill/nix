@@ -5,6 +5,7 @@ local emojis = {
 	[hs.keycodes.map.c] = "✅",
 	[hs.keycodes.map.t] = "🧵",
 	[hs.keycodes.map.f] = "🔥",
+	[hs.keycodes.map.g] = "🟢",
 	[hs.keycodes.map.space] = "👍",
 }
 local bridgeKeyCode = hs.keycodes.map.f18

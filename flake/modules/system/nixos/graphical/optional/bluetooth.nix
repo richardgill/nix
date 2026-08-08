@@ -4,6 +4,6 @@
   hardware.bluetooth.powerOnBoot = true;
 
   environment.systemPackages = with pkgs; [
-    blueberry
+    bluetui
   ];
 }

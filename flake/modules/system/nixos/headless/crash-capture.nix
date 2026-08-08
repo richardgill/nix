@@ -1,4 +1,16 @@
-{ lib, pkgs, ... }:
+{
+  lib,
+  pkgs,
+  ...
+}:
+let
+  coredumpSettings = {
+    Storage = "external";
+    Compress = "yes";
+    ProcessSizeMax = "8G";
+    ExternalSizeMax = "8G";
+  };
+in
 {
   boot.kernelParams = [ "log_buf_len=32M" ];
 
@@ -21,12 +33,7 @@
     '';
   };
 
-  systemd.coredump.extraConfig = ''
-    Storage=external
-    Compress=yes
-    ProcessSizeMax=8G
-    ExternalSizeMax=8G
-  '';
+  systemd.coredump.settings.Coredump = coredumpSettings;
 
   systemd.tmpfiles.rules = [
     "d /var/log/crash 0755 root root - -"

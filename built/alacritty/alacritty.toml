@@ -1,6 +1,6 @@
 
 [terminal.shell]
-program = "/nix/store/lm0ys7aqysrm12blzk5n0p25vvn16g8x-zsh-5.9/bin/zsh"
+program = "/nix/store/yw6r9ix2mp9annb62z2iwp2ibpk31wpa-zsh-5.9.1/bin/zsh"
 args = ["-l"]
 
 [bell]

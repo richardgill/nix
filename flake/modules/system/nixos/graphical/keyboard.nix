@@ -194,11 +194,13 @@
   };
 
   systemd.user.services.xremap = {
+    unitConfig = {
+      StartLimitBurst = 5;
+      StartLimitIntervalSec = 60;
+    };
     serviceConfig = {
       Restart = "always";
       RestartSec = 3;
-      StartLimitBurst = 5;
-      StartLimitIntervalSec = 60;
       Environment = [
         "PATH=/etc/profiles/per-user/${vars.userName}/bin:/run/current-system/sw/bin:/usr/bin:/bin"
       ];

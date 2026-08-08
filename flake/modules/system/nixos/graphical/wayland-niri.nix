@@ -1,7 +1,23 @@
 {
+  lib,
   pkgs,
   ...
 }:
+let
+  niriSession = pkgs.writeTextFile {
+    name = "niri-session";
+    destination = "/share/wayland-sessions/niri.desktop";
+    text = ''
+      [Desktop Entry]
+      Name=Niri
+      Comment=A scrollable-tiling Wayland compositor
+      Exec=${lib.getExe pkgs.uwsm} start -F -- /run/current-system/sw/bin/niri-session
+      Type=Application
+      DesktopNames=niri
+    '';
+    derivationArgs.passthru.providedSessions = [ "niri" ];
+  };
+in
 {
   imports = [ ./wayland-base.nix ];
 
@@ -15,13 +31,11 @@
     package = pkgs.niri;
   };
 
-  programs.uwsm = {
-    enable = true;
-    waylandCompositors.niri = {
-      prettyName = "Niri";
-      comment = "Niri compositor managed by UWSM";
-      binPath = "/run/current-system/sw/bin/niri";
-    };
+  programs.uwsm.enable = true;
+
+  services.displayManager = {
+    defaultSession = "niri";
+    sessionPackages = lib.mkForce [ niriSession ];
   };
 
   xdg.portal = {

@@ -14,7 +14,7 @@ in
     coreutils
     curl
     datamash
-    docker
+    docker_29
     ffmpeg
     gcc
     gawk
@@ -31,7 +31,7 @@ in
     home-manager
     unstable.mise
     nix-fast-build
-    nixfmt-rfc-style
+    nixfmt
     nixd
     openssl
     qrencode

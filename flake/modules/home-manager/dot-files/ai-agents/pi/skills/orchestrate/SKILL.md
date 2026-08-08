@@ -14,6 +14,7 @@ Delegate work to another Pi in an existing tmux session:
 
 - In the current tmux session in a new tmux window.
 - In an existing worktree's tmux session in a new tmux window.
+  - Find its session by matching the worktree path: `tmux list-panes -a -F '#{session_name}: #{pane_current_path}' | rg '<worktree-path>'`.
 - Or create a new worktree with a tmux session by using the worktrees skill.
 
 Delegation is not fire-and-forget. Every delegated task must have a tracked listener before detached work starts.

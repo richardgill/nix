@@ -2,7 +2,7 @@
 source ~/Scripts/lib/git
 
 alias s="git status"
-alias d="git-local-diff"
+alias d="revue diff"
 alias hard="git reset --hard"
 alias soft="git reset --soft HEAD~1"
 alias co="git checkout"
@@ -70,15 +70,15 @@ alias t="~/Scripts/tmux-start"
 alias pi="~/Scripts/pi"
 alias pnx="pnpm exec nx"
 alias ls="~/Scripts/ls"
-alias lso="/nix/store/hqkszxk2c0cxvd04xa4gsaqs182dw8l2-coreutils-9.8/bin/ls"
+alias lso="/nix/store/5kcc5rnag7yymmsr6yqs7993xpdqs62w-coreutils-9.11/bin/ls"
 alias tree="ls --tree"
-alias cato="/nix/store/hqkszxk2c0cxvd04xa4gsaqs182dw8l2-coreutils-9.8/bin/cat"
+alias cato="/nix/store/5kcc5rnag7yymmsr6yqs7993xpdqs62w-coreutils-9.11/bin/cat"
 alias as="open -a \"Android Studio\""
 alias vlc="/Applications/VLC.app/Contents/MacOS/VLC"
 alias ett="et-with-tunnel"
 
 alias sound="wiremix"
-alias bluetooth="blueberry"
+alias bluetooth="bluetui"
 alias wifi="nmtui"
 alias y='yazi'
 if [[ -z "$IS_CLAUDE" ]]; then

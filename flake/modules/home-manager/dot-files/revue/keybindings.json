@@ -1,0 +1,8 @@
+{
+  "half-page-up": ["ctrl+u", "ctrl+up"],
+  "half-page-down": ["ctrl+d", "ctrl+down"],
+  "previous-page": [",", "H"],
+  "next-page": [".", "h"],
+  "toggle-file-review": ["f", "v", "m"],
+  "reload": ["ctrl+r", "f5", "R"]
+}

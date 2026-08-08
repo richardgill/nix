@@ -39,7 +39,7 @@ in
     unstable.gh
     gh-stack
     lefthook
-    nixfmt-rfc-style
+    nixfmt
     ncdu
     oh-my-posh
     postgresql

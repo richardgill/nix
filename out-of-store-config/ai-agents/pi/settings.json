@@ -32,7 +32,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.84.0",
+  "lastChangelogVersion": "0.84.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [

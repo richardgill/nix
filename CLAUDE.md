@@ -10,6 +10,8 @@ Use the `.justfile` for common tasks and commands.
 Changes in `./flake`: run `just switch` after making changes to directly deploy changes (builds and activates the new configuration). Only skip this if the change is particularly dangerous, but home dir changes are fine.
 Changes in `./out-of-store-config`: no need to run `just switch` changes are picked up immediately after re-launching the affected program  
 
+When I say "switch" run `just switch` for me.
+
 To edit my dot files in `~/` they are actually symlinked from `flake/modules/home-manager/shared/headless/dot-files.nix` so search there. 
 
 We prefer keeping them as text files on disk with handlebar templating when needed.

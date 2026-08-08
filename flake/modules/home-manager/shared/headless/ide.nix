@@ -35,8 +35,8 @@ in
     kotlin-language-server
     lua-language-server
     nixd
-    nodePackages.vscode-langservers-extracted
-    nodePackages."@tailwindcss/language-server"
+    vscode-langservers-extracted
+    tailwindcss-language-server
     pyright
     ruff
     unstable.typescript-go
@@ -44,7 +44,7 @@ in
     # Formatters
     gofumpt
     ktfmt
-    nodePackages.prettier
+    prettier
     prettierd
     stylua
   ];

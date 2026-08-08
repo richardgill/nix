@@ -21,8 +21,6 @@ in
   environment.extraInit = ''
     export PATH="${androidHome}/platform-tools:${androidHome}/emulator:$PATH"
   '';
-
-  programs.adb.enable = true;
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     alsa-lib
@@ -48,17 +46,17 @@ in
     pango
     systemd
     util-linux
-    xorg.libICE
-    xorg.libSM
-    xorg.libX11
-    xorg.libXcomposite
-    xorg.libXdamage
-    xorg.libXext
-    xorg.libXfixes
-    xorg.libXi
-    xorg.libXrandr
-    xorg.libxcb
-    xorg.libxkbfile
+    libice
+    libsm
+    libx11
+    libxcomposite
+    libxdamage
+    libxext
+    libxfixes
+    libxi
+    libxrandr
+    libxcb
+    libxkbfile
     zlib
   ];
 

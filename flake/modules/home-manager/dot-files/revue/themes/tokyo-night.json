@@ -1,0 +1,38 @@
+{
+  "extends": "tokyo-night",
+  "label": "Tokyo Night - Neovim CodeDiff",
+  "background": "#1a1b26",
+  "foreground": "#c0caf5",
+  "diffColors": {
+    "added": "#3fb950",
+    "removed": "#f85149",
+    "modified": "#7aa2f7"
+  },
+  "syntaxTheme": "tokyo-night",
+  "overrides": {
+    "background": "#1a1b26",
+    "panel": "#16161e",
+    "panelAlt": "#292e42",
+    "border": "#15161e",
+    "text": "#c0caf5",
+    "muted": "#808ab4",
+    "heading": "#7aa2f7",
+    "accent": "#7aa2f7",
+    "accentMuted": "#292e42",
+    "contextBg": "#1a1b26",
+    "addedBg": "#1f302b",
+    "removedBg": "#35212a",
+    "addedContentBg": "#1f302b",
+    "removedContentBg": "#35212a",
+    "addedEmphasisBg": "#264e33",
+    "removedEmphasisBg": "#5f2c31",
+    "selectedHunk": "#292e42",
+    "addedSignColor": "#d6ddf9",
+    "removedSignColor": "#d6ddf9",
+    "lineNumberFg": "#636b8d",
+    "badgeAdded": "#b3f6c0",
+    "badgeRemoved": "#ffc0b9",
+    "badgeModified": "#ff9e64",
+    "badgeNeutral": "#808ab4"
+  }
+}

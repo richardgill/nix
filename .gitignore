@@ -3,7 +3,6 @@ Brewfile
 result
 .nix-fast-build/
 .claude/settings.local.json
-.revue/
 out-of-store-config/obs-studio/logs/
 out-of-store-config/obs-studio/profiler_data/
 

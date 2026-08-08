@@ -2,7 +2,7 @@
   description = "nix-config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-firefox-151-stable.url = "github:nixos/nixpkgs/e820eb4a444b46a19b2e03e8dfd2359439ff30fe";
 
@@ -27,8 +27,7 @@
 
     # Use a commit SHA from https://github.com/nix-community/neovim-nightly-overlay/commits/master;
     # each commit pins a matching Neovim nightly source and build dependencies.
-    neovim-nightly-overlay.url =
-      "github:nix-community/neovim-nightly-overlay/4795f73d45458c015d1997ece7867d9341f0f6cd";
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay/4795f73d45458c015d1997ece7867d9341f0f6cd";
 
     impermanence.url = "github:nix-community/impermanence";
 
@@ -38,12 +37,12 @@
     };
 
     home-manager = {
-      url = "github:nix-community/home-manager/release-25.11";
+      url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     nix-darwin = {
-      url = "github:nix-darwin/nix-darwin/nix-darwin-25.11";
+      url = "github:nix-darwin/nix-darwin/nix-darwin-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -79,7 +78,7 @@
     xremap-flake.url = "github:xremap/nix-flake";
 
     stylix = {
-      url = "github:danth/stylix/release-25.11";
+      url = "github:danth/stylix/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

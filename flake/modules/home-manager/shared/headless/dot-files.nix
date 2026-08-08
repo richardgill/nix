@@ -141,6 +141,8 @@ in
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcpc/mcp.json";
 
       # Static files (not templated)
+      ".revue/keybindings.json".source = ../../dot-files/revue/keybindings.json;
+      ".revue/themes".source = ../../dot-files/revue/themes;
       ".config/obs-studio".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/obs-studio";
       ".config/git/config".source = ../../dot-files/git/config;
