@@ -40,7 +40,8 @@ let
       bun ./build-templates.bundle.js \
         --data-file $dataJsonPath \
         --outDir $out \
-        --external-skill gh-stack=${inputs.gh-stack}/skills/gh-stack/SKILL.md
+        --external-skill gh-stack=${inputs.gh-stack}/skills/gh-stack \
+        --external-skill-overlay gh-stack=../modules/home-manager/dot-files/ai-agents/shared/skill-overlays/gh-stack/SKILL.md.hbs
     '';
 
     # buildPhase writes directly to $out, no installPhase needed

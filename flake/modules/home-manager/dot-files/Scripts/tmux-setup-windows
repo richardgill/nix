@@ -48,8 +48,8 @@ source ~/Scripts/lib/ai-agent
 setup_tmux_windows() {
   local session_name="$1"
   local ai1_cmd="$2"
+  local no_agent="$3"
   local default_ai
-  default_ai=$(default_ai_agent)
   if [ -z "$session_name" ] && [ -n "$TMUX" ]; then
     session_name=$(tmux display-message -p "#{session_name}")
   fi
@@ -68,23 +68,26 @@ setup_tmux_windows() {
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "short"
     tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "long"
 
-    AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-$default_ai}" Enter
+    if [[ -z "$no_agent" ]]; then
+      default_ai=$(default_ai_agent)
+      AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
+      tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-$default_ai}" Enter
 
-    AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
-    tmux send-keys -t "$AI_WINDOW_2" "$default_ai" Enter
+      AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "$default_ai" -P -F "#{window_id}")
+      tmux send-keys -t "$AI_WINDOW_2" "$default_ai" Enter
 
-    # Stagger Claude Code launches - concurrent starts cause issues
-    # AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    # tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
+      # Stagger Claude Code launches - concurrent starts cause issues
+      # AI_WINDOW_1=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+      # tmux send-keys -t "$AI_WINDOW_1" "${ai1_cmd:-cl}" Enter
 
-    # AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    # (sleep 2 && tmux send-keys -t "$AI_WINDOW_2" "cl" Enter) &
+      # AI_WINDOW_2=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+      # (sleep 2 && tmux send-keys -t "$AI_WINDOW_2" "cl" Enter) &
 
-    # AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
-    # (sleep 4 && tmux send-keys -t "$AI_WINDOW_3" "cl" Enter) &
+      # AI_WINDOW_3=$(tmux new-window -t "$session_name" -a -c "$ORIGINAL_PATH" -n "cl" -P -F "#{window_id}")
+      # (sleep 4 && tmux send-keys -t "$AI_WINDOW_3" "cl" Enter) &
 
-    tmux select-window -t "$AI_WINDOW_1"
+      tmux select-window -t "$AI_WINDOW_1"
+    fi
 
     echo "$SOCKET_FILE"
   fi

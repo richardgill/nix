@@ -10,6 +10,28 @@ metadata:
   version: "0.1.0"
 ---
 
+## Local stacked-worktree workflow
+
+These instructions override the same-checkout workflows below. Every active pull request branch in a stack must have its own sibling worktree and tmux session.
+
+Plan the complete stack first, then build it bottom-up. Finish and commit each parent layer before creating its child so the child starts from the parent's completed tip. Give each layer a focused prompt describing only that pull request's concern.
+
+Invoke the `worktrees` skill for every layer. Create the bottom layer from `main`, then create each child from its parent:
+
+```bash
+~/Scripts/worktree-branch --no-switch --pull --binary codex --prompt-file '<prompt-file>' '<bottom>'
+~/Scripts/worktree-branch --no-switch --pull --binary codex --prompt-file '<prompt-file>' '<parent>' '<child>'
+```
+
+Because the branches live in separate worktrees, manage stack membership without local gh-stack tracking:
+
+```bash
+gh stack link --remote origin '<bottom>' '<middle>' '<top>'
+```
+
+Do not use `gh stack init`, `add`, `checkout`, navigation, `rebase`, or `sync` for this workflow. Rebase changed descendants from within their own worktrees, bottom-up, then rerun `gh stack link`.
+
+
 # gh-stack
 
 `gh stack` is a [GitHub CLI](https://cli.github.com/) extension for stacked branches and pull

@@ -1,0 +1,33 @@
+{
+  "rules": [
+    {
+      "name": "delegate-sub-process-fork",
+      "when": {
+        "metadata": {
+          "pi.subProcess": true,
+          "pi.subProcessContext": "fork"
+        },
+        "environment": {
+          "PI_SKILL_DELEGATE": null
+        }
+      },
+      "position": "replace",
+      "sessionBranch": "previousTurn",
+      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `PI_SKILL_DELEGATE=1 tmux-pi --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --pi-session {{runtime.sessionBranch.pathShell}} --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's listener and supervision protocol, and record the window ID reported by `tmux-pi`. You, the top-level process, own cleanup of that window; do not delegate cleanup to the child. Before returning a final response, confirm the delegated task is resolved and run `tmux kill-window -t '<window-id>'`."
+    },
+    {
+      "name": "delegate-sub-process-fresh",
+      "when": {
+        "metadata": {
+          "pi.subProcess": true,
+          "pi.subProcessContext": "fresh"
+        },
+        "environment": {
+          "PI_SKILL_DELEGATE": null
+        }
+      },
+      "position": "replace",
+      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `PI_SKILL_DELEGATE=1 tmux-pi --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's listener and supervision protocol, and record the window ID reported by `tmux-pi`. You, the top-level process, own cleanup of that window; do not delegate cleanup to the child. Before returning a final response, confirm the delegated task is resolved and run `tmux kill-window -t '<window-id>'`."
+    }
+  ]
+}

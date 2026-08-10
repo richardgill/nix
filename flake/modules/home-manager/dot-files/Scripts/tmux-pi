@@ -1,0 +1,182 @@
+#!/usr/bin/env bash
+# @describe Launch a supervised Pi agent in tmux
+# @option --prompt-file File containing the delegated Pi prompt
+# @option --task-slug Short lowercase task name used for the window and channel
+# @option --timeout Listener timeout (defaults to 10m)
+# @option --pi-session Pi session file to fork
+# @option --model Pi model
+# @option --thinking Pi thinking level
+# @option --target Existing repo or worktree path (defaults to the current tmux session and directory)
+# @option --worktree Create a worktree with this branch name
+# @option --source-ref Explicit source ref for the new worktree
+# @option --wait-channel Re-arm an existing completion channel without launching Pi
+
+fail() {
+  printf 'Error: %s\n' "$1" >&2
+  exit 1
+}
+
+cleanup_listener() {
+  [[ -n "${LISTENER_PID:-}" ]] || return
+  kill "$LISTENER_PID" 2>/dev/null
+  wait "$LISTENER_PID" 2>/dev/null
+}
+
+wait_for_channel() {
+  local channel="$1"
+  local timeout_duration="$2"
+  local status
+
+  printf 'Listener armed: channel=%s\n' "$channel"
+  timeout "$timeout_duration" tmux wait-for "$channel"
+  status=$?
+  printf 'Listener exited with status %s. Inspect the delegate; if unresolved, re-arm channel %s.\n' "$status" "$channel"
+  return "$status"
+}
+
+make_channel() {
+  local task_name="$1"
+  local suffix
+
+  [[ "$task_name" =~ ^[a-z0-9]([a-z0-9-]{0,11}[a-z0-9])?$ ]] || fail "--task-slug must be lowercase, contain only letters, numbers, or hyphens, and be at most 13 characters"
+  suffix=$(head -c 5 /dev/urandom | base64 | tr '+/' '_-' | tr -d '=\n' | cut -c1-6)
+  printf '%s-%s' "$task_name" "$suffix"
+}
+
+prepare_prompt() {
+  local channel="$1"
+  local source_file="$2"
+  local prepared_file="/tmp/pi-prompt-${channel}.md"
+
+  [[ -f "$source_file" ]] || fail "--prompt-file does not exist or is not a file: $source_file"
+  cp "$source_file" "$prepared_file"
+
+  printf '\nBefore signalling, leave a concise status in your pane. Whenever finished, blocked, or needing parent attention, run exactly:\n\n`tmux wait-for -S "$PI_DELEGATE_CHANNEL"`\n\nYou may signal repeatedly. Remain available for follow-up work.\n' >> "$prepared_file"
+  printf '%s' "$prepared_file"
+}
+
+build_pi_command() {
+  local prompt_file="$1"
+  local pi_session="$2"
+  local model="$3"
+  local thinking="$4"
+  local channel="$5"
+  local pi_binary
+  local args
+
+  pi_binary=$(command -v pi) || fail "pi is not on PATH"
+  args=(env PI_DELEGATE=1 PI_DELEGATE_CHANNEL="$channel")
+  [[ -n "${PI_SKILL_DELEGATE:-}" ]] && args+=(PI_SKILL_DELEGATE="$PI_SKILL_DELEGATE")
+  args+=("$pi_binary")
+  [[ -n "$pi_session" ]] && args+=(--session "$pi_session")
+  [[ -n "$model" ]] && args+=(--model "$model")
+  [[ -n "$thinking" ]] && args+=(--thinking "$thinking")
+  args+=("@$prompt_file")
+  printf '%q ' "${args[@]}"
+}
+
+resolve_target() {
+  local worktree="$1"
+  local source_ref="$2"
+  local target="$3"
+  local main_worktree
+  local session
+  local args=(--no-switch --no-agent --pull)
+
+  if [[ -z "$worktree" && -z "$target" ]]; then
+    TARGET_CWD=$(realpath "$PWD")
+    TARGET_SESSION=$(tmux display-message -p '#{session_name}') || fail "--target is required outside tmux"
+    return
+  fi
+
+  if [[ -n "$worktree" ]]; then
+    if [[ "$(basename "$PWD")" == "main" && -d "$PWD/.git" ]]; then
+      main_worktree=$(realpath "$PWD")
+    else
+      [[ -d "$PWD/../main/.git" ]] || fail "run from the main worktree or one of its sibling worktrees"
+      main_worktree=$(realpath "$PWD/../main")
+    fi
+
+    target="$main_worktree/../${worktree//\//-}"
+    if [[ -n "$source_ref" ]]; then
+      (cd "$main_worktree" && "$HOME/Scripts/worktree-branch" "${args[@]}" "$source_ref" "$worktree") || exit 1
+    else
+      (cd "$main_worktree" && "$HOME/Scripts/worktree-branch" "${args[@]}" "$worktree") || exit 1
+    fi
+  fi
+
+  TARGET_CWD=$(realpath "$target") || fail "target does not exist: $target"
+  session=$(tmux list-panes -a -F $'#{session_name}\t#{pane_current_path}' |
+    awk -F '\t' -v path="$TARGET_CWD" '$2 == path { print $1; exit }')
+  [[ -n "$session" ]] || fail "could not find the tmux session for $TARGET_CWD"
+  TARGET_SESSION="$session"
+}
+
+launch_pi_window() {
+  local task="$1"
+  local session="$2"
+  local cwd="$3"
+  local command="$4"
+  local details
+
+  WINDOW_ID=$(tmux new-window -d -P -F '#{window_id}' \
+    -t "${session}:" \
+    -c "$cwd" \
+    -n "$task" \
+    "$command") || return 1
+
+  sleep 1
+  tmux rename-window -t "$WINDOW_ID" "$task" || return 1
+  details=$(tmux display-message -p -t "$WINDOW_ID" '#{session_name} #{window_id} #{window_name} #{pane_current_command}') || return 1
+  printf 'Launched: session=%s window=%s task=%s command=%s\n' "$session" "$WINDOW_ID" "$task" "${details##* }"
+}
+
+run() {
+  eval "$(argc --argc-eval "$0" "$@")"
+
+  local timeout_duration="${argc_timeout:-10m}"
+  if [[ -n "${argc_wait_channel:-}" ]]; then
+    wait_for_channel "$argc_wait_channel" "$timeout_duration"
+    exit $?
+  fi
+
+  [[ -n "${argc_prompt_file:-}" ]] || fail "--prompt-file is required"
+  [[ -n "${argc_task_slug:-}" ]] || fail "--task-slug is required"
+  [[ -z "${argc_source_ref:-}" || -n "${argc_worktree:-}" ]] || fail "--source-ref requires --worktree"
+  [[ -z "${argc_worktree:-}" || -z "${argc_target:-}" ]] || fail "--worktree cannot be combined with --target"
+
+  local task_name
+  local channel
+  local prepared_prompt
+  local pi_command
+  local listener_pid
+  local listener_status
+
+  task_name="$argc_task_slug"
+  channel=$(make_channel "$task_name")
+  prepared_prompt=$(prepare_prompt "$channel" "$argc_prompt_file")
+  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "${argc_model:-}" "${argc_thinking:-}" "$channel")
+
+  timeout "$timeout_duration" tmux wait-for "$channel" &
+  listener_pid=$!
+  LISTENER_PID="$listener_pid"
+  trap cleanup_listener EXIT INT TERM
+  sleep 0.1
+  kill -0 "$listener_pid" 2>/dev/null || fail "listener exited before launch for channel $channel"
+  printf 'Listener armed: task=%s channel=%s prompt=%s\n' "$task_name" "$channel" "$prepared_prompt"
+
+  resolve_target "${argc_worktree:-}" "${argc_source_ref:-}" "${argc_target:-}"
+
+  kill -0 "$listener_pid" 2>/dev/null || fail "listener exited before launch for channel $channel"
+  launch_pi_window "$task_name" "$TARGET_SESSION" "$TARGET_CWD" "$pi_command" || fail "failed to launch delegated Pi"
+
+  wait "$listener_pid"
+  listener_status=$?
+  LISTENER_PID=
+  trap - EXIT INT TERM
+  printf 'Listener exited with status %s. Inspect task %s in window %s; if unresolved, re-arm channel %s.\n' \
+    "$listener_status" "$task_name" "$WINDOW_ID" "$channel"
+  exit "$listener_status"
+}
+
+run "$@"

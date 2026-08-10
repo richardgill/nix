@@ -125,7 +125,7 @@ export const agents = {
   },
   pi: {
     sharedSkills: true,
-    excludeSkills: ["diff", "pr-diff"],
+    excludeSkills: ["diff", "pr-diff", "worktrees"],
     builtInWebSearch: false,
     webSearchName: activeWebSearchProvider.displayName,
     webFetchName: activeWebSearchProvider.fetchCommand,

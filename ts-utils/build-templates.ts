@@ -6,6 +6,7 @@ import {
   readFileSync,
   writeFileSync,
   cpSync,
+  chmodSync,
   readdirSync,
   existsSync,
   statSync,
@@ -64,7 +65,12 @@ type RenderContext = TemplateData & {
   webSearchProvider?: WebSearchProvider;
 };
 
-export type ExternalSkillContents = Readonly<Record<string, string>>;
+export type ExternalSkill = {
+  sourcePath: string;
+  overlayPath?: string;
+};
+
+export type ExternalSkills = Readonly<Record<string, ExternalSkill>>;
 
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
 const getAgentModelFamily = (agent: AgentName) => agents[agent].modelFamily;
@@ -77,6 +83,7 @@ const parseCliArgs = () => {
       "data-file": { type: "string", short: "d" },
       outDir: { type: "string", short: "o" },
       "external-skill": { type: "string", multiple: true },
+      "external-skill-overlay": { type: "string", multiple: true },
     },
   });
 
@@ -91,6 +98,7 @@ const parseCliArgs = () => {
     dataFile: values["data-file"],
     outDir: values.outDir,
     externalSkillSpecs: values["external-skill"] ?? [],
+    externalSkillOverlaySpecs: values["external-skill-overlay"] ?? [],
   };
 };
 
@@ -108,23 +116,47 @@ const readSkillName = (content: string) => {
   return name;
 };
 
-const loadExternalSkills = (specs: readonly string[]): ExternalSkillContents =>
+const parseNamedPaths = (specs: readonly string[]) =>
   Object.fromEntries(
     specs.map((spec) => {
       const separator = spec.indexOf("=");
       if (separator < 1) {
         throw new Error(`invalid external skill spec: ${spec}`);
       }
+      return [spec.slice(0, separator), spec.slice(separator + 1)];
+    }),
+  );
 
-      const name = spec.slice(0, separator);
-      const content = readFileSync(spec.slice(separator + 1), "utf-8");
-      const skillName = readSkillName(content);
+const loadExternalSkills = (
+  sourceSpecs: readonly string[],
+  overlaySpecs: readonly string[],
+): ExternalSkills => {
+  const sources = parseNamedPaths(sourceSpecs);
+  const overlays = parseNamedPaths(overlaySpecs);
+
+  for (const name of Object.keys(overlays)) {
+    if (!sources[name]) {
+      throw new Error(`${name}: external skill overlay has no skill source`);
+    }
+  }
+
+  return Object.fromEntries(
+    Object.entries(sources).map(([name, sourcePath]) => {
+      const skillPath = join(sourcePath, "SKILL.md");
+      if (!existsSync(skillPath)) {
+        throw new Error(`${name}: external skill directory has no SKILL.md`);
+      }
+      const skillName = readSkillName(readFileSync(skillPath, "utf-8"));
       if (skillName !== name) {
         throw new Error(`${name}: external skill is named ${skillName}`);
       }
-      return [name, content];
+      if (overlays[name] && !existsSync(overlays[name])) {
+        throw new Error(`${name}: external skill overlay does not exist`);
+      }
+      return [name, { sourcePath, overlayPath: overlays[name] }];
     }),
   );
+};
 
 const ensureDir = (path: string) => {
   mkdirSync(dirname(path), { recursive: true });
@@ -148,6 +180,27 @@ const copyFile = (sourcePath: string, outputPath: string) => {
   ensureDir(outputPath);
   cpSync(sourcePath, outputPath);
   console.log(`Copied: ${relative(process.cwd(), outputPath)}`);
+};
+
+const applySkillOverlay = (
+  skillPath: string,
+  overlayPath: string | undefined,
+  data: RenderContext,
+) => {
+  if (!overlayPath) return;
+
+  const content = readFileSync(skillPath, "utf-8");
+  const frontmatter = content.match(/^---\r?\n[\s\S]*?\r?\n---(?:\r?\n|$)/)?.[0];
+  if (!frontmatter) {
+    throw new Error(`${skillPath}: skill does not contain frontmatter`);
+  }
+
+  const overlay = Handlebars.compile(readFileSync(overlayPath, "utf-8"))(data);
+  chmodSync(skillPath, 0o644);
+  writeFileSync(
+    skillPath,
+    `${frontmatter}\n${overlay.trim()}\n\n${content.slice(frontmatter.length)}`,
+  );
 };
 
 const registerPartialsFromDir = (partialsPath: string) => {
@@ -193,7 +246,7 @@ const processSharedContent = (
   rootDir: string,
   outDir: string,
   data: TemplateData,
-  externalSkills: ExternalSkillContents,
+  externalSkills: ExternalSkills,
 ) => {
   const sharedPath = join(rootDir, DOT_FILES_PATH, "ai-agents/shared");
 
@@ -240,19 +293,19 @@ const processSharedContent = (
         }
       }
 
-      for (const [skillName, content] of Object.entries(externalSkills)) {
+      for (const [skillName, skill] of Object.entries(externalSkills)) {
         if (excludeSkills.includes(skillName)) {
           console.log(`  Skipping excluded external skill: ${skillName}`);
           continue;
         }
 
-        const outputPath = join(targetSkillsPath, skillName, "SKILL.md");
+        const outputPath = join(targetSkillsPath, skillName);
         if (existsSync(outputPath)) {
           throw new Error(`External skill conflicts with local skill: ${skillName}`);
         }
 
-        ensureDir(outputPath);
-        writeFileSync(outputPath, content);
+        cpSync(skill.sourcePath, outputPath, { recursive: true });
+        applySkillOverlay(join(outputPath, "SKILL.md"), skill.overlayPath, agentData);
         console.log(`Copied external skill: ${skillName} for ${agent}`);
       }
     }
@@ -333,8 +386,16 @@ const processDirectory = (
 };
 
 export const buildTemplates = () => {
-  const { dataFile, outDir, externalSkillSpecs } = parseCliArgs();
-  const externalSkills = loadExternalSkills(externalSkillSpecs);
+  const {
+    dataFile,
+    outDir,
+    externalSkillSpecs,
+    externalSkillOverlaySpecs,
+  } = parseCliArgs();
+  const externalSkills = loadExternalSkills(
+    externalSkillSpecs,
+    externalSkillOverlaySpecs,
+  );
 
   const repoRoot = dirname(import.meta.dir);
   const rootDir = existsSync(join(repoRoot, "flake"))

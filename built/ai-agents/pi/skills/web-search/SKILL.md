@@ -4,7 +4,7 @@ description: web search API via Kagi CLI. Use when you need current information,
 metadata:
   pi:
     subProcess: true
-    subProcessContext: fork
+    subProcessContext: fresh
     model: openai-codex/gpt-5.6-sol
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob

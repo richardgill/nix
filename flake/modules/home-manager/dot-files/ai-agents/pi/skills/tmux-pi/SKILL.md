@@ -1,0 +1,85 @@
+---
+name: tmux-pi
+description: |
+  Delegate and oversee work in tmux-hosted Pi agents.
+  Triggers: "🧵", "thread", "delegate", "orchestrate", "oversee", "worktree", "spawn".
+  Use for launching, monitoring, following up with, or coordinating delegated Pi work.
+---
+
+# tmux-pi
+
+## Delegate work
+
+Delegate work to another Pi:
+
+- In the current tmux session and working directory by default.
+- In another existing repo or worktree tmux session with `--target`.
+- In a new worktree and tmux session with `--worktree`. This pulls local `main` first and creates the branch from its updated HEAD unless `--source-ref` is supplied.
+
+Delegation is not fire-and-forget. `tmux-pi` arms a tracked listener before detached work starts and reports the task, channel, prompt, session, and window.
+
+## Launch the delegate
+
+Choose a short, human-readable lowercase task name of at most 13 characters. `tmux-pi` only accepts prompt files. Use an existing issue, plan, design, or spec, or write generated prompt text to a temporary file first.
+
+Run `tmux-pi` with bash tool settings `timeout: 1` and `timeoutAction: "background"`. Do not continue until the tool confirms it is running in the background and its output says `Listener armed`.
+
+Current tmux session and working directory:
+
+```bash
+tmux-pi \
+  --task-slug 'auth-research' \
+  --prompt-file '<prompt-file>'
+```
+
+Another existing repo or worktree tmux session:
+
+```bash
+tmux-pi \
+  --task-slug 'auth-research' \
+  --prompt-file '<prompt-file>' \
+  --target '<repo-or-worktree>'
+```
+
+New worktree from local `main` HEAD:
+
+```bash
+tmux-pi \
+  --task-slug 'auth-research' \
+  --prompt-file '<prompt-file>' \
+  --worktree '<branch>'
+```
+
+Add `--source-ref '<ref>'` only when the worktree should start from an explicit source ref. Add `--pi-session`, `--model`, or `--thinking` when supplied by the request.
+
+`tmux-pi` copies the source prompt to `/tmp/pi-prompt-<task>.md`, appends the completion protocol, launches the child with `PI_DELEGATE=1`, and waits for its signal. Keep the task, channel, and window from its output available for supervision.
+
+After verifying the delegate launched, do not poll with `capture-pane`, `bash_process`, `sleep`, or repeated status commands. Wait for the background listener completion notification. Inspect the pane and repository only after that notification, unless the user explicitly requests live monitoring.
+
+## Oversee delegated work
+
+When `tmux-pi` exits, inspect the delegated pane and repository. Exit status `124` means the ten-minute liveness timeout expired rather than the delegate signalling.
+
+If the task remains unresolved, re-arm the same channel with bash tool settings `timeout: 1` and `timeoutAction: "background"` before sending follow-up work:
+
+```bash
+tmux-pi --wait-channel '<channel>' --timeout 10m
+```
+
+After the listener reports that it is armed, send follow-up instructions with `tmux send-keys`. A signal sent between listeners is latched, so the next waiter exits immediately. Multiple signals before re-arming collapse into one. Use a fresh channel only for a new delegated task.
+
+Never type multiline follow-up messages into Pi with `tmux send-keys`. Write the message to a file under `/tmp`, then send its absolute `@` file reference as one line:
+
+```bash
+followup_file=/tmp/pi-followup-<task>.md
+# Write the multiline instructions to "$followup_file" with the write tool.
+tmux send-keys -t '<window-id>' "@$followup_file" Enter
+```
+
+For skill delegates, close the delegated tmux window after confirming the task is resolved:
+
+```bash
+tmux kill-window -t '<window-id>'
+```
+
+Remove the prepared prompt only when the task is resolved. Never respond finally while observed delegated work remains unresolved unless explicitly asked not to wait.

@@ -137,7 +137,13 @@ trust_level = "trusted"
 [projects."/Users/rich/code/pi-extensions/main"]
 trust_level = "trusted"
 
+[projects."/Users/rich/code/qmk-firmware-richard"]
+trust_level = "trusted"
+
 [projects."/home/rich/code/codediff-testing"]
+trust_level = "trusted"
+
+[projects."/home/rich/code/ghostty/main"]
 trust_level = "trusted"
 
 [notice.model_migrations]

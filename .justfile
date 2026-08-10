@@ -168,7 +168,8 @@ template machine='':
     nix shell nixpkgs#bun --command bun ./build-templates.bundle.js \
       --data-file "$data_file" \
       --outDir ../../built \
-      --external-skill "gh-stack=$gh_stack_skill"
+      --external-skill "gh-stack=$gh_stack_skill" \
+      --external-skill-overlay gh-stack=../modules/home-manager/dot-files/ai-agents/shared/skill-overlays/gh-stack/SKILL.md.hbs
 
     rm -f "$data_file"
     echo "Templates built to: built/"

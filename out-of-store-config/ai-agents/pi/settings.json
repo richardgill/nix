@@ -46,6 +46,7 @@
     "~/code/pi-extensions/main/extensions/handoff",
     "~/code/pi-extensions/main/extensions/notify",
     "~/code/pi-extensions/main/extensions/process-info",
+    "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
     "~/code/pi-extensions/main/extensions/trust-all-projects",
     "npm:@calesennett/pi-codex-fast",

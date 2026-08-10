@@ -5,6 +5,7 @@
 # @option --prompt-file Path to a file to use as the prompt (e.g. an issue plan.md)
 # @option -b --binary Binary to use for AI agent (defaults to ~/.config/ai-agent)
 # @flag -d --no-switch Don't switch to the new tmux session
+# @flag --no-agent Create the worktree and tmux session without AI agent windows
 # @flag -p --pull Automatically pull main if behind (no prompt)
 # @arg source_branch! Branch name or remote/branch (e.g., origin/my-branch)
 # @arg dest_name Destination name (defaults to source_branch name)
@@ -26,6 +27,11 @@ EXAMPLES
 fi
 
 eval "$(argc --argc-eval "$0" "$@")"
+
+if [[ -n "$argc_no_agent" && ( -n "$argc_cmd" || -n "$argc_prompt" || -n "$argc_prompt_file" ) ]]; then
+  echo "Error: --no-agent cannot be combined with --cmd, --prompt, or --prompt-file" >&2
+  exit 1
+fi
 
 source ~/Scripts/lib/ai-agent
 argc_binary="${argc_binary:-$(default_ai_agent)}"
@@ -77,8 +83,13 @@ SOURCE=$(realpath .)
 SOURCE_BRANCH="$argc_source_branch"
 DEST_NAME="$argc_dest_name"
 
+is_remote_branch() {
+  local remote="${1%%/*}"
+  [[ "$1" == */* ]] && git remote get-url "$remote" > /dev/null 2>&1
+}
+
 # Handle single argument that is a remote branch (e.g., origin/branch-name)
-if [ -z "$DEST_NAME" ] && [[ "$SOURCE_BRANCH" == */* ]]; then
+if [ -z "$DEST_NAME" ] && is_remote_branch "$SOURCE_BRANCH"; then
   # For single remote branch argument, extract branch name and use it as both directory and branch name
   DEST_NAME=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
 fi
@@ -113,7 +124,7 @@ fi
 
 # Determine if we have a source branch to create from
 if [ -n "$argc_dest_name" ]; then
-  if [[ "$SOURCE_BRANCH" == */* ]]; then
+  if is_remote_branch "$SOURCE_BRANCH"; then
     REMOTE=$(echo "$SOURCE_BRANCH" | cut -d'/' -f1)
     BRANCH=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
     echo "Fetching remote branch $SOURCE_BRANCH..."
@@ -123,9 +134,9 @@ if [ -n "$argc_dest_name" ]; then
     git push -u origin "$DEST_NAME"
     cd - > /dev/null
   else
-    git worktree add "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
+    git worktree add -b "$DEST_NAME" "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
   fi
-elif [[ "$SOURCE_BRANCH" == */* ]]; then
+elif is_remote_branch "$SOURCE_BRANCH"; then
   REMOTE=$(echo "$SOURCE_BRANCH" | cut -d'/' -f1)
   BRANCH=$(echo "$SOURCE_BRANCH" | cut -d'/' -f2-)
   echo "Fetching remote branch $SOURCE_BRANCH..."
@@ -134,14 +145,16 @@ elif [[ "$SOURCE_BRANCH" == */* ]]; then
   cd "$TARGET" || { echo "Error: failed to cd to $TARGET" >&2; exit 1; }
   git push -u origin "$DEST_NAME"
   cd - > /dev/null
+elif git show-ref --verify --quiet "refs/heads/$SOURCE_BRANCH"; then
+  git worktree add "$TARGET" "$SOURCE_BRANCH" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
 else
-  git worktree add "$TARGET" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
+  git worktree add -b "$DEST_NAME" "$TARGET" || { echo "Error: failed to create worktree at $TARGET" >&2; exit 1; }
 fi
 
 # Trust mise configs before tmux session starts (shell hook runs on cd to TARGET)
 mise trust --all --cd "$TARGET"
 
 TMUX_SESSION=$(create_worktree_session $(realpath "$TARGET") "$argc_no_switch")
-SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd")
+SOCKET_FILE=$(setup_tmux_windows "$TMUX_SESSION" "$argc_cmd" "$argc_no_agent")
 
 tmux send-keys -t "${TMUX_SESSION}:long" "$(dirname "$0")/worktree-branch-setup \"$SOURCE\" \"$TARGET\" \"$SOCKET_FILE\"" Enter

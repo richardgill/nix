@@ -199,7 +199,7 @@
 
     in
     {
-      ghStackSkill = "${inputs.gh-stack}/skills/gh-stack/SKILL.md";
+      ghStackSkill = "${inputs.gh-stack}/skills/gh-stack";
 
       # Enables `nix fmt` at root of repo to format all nix files
       formatter = forAllSystems (system: treefmtEval.${system}.config.build.wrapper);

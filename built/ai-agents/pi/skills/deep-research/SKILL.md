@@ -4,7 +4,7 @@ description: Searches the web, fetches documentation, and searches GitHub code. 
 metadata:
   pi:
     subProcess: true
-    subProcessContext: fork
+    subProcessContext: fresh
     model: openai-codex/gpt-5.6-sol
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
