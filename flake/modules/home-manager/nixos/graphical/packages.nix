@@ -46,7 +46,6 @@ in
       slurp
       swaybg
       swayidle
-      telegram-desktop
       swaylock
       swayosd
       brightnessctl

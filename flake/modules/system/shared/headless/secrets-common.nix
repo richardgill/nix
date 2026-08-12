@@ -12,7 +12,8 @@ let
     "kagi-session-token"
     "openai-api-key"
     "exa-api-key"
-    "telegram-bot-token"
+    "ntfy-agent-topic"
+    "ntfy-github-topic"
   ];
 
   # Generate secret configurations with appropriate ownership

@@ -260,6 +260,7 @@ binds {
     Ctrl+Alt+Shift+Super+H repeat=false { spawn "~/Scripts/nixos/launch-app" "password"; }
     Ctrl+Alt+Shift+Super+I repeat=false { spawn "~/Scripts/nixos/launch-app" "chrome"; }
     Ctrl+Alt+Shift+Super+M repeat=false { spawn "~/Scripts/nixos/launch-app" "music"; }
+    Ctrl+Alt+Shift+Super+N repeat=false { spawn-sh "niri msg action focus-workspace browser; exec $HOME/Scripts/nixos/launch-in-app-scope firefox https://ntfy.sh/app"; }
     Ctrl+Alt+Shift+Super+S repeat=false { spawn "~/Scripts/nixos/launch-app" "slack"; }
     Ctrl+Alt+Shift+Super+T repeat=false { spawn "~/Scripts/nixos/launch-app" "todoist"; }
     Ctrl+Alt+Shift+Super+W repeat=false { spawn "~/Scripts/nixos/launch-app" "beeper"; }

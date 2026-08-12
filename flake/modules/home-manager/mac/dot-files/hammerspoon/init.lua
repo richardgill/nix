@@ -120,6 +120,10 @@ hs.hotkey.bind(hyper, "m", function()
 	launchCmus()
 end)
 
+hs.hotkey.bind(hyper, "n", function()
+	hs.urlevent.openURL("https://ntfy.sh/app")
+end)
+
 hs.hotkey.bind(hyper, "h", function()
 	hs.application.launchOrFocus("1Password")
 end)

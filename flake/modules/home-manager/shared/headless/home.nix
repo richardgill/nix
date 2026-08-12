@@ -11,8 +11,8 @@
     sessionVariables = {
       COLORTERM = "truecolor";
       SSL_CERT_FILE = "/etc/ssl/certs/ca-certificates.crt";
-      TELEGRAM_BOT_TOKEN_FILE = osConfig.sops.secrets."telegram-bot-token".path;
-      TELEGRAM_CHAT_ID = "7743550827";
+      NTFY_AGENT_TOPIC_FILE = osConfig.sops.secrets."ntfy-agent-topic".path;
+      NTFY_GITHUB_TOPIC_FILE = osConfig.sops.secrets."ntfy-github-topic".path;
     };
 
   };

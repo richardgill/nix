@@ -18,9 +18,15 @@ elapsed() {
 }
 
 ADD_ALL=false
+COMMIT_MSG=""
 for arg in "$@"; do
   if [ "$arg" = "--add-all" ]; then
     ADD_ALL=true
+  elif [ -z "$COMMIT_MSG" ]; then
+    COMMIT_MSG="$arg"
+  else
+    echo "Usage: auto-commit [--add-all] [commit message]" >&2
+    exit 2
   fi
 done
 
@@ -44,10 +50,11 @@ if [ -z "$(git status --porcelain)" ]; then
 fi
 
 printf '\n' >&2
-DIFF_LINES=$(git diff --cached | wc -l | tr -d ' ')
-log "Generating commit message (diff: $DIFF_LINES lines)"
+if [ -z "$COMMIT_MSG" ]; then
+  DIFF_LINES=$(git diff --cached | wc -l | tr -d ' ')
+  log "Generating commit message (diff: $DIFF_LINES lines)"
 
-PROMPT_BASE=$(cat <<EOF
+  PROMPT_BASE=$(cat <<EOF
 Generate a succinct commit message for these changes. Output ONLY the commit message, no explanation. Do not use prefixes like [chore], [billing], etc. Keep it simple and brief for PR review.
 
 <example>
@@ -68,28 +75,31 @@ $(git diff --cached --stat)
 EOF
 )
 
-if [ "$DIFF_LINES" -gt 400 ]; then
+  if [ "$DIFF_LINES" -gt 400 ]; then
     PROMPT="$PROMPT_BASE"
-else
+  else
     PROMPT="$PROMPT_BASE
 
 $(git diff --cached)"
+  fi
+
+  COMMIT_MSG_START=$(date +%s)
+  COMMIT_MSG=$("$SCRIPT_DIR/ai-prompt" "$PROMPT") || {
+    status=$?
+    log "Commit message generation failed after $(elapsed "$COMMIT_MSG_START") (exit $status)"
+    exit "$status"
+  }
+
+  if [ -z "$COMMIT_MSG" ]; then
+    log "Commit message generation failed: empty response"
+    exit 1
+  fi
+
+  printf '\n' >&2
+  log "Commit message generated in $(elapsed "$COMMIT_MSG_START"): $COMMIT_MSG"
+else
+  log "Using provided commit message: $COMMIT_MSG"
 fi
-
-COMMIT_MSG_START=$(date +%s)
-COMMIT_MSG=$("$SCRIPT_DIR/ai-prompt" "$PROMPT") || {
-  status=$?
-  log "Commit message generation failed after $(elapsed "$COMMIT_MSG_START") (exit $status)"
-  exit "$status"
-}
-
-if [ -z "$COMMIT_MSG" ]; then
-  log "Commit message generation failed: empty response"
-  exit 1
-fi
-
-printf '\n' >&2
-log "Commit message generated in $(elapsed "$COMMIT_MSG_START"): $COMMIT_MSG"
 
 COMMIT_START=$(date +%s)
 log "Running git commit"

@@ -17,9 +17,8 @@ in
       StateDirectory = "ai-cron";
       Environment = [
         "PATH=${pathEnv}"
-        "NOTIFY_SEND_PATH=${pkgs.libnotify}/bin/notify-send"
-        "TELEGRAM_BOT_TOKEN_FILE=${config.home.sessionVariables.TELEGRAM_BOT_TOKEN_FILE}"
-        "TELEGRAM_CHAT_ID=${config.home.sessionVariables.TELEGRAM_CHAT_ID}"
+        "NTFY_AGENT_TOPIC_FILE=${config.home.sessionVariables.NTFY_AGENT_TOPIC_FILE}"
+        "NTFY_GITHUB_TOPIC_FILE=${config.home.sessionVariables.NTFY_GITHUB_TOPIC_FILE}"
       ];
     };
     Install = {

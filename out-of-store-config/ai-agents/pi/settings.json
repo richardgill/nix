@@ -53,6 +53,6 @@
     "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
-    "enabled": true
+    "enabled": false
   }
 }

@@ -139,7 +139,6 @@
           ".local/share/voxtype"
           ".local/share/Steam"
           ".local/share/Rocket League"
-          ".local/share/TelegramDesktop"
           ".local/share/syncthing"
           ".steam"
           ".cache/cmus"

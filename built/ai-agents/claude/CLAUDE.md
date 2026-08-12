@@ -48,10 +48,11 @@
 
 - Only do git commits when I explicitly ask.
 - Treat these standalone messages as explicit authorization to run the corresponding command:
+  - Decide on a succinct commit message that describes the changes and pass it to the command.
   - These commands run `git add .` if nothing is staged; run `git add <specific-files>` first if you want to commit only specific files.
-  - `ci`: run `auto-commit`
-  - `cip`: run `auto-commit-push`
-  - `cipr`: run `auto-commit-pr`
+  - `ci`: run `auto-commit "<commit message>"`
+  - `cip`: run `auto-commit-push "<commit message>"`
+  - `cipr`: run `auto-commit-pr "<commit message>"`
 - Never amend commits unless I explicitly ask.
 - Never force push unless I explicitly ask or it is required by a stacked PR workflow. Always use `--force-with-lease`, never `--force`.
 - PR's should be created in draft status unless I explicitly ask.
@@ -60,7 +61,7 @@
 - Keep each review-comment fix in its own commit when practical, then reply warmly with a short acknowledgement and the commit SHA, for example: `Fixed in <sha>`. Be sure to have commited and pushed the sha before the comment which includes it. 
 - "Manual testing" means running commands to test something like a human would. Do it by default unless asked otherwise.
 - Watch gh checks by running `gh pr checks --watch --fail-fast || gh run view --log-failed | tail -n 200` in background
-  - “🟢”, “green”, “baby”, or “babysit” means: watch the gh checks until they're successful, make any small fixes, and rerun any transient failures until all checks are green. If the issue needs my input, Telegram me.
+  - “🟢”, “green”, “baby”, or “babysit” means: watch the gh checks until they're successful, make any small fixes, and rerun any transient failures until all checks are green. If the issue needs my input, notify me.
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use WebFetch.
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
