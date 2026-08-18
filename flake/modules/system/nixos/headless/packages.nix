@@ -2,13 +2,10 @@
   config,
   lib,
   pkgs,
-  nixpkgs-unstable,
   ...
 }:
 let
-  sharedPackages = import ../../shared/headless/packages.nix {
-    inherit pkgs nixpkgs-unstable;
-  };
+  sharedPackages = import ../../shared/headless/packages.nix { inherit pkgs; };
 in
 {
   environment.systemPackages =

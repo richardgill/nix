@@ -13,7 +13,6 @@ alias wtor="~/Scripts/worktree-open --reset"
 alias wtd="~/Scripts/worktree-purge"
 alias wtc="~/Scripts/worktree-close"
 alias wtl="eza --sort=modified --reverse --time=modified --long --no-user --no-permissions"
-alias bdi="~/Scripts/bd-interactive"
 alias log="git log --graph --decorate --pretty=format:'%h - %an, %ar : %s'"
 alias ghdiff="~/Scripts/gh-diff"
 alias prChecks='gh pr checks --watch'

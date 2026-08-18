@@ -1,9 +1,6 @@
-{ pkgs, nixpkgs-unstable, ... }:
+{ pkgs, ... }:
 let
-  unstable = import nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
+  unstable = pkgs.unstablePkgs;
 in
 {
   packages = with pkgs; [

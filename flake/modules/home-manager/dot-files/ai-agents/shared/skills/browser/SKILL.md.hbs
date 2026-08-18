@@ -6,6 +6,14 @@ description: |
   or report what is visible. Do not use this skill for plain link opening; use `open <url>` instead.
   Trigger phrases include "click on", "fill out the form", "take a screenshot", "scrape",
   "automate", "test the website", "log into", "inspect this page", or any browser interaction request.
+{{#if (eq agent "pi")}}
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fresh
+    model: {{modelProfiles.balancedMedium.providerModel}}
+    thinkingLevel: {{modelProfiles.balancedMedium.thinkingLevel}}
+{{/if}}
 ---
 
 # Browser Automation with agent-browser

@@ -1,6 +1,14 @@
 ---
 name: discord-search
 description: Search public Discord help-channel archives via Answer Overflow MCP (mcpc @discord-search).
+{{#if (eq agent "pi")}}
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fresh
+    model: {{modelProfiles.economicalMedium.providerModel}}
+    thinkingLevel: {{modelProfiles.economicalMedium.thinkingLevel}}
+{{/if}}
 ---
 
 Use `mcpc @discord-search` to search Answer Overflow — a searchable archive of public Discord help channels.

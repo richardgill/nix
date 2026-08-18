@@ -54,6 +54,7 @@ in
   openaiApiKeyPath = config.sops.secrets."openai-api-key".path;
   exaApiKeyPath = config.sops.secrets."exa-api-key".path;
   defaultShell = "${pkgs.zsh}/bin/zsh";
+  gwsSkillsPath = "${pkgs.unstablePkgs.gws.src}/skills";
   catppuccinPlugin = "${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux";
   resurrectPlugin = "${pkgs.tmuxPlugins.resurrect}/share/tmux-plugins/resurrect/resurrect.tmux";
   continuumPlugin = "${pkgs.tmuxPlugins.continuum}/share/tmux-plugins/continuum/continuum.tmux";

@@ -1,7 +1,6 @@
 {
   lib,
   pkgs,
-  nixpkgs-unstable,
   config,
   osConfig,
   vars,
@@ -9,10 +8,7 @@
   ...
 }:
 let
-  unstable = import nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
+  unstable = pkgs.unstablePkgs;
 
   # Import shared templates
   templates = import ./templates.nix {

@@ -20,7 +20,6 @@
   home-manager = {
     extraSpecialArgs = {
       inherit inputs outputs vars;
-      inherit (inputs) nixpkgs-unstable;
     };
     useGlobalPkgs = true;
     useUserPackages = true;

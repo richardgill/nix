@@ -12,7 +12,7 @@ clipboard-read = allow
 clipboard-write = allow
 
 # Linux configuration
-font-size = 12.5
+font-size = 13
 # Send CSI modified arrows instead of ESC B/F so pi sees Alt+Left/Right when Kitty keyboard mode is active.
 keybind = alt+left=text:\x1b[1;3D
 keybind = alt+right=text:\x1b[1;3C

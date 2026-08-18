@@ -19,8 +19,8 @@ Plan the complete stack first, then build it bottom-up. Finish and commit each p
 Invoke the `tmux-pi` skill for every layer. Create the bottom layer from `main`, then create each child from its parent:
 
 ```bash
-tmux-pi --task-slug '<task>' --prompt-file '<prompt-file>' --worktree '<bottom>'
-tmux-pi --task-slug '<task>' --prompt-file '<prompt-file>' --worktree '<child>' --source-ref '<parent>'
+tmux-pi --task-slug '<task>' --prompt-file '<prompt-file>' --worktree '<bottom>' --model "openai-codex/gpt-5.6-sol" --thinking "high"
+tmux-pi --task-slug '<task>' --prompt-file '<prompt-file>' --worktree '<child>' --source-ref '<parent>' --model "openai-codex/gpt-5.6-sol" --thinking "high"
 ```
 
 Follow the skill's listener and supervision protocol before moving to the next layer.

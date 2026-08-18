@@ -114,9 +114,18 @@ in
         ${writeDarwinProfilesIni}
 
         if [ -d "/Applications/Firefox.app/Contents/Resources" ]; then
-          mkdir -p "${policyFolder}"
-          rm -f "${policyFolder}/policies.json"
-          cp -f "${policiesJson}" "${policyFolder}/policies.json"
+          POLICIES_TEMP_DIR=$(mktemp -d)
+          cp -f "${policiesJson}" "$POLICIES_TEMP_DIR/policies.json"
+          /usr/bin/osascript <<APPLESCRIPT
+        tell application "Finder"
+          set resourcesFolder to POSIX file "/Applications/Firefox.app/Contents/Resources" as alias
+          if not (exists folder "distribution" of resourcesFolder) then
+            make new folder at resourcesFolder with properties {name:"distribution"}
+          end if
+          duplicate POSIX file "$POLICIES_TEMP_DIR/policies.json" to folder "distribution" of resourcesFolder with replacing
+        end tell
+        APPLESCRIPT
+          rm -rf "$POLICIES_TEMP_DIR"
         fi
       ''}
       ${lib.optionalString (!pkgs.stdenv.isDarwin) ''

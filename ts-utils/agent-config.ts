@@ -1,17 +1,29 @@
 export type ModelFamily = "anthropic" | "openai" | "google";
 
-export type AgentPreset = {
+export type AgentModel = {
   provider: string;
   model: string;
   providerModel: string;
-  thinkingLevel: "low" | "medium" | "high" | "xhigh";
 };
 
-export type AgentPresets = {
-  low: AgentPreset;
-  medium: AgentPreset;
-  high: AgentPreset;
-  xhigh: AgentPreset;
+export type AgentModels = {
+  luna: AgentModel;
+  terra: AgentModel;
+  sol: AgentModel;
+};
+
+export type AgentModelProfile = AgentModel & {
+  thinkingLevel: "medium" | "high" | "xhigh";
+};
+
+export type AgentModelProfiles = {
+  economicalMedium: AgentModelProfile;
+  economicalHigh: AgentModelProfile;
+  balancedMedium: AgentModelProfile;
+  balancedHigh: AgentModelProfile;
+  strongMedium: AgentModelProfile;
+  strongHigh: AgentModelProfile;
+  strongXhigh: AgentModelProfile;
 };
 
 export type WebSearchProvider = {
@@ -36,13 +48,32 @@ export type AgentConfig = {
   commandsFolder: string;
   binary: string;
   modelFamily: ModelFamily;
-  presets?: AgentPresets;
+  models?: AgentModels;
+  modelProfiles?: AgentModelProfiles;
 };
 
-const mediumModel = "gpt-5.6-sol";
-const mediumProvider = `openai-codex/${mediumModel}`;
-const highModel = "gpt-5.6-sol";
-const highProvider = `openai-codex/${highModel}`;
+const openAiCodexModel = (model: string): AgentModel => ({
+  provider: "openai-codex",
+  model,
+  providerModel: `openai-codex/${model}`,
+});
+
+const models = {
+  luna: openAiCodexModel("gpt-5.6-luna"),
+  terra: openAiCodexModel("gpt-5.6-terra"),
+  sol: openAiCodexModel("gpt-5.6-sol"),
+} satisfies AgentModels;
+
+const modelProfiles = {
+  economicalMedium: { ...models.luna, thinkingLevel: "medium" },
+  economicalHigh: { ...models.luna, thinkingLevel: "high" },
+  balancedMedium: { ...models.terra, thinkingLevel: "medium" },
+  balancedHigh: { ...models.terra, thinkingLevel: "high" },
+  strongMedium: { ...models.sol, thinkingLevel: "medium" },
+  strongHigh: { ...models.sol, thinkingLevel: "high" },
+  strongXhigh: { ...models.sol, thinkingLevel: "xhigh" },
+} satisfies AgentModelProfiles;
+
 const webSearchSkill = "web-search";
 const webSearchProviders = {
   exa: {
@@ -134,32 +165,8 @@ export const agents = {
     commandsFolder: "",
     binary: "pi",
     modelFamily: "openai",
-    presets: {
-      low: {
-        provider: "openai-codex",
-        model: mediumModel,
-        providerModel: mediumProvider,
-        thinkingLevel: "low",
-      },
-      medium: {
-        provider: "openai-codex",
-        model: mediumModel,
-        providerModel: mediumProvider,
-        thinkingLevel: "medium",
-      },
-      high: {
-        provider: "openai-codex",
-        model: highModel,
-        providerModel: highProvider,
-        thinkingLevel: "high",
-      },
-      xhigh: {
-        provider: "openai-codex",
-        model: highModel,
-        providerModel: highProvider,
-        thinkingLevel: "xhigh",
-      },
-    },
+    models,
+    modelProfiles,
   },
 } as const satisfies Record<string, AgentConfig>;
 

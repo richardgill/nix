@@ -7,7 +7,24 @@
   ...
 }:
 let
-  playwrightBrowsers = inputs.playwright.packages.${pkgs.stdenv.hostPlatform.system}.playwright-driver.browsers;
+  upstreamPlaywrightBrowsers = inputs.playwright.packages.${pkgs.stdenv.hostPlatform.system}.playwright-driver.browsers;
+  playwrightBrowsers = pkgs.runCommand "playwright-browsers-compatible" { } ''
+    mkdir -p "$out"
+    cp -rs "${upstreamPlaywrightBrowsers}/." "$out/"
+    find "$out" -type d -exec chmod u+w {} +
+
+    for browser in "${upstreamPlaywrightBrowsers}"/chromium-[0-9]*; do
+      revision="''${browser##*-}"
+      mkdir -p "$out/chromium-$revision/chrome-linux64"
+      ln -s "$browser/chrome-linux/chrome" "$out/chromium-$revision/chrome-linux64/chrome"
+    done
+
+    for browser in "${upstreamPlaywrightBrowsers}"/chromium_headless_shell-*; do
+      revision="''${browser##*-}"
+      mkdir -p "$out/chromium_headless_shell-$revision/chrome-headless-shell-linux64"
+      ln -s "$browser/chrome-linux/headless_shell" "$out/chromium_headless_shell-$revision/chrome-headless-shell-linux64/chrome-headless-shell"
+    done
+  '';
 in
 {
   home.sessionVariables = {

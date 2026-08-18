@@ -4,14 +4,10 @@
   config,
   lib,
   pkgs,
-  nixpkgs-unstable,
   ...
 }:
 let
-  unstable = import nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
+  unstable = pkgs.unstablePkgs;
 in
 {
   home.activation.removeMutableGhStack = lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''

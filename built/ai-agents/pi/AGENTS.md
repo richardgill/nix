@@ -48,6 +48,7 @@
 
 ## Workflow
 
+- Default to delegating self-contained medium-sized implementation and research tasks through `tmux-pi`; perform higher-level work and complex thinking inline.
 - Only do git commits when I explicitly ask.
 - Treat these standalone messages as explicit authorization to run the corresponding command:
   - Decide on a succinct commit message that describes the changes and pass it to the command.

@@ -5,8 +5,8 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fork
-    model: openai-codex/gpt-5.6-sol
-    thinkingLevel: high
+    model: openai-codex/gpt-5.6-terra
+    thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob, Task
 ---
 

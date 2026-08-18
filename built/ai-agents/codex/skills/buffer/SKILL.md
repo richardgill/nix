@@ -7,6 +7,12 @@ Use `mcpc @buffer` for Buffer operations.
 
 Unless Richard explicitly says otherwise, create every requested social post for both the connected Twitter and Bluesky channels. Call `get_account` and `list_channels`, then use the exact channel IDs returned for the `twitter` and `bluesky` services. Treat one requested post as two `create_post` operations, and ask before proceeding if either channel is unavailable.
 
+Draft posts by default using `saveToDraft: true`. After creating drafts, give Richard the Buffer drafts link:
+
+`https://publish.buffer.com/schedule?tab=drafts`
+
+Only publish when Richard explicitly asks to post or publish it now. When publishing, update the existing drafts rather than creating duplicate posts.
+
 If the session is missing or unauthorized, ask Richard to run:
 
 ```bash

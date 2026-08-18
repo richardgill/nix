@@ -4,15 +4,11 @@
   config,
   lib,
   pkgs,
-  nixpkgs-unstable,
   inputs,
   ...
 }:
 let
-  unstable = import nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
+  unstable = pkgs.unstablePkgs;
   isAarch64Linux = pkgs.stdenv.hostPlatform.system == "aarch64-linux";
 in
 {

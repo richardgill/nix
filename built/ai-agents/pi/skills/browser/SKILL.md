@@ -6,6 +6,12 @@ description: |
   or report what is visible. Do not use this skill for plain link opening; use `open <url>` instead.
   Trigger phrases include "click on", "fill out the form", "take a screenshot", "scrape",
   "automate", "test the website", "log into", "inspect this page", or any browser interaction request.
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fresh
+    model: openai-codex/gpt-5.6-terra
+    thinkingLevel: medium
 ---
 
 # Browser Automation with agent-browser

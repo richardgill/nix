@@ -122,8 +122,6 @@
           ".config/sops"
           ".config/secrets"
           ".config/op"
-          ".gmcli"
-          ".gccli"
           ".zoom"
           ".local/share/gh/extensions"
           ".local/share/zoxide"

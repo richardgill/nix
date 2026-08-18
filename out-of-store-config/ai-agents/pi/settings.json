@@ -32,7 +32,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.84.1",
+  "lastChangelogVersion": "0.84.2",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -53,6 +53,7 @@
     "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
-    "enabled": false
+    "enabled": false,
+    "mode": "off"
   }
 }

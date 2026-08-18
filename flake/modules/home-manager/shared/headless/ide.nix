@@ -1,12 +1,6 @@
-{
-  pkgs,
-  nixpkgs-unstable,
-  ...
-}:
+{ pkgs, ... }:
 let
-  unstable = import nixpkgs-unstable {
-    inherit (pkgs.stdenv.hostPlatform) system;
-  };
+  unstable = pkgs.unstablePkgs;
   treesitter = unstable.vimPlugins.nvim-treesitter.withPlugins (p: [
     p.bash
     p.diff

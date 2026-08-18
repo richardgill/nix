@@ -1,0 +1,28 @@
+---
+name: gmail
+description: Gmail via gws.
+{{#if (eq agent "pi")}}
+metadata:
+  pi:
+    subProcess: true
+    subProcessContext: fresh
+    model: {{modelProfiles.economicalMedium.providerModel}}
+    thinkingLevel: {{modelProfiles.economicalMedium.thinkingLevel}}
+{{/if}}
+---
+
+# Gmail via gws
+
+Use `gws` for Gmail operations.
+
+Before using Gmail, read all of these official `gws` skill references:
+
+- `{{gwsSkillsPath}}/gws-shared/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-forward/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-read/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-reply/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-reply-all/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-send/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-triage/SKILL.md`
+- `{{gwsSkillsPath}}/gws-gmail-watch/SKILL.md`

@@ -18,8 +18,9 @@ import {
   activeWebSearchProvider,
   agents,
   type AgentConfig,
+  type AgentModelProfiles,
+  type AgentModels,
   type AgentName,
-  type AgentPresets,
   type ModelFamily,
   type WebSearchProvider,
 } from "./agent-config";
@@ -42,6 +43,7 @@ const templateDataSchema = z
     openaiApiKeyPath: z.string(),
     exaApiKeyPath: z.string(),
     defaultShell: z.string(),
+    gwsSkillsPath: z.string(),
     catppuccinPlugin: z.string(),
     resurrectPlugin: z.string(),
     continuumPlugin: z.string(),
@@ -58,7 +60,8 @@ type RenderContext = TemplateData & {
   agent?: AgentName;
   binary: string;
   modelFamily?: ModelFamily;
-  presets?: AgentPresets;
+  models?: AgentModels;
+  modelProfiles?: AgentModelProfiles;
   builtInWebSearch?: boolean;
   webSearchName?: string;
   webFetchName?: string;
@@ -74,8 +77,10 @@ export type ExternalSkills = Readonly<Record<string, ExternalSkill>>;
 
 const getAgentBinary = (agent: AgentName) => agents[agent].binary;
 const getAgentModelFamily = (agent: AgentName) => agents[agent].modelFamily;
-const getAgentPresets = (agent: AgentName) =>
-  (agents[agent] as AgentConfig).presets;
+const getAgentModels = (agent: AgentName) =>
+  (agents[agent] as AgentConfig).models;
+const getAgentModelProfiles = (agent: AgentName) =>
+  (agents[agent] as AgentConfig).modelProfiles;
 
 const parseCliArgs = () => {
   const { values } = parseArgs({
@@ -259,7 +264,8 @@ const processSharedContent = (
       agent,
       binary: getAgentBinary(agent),
       modelFamily: getAgentModelFamily(agent),
-      presets: getAgentPresets(agent),
+      models: getAgentModels(agent),
+      modelProfiles: getAgentModelProfiles(agent),
       builtInWebSearch: config.builtInWebSearch,
       webSearchName: config.webSearchName,
       webFetchName: config.webFetchName,
@@ -352,7 +358,8 @@ const processDirectory = (
             agent: agentName,
             binary: getAgentBinary(agentName),
             modelFamily: getAgentModelFamily(agentName),
-            presets: getAgentPresets(agentName),
+            models: getAgentModels(agentName),
+            modelProfiles: getAgentModelProfiles(agentName),
             builtInWebSearch: agentConfig.builtInWebSearch,
             webSearchName: agentConfig.webSearchName,
             webFetchName: agentConfig.webFetchName,

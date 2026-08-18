@@ -70,8 +70,10 @@
       flake = false;
     };
 
+    # Pin before Docker Desktop adopted cask syntax unsupported by Homebrew 6.0.13. Remove after nix-homebrew ships a newer Homebrew release.
+    # https://github.com/Homebrew/homebrew-cask/commit/957be8614e7cb00871430075ad1876c857430f8b
     homebrew-cask = {
-      url = "github:homebrew/homebrew-cask";
+      url = "github:homebrew/homebrew-cask/1d8e5d0dbc14e8c9d22be23abae5f79b11a9ef48";
       flake = false;
     };
 
@@ -165,13 +167,13 @@
         nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs outputs vars;
-            inherit (inputs) nixpkgs-unstable;
             inherit hostName;
           };
           modules = [
             path
             {
               nixpkgs.overlays = [
+                (import ./overlays/unstable-packages.nix { inherit inputs; })
                 (import ./overlays/pins.nix { inherit inputs; })
                 (import ./overlays/bambu-studio.nix)
               ];
@@ -184,13 +186,13 @@
         nix-darwin.lib.darwinSystem {
           specialArgs = {
             inherit inputs outputs vars;
-            inherit (inputs) nixpkgs-unstable;
             inherit hostName;
           };
           modules = [
             path
             {
               nixpkgs.overlays = [
+                (import ./overlays/unstable-packages.nix { inherit inputs; })
                 (import ./overlays/pins.nix { inherit inputs; })
               ];
             }

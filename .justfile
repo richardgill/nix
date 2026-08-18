@@ -184,7 +184,25 @@ template-bundle:
 
     if [ ! -d node_modules ] || [ bun.lock -nt node_modules ] || [ package.json -nt node_modules ]; then
       "${bun_cmd[@]}" install --frozen-lockfile
+      touch node_modules
     fi
 
-    mkdir -p ../flake/template-builder
-    "${bun_cmd[@]}" run prepare-template-bundle.ts --outfile ../flake/template-builder/build-templates.bundle.js
+    # Rebuild the template bundle only when its TypeScript or package inputs change.
+    bundle=../flake/template-builder/build-templates.bundle.js
+    input_hash=$(
+      git ls-files --cached --others --exclude-standard -z -- '*.ts' bun.lock package.json |
+        sort -z |
+        while IFS= read -r -d '' input; do
+          if [ -e "$input" ]; then
+            printf '%s\0%s\n' "$input" "$(git hash-object -- "$input")"
+          fi
+        done |
+        git hash-object --stdin
+    )
+    input_hash_file=node_modules/.template-bundle-input-hash
+
+    if [ ! -f "$bundle" ] || [ ! -f "$input_hash_file" ] || [ "$(<"$input_hash_file")" != "$input_hash" ]; then
+      mkdir -p "$(dirname "$bundle")"
+      "${bun_cmd[@]}" run prepare-template-bundle.ts --outfile "$bundle"
+      printf '%s\n' "$input_hash" > "$input_hash_file"
+    fi

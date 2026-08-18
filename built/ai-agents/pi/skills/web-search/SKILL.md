@@ -5,7 +5,7 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fresh
-    model: openai-codex/gpt-5.6-sol
+    model: openai-codex/gpt-5.6-luna
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
 ---

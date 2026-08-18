@@ -22,6 +22,8 @@ Delegation is not fire-and-forget. `tmux-pi` arms a tracked listener before deta
 
 Choose a short, human-readable lowercase task name of at most 13 characters. `tmux-pi` only accepts prompt files. Use an existing issue, plan, design, or spec, or write generated prompt text to a temporary file first.
 
+Use the `balancedMedium` profile for straightforward tasks that need less reasoning, such as writing code from a clear plan or specification: `--model "openai-codex/gpt-5.6-terra" --thinking "medium"`. Use a stronger profile when the delegate must investigate ambiguity, make difficult design decisions, or solve an unclear problem.
+
 Run `tmux-pi` with bash tool settings `timeout: 1` and `timeoutAction: "background"`. Do not continue until the tool confirms it is running in the background and its output says `Listener armed`.
 
 Current tmux session and working directory:
@@ -41,13 +43,15 @@ tmux-pi \
   --target '<repo-or-worktree>'
 ```
 
-New worktree from local `main` HEAD:
+New worktree from local `main` HEAD always uses the `strongHigh` profile:
 
 ```bash
 tmux-pi \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>' \
-  --worktree '<branch>'
+  --worktree '<branch>' \
+  --model "openai-codex/gpt-5.6-sol" \
+  --thinking "high"
 ```
 
 Add `--source-ref '<ref>'` only when the worktree should start from an explicit source ref. Add `--pi-session`, `--model`, or `--thinking` when supplied by the request.

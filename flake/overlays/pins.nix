@@ -149,6 +149,18 @@ in
     };
   };
 
+  # Niri 26.04 leaks memory while monitors are powered off.
+  # Remove this patch once the fix is merged, released, and available in Nixpkgs.
+  # Upstream: https://github.com/niri-wm/niri/pull/3910
+  niri = prev.niri.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      (prev.fetchpatch {
+        url = "https://github.com/niri-wm/niri/commit/164c9575cdb37ee8e57951eea7dac3ce957579c2.patch";
+        hash = "sha256-at6S/DeGwdhsJ+zicSFezE71/KbiNo8FMTsZ6hVYN9c=";
+      })
+    ];
+  });
+
   # Neovim is pinned to a 0.13 nightly commit for OS watcher-driven 'autoread'.
   # Remove the pin when Neovim 0.13 is stable and available in Nixpkgs.
   # Upstream: https://github.com/neovim/neovim/pull/37971

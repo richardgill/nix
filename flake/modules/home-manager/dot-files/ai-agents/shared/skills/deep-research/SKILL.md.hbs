@@ -12,8 +12,8 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fresh
-    model: {{presets.medium.providerModel}}
-    thinkingLevel: {{presets.medium.thinkingLevel}}
+    model: {{modelProfiles.strongMedium.providerModel}}
+    thinkingLevel: {{modelProfiles.strongMedium.thinkingLevel}}
 {{/if}}
 {{#if builtInWebSearch}}
 allowed-tools: {{webSearchName}}, {{webFetchName}}, Bash, Read, Grep, Glob

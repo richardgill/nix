@@ -7,22 +7,9 @@ description: Google Calendar via gws.
 
 Use `gws` for Google Calendar operations.
 
-When you need the official generated skill docs, create a temp directory under `/tmp/`, run `gws generate-skills` there, concatenate the generated Calendar skill docs into one file, then read that file:
+Before using Google Calendar, read all of these official `gws` skill references:
 
-```bash
-tmpdir="$(mktemp -d /tmp/gws-calendar.XXXXXX)"
-combined="$tmpdir/gws-calendar.md"
-(
-  cd "$tmpdir"
-  gws generate-skills
-  shopt -s nullglob
-  : > "$combined"
-  for file in skills/gws-calendar*/SKILL.md; do
-    printf '\n\n%s\n\n' "--- $file ---" >> "$combined"
-    cat "$file" >> "$combined"
-  done
-)
-```
-
-You only need to read this:
-- `$tmpdir/gws-calendar.md`
+- `/nix/store/5k3chv2szn2qgxsw7b1wij8zqmk8w33m-source/skills/gws-shared/SKILL.md`
+- `/nix/store/5k3chv2szn2qgxsw7b1wij8zqmk8w33m-source/skills/gws-calendar/SKILL.md`
+- `/nix/store/5k3chv2szn2qgxsw7b1wij8zqmk8w33m-source/skills/gws-calendar-agenda/SKILL.md`
+- `/nix/store/5k3chv2szn2qgxsw7b1wij8zqmk8w33m-source/skills/gws-calendar-insert/SKILL.md`

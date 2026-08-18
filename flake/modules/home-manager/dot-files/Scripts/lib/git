@@ -62,9 +62,18 @@ gh_stack_branch_position() {
 }
 
 get_pr_base_branch() {
+  local branch="$1"
   local info
-  info=$(get_gh_stack_branch_info "$1") || return 1
-  echo "${info#*$'\t'}"
+  local position
+
+  info=$(get_gh_stack_branch_info "$branch") || return 1
+  position="${info%%$'\t'*}"
+  if [[ "$position" != "none" ]]; then
+    echo "${info#*$'\t'}"
+    return
+  fi
+
+  gh pr view "$branch" --json baseRefName --jq .baseRefName 2>/dev/null || echo main
 }
 
 require_gh_stack_top_or_unstacked() {
