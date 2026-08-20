@@ -49,6 +49,7 @@
 ## Workflow
 
 - Default to delegating self-contained medium-sized implementation and research tasks through `tmux-pi`; perform higher-level work and complex thinking inline.
+- Use `openai-codex/gpt-5.6-terra` with `medium` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
 - Only do git commits when I explicitly ask.
 - Treat these standalone messages as explicit authorization to run the corresponding command:
   - Decide on a succinct commit message that describes the changes and pass it to the command.

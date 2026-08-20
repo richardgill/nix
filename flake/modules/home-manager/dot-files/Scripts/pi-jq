@@ -1,0 +1,138 @@
+#!/usr/bin/env bash
+# @describe Read concise messages and errors from a Pi session JSONL file
+# @flag -t --turn Latest user turn summary
+# @flag -e --errors Failed tool results
+# @flag -l --log Compact user and assistant log
+# @option -m --messages Last N meaningful user and assistant messages
+# @option -r --role <user|assistant> Filter --messages to a role
+# @flag -p --path Print the resolved JSONL path
+# @flag -a --all Inspect the whole session (only with --errors)
+# @flag -j --json Print machine-readable JSON
+# @option -n --chars=700 Maximum characters per message
+# @option -d --session-dir Session root override
+# @arg session-id! Pi session ID or unique prefix
+
+fail() {
+  printf 'Error: %s\n' "$1" >&2
+  exit 1
+}
+
+resolve_session_root() {
+  if [[ -n "${argc_session_dir:-}" ]]; then
+    printf '%s' "$argc_session_dir"
+  elif [[ -n "${PI_CODING_AGENT_SESSION_DIR:-}" ]]; then
+    printf '%s' "$PI_CODING_AGENT_SESSION_DIR"
+  elif [[ -n "${PI_CODING_AGENT_DIR:-}" ]]; then
+    printf '%s/sessions' "$PI_CODING_AGENT_DIR"
+  else
+    printf '%s/.pi/agent/sessions' "$HOME"
+  fi
+}
+
+resolve_session_path() {
+  local root="$1"
+  local id="$2"
+  local -a matches=()
+  local path
+  local name
+  local uuid
+
+  [[ "$id" != */* ]] || fail "session ID must not contain '/': $id"
+  [[ -d "$root" ]] || fail "session directory does not exist: $root"
+  while IFS= read -r -d '' path; do
+    name=${path##*/}
+    [[ "$name" == *"_$id.jsonl" ]] && matches+=("$path")
+  done < <(find "$root" -type f -name '*.jsonl' -print0)
+  if ((${#matches[@]} == 0)); then
+    while IFS= read -r -d '' path; do
+      name=${path##*/}
+      uuid=${name%.jsonl}
+      uuid=${uuid##*_}
+      [[ "$uuid" == "$id"* ]] && matches+=("$path")
+    done < <(find "$root" -type f -name '*.jsonl' -print0)
+  fi
+  ((${#matches[@]})) || fail "no session matches: $id"
+  ((${#matches[@]} == 1)) || fail "ambiguous session ID '$id' (${#matches[@]} matches)"
+  printf '%s' "${matches[0]}"
+}
+
+run() {
+  eval "$(argc --argc-eval "$0" "$@")"
+
+  local chars="${argc_chars:-700}"
+  local messages="${argc_messages:-1}"
+  local mode_count=0
+  local mode=messages
+  local role="${argc_role:-}"
+  local root
+  local path
+  local filter
+  local formatter
+  local all=false
+
+  [[ "$chars" =~ ^[1-9][0-9]*$ ]] || fail "--chars must be a positive integer"
+  [[ -z "${argc_messages:-}" || "$messages" =~ ^[1-9][0-9]*$ ]] || fail "--messages must be a positive integer"
+  [[ -z "${argc_role:-}" || -n "${argc_messages:-}" ]] || fail "--role requires --messages"
+  [[ -z "${argc_role:-}" || "${argc_role}" == "user" || "${argc_role}" == "assistant" ]] || fail "--role must be 'user' or 'assistant'"
+  for candidate in turn errors log messages path; do
+    local candidate_var="argc_$candidate"
+    if [[ -n "${!candidate_var:-}" ]]; then
+      mode=$candidate
+      ((mode_count += 1))
+    fi
+  done
+  ((mode_count <= 1)) || fail "modes are mutually exclusive"
+  ((mode_count > 0)) || role=assistant
+  [[ -z "${argc_turn:-}${argc_log:-}${argc_messages:-}${argc_path:-}" || -z "${argc_all:-}" ]] || fail "--all is only valid with --errors"
+  [[ -z "${argc_all:-}" || -n "${argc_errors:-}" ]] || fail "--all requires --errors"
+  [[ -n "${argc_all:-}" ]] && all=true
+
+  root=$(resolve_session_root) || return
+  path=$(resolve_session_path "$root" "$argc_session_id") || return
+  if [[ "$mode" == path ]]; then
+    if [[ -n "${argc_json:-}" ]]; then jq -n --arg path "$path" '{path: $path}'; else printf '%s\n' "$path"; fi
+    return
+  fi
+
+  filter='
+    def text:
+      if (.content | type) == "string" then .content
+      elif (.content | type) == "array" then [.content[] | select(type == "object" and .type == "text" and (.text | type) == "string") | .text] | join("\n")
+      else "" end;
+    def message: .[] | select(.type == "message" and (.message.role == "user" or .message.role == "assistant"));
+    def failed: .[] | select(.type == "message" and .message.role == "toolResult" and .message.isError == true);
+    def turn: . as $items | [range(0; length) | select($items[.] | .type == "message" and .message.role == "user")] | last as $start | if $start == null then [] else $items[$start:] end;
+    def clip($n): if length > $n then .[0:$n] + "…" else . end;
+    def errors: [failed | {tool: .message.toolName, text: (.message | text | clip($chars))}];
+    def status: [message | select(.message.role == "assistant") | (.message | text) | select(length > 0)] | last // "";
+    [split("\n")[] | fromjson? | select(.)] |
+    if $mode == "turn" then
+      turn | {
+        request: ([message | select(.message.role == "user") | (.message | text) | select(length > 0)] | last // "" | clip($chars)),
+        status: (status | clip($chars)),
+        tools: ([.[] | select(.type == "message" and .message.role == "assistant") | .message.content[]? | select(.type == "toolCall") | .name] | unique),
+        errors: errors
+      }
+    elif $mode == "errors" then
+      (if $all then . else turn end) | {errors: errors}
+    elif $mode == "messages" then
+      [message | select($role == "" or .message.role == $role) | (.message | text) as $text | select($text | test("[^[:space:]]")) | {role: .message.role, text: ($text | clip($chars))}] |
+      {messages: .[-$message_count:]}
+    else
+      {log: [message | (.message | text) as $text | select($text | length > 0) | {role: .message.role, text: ($text | clip($chars))}]}
+    end'
+
+  if [[ -n "${argc_json:-}" ]]; then
+    formatter='.'
+  else
+    case "$mode" in
+      turn) formatter='"request: \(.request)\nstatus: \(.status)\ntools: \(if (.tools | length > 0) then (.tools | join(", ")) else "none" end)" + (if (.errors | length > 0) then "\nerrors:\n" + (.errors | map("- \(.tool): \(.text)") | join("\n")) else "" end)' ;;
+      errors) formatter='.errors[]? | "\(.tool): \(.text)"' ;;
+      log) formatter='.log[] | "\(.role): \(.text)"' ;;
+      messages) formatter='.messages[] | "\(.role): \(.text)"' ;;
+    esac
+  fi
+  jq -sR --arg mode "$mode" --arg role "$role" --argjson chars "$chars" --argjson message_count "$messages" --argjson all "$all" "$filter" "$path" | jq -r "$formatter"
+}
+
+run "$@"

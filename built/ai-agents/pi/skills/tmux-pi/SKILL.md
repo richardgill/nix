@@ -16,15 +16,13 @@ Delegate work to another Pi:
 - In another existing repo or worktree tmux session with `--target`.
 - In a new worktree and tmux session with `--worktree`. This pulls local `main` first and creates the branch from its updated HEAD unless `--source-ref` is supplied.
 
-Delegation is not fire-and-forget. `tmux-pi` arms a tracked listener before detached work starts and reports the task, channel, prompt, session, and window.
+Delegation remains supervised without blocking the parent. `tmux-pi` launches the child with the parent Pi session ID, reports the child Pi session ID and tmux window, then returns. The `pi-ipc` extension notifies the parent after every child `agent_settled` event.
 
 ## Launch the delegate
 
-Choose a short, human-readable lowercase task name of at most 13 characters. `tmux-pi` only accepts prompt files. Use an existing issue, plan, design, or spec, or write generated prompt text to a temporary file first.
+For --task-slug choose a human-readable lowercase task slug of at most 13 characters using only letters, numbers, and internal hyphens; it must start and end with a letter or number. `tmux-pi` only accepts prompt files. Use an existing issue, plan, design, or spec, or write generated prompt text to a temporary file first.
 
-Use the `balancedMedium` profile for straightforward tasks that need less reasoning, such as writing code from a clear plan or specification: `--model "openai-codex/gpt-5.6-terra" --thinking "medium"`. Use a stronger profile when the delegate must investigate ambiguity, make difficult design decisions, or solve an unclear problem.
-
-Run `tmux-pi` with bash tool settings `timeout: 1` and `timeoutAction: "background"`. Do not continue until the tool confirms it is running in the background and its output says `Listener armed`.
+Whe running `tmux-pi`, confirm the launcher reaches `Launched`; if slow worktree setup moves the command to the background, wait only for its automatic completion notification and do not poll it.
 
 Current tmux session and working directory:
 
@@ -54,23 +52,23 @@ tmux-pi \
   --thinking "high"
 ```
 
-Add `--source-ref '<ref>'` only when the worktree should start from an explicit source ref. Add `--pi-session`, `--model`, or `--thinking` when supplied by the request.
+Add `--source-ref '<ref>'` only when the worktree should start from an explicit source ref. Add `--pi-session`, `--model`, or `--thinking` when supplied by the request. Skill metadata delegates use `--skill`, which marks the child without exposing the internal environment variable at the call site.
 
-`tmux-pi` copies the source prompt to `/tmp/pi-prompt-<task>.md`, appends the completion protocol, launches the child with `PI_DELEGATE=1`, and waits for its signal. Keep the task, channel, and window from its output available for supervision.
+`tmux-pi` launches the child with `PI_DELEGATE=1`, `PI_DELEGATE_PARENT_SESSION_ID=<parent-session-id>`, and `PI_DELEGATE_TASK_SLUG=<task-slug>`, then returns. Keep the task, child Pi session ID, and window from its output available for supervision.
 
-After verifying the delegate launched, do not poll with `capture-pane`, `bash_process`, `sleep`, or repeated status commands. Wait for the background listener completion notification. Inspect the pane and repository only after that notification, unless the user explicitly requests live monitoring.
+Child will let you know when it's finished; no need to wait or poll. Do not use `capture-pane`, `bash_process`, `sleep`, or repeated status commands while waiting. Inspect the pane only if the notification is incomplete or the user explicitly requests live monitoring.
 
 ## Oversee delegated work
 
-When `tmux-pi` exits, inspect the delegated pane and repository. Exit status `124` means the ten-minute liveness timeout expired rather than the delegate signalling.
+When `pi-ipc` delivers a `delegate-settled` notification, use the delegated status embedded in the notification as the primary report. Do not run `pi-jq` again unless the embedded status is incomplete, reports an inspection failure, or richer diagnostics are necessary. Use `tmux capture-pane` only if session inspection fails or terminal-only state is required.
 
-If the task remains unresolved, re-arm the same channel with bash tool settings `timeout: 1` and `timeoutAction: "background"` before sending follow-up work:
+### Use pi-jq
 
-```bash
-tmux-pi --wait-channel '<channel>' --timeout 10m
-```
+For fallback inspection, `pi-jq <session-id> --messages 1 --role assistant --chars 5000` prints the latest answer without repeating the delegated request. Use `--messages 3` when recent conversational context is necessary, `--turn` for richer diagnostics with the latest request, status, tools, and errors, `--errors` for failures, `--log` for the whole compact conversation, `--path` for the JSONL path, and `--json` for structured output. IDs may be shortened to a unique prefix.
 
-After the listener reports that it is armed, send follow-up instructions with `tmux send-keys`. A signal sent between listeners is latched, so the next waiter exits immediately. Multiple signals before re-arming collapse into one. Use a fresh channel only for a new delegated task.
+If `pi-jq` needs another feature, read `~/code/nix-private/CLAUDE.md`, edit `~/code/nix-private/flake/modules/home-manager/dot-files/Scripts/pi-jq`, and run `just switch` from `~/code/nix-private` to deploy it.
+
+If the task remains unresolved, send follow-up instructions with `tmux send-keys`. The child will notify the parent again when the follow-up turn settles; assess the fresh embedded status directly before deciding whether more work is needed.
 
 Never type multiline follow-up messages into Pi with `tmux send-keys`. Write the message to a file under `/tmp`, then send its absolute `@` file reference as one line:
 
@@ -86,4 +84,6 @@ For skill delegates, close the delegated tmux window after confirming the task i
 tmux kill-window -t '<window-id>'
 ```
 
-Remove the prepared prompt only when the task is resolved. Never respond finally while observed delegated work remains unresolved unless explicitly asked not to wait.
+Worktree delegates are the exception: leave their tmux windows open after completion for human follow-ups. Do not kill a worktree delegate's window unless the user explicitly asks.
+
+After launch, end the current turn with a brief delegation-in-progress status; do not claim the task is complete. `pi-ipc` will start or steer a later parent turn when the child settles. Then resume supervision and do not present the task as complete while notified work remains unresolved.

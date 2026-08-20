@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ -n "$TMUX" && -n "$TMUX_PANE" ]]; then
+if [[ "${PI_DELEGATE:-}" != 1 && -n "$TMUX" && -n "$TMUX_PANE" ]]; then
   window_id=$(tmux display-message -p -t "$TMUX_PANE" '#{window_id}')
   [[ -n "$window_id" ]] && tmux rename-window -t "$window_id" "pi"
 fi

@@ -25,6 +25,8 @@ tmux-pi --task-slug '<task>' --prompt-file '<prompt-file>' --worktree '<child>' 
 
 Follow the skill's listener and supervision protocol before moving to the next layer.
 
+Preserve every existing stack entry, including merged and closed PRs, unless the user explicitly asks to remove it. Before unstacking, rebuilding, or relinking a stack, inspect the complete remote stack. If the intended operation would omit, reorder, or split existing entries, stop and ask rather than proceeding.
+
 Because the branches live in separate worktrees, manage stack membership without local gh-stack tracking:
 
 ```bash

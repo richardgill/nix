@@ -45,6 +45,7 @@
     "~/code/pi-extensions/main/extensions/footer",
     "~/code/pi-extensions/main/extensions/handoff",
     "~/code/pi-extensions/main/extensions/notify",
+    "~/code/pi-extensions/main/extensions/ipc",
     "~/code/pi-extensions/main/extensions/process-info",
     "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
@@ -54,6 +55,6 @@
   ],
   "pi-codex-fast": {
     "enabled": false,
-    "mode": "off"
+    "mode": "fast"
   }
 }

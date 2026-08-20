@@ -23,6 +23,8 @@ Invoke the `worktrees` skill for every layer. Create the bottom layer from `main
 ~/Scripts/worktree-branch --no-switch --pull --binary oc --prompt-file '<prompt-file>' '<parent>' '<child>'
 ```
 
+Preserve every existing stack entry, including merged and closed PRs, unless the user explicitly asks to remove it. Before unstacking, rebuilding, or relinking a stack, inspect the complete remote stack. If the intended operation would omit, reorder, or split existing entries, stop and ask rather than proceeding.
+
 Because the branches live in separate worktrees, manage stack membership without local gh-stack tracking:
 
 ```bash
