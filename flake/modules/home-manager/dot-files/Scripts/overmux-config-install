@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+config_dir="$HOME/.config/overmux"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/overmux"
+dependency_hash_file="$state_dir/config-dependencies.sha256"
+
+[[ -f "$config_dir/package.json" && -f "$config_dir/pnpm-lock.yaml" ]] || {
+  echo "overmux-config-install: missing config package files" >&2
+  exit 1
+}
+
+mkdir -p "$state_dir"
+dependency_hash=$(sha256sum "$config_dir/package.json" "$config_dir/pnpm-lock.yaml" | sha256sum | cut -d ' ' -f 1)
+installed_hash=""
+if [[ -f "$dependency_hash_file" ]]; then
+  installed_hash=$(<"$dependency_hash_file")
+fi
+
+if [[ ! -d "$config_dir/node_modules" || "$dependency_hash" != "$installed_hash" ]]; then
+  pnpm --dir "$config_dir" install --frozen-lockfile
+  printf '%s\n' "$dependency_hash" > "$dependency_hash_file"
+fi
+
+mapfile -t dependencies < <(jq -r '[.dependencies, .devDependencies, .optionalDependencies, .peerDependencies] | map(. // {}) | add | to_entries[] | select(.value | startswith("link:")) | [.key, .value[5:]] | @tsv' "$config_dir/package.json")
+
+for dependency in "${dependencies[@]}"; do
+  IFS=$'\t' read -r name link_path <<< "$dependency"
+  active_path="${link_path#*active-server/}"
+  if [[ "$active_path" != "$link_path" ]]; then
+    source="$HOME/code/overmux/active-server/$active_path"
+  elif [[ "$link_path" = /* ]]; then
+    source=$(realpath --no-symlinks -m "$link_path")
+  else
+    source=$(realpath --no-symlinks -m "$config_dir/$link_path")
+  fi
+  destination="$config_dir/node_modules/$name"
+  mkdir -p "$(dirname "$destination")"
+  ln -sfnT "$source" "$destination"
+done
+
+pnpm --dir "$config_dir" build

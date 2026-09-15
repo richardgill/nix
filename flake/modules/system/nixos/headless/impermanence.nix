@@ -91,7 +91,6 @@
           ".claude/statsig"
           ".claude/todos"
           ".codex/sessions"
-          ".hapi"
           ".mcpc"
           ".pi/agent/sessions"
           ".pulumi"
@@ -134,6 +133,7 @@
           ".local/share/nautilus"
           ".local/share/gvfs-metadata" # Nautilus per-folder sorting and view preferences
           ".local/share/opencode"
+          ".local/share/overmux"
           ".local/share/voxtype"
           ".local/share/Steam"
           ".local/share/Rocket League"
@@ -145,6 +145,7 @@
           ".cache/thumbnails"
           ".local/state/ai-cron"
           ".local/state/nvim"
+          ".local/state/overmux"
           ".local/state/tmux"
           ".local/state/yazi"
           ".local/state/wireplumber"

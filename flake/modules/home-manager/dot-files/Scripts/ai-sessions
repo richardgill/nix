@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
-source ~/Scripts/lib/ai-agent
-source ~/Scripts/lib/ai-sessions/claude-sessions
-source ~/Scripts/lib/ai-sessions/pi-sessions
+script_dir=$(dirname "$(realpath "$0")")
+script_lib_dir="$script_dir/lib"
+[[ -f "$script_lib_dir/ai-agent" ]] || script_lib_dir="$HOME/Scripts/lib"
+
+source "$script_lib_dir/ai-agent"
+source "$script_lib_dir/ai-sessions/claude-sessions"
+source "$script_lib_dir/ai-sessions/pi-sessions"
 
 AI_SESSIONS_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/ai-sessions"
 
@@ -419,7 +423,7 @@ while (( $# > 0 )); do
       shift
       socket="${1:-}"
       ;;
-    run|cached|list|refresh|watch|debug|new|fork|ignore|clear|send)
+    run|cached|list|json|refresh|watch|debug|new|fork|ignore|clear|send)
       action="$1"
       ;;
     *)
@@ -435,6 +439,9 @@ case "$action" in
     ;;
   list)
     ai_sessions_refresh_list "$agent"
+    ;;
+  json)
+    ai_sessions_list_json "$agent"
     ;;
   refresh)
     ai_sessions_refresh_cache "$agent"

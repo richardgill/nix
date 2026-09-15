@@ -1,20 +1,20 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-5.6-sol",
-  "defaultThinkingLevel": "high",
+  "defaultModel": "gpt-6-astra",
+  "defaultThinkingLevel": "medium",
   "tuiMode": "fullscreen",
   "enabledModels": [
     "openai-codex/gpt-5.3-codex-spark",
-    "openai-codex/gpt-5.6-sol"
+    "openai-codex/gpt-6-astra"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
   "shellCommandPrefix": "shopt -s expand_aliases",
-  "hideThinkingBlock": true,
+  "hideThinkingBlock": false,
   "collapseChangelog": false,
   "compaction": {
-    "enabled": false,
+    "enabled": true,
     "reserveTokens": 16384,
     "keepRecentTokens": 20000
   },
@@ -32,7 +32,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.84.2",
+  "lastChangelogVersion": "0.85.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -45,7 +45,7 @@
     "~/code/pi-extensions/main/extensions/footer",
     "~/code/pi-extensions/main/extensions/handoff",
     "~/code/pi-extensions/main/extensions/notify",
-    "~/code/pi-extensions/main/extensions/ipc",
+    "~/code/overmux/main/packages/ecosystem/pi",
     "~/code/pi-extensions/main/extensions/process-info",
     "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
@@ -54,7 +54,7 @@
     "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
-    "enabled": false,
+    "enabled": true,
     "mode": "fast"
   }
 }

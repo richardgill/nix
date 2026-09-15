@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+exec node "$HOME/code/overmux/active-server/packages/ecosystem/pi/dist/cli.js" "$@"

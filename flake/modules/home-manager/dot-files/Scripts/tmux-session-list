@@ -18,7 +18,7 @@ existing_session_rows() {
   local file q_file
   file=$(recency_file)
   q_file=$(quarantine_file)
-  tmux list-sessions -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
+  tmux list-sessions -f '#{!=:#{@overmux_shadow},1}' -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}'$'\t''#{?session_last_attached,#{session_last_attached},0}'$'\t''#{session_activity}' 2>/dev/null \
     | awk -F '\t' -v recency_file="$file" -v quarantine_file="$q_file" '
         BEGIN {
           if (recency_file != "") {
@@ -39,6 +39,7 @@ existing_session_rows() {
           id = $2
           created = $3
           if ((id SUBSEP created SUBSEP name) in quarantined) next
+          if (name ~ /^__overmux_shadow_/) next
           if (name ~ /^(code|background)$/) next
           last_attached = $4 + 0
           activity = $5 + 0
@@ -77,9 +78,10 @@ quarantined_inactive_rows() {
         session = $5
         path = $6
         if (NF != 8 || quarantine_at == "" || id == "" || created == "" || session == "" || path == "") next
+        if (session ~ /^__overmux_shadow_/) next
         if ((id SUBSEP created SUBSEP session) in active) print quarantine_at "\t" session "\t" path
       }
-    ' <(tmux list-sessions -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}' 2>/dev/null) "$file"
+    ' <(tmux list-sessions -f '#{!=:#{@overmux_shadow},1}' -F '#{session_name}'$'\t''#{session_id}'$'\t''#{session_created}' 2>/dev/null) "$file"
 }
 
 recent_inactive_rows() {
@@ -96,9 +98,10 @@ recent_inactive_rows() {
         name = $2
         path = $3
         if (name == "" || path == "" || name in existing) next
+        if (name ~ /^__overmux_shadow_/) next
         print last_seen "\t" name "\t" path
       }
-    ' <(tmux list-sessions -F '#{session_name}' 2>/dev/null) "$file"
+    ' <(tmux list-sessions -f '#{!=:#{@overmux_shadow},1}' -F '#{session_name}' 2>/dev/null) "$file"
 }
 
 inactive_session_rows() {

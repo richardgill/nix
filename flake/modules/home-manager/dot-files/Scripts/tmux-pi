@@ -2,7 +2,9 @@
 # @describe Launch a supervised Pi agent in tmux
 # @option --prompt-file File containing the delegated Pi prompt
 # @option --task-slug Short lowercase task name used for the window name
-# @flag --skill Mark the child as a delegated skill invocation
+# @flag --skill Mark the child as a skill invocation
+# @flag --block-nested Prevent the launched child from delegating
+# @flag --no-callback Launch without notifying the parent when the child settles
 # @option --pi-session Pi session file to fork
 # @option --model Pi model
 # @option --thinking Pi thinking level
@@ -37,11 +39,14 @@ resolve_session_id() {
 prepare_prompt() {
   local channel="$1"
   local source_file="$2"
+  local block_nested="$3"
   local prepared_file="/tmp/pi-prompt-${channel}.md"
+  local delegation_instruction='You may delegate distinct, self-contained subtasks when useful, but do not merely redelegate this task.'
 
   [[ -f "$source_file" ]] || fail "--prompt-file does not exist or is not a file: $source_file"
+  [[ -z "$block_nested" ]] || delegation_instruction='Do not invoke tmux-pi or delegate.'
   {
-    printf '%s\n\n' 'You are running as a delegate. Do not immediately redelegate this task. First inspect the relevant code and establish the implementation shape. Delegate only if a distinct, self-contained subtask remains.'
+    printf '%s %s\n\n' 'You are the worker already launched for this task. Treat requests to perform this "in a thread" as already satisfied. Complete only the substantive task; the parent owns follow-on work.' "$delegation_instruction"
     cat "$source_file"
   } > "$prepared_file"
   printf '%s' "$prepared_file"
@@ -56,12 +61,15 @@ build_pi_command() {
   local model="$6"
   local thinking="$7"
   local skill="$8"
+  local block_nested="$9"
   local pi_binary
   local args
 
   pi_binary=$(command -v pi) || fail "pi is not on PATH"
-  args=(env -u PI_SKILL_DELEGATE PI_DELEGATE=1 PI_DELEGATE_PARENT_SESSION_ID="$parent_session_id" PI_DELEGATE_TASK_SLUG="$task_slug")
-  [[ -n "$skill" ]] && args+=(PI_SKILL_DELEGATE=1)
+  args=(env -u PI_SKILL_CHILD -u PI_BLOCK_NESTED -u PI_PARENT_SESSION_ID PI_CHILD=1 PI_TASK_SLUG="$task_slug")
+  [[ -n "$parent_session_id" ]] && args+=(PI_PARENT_SESSION_ID="$parent_session_id")
+  [[ -n "$skill" ]] && args+=(PI_SKILL_CHILD=1)
+  [[ -n "$block_nested" ]] && args+=(PI_BLOCK_NESTED=1)
   args+=("$pi_binary")
   if [[ -n "$pi_session" ]]; then
     args+=(--session "$pi_session")
@@ -116,6 +124,7 @@ launch_pi_window() {
   local session="$2"
   local cwd="$3"
   local command="$4"
+  local current_session=""
 
   WINDOW_ID=$(tmux new-window -d -P -F '#{window_id}' \
     -t "${session}:" \
@@ -125,6 +134,15 @@ launch_pi_window() {
   tmux set-option -p -t "$WINDOW_ID" allow-rename off >/dev/null || return 1
   tmux set-window-option -t "$WINDOW_ID" automatic-rename off >/dev/null || return 1
   tmux rename-window -t "$WINDOW_ID" "$task" || return 1
+
+  if [[ -n "${TMUX_PANE:-}" ]]; then
+    current_session=$(tmux display-message -p -t "$TMUX_PANE" '#{session_name}') || return 1
+  fi
+
+  # Select the child in another session without moving the client from its current session.
+  if [[ "$session" != "$current_session" ]]; then
+    tmux select-window -t "$WINDOW_ID" || return 1
+  fi
 }
 
 run() {
@@ -132,7 +150,8 @@ run() {
 
   [[ -n "${argc_prompt_file:-}" ]] || fail "--prompt-file is required"
   [[ -n "${argc_task_slug:-}" ]] || fail "--task-slug is required"
-  [[ -n "${PI_SESSION_ID:-}" ]] || fail "tmux-pi must be launched from a persisted parent Pi session"
+  [[ "${PI_BLOCK_NESTED:-}" != 1 ]] || fail "nested delegation is blocked; complete the task in this worker"
+  [[ -n "${argc_no_callback:-}" || -n "${PI_SESSION_ID:-}" ]] || fail "tmux-pi must be launched from a persisted parent Pi session unless --no-callback is used"
   [[ -z "${argc_source_ref:-}" || -n "${argc_worktree:-}" ]] || fail "--source-ref requires --worktree"
   [[ -z "${argc_worktree:-}" || -z "${argc_target:-}" ]] || fail "--worktree cannot be combined with --target"
 
@@ -140,16 +159,31 @@ run() {
   local session_id
   local prepared_prompt
   local pi_command
+  local parent_session_id="${PI_SESSION_ID:-}"
+  local callback_status="enabled"
+
+  if [[ -n "${argc_no_callback:-}" ]]; then
+    parent_session_id=""
+    callback_status="disabled"
+  fi
 
   task_name="$argc_task_slug"
   validate_task_name "$task_name"
   session_id=$(resolve_session_id "${argc_pi_session:-}")
-  prepared_prompt=$(prepare_prompt "$session_id" "$argc_prompt_file")
-  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$PI_SESSION_ID" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}")
+  prepared_prompt=$(prepare_prompt "$session_id" "$argc_prompt_file" "${argc_block_nested:-}")
+  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$parent_session_id" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}" "${argc_block_nested:-}")
 
   resolve_target "${argc_worktree:-}" "${argc_source_ref:-}" "${argc_target:-}"
-  launch_pi_window "$task_name" "$TARGET_SESSION" "$TARGET_CWD" "$pi_command" || fail "failed to launch delegated Pi"
-  printf '✓ %s launched\n  Pi session:  %s\n  Tmux window: %s\n' "$task_name" "$session_id" "$WINDOW_ID"
+  launch_pi_window "$task_name" "$TARGET_SESSION" "$TARGET_CWD" "$pi_command" || fail "failed to launch child Pi"
+  printf '✓ %s launched\n  Pi session:  %s\n  Tmux window: %s\n  Callback:    %s\n' "$task_name" "$session_id" "$WINDOW_ID" "$callback_status"
+
+  local deep_link_prefix
+  local tmux_path
+  if deep_link_prefix=$(overmux instance --json 2>/dev/null | jq -er '.deepLinkPrefix // empty') &&
+    tmux_path=$(tmux display-message -p -t "$WINDOW_ID" '#{session_id}/#{window_id}/#{pane_id}' 2>/dev/null); then
+    tmux_path=${tmux_path//[\$@%]/}
+    printf '\n%s/tmux/%s\n' "$deep_link_prefix" "$tmux_path"
+  fi
 }
 
 run "$@"

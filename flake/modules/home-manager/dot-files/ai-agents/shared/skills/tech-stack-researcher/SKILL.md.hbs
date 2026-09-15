@@ -11,7 +11,8 @@ user-invocable: true
 metadata:
   pi:
     subProcess: true
-    subProcessContext: fork
+    subProcessContext: fresh
+    allowChildDelegation: false
     model: {{modelProfiles.balancedMedium.providerModel}}
     thinkingLevel: {{modelProfiles.balancedMedium.thinkingLevel}}
 {{/if}}

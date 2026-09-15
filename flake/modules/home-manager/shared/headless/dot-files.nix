@@ -139,6 +139,8 @@ in
 
       ".config/mcpc/mcp.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcpc/mcp.json";
+      ".config/overmux".source =
+        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/overmux";
 
       # Static files (not templated)
       ".revue/keybindings.json".source = ../../dot-files/revue/keybindings.json;

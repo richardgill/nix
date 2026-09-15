@@ -34,6 +34,8 @@ elif [[ "$workspace_key" == "browser" ]]; then
   focus_or_launch "browser" '^firefox$' '' '' firefox
 elif [[ "$workspace_key" == "activity" ]]; then
   focus_or_launch "activity" '' '^btop$' '' "$HOME/Scripts/nixos/launch-terminal-app" btop
+elif [[ "$workspace_key" == "overmux" ]]; then
+  focus_or_launch "terminal" '^overmux-desktop$' '' '' "$HOME/Scripts/overmux-desktop"
 elif [[ "$workspace_key" == "discord" ]]; then
   focus_or_launch "discord" '^discord$' '' '' discord
 elif [[ "$workspace_key" == "password" ]]; then

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+active_checkout="$HOME/code/overmux/active-server"
+cli="$active_checkout/packages/runtime/overmux/dist/bin.js"
+
+if [[ ! -f "$cli" ]]; then
+  echo "overmux: active server CLI is not built: $cli" >&2
+  exit 1
+fi
+
+exec node "$cli" "$@"

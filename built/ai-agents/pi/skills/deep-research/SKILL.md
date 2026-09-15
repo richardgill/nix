@@ -5,7 +5,8 @@ metadata:
   pi:
     subProcess: true
     subProcessContext: fresh
-    model: openai-codex/gpt-5.6-sol
+    allowChildDelegation: false
+    model: openai-codex/gpt-6-astra
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob
 ---

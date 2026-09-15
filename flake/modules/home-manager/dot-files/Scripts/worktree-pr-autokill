@@ -6,6 +6,9 @@ source "$(dirname "$0")/lib/tmux-state"
 QUARANTINE_FILE=$(tmux_quarantine_file)
 dry_run=0
 quiet=0
+manual_session=""
+expected_id=""
+expected_created=""
 merged_within_seconds="${WORKTREE_PR_AUTOKILL_MERGED_WITHIN_SECONDS:-120}"
 kill_after_seconds="${WORKTREE_PR_AUTOKILL_KILL_AFTER_SECONDS:-7200}"
 
@@ -13,6 +16,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     --dry-run) dry_run=1; shift ;;
     --quiet) quiet=1; shift ;;
+    --manual-session) manual_session="${2:?missing session}"; shift 2 ;;
+    --expected-id) expected_id="${2:?missing id}"; shift 2 ;;
+    --expected-created) expected_created="${2:?missing created}"; shift 2 ;;
     --merged-within-seconds) merged_within_seconds="${2:?missing seconds}"; shift 2 ;;
     --kill-after-seconds) kill_after_seconds="${2:?missing seconds}"; shift 2 ;;
     *) echo "Unknown argument: $1" >&2; exit 1 ;;
@@ -189,6 +195,50 @@ maybe_quarantine_session() {
   quarantine_session_processes "$session"
 }
 
+manual_quarantine_session() {
+  local session="$1"
+  local id created path now kill_after
+
+  [[ -n "$expected_id" && -n "$expected_created" ]] || {
+    echo "Manual quarantine requires expected identity" >&2
+    return 1
+  }
+  [[ "$session" != "code" && "$session" != "background" ]] || {
+    echo "Pinned session cannot be quarantined: $session" >&2
+    return 1
+  }
+  session_exists "$session" || {
+    echo "Session is no longer available: $session" >&2
+    return 1
+  }
+
+  id=$(tmux display-message -p -t "$session:" '#{session_id}' 2>/dev/null || true)
+  created=$(tmux display-message -p -t "$session:" '#{session_created}' 2>/dev/null || true)
+  [[ "$id" == "$expected_id" && "$created" == "$expected_created" ]] || {
+    echo "Session identity changed: $session" >&2
+    return 1
+  }
+  is_quarantined_session "$id" "$created" "$session" && {
+    echo "Session is already quarantined: $session" >&2
+    return 1
+  }
+
+  path=$(tmux display-message -p -t "$session:" '#{session_path}' 2>/dev/null || true)
+  [[ -n "$path" && -d "$path" ]] || {
+    echo "Session path is unavailable: $session" >&2
+    return 1
+  }
+  now=$(date +%s)
+  kill_after=$((now + kill_after_seconds))
+  if (( dry_run )); then
+    say "would manually quarantine: $session"
+    return 0
+  fi
+  record_quarantine "$now" "$kill_after" "$id" "$created" "$session" "$path" "manual" "manual"
+  say "manually quarantined: $session"
+  quarantine_session_processes "$session"
+}
+
 cleanup_quarantine_rows() {
   local now
   now=$(date +%s)
@@ -214,6 +264,10 @@ cleanup_quarantine_rows() {
 }
 
 main() {
+  if [[ -n "$manual_session" ]]; then
+    manual_quarantine_session "$manual_session"
+    return
+  fi
   cleanup_quarantine_rows
   tmux list-sessions -F '#{session_name}' 2>/dev/null | while IFS= read -r session; do
     [[ -n "$session" ]] || continue

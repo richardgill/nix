@@ -7,7 +7,6 @@
 - Check invariants with guards at the top of functions; return or throw if they fail.
 - Push side effects to the edges: fetch, transform (pure), emit. Don't interleave I/O with logic.
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
-- New comments: Do NOT introduce new comments unless it's a truly exceptional case / noteworthy. You may override this rule if the user requests it explicitly.
 - Prefer less indirection unless it helps DRY or readability
 - Follow existing code patterns when deciding whether and how to add tests; otherwise, test useful behavior and prioritize readability over test volume.
 - Prefer table-driven tests when covering multiple similar cases.
@@ -52,6 +51,9 @@
 
 ## Workflow
 
+- Before implementation, consider `gh stack` for changes likely to exceed 400 reviewable changed lines or span multiple dependent concerns. Use it by default above 800 reviewable lines; above 1,200, ask before proceeding with a single PR.
+- Exclude lockfiles, generated code, snapshots, vendored files, build artifacts, and formatting-only changes from reviewable line counts unless they require meaningful review.
+- “🛑”, “LTF” (“let’s talk first”), or “LJT” (“let’s just talk”) means: discuss and agree on the approach first. Do not edit files, run mutating commands, or take external actions until I explicitly approve.
 {{#if (eq agent "pi")}}
 - Default to delegating self-contained medium-sized implementation and research tasks through `tmux-pi`; perform higher-level work and complex thinking inline.
 - Use `{{modelProfiles.balancedMedium.providerModel}}` with `{{modelProfiles.balancedMedium.thinkingLevel}}` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
@@ -86,6 +88,9 @@ Avoid putting large, generated, vendored, or external trees in overlay/. Use `~/
 
 ## Response conventions
 
+- In explanations, define any term or concept that is not well-known before using it.
+- Prefer showing user-facing APIs over internal implementation details.
+- Prefer usage examples that demonstrate how those APIs are called or applied.
 - Use `-` instead of an em dash; never use em dashes.
 - When referencing files, use repo-relative paths: `./folder/file.txt`, `./folder/file.txt:5`, or `./folder/file.txt:4-7`.
 - Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "interfaces" / code seams before implementation details.
@@ -116,15 +121,10 @@ You need to show me the code as a 'sketch' of the 'shape' of the code whilst bei
 
 What to include:
 
-- The high level 'story' of function calls and high-level control flow.
-- Show the flow of the code as if I was reading the usages, so I can understand the structure that a first time reader of the code would see. But omit the
- technical details from the code, it's a sketch.
-- I care about the functions (including signatures, put them as comments above the function usages). Use TypeScript imports at the top to show file paths, file status, and function status.
-- Relevant code context around the changes so I can understand how our changes and additions fit into the existing code
-
-What **not** to include:
-- Internal implementation details that are obvious, by default omit the code inside of functions themselves unless it's important
-- Too much information - you need to maximize comprehension so I can review proposed changes quickly
+- Show the control flow from the caller's perspective.
+- Include relevant surrounding context, function signatures, and imports.
+- Omit implementation details unless they are important to the proposed design.
+- Keep it brief and focused on what is needed to review the proposal.
 
 ## SSH to local client with reverse tunnel
 
@@ -142,4 +142,10 @@ scp -P ${TUNNEL_PORT:-1999} ./screenshot.png localhost:~/Screenshots/
 scp -P ${TUNNEL_PORT:-1999} localhost:~/Downloads/file ./
 scp -P ${TUNNEL_PORT:-1999} localhost:~/Screenshots/screenshot.png ./
 ```
+
+## Overmux
+
+Run `overmux instance --json` to discover the running server's `instanceId` and `deepLinkPrefix`; do not assume the instance name matches the hostname.
+
+Link to tmux using `<deepLinkPrefix>/tmux/<session>/<window>/<pane>`. Use numeric tmux IDs with the `$`, `@`, and `%` prefixes removed, not window or pane indices. For example, session `$1`, window `@2`, pane `%647` becomes `overmux://um790-4242/tmux/1/2/647`. Session-only (`overmux://um790-4242/tmux/1`) and session/window (`overmux://um790-4242/tmux/1/2`) links also work.
 

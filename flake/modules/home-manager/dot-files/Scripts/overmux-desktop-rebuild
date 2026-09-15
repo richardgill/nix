@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ $# -le 1 ]] || {
+  echo "Usage: overmux-desktop-rebuild [checkout]" >&2
+  exit 1
+}
+
+checkout_input="${1:-$HOME/code/overmux/main}"
+if ! checkout=$(realpath -e "$checkout_input") || [[ ! -f "$checkout/flake.nix" || ! -f "$checkout/package.json" || ! -f "$checkout/pnpm-lock.yaml" || ! -f "$checkout/apps/desktop/package.json" ]]; then
+  echo "overmux-desktop-rebuild: checkout is not an Overmux desktop repository: $checkout_input" >&2
+  exit 1
+fi
+
+if [[ ! -d "$checkout/node_modules" ]]; then
+  echo "overmux-desktop-rebuild: dependencies are missing; run pnpm install in $checkout" >&2
+  exit 1
+fi
+
+nix build --impure --no-link "path:$checkout#overmux-desktop"
+(
+  cd "$checkout"
+  pnpm --filter @overmux/desktop build
+)
+
+active_checkout="$HOME/code/overmux/active-desktop"
+temporary_selection="$HOME/code/overmux/.active-desktop.$$"
+ln -s "$checkout" "$temporary_selection"
+mv -Tf "$temporary_selection" "$active_checkout"

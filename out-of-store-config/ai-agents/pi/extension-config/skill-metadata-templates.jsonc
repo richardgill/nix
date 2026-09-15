@@ -5,29 +5,31 @@
       "when": {
         "metadata": {
           "pi.subProcess": true,
-          "pi.subProcessContext": "fork"
+          "pi.subProcessContext": "fork",
+          "pi.allowChildDelegation": false
         },
         "environment": {
-          "PI_SKILL_DELEGATE": null
+          "PI_SKILL_CHILD": null
         }
       },
       "position": "replace",
       "sessionBranch": "previousTurn",
-      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `tmux-pi --skill --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --pi-session {{runtime.sessionBranch.pathShell}} --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's launch and notification supervision protocol, and record the child session ID and window ID reported by `tmux-pi`. After launch, return only a brief delegation-in-progress status. When `pi-ipc` notifies you that the child settled, resume supervision. You, the top-level process, own cleanup of that window; once the task is resolved, run `tmux kill-window -t '<window-id>'` and provide the final result."
+      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `tmux-pi --skill --block-nested --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --pi-session {{runtime.sessionBranch.pathShell}} --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's launch and notification supervision protocol, and record the child session ID and window ID reported by `tmux-pi`. After launch, return only a brief delegation-in-progress status. When `overmux-pi` notifies you that the child settled, resume supervision. You, the top-level process, own cleanup of that window; once the task is resolved, run `tmux kill-window -t '<window-id>'` and provide the final result."
     },
     {
       "name": "delegate-sub-process-fresh",
       "when": {
         "metadata": {
           "pi.subProcess": true,
-          "pi.subProcessContext": "fresh"
+          "pi.subProcessContext": "fresh",
+          "pi.allowChildDelegation": false
         },
         "environment": {
-          "PI_SKILL_DELEGATE": null
+          "PI_SKILL_CHILD": null
         }
       },
       "position": "replace",
-      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `tmux-pi --skill --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's launch and notification supervision protocol, and record the child session ID and window ID reported by `tmux-pi`. After launch, return only a brief delegation-in-progress status. When `pi-ipc` notifies you that the child settled, resume supervision. You, the top-level process, own cleanup of that window; once the task is resolved, run `tmux kill-window -t '<window-id>'` and provide the final result."
+      "template": "Use the tmux-pi skill to delegate this request. Choose a short, human-readable lowercase task name of at most 13 characters. Create a prompt file with `PROMPT_FILE=$(mktemp /tmp/pi-skill-prompt-XXXXXX); printf '%s\\n' {{runtime.skillInvocation.shell}} > \"$PROMPT_FILE\"`, then run `tmux-pi --skill --block-nested --task-slug '<task-slug>' --prompt-file \"$PROMPT_FILE\" --model \"{{metadata.pi.model}}\" --thinking \"{{metadata.pi.thinkingLevel}}\"`. Follow the skill's launch and notification supervision protocol, and record the child session ID and window ID reported by `tmux-pi`. After launch, return only a brief delegation-in-progress status. When `overmux-pi` notifies you that the child settled, resume supervision. You, the top-level process, own cleanup of that window; once the task is resolved, run `tmux kill-window -t '<window-id>'` and provide the final result."
     }
   ]
 }

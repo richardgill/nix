@@ -1,19 +1,14 @@
 ---
 name: notify
-description: Send Richard an ntfy notification.
+description: Send Richard an Overmux notification.
 ---
 
-Use `notify` to send Richard a notification on the Agent topic.
-
-Examples:
+Always use `"topic":"agent"`.
 
 ```bash
-notify "Need your input on this change"
-notify "Build passed"
+overmux call notification --input '{"title":"Agent","body":"Need your input","topic":"agent"}'
 ```
 
-Use `--title` or `--click` when useful:
+When an agent conversation finishes, prefer linking to its tmux pane so Richard can return to it.
 
-```bash
-notify --title "CI needs attention" --click "https://github.com/example/repo/actions" "The build failed"
-```
+Optionally add `"link":"/tmux/<session>/<window>/<pane>"` using numeric tmux IDs without `$`, `@`, or `%` prefixes, or an HTTPS URL. Omit `link` to open the inbox entry; do not use `overmux://` links.

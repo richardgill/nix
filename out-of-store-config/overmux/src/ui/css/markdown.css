@@ -1,0 +1,82 @@
+.markdown > :first-child {
+  margin-top: 0;
+}
+
+.markdown > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown p,
+.markdown ul,
+.markdown ol,
+.markdown pre,
+.markdown table,
+.markdown blockquote {
+  margin-block: 1rem;
+}
+
+.markdown ul,
+.markdown ol {
+  padding-inline-start: 1.5rem;
+}
+
+.markdown ul {
+  list-style: disc;
+}
+
+.markdown ol {
+  list-style: decimal;
+}
+
+.markdown li + li {
+  margin-top: 0.25rem;
+}
+
+.markdown input[type="checkbox"] {
+  margin-inline-end: 0.5rem;
+  accent-color: var(--om-color-accent);
+}
+
+.markdown a {
+  color: var(--om-color-accent);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.markdown pre {
+  overflow-x: auto;
+  padding: 0.75rem;
+  border: 1px solid var(--om-color-border);
+  border-radius: var(--om-radius);
+  color: var(--om-color-fg);
+  background: var(--om-color-panel);
+}
+
+.markdown code {
+  font-family: var(--om-font-mono);
+  font-size: 0.875em;
+}
+
+.markdown :not(pre) > code {
+  padding: 0.1em 0.3em;
+  border-radius: 0.25rem;
+  background: var(--om-color-panel);
+}
+
+.markdown table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.markdown th,
+.markdown td {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--om-color-border);
+  text-align: start;
+}
+
+.markdown th {
+  background: var(--om-color-panel);
+}

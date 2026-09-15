@@ -1,17 +1,17 @@
 {
   "medium": {
     "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
+    "model": "gpt-6-astra",
     "thinkingLevel": "medium"
   },
   "high": {
     "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
+    "model": "gpt-6-astra",
     "thinkingLevel": "high"
   },
   "xhigh": {
     "provider": "openai-codex",
-    "model": "gpt-5.6-sol",
+    "model": "gpt-6-astra",
     "thinkingLevel": "xhigh"
   }
 }

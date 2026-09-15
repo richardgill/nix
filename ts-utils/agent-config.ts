@@ -9,7 +9,7 @@ export type AgentModel = {
 export type AgentModels = {
   luna: AgentModel;
   terra: AgentModel;
-  sol: AgentModel;
+  astra: AgentModel;
 };
 
 export type AgentModelProfile = AgentModel & {
@@ -61,7 +61,7 @@ const openAiCodexModel = (model: string): AgentModel => ({
 const models = {
   luna: openAiCodexModel("gpt-5.6-luna"),
   terra: openAiCodexModel("gpt-5.6-terra"),
-  sol: openAiCodexModel("gpt-5.6-sol"),
+  astra: openAiCodexModel("gpt-6-astra"),
 } satisfies AgentModels;
 
 const modelProfiles = {
@@ -69,9 +69,9 @@ const modelProfiles = {
   economicalHigh: { ...models.luna, thinkingLevel: "high" },
   balancedMedium: { ...models.terra, thinkingLevel: "medium" },
   balancedHigh: { ...models.terra, thinkingLevel: "high" },
-  strongMedium: { ...models.sol, thinkingLevel: "medium" },
-  strongHigh: { ...models.sol, thinkingLevel: "high" },
-  strongXhigh: { ...models.sol, thinkingLevel: "xhigh" },
+  strongMedium: { ...models.astra, thinkingLevel: "medium" },
+  strongHigh: { ...models.astra, thinkingLevel: "high" },
+  strongXhigh: { ...models.astra, thinkingLevel: "xhigh" },
 } satisfies AgentModelProfiles;
 
 const webSearchSkill = "web-search";

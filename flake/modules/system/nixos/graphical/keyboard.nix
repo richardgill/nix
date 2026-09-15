@@ -127,6 +127,7 @@
               "Alacritty"
               "com.mitchellh.ghostty"
               "ghostty"
+              "overmux-desktop"
             ];
           };
           remap = {
@@ -182,6 +183,7 @@
               "Alacritty"
               "com.mitchellh.ghostty"
               "ghostty"
+              "overmux-desktop"
             ];
           };
           remap = {

@@ -1,0 +1,46 @@
+{
+  "name": "richard-overmux",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "overmux check --config ./overmux.config.ts",
+    "dev": "overmux serve --config ./overmux.config.ts"
+  },
+  "dependencies": {
+    "@overmux/git": "link:../../../overmux/active-server/packages/ecosystem/git",
+    "@overmux/jsonl-store": "link:../../../overmux/active-server/packages/ecosystem/jsonl-store",
+    "@overmux/pi": "link:../../../overmux/active-server/packages/ecosystem/pi",
+    "@overmux/tmux": "link:../../../overmux/active-server/packages/ecosystem/tmux",
+    "@overmux/vite": "link:../../../overmux/active-server/packages/runtime/vite",
+    "@overmux/xterm": "link:../../../overmux/active-server/packages/ecosystem/xterm",
+    "@radix-ui/react-alert-dialog": "^1.1.23",
+    "@radix-ui/react-dialog": "^1.1.23",
+    "@radix-ui/react-tabs": "^1.1.21",
+    "@shikijs/themes": "4.4.3",
+    "@tailwindcss/vite": "4.3.3",
+    "@tanstack/react-router": "^1.170.32",
+    "@vitejs/plugin-react": "link:../../../overmux/active-server/node_modules/@vitejs/plugin-react",
+    "@xterm/addon-clipboard": "^0.2.0",
+    "lucide-react": "^1.34.0",
+    "mdast-util-to-string": "^4.0.0",
+    "overmux": "link:../../../overmux/active-server/packages/runtime/overmux",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "strip-markdown": "^6.0.0",
+    "tailwindcss": "4.3.3",
+    "unified": "^11.0.5",
+    "vite": "link:../../../overmux/active-server/node_modules/vite",
+    "zod": "link:../../../overmux/active-server/node_modules/zod"
+  },
+  "packageManager": "pnpm@10.33.0",
+  "devDependencies": {
+    "@types/node": "22.19.20",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "typescript": "^5.9.0"
+  }
+}

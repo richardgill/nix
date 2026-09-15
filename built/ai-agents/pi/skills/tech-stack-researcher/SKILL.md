@@ -4,7 +4,8 @@ description: Researches and compares tech stack choices (libraries, frameworks, 
 metadata:
   pi:
     subProcess: true
-    subProcessContext: fork
+    subProcessContext: fresh
+    allowChildDelegation: false
     model: openai-codex/gpt-5.6-terra
     thinkingLevel: medium
 allowed-tools: Bash, Read, Grep, Glob, Task

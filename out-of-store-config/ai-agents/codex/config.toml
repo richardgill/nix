@@ -1,8 +1,8 @@
 # Codex CLI Configuration
 # https://developers.openai.com/codex/config-reference
 
-# Model selection - use the default (gpt-5.6-sol for signed-in users)
-# model = "gpt-5.6-sol"
+# Model selection - use the default (gpt-6-astra for signed-in users)
+# model = "gpt-6-astra"
 model_reasoning_effort = "high"
 
 # Recognize CLAUDE.md as fallback for projects without AGENTS.md
@@ -15,7 +15,7 @@ approval_policy = "never"
 # Options: read-only, workspace-write, danger-full-access
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
-model = "gpt-5.6-sol"
+model = "gpt-6-astra"
 service_tier = "fast"
 
 notify = ["/Users/rich/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
@@ -146,8 +146,11 @@ trust_level = "trusted"
 [projects."/home/rich/code/ghostty/main"]
 trust_level = "trusted"
 
+[projects."/home/rich/code/overmux/main"]
+trust_level = "trusted"
+
 [notice.model_migrations]
-"gpt-5.3-codex" = "gpt-5.6-sol"
+"gpt-5.3-codex" = "gpt-6-astra"
 "gpt-5.4" = "gpt-5.6-terra"
 
 [plugins."github@openai-curated"]
@@ -184,7 +187,7 @@ enabled = true
 enabled = true
 
 [tui.model_availability_nux]
-"gpt-5.6-sol" = 4
+"gpt-6-astra" = 4
 
 [marketplaces.openai-bundled]
 last_updated = "2026-08-05T22:10:37Z"
@@ -225,3 +228,29 @@ enabled = false
 [desktop]
 conversationDetailMode = "STEPS_COMMANDS"
 ambient-suggestions-enabled = true
+
+[hooks.state]
+
+[hooks.state."/home/rich/.codex/hooks.json:pre_tool_use:0:0"]
+trusted_hash = "sha256:84784ae1c65fef123d4383ac1bb31460affac27eba80a5b3ea3aa515dd4d7ae0"
+
+[hooks.state."/home/rich/.codex/hooks.json:permission_request:0:0"]
+trusted_hash = "sha256:5c761ae9323b8627c54fd9897443475fba2f22f899b61920b9ff3b6432785129"
+
+[hooks.state."/home/rich/.codex/hooks.json:post_tool_use:0:0"]
+trusted_hash = "sha256:b28c21ed5bc8620af0e1fc3869f60c2bef69d1eb88b3a807723780482c2e79d3"
+
+[hooks.state."/home/rich/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:4d0447f331f99b99768f53ecc9507bdae2e72007a44188f2cab002d5412241f4"
+
+[hooks.state."/home/rich/.codex/hooks.json:user_prompt_submit:0:0"]
+trusted_hash = "sha256:7f8b753c5c717e703fa6694dc572e21d91a2417416007191b9bc93a0921bb5e1"
+
+[hooks.state."/home/rich/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:f526d03d75c2ee72f0b1f445765b00400ca8de6448479d14c93b1ec6654b1ed8"
+
+[hooks.state."/home/rich/.codex/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:a81ea4a23bd324912b353d4c6cff4f607934e15ef0f08536a48eda71378e7995"
+
+[hooks.state."/home/rich/.codex/hooks.json:stop:0:0"]
+trusted_hash = "sha256:6fb481dbc3c92db3486c19a29818b577b20ffa768ed1914d5e2f07848e346ae7"

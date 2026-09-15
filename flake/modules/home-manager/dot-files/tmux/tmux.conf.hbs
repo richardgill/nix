@@ -41,6 +41,7 @@ set -ag terminal-overrides ",$TERM:Tc"
 # Fixes curly underline: https://www.reddit.com/r/neovim/comments/1933cgg/how_can_i_fix_the_tmux_color_issue_once_and_for
 set-option -sa terminal-features ",$TERM:RGB"
 set-option -ga terminal-features ",$TERM:usstyle"
+set-option -ga terminal-features ",xterm-256color:sync"
 set-option -ga terminal-features ",*:hyperlinks"
 
 # Dual prefix configuration: both § and F12 work everywhere
@@ -54,7 +55,7 @@ unbind-key -a
 bind-key :     command-prompt
 # Enter tmux scrollback mode (navigate/search/copy terminal output)
 bind-key p     copy-mode
-bind-key d     detach-client
+bind-key D     detach-client
 bind-key 1     select-window -t 1
 bind-key 2     select-window -t 2
 bind-key 3     select-window -t 3

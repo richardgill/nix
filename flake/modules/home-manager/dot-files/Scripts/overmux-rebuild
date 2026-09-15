@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+[[ $# -le 1 ]] || {
+  echo "Usage: overmux-rebuild [checkout]" >&2
+  exit 1
+}
+
+checkout_input="${1:-$HOME/code/overmux/main}"
+if ! checkout=$(realpath -e "$checkout_input") || [[ ! -f "$checkout/package.json" || ! -f "$checkout/pnpm-lock.yaml" || ! -f "$checkout/pnpm-workspace.yaml" ]]; then
+  echo "overmux-rebuild: checkout is not an Overmux repository: $checkout_input" >&2
+  exit 1
+fi
+
+cd "$checkout"
+pnpm install --frozen-lockfile
+pnpm build
+
+for output in \
+  packages/runtime/overmux/dist/bin.js \
+  packages/runtime/overmux/dist/exports/index.js; do
+  [[ -f "$output" ]] || {
+    echo "overmux-rebuild: build did not produce $output" >&2
+    exit 1
+  }
+done
+
+active_checkout="$HOME/code/overmux/active-server"
+previous_checkout=$(readlink "$active_checkout")
+temporary_selection="$HOME/code/overmux/.active-server.$$"
+config_install="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/overmux-config-install"
+
+ln -s "$checkout" "$temporary_selection"
+mv -Tf "$temporary_selection" "$active_checkout"
+
+if ! "$config_install"; then
+  ln -s "$previous_checkout" "$temporary_selection"
+  mv -Tf "$temporary_selection" "$active_checkout"
+  exit 1
+fi
+
+systemctl --user reset-failed overmux.service
+if ! systemctl --user restart overmux.service; then
+  ln -s "$previous_checkout" "$temporary_selection"
+  mv -Tf "$temporary_selection" "$active_checkout"
+  "$config_install" || true
+  systemctl --user reset-failed overmux.service
+  systemctl --user restart overmux.service || true
+  exit 1
+fi
