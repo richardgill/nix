@@ -1,7 +1,15 @@
 // Mobile-only workspace navigation keeps terminal controls out of the drawer.
 // The Sheet primitive provides modal dismissal and focus management.
 // Session order is supplied by tmux state and deliberately left unchanged.
-import { Bell, RefreshCw, Settings, SquareTerminal, X } from "lucide-react";
+import {
+  Bell,
+  GitCompare,
+  GitCompareArrows,
+  RefreshCw,
+  Settings,
+  SquareTerminal,
+  X,
+} from "lucide-react";
 import { useEffect, useRef } from "react";
 import type { RefObject } from "react";
 
@@ -10,6 +18,9 @@ import { Sheet, SheetContent } from "../shadcn/sheet";
 import { cn } from "../shadcn/utils";
 
 type MobileWorkspaceSidebarProps = {
+  actionsDisabled: boolean;
+  onGitChanges: () => void;
+  onGitWorkingTree: () => void;
   onNotifications: () => void;
   onResetFontSize: () => void;
   openerRef: RefObject<HTMLButtonElement | null>;
@@ -22,6 +33,9 @@ type MobileWorkspaceSidebarProps = {
 };
 
 export const MobileWorkspaceSidebar = ({
+  actionsDisabled,
+  onGitChanges,
+  onGitWorkingTree,
   onNotifications,
   onResetFontSize = () => null,
   openerRef,
@@ -97,6 +111,30 @@ export const MobileWorkspaceSidebar = ({
         </header>
         <nav className="shrink-0 p-2" aria-label="Workspace actions">
           <button
+            className="flex min-h-[2.375rem] w-full items-center gap-1 border-l-4 border-transparent px-2 py-2 text-left text-sm leading-5 hover:bg-panel-muted disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            disabled={actionsDisabled}
+            onClick={() => {
+              closeForAction();
+              onGitWorkingTree();
+            }}
+            type="button"
+          >
+            <GitCompare aria-hidden="true" className="size-5 shrink-0" />
+            <span className="truncate">Changes vs origin/main</span>
+          </button>
+          <button
+            className="flex min-h-[2.375rem] w-full items-center gap-1 border-l-4 border-transparent px-2 py-2 text-left text-sm leading-5 hover:bg-panel-muted disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+            disabled={actionsDisabled}
+            onClick={() => {
+              closeForAction();
+              onGitChanges();
+            }}
+            type="button"
+          >
+            <GitCompareArrows aria-hidden="true" className="size-5 shrink-0" />
+            <span className="truncate">Local changes</span>
+          </button>
+          <button
             className="flex min-h-[2.375rem] w-full items-center gap-1 border-l-4 border-transparent px-2 py-2 text-left text-sm leading-5 hover:bg-panel-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             onClick={() => {
               closeForAction();
@@ -118,7 +156,10 @@ export const MobileWorkspaceSidebar = ({
             Reset terminal font size
           </button>
         </nav>
-        <div className="min-h-0 flex-1 overflow-y-auto border-t p-2" aria-label="Tmux sessions">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto border-t p-2"
+          aria-label="Tmux sessions"
+        >
           <div className="flex flex-col gap-1">
             {sessions.map((session) => {
               const selected = session.id === selectedSessionId;
@@ -127,7 +168,8 @@ export const MobileWorkspaceSidebar = ({
                   aria-current={selected ? "page" : undefined}
                   className={cn(
                     "flex min-h-[2.375rem] min-w-0 items-center gap-1 border-l-4 border-transparent px-2 py-2 text-left text-sm leading-5 hover:bg-panel-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-                    selected && "border-accent bg-accent/15 font-bold text-accent",
+                    selected &&
+                      "border-accent bg-accent/15 font-bold text-accent",
                   )}
                   key={session.id}
                   onClick={() => {
@@ -140,7 +182,9 @@ export const MobileWorkspaceSidebar = ({
                     aria-hidden="true"
                     className="size-5 shrink-0"
                   />
-                  <span className="min-w-0 flex-1 truncate">{session.name}</span>
+                  <span className="min-w-0 flex-1 truncate">
+                    {session.name}
+                  </span>
                 </button>
               );
             })}

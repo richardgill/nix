@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -euo pipefail
 
 force=false
 while getopts "f" opt; do

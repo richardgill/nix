@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "types": ["vite/client", "node"]
+  },
+  "include": ["src", "overmux.config.ts", "vite.config.ts", "vitest.config.ts"],
+  "exclude": [
+    "src/ui/old",
+    "src/server/server-index-old.ts",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "node_modules"
+  ]
+}

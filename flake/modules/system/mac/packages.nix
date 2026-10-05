@@ -49,6 +49,7 @@ in
       "beeper"
       "blender"
       "chatgpt"
+      "codex-app"
       "cursor"
       "discord"
       "docker-desktop"

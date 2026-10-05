@@ -74,7 +74,8 @@
                       "^com\\.googlecode\\.iterm2$",
                       "^com\\.apple\\.Terminal$",
                       "^com\\.github\\.wez\\.wezterm$",
-                      "^com\\.mitchellh\\.ghostty$"
+                      "^com\\.mitchellh\\.ghostty$",
+                      "^com\\.overmux\\.desktop$"
                     ],
                     "file_paths": ["Chrome Remote Desktop\\.app"],
                     "type": "frontmost_application_unless"
@@ -139,7 +140,8 @@
                       "^com\\.googlecode\\.iterm2$",
                       "^com\\.apple\\.Terminal$",
                       "^com\\.github\\.wez\\.wezterm$",
-                      "^com\\.mitchellh\\.ghostty$"
+                      "^com\\.mitchellh\\.ghostty$",
+                      "^com\\.overmux\\.desktop$"
                     ],
                     "file_paths": ["Chrome Remote Desktop\\.app"],
                     "type": "frontmost_application_unless"
@@ -207,7 +209,8 @@
                       "^com\\.googlecode\\.iterm2$",
                       "^com\\.apple\\.Terminal$",
                       "^com\\.github\\.wez\\.wezterm$",
-                      "^com\\.mitchellh\\.ghostty$"
+                      "^com\\.mitchellh\\.ghostty$",
+                      "^com\\.overmux\\.desktop$"
                     ],
                     "file_paths": ["Chrome Remote Desktop\\.app"],
                     "type": "frontmost_application_unless"
@@ -272,7 +275,8 @@
                       "^com\\.googlecode\\.iterm2$",
                       "^com\\.apple\\.Terminal$",
                       "^com\\.github\\.wez\\.wezterm$",
-                      "^com\\.mitchellh\\.ghostty$"
+                      "^com\\.mitchellh\\.ghostty$",
+                      "^com\\.overmux\\.desktop$"
                     ],
                     "file_paths": ["Chrome Remote Desktop\\.app"],
                     "type": "frontmost_application_unless"

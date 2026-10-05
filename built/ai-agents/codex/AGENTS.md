@@ -12,6 +12,7 @@
 - Prefer table-driven tests when covering multiple similar cases.
 
 - Unless explicitly asked, prefer clean breaks over backwards compatibility; if unsure, ask instead of hedging with legacy paths, shims, or fallback layers.
+- Use blank lines to separate logical steps in code; keep closely related statements together rather than spacing every statement apart.
 
 ### TypeScript / JavaScript
 
@@ -46,7 +47,6 @@
 
 ## Workflow
 
-- Before implementation, consider `gh stack` for changes likely to exceed 400 reviewable changed lines or span multiple dependent concerns. Use it by default above 800 reviewable lines; above 1,200, ask before proceeding with a single PR.
 - Exclude lockfiles, generated code, snapshots, vendored files, build artifacts, and formatting-only changes from reviewable line counts unless they require meaningful review.
 - “🛑”, “LTF” (“let’s talk first”), or “LJT” (“let’s just talk”) means: discuss and agree on the approach first. Do not edit files, run mutating commands, or take external actions until I explicitly approve.
 - Only do git commits when I explicitly ask.
@@ -68,6 +68,7 @@
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use kagi ask-page <url> "<question>".
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
+
 
 ## Overlay and scratch work
 

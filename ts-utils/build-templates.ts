@@ -7,6 +7,7 @@ import {
   writeFileSync,
   cpSync,
   chmodSync,
+  lstatSync,
   readdirSync,
   existsSync,
   statSync,
@@ -187,6 +188,18 @@ const copyFile = (sourcePath: string, outputPath: string) => {
   console.log(`Copied: ${relative(process.cwd(), outputPath)}`);
 };
 
+const makeWritable = (path: string) => {
+  const stat = lstatSync(path);
+  if (stat.isSymbolicLink()) return;
+
+  chmodSync(path, stat.mode | 0o200);
+  if (stat.isDirectory()) {
+    for (const entry of readdirSync(path)) {
+      makeWritable(join(path, entry));
+    }
+  }
+};
+
 const applySkillOverlay = (
   skillPath: string,
   overlayPath: string | undefined,
@@ -311,6 +324,7 @@ const processSharedContent = (
         }
 
         cpSync(skill.sourcePath, outputPath, { recursive: true });
+        makeWritable(outputPath);
         applySkillOverlay(join(outputPath, "SKILL.md"), skill.overlayPath, agentData);
         console.log(`Copied external skill: ${skillName} for ${agent}`);
       }

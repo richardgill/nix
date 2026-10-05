@@ -116,7 +116,7 @@ bindkey "^[[3;9~" kill-line # cmd+Delete
 bindkey '^[l' autosuggest-accept
 
 # ctrl + u only deletes from where the cursor is. (which is then bound to command + left elsewhere)
-# bindkey '^U' backward-kill-line
+bindkey '^U' backward-kill-line
 
 # ctrl + backspace generates ^H
 bindkey "^H" backward-kill-word

@@ -1,4 +1,5 @@
 
+import { homedir } from "node:os";
 import { join } from "node:path";
 import { expect, test as testCases, vi } from "vitest";
 import type { TmuxBackend } from "@overmux/tmux/server";

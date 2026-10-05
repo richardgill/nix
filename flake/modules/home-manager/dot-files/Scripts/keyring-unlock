@@ -1,0 +1,73 @@
+#!@python@/bin/python3
+
+import argparse
+import getpass
+import sys
+
+import dbus
+
+
+def unlock_keyring(check=False):
+    bus = dbus.SessionBus()
+    service = bus.get_object("org.freedesktop.secrets", "/org/freedesktop/secrets")
+    collection = "/org/freedesktop/secrets/collection/login"
+    properties = dbus.Interface(
+        bus.get_object("org.freedesktop.secrets", collection),
+        "org.freedesktop.DBus.Properties",
+    )
+    if not properties.Get("org.freedesktop.Secret.Collection", "Locked"):
+        print("Your login keyring is already unlocked.")
+        return 0
+    if check:
+        print("Your login keyring is locked.")
+        return 1
+    if not sys.stdin.isatty():
+        print("Run keyring-unlock in an interactive terminal.", file=sys.stderr)
+        return 1
+
+    _, session_path = dbus.Interface(service, "org.freedesktop.Secret.Service").OpenSession(
+        "plain", dbus.String("", variant_level=1)
+    )
+    session = dbus.Interface(
+        bus.get_object("org.freedesktop.secrets", session_path),
+        "org.freedesktop.Secret.Session",
+    )
+    try:
+        password = getpass.getpass("Keyring password (input hidden): ")
+        secret = dbus.Struct(
+            (
+                session_path,
+                dbus.Array([], signature="y"),
+                dbus.ByteArray(password.encode("utf-8")),
+                "text/plain; charset=utf8",
+            ),
+            signature="oayays",
+        )
+        dbus.Interface(
+            service, "org.gnome.keyring.InternalUnsupportedGuiltRiddenInterface"
+        ).UnlockWithMasterPassword(dbus.ObjectPath(collection), secret)
+        if properties.Get("org.freedesktop.Secret.Collection", "Locked"):
+            print("Your login keyring is still locked.", file=sys.stderr)
+            return 1
+        print("Success: your login keyring is unlocked.")
+        return 0
+    finally:
+        session.Close()
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Unlock your GNOME login keyring over SSH or locally.")
+    parser.add_argument("--check", action="store_true", help="Check status without prompting; exit 0 if unlocked, 1 if locked.")
+    args = parser.parse_args()
+    try:
+        return unlock_keyring(check=args.check)
+    except dbus.DBusException as error:
+        print(f"Keyring error: {error.get_dbus_name()}: {error.get_dbus_message()}", file=sys.stderr)
+        return 1
+    except (KeyboardInterrupt, EOFError):
+        print("\nUnlock cancelled.", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

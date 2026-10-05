@@ -1,1 +1,1 @@
-Immediately run `overmux ai context` for documentation about Overmux.
+Immediately run `overmux docs ai-context` for documentation about Overmux.

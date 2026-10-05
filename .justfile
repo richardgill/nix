@@ -153,6 +153,9 @@ template machine='':
 
     echo "Building templates for: $machine"
 
+    if [ -d built ]; then
+      chmod -R u+w built
+    fi
     rm -rf built
 
     # Get template config from Nix

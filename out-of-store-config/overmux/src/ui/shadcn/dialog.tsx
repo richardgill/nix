@@ -11,8 +11,11 @@ export const DialogClose = DialogPrimitive.Close;
 
 export const DialogContent = forwardRef<
   HTMLDivElement,
-  ComponentProps<typeof DialogPrimitive.Content> & { closeHint?: ReactNode }
->(({ children, className, closeHint, ...props }, ref) => (
+  ComponentProps<typeof DialogPrimitive.Content> & {
+    closeHint?: ReactNode;
+    hideCloseButton?: boolean;
+  }
+>(({ children, className, closeHint, hideCloseButton, ...props }, ref) => (
   <OvermuxPortal>
     <DialogPrimitive.Overlay className="fixed inset-0 z-[1100] bg-black/70" />
     <DialogPrimitive.Content
@@ -24,11 +27,13 @@ export const DialogContent = forwardRef<
       {...props}
     >
       {children}
-      <DialogPrimitive.Close className="absolute top-3 right-3 inline-flex items-center gap-2 rounded p-1 text-foreground/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-        {closeHint}
-        <X className="size-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
+      {!hideCloseButton ? (
+        <DialogPrimitive.Close className="absolute top-3 right-3 inline-flex items-center gap-2 rounded p-1 text-foreground/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+          {closeHint}
+          <X className="size-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      ) : null}
     </DialogPrimitive.Content>
   </OvermuxPortal>
 ));

@@ -161,6 +161,18 @@ in
     ];
   });
 
+  # tmux 3.6a can crash when a deferred control notification outlives its session.
+  # Remove this patch when Nixpkgs includes the fix (present in tmux 3.8-rc3, not 3.7c).
+  # Upstream PR: https://github.com/tmux/tmux/pull/5244
+  tmux = prev.tmux.overrideAttrs (old: {
+    patches = (old.patches or [ ]) ++ [
+      (prev.fetchpatch {
+        url = "https://github.com/tmux/tmux/commit/035447b08f3b2db1d370422a9d8a3b53c88a2cc8.patch";
+        hash = "sha256-9b6vCgTJZjgp4nf7tLHLhM1kCvlJBZ0HH0yUNHXJh4A=";
+      })
+    ];
+  });
+
   # Neovim is pinned to a 0.13 nightly commit for OS watcher-driven 'autoread'.
   # Remove the pin when Neovim 0.13 is stable and available in Nixpkgs.
   # Upstream: https://github.com/neovim/neovim/pull/37971

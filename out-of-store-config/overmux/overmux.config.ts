@@ -12,7 +12,7 @@ export default defineOvermuxConfig({
     ],
     trustedProxyPeer: "127.0.0.1",
   },
-  debug: true,
+  logLevel: "debug",
   host: "127.0.0.1",
   port: 4242,
   productionWebAssetsDir: "./dist",

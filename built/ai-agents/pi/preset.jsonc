@@ -1,0 +1,15 @@
+{
+  "cycleShortcut": "ctrl+p",
+  "presets": {
+    "strong": {
+      "provider": "openai",
+      "model": "gpt-6.1-sol",
+      "thinkingLevel": "high"
+    },
+    "xstrong": {
+      "provider": "openai",
+      "model": "gpt-6-astra",
+      "thinkingLevel": "high"
+    }
+  }
+}

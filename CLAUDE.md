@@ -20,13 +20,14 @@ Dotfile templates may use the `.hbs` suffix. Use `*.ext*` globs when searching f
 ## Workflow
 
 - Use the `.justfile` for common tasks and commands.
+- After reboot, run `keyring-unlock` in an interactive terminal (including SSH/tmux) to unlock GNOME Keyring; it securely prompts for the keyring password.
 - When I say "switch", run `just switch` for me.
 - After changing `./flake/`, run `just switch` to build and activate the configuration. Only skip this for particularly dangerous changes; home-directory changes are safe to apply.
 - Changes under `./out-of-store-config/` are picked up after relaunching the affected program and do not require `just switch`.
 - Edit the repository sources for dotfiles rather than their symlinks in `~/`.
 - Prefer keeping dotfiles as text files on disk, using Handlebars templates when needed.
 - Put temporary package pins in `./flake/overlays/pins.nix`. Above each pin, explain why it exists, when to remove or revisit it, and include relevant upstream or Nixpkgs links.
-- Run `overmux ai context` for documentation about Overmux.
+- Run `overmux docs ai-context` for documentation about Overmux.
 
 
 - Add new impermanence persistence directories and files to `./flake/modules/system/nixos/headless/impermanence.nix`.

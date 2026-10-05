@@ -28,6 +28,7 @@ let
   # Programmatically generate Scripts entries
   scriptFiles = builtins.readDir ../../dot-files/Scripts;
   linuxOnlyScripts = [
+    "keyring-unlock"
     "open"
     "paste"
     "screen-record"
@@ -40,7 +41,14 @@ let
       (
         name: type:
         lib.nameValuePair "Scripts/${name}" {
-          source = ../../dot-files/Scripts + "/${name}";
+          executable = if name == "keyring-unlock" then true else null;
+          source =
+            if name == "keyring-unlock" then
+              pkgs.replaceVars ../../dot-files/Scripts/keyring-unlock {
+                python = pkgs.python3.withPackages (p: [ p.dbus-python ]);
+              }
+            else
+              ../../dot-files/Scripts + "/${name}";
         }
       )
       (
@@ -65,6 +73,16 @@ in
 
   home.file =
     scriptsEntries
+    // lib.genAttrs (map (name: ".pi/agent/extension-config/${name}") [
+      "context-commands.jsonc"
+      "overmux-pi.jsonc"
+      "parrot.jsonc"
+      "skill-metadata-templates.jsonc"
+      "task-context.jsonc"
+      "tmux-bash.jsonc"
+    ]) (path: {
+      source = config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extension-config/${builtins.baseNameOf path}";
+    })
     // {
       ".config/nvim".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/nvim";
@@ -123,11 +141,9 @@ in
       ".pi/agent/AGENTS.md".source = "${builtTemplates}/ai-agents/pi/AGENTS.md";
       ".pi/agent/settings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/settings.json";
-      ".pi/agent/presets.json".source = "${builtTemplates}/ai-agents/pi/presets.json";
+      ".pi/agent/extension-config/preset.jsonc".source = "${builtTemplates}/ai-agents/pi/preset.jsonc";
       ".pi/agent/keybindings.json".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/keybindings.json";
-      ".pi/agent/extension-config".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/extension-config";
       ".pi/agent/skills".source = "${builtTemplates}/ai-agents/pi/skills";
       ".pi/agent/themes".source =
         config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/ai-agents/pi/themes";

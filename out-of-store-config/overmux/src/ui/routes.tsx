@@ -8,6 +8,7 @@ import {
 import { useCommand } from "overmux/client";
 
 import { commands } from "./commands";
+import { GitChangesRedirectRoute, gitChangesSearchSchema } from "./git";
 import {
   NotificationsRedirectRoute,
   notificationSearchSchema,
@@ -21,6 +22,12 @@ const RootRoute = () => {
   const router = useRouter();
   useCommand(commands.openNotifications, {
     run: () => openNotifications(router),
+  });
+  useCommand(commands.openGithubNotifications, {
+    run: () => openNotifications(router, "github"),
+  });
+  useCommand(commands.openAgentNotifications, {
+    run: () => openNotifications(router, "agent"),
   });
   return <Outlet />;
 };
@@ -50,10 +57,15 @@ const notificationDetailRoute = createRoute({
   getParentRoute: () => notificationChannelRoute,
   path: "$id",
 });
+const gitChangesRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "git/$mode",
+  component: GitChangesRedirectRoute,
+});
 const tmuxRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "tmux",
-  validateSearch: notificationSearchSchema,
+  validateSearch: notificationSearchSchema.extend(gitChangesSearchSchema.shape),
   component: TmuxTerminalLayoutRoute,
 });
 const tmuxIndexRoute = createRoute({
@@ -79,6 +91,7 @@ const routeTree = rootRoute.addChildren([
     notificationsIndexRoute,
     notificationChannelRoute.addChildren([notificationDetailRoute]),
   ]),
+  gitChangesRoute,
   tmuxRoute.addChildren([tmuxIndexRoute, sessionRoute, windowRoute, paneRoute]),
 ]);
 export const routes = createRouter({

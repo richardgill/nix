@@ -6,7 +6,7 @@ metadata:
     subProcess: true
     subProcessContext: fresh
     allowChildDelegation: false
-    model: openai-codex/gpt-5.6-luna
+    model: openai/gpt-5.6-luna
     thinkingLevel: medium
 ---
 

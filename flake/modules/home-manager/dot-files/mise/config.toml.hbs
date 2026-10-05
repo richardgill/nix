@@ -5,6 +5,7 @@ revuediff = "github:mtford90/revue"
 bun = "1.3.3"
 deno = "2.3.3"
 go = "latest"
+hunk = { version = "latest", minimum_release_age = "0s" }
 node = ['23.11.0']
 pkl = "0.28.2"
 python = "3.13.4"
@@ -16,7 +17,7 @@ rust = "latest"
 "npm:@anthropic-ai/claude-code" = "2.1.133"
 "npm:@sourcegraph/amp" = "0.0.1768035453-g894cb5"
 "npm:agent-browser" = "0.17.1"
-"npm:kagi-cli" = "0.3.3"
+"github:Microck/kagi-cli" = "0.20.1"
 pi = { version = "latest", minimum_release_age = "0s" }
 "npm:pi-pack" = "latest"
 # Slack re-auth needs localhost callback support: https://github.com/apify/mcpc/issues/269
@@ -31,6 +32,9 @@ idiomatic_version_file_enable_tools = ["node", "pnpm"]
 experimental = true
 
 {{#if isLinux}}
+# Use Nix's tmux directly; frequent polling through Mise's shim adds unnecessary CPU overhead.
+disable_tools = ["tmux"]
+
 # Mise on NixOS sets this to true by default https://mise.jdx.dev/configuration/settings.html#all_compile
 # We have programs.nix-ld.enable = true; so we don't need to compile everything
 all_compile = false

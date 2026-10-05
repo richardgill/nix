@@ -3,11 +3,12 @@
 # @option --prompt-file File containing the delegated Pi prompt
 # @option --task-slug Short lowercase task name used for the window name
 # @flag --skill Mark the child as a skill invocation
-# @flag --block-nested Prevent the launched child from delegating
+# @flag --block-nested Prevent the launched child from supervised delegation (FAF remains allowed)
 # @flag --no-callback Launch without notifying the parent when the child settles
 # @option --pi-session Pi session file to fork
 # @option --model Pi model
 # @option --thinking Pi thinking level
+# @option --speed Speed mode: off, fast, or ultrafast
 # @option --target Existing repo or worktree path (defaults to the current tmux session and directory)
 # @option --worktree Create a worktree with this branch name
 # @option --source-ref Explicit source ref for the new worktree
@@ -44,7 +45,7 @@ prepare_prompt() {
   local delegation_instruction='You may delegate distinct, self-contained subtasks when useful, but do not merely redelegate this task.'
 
   [[ -f "$source_file" ]] || fail "--prompt-file does not exist or is not a file: $source_file"
-  [[ -z "$block_nested" ]] || delegation_instruction='Do not invoke tmux-pi or delegate.'
+  [[ -z "$block_nested" ]] || delegation_instruction='Do not use supervised delegation. You may delegate distinct, self-contained subtasks with tmux-pi --no-callback (fire-and-forget), but do not supervise them or merely redelegate this task.'
   {
     printf '%s %s\n\n' 'You are the worker already launched for this task. Treat requests to perform this "in a thread" as already satisfied. Complete only the substantive task; the parent owns follow-on work.' "$delegation_instruction"
     cat "$source_file"
@@ -62,6 +63,7 @@ build_pi_command() {
   local thinking="$7"
   local skill="$8"
   local block_nested="$9"
+  local speed="${10}"
   local pi_binary
   local args
 
@@ -78,6 +80,7 @@ build_pi_command() {
   fi
   [[ -n "$model" ]] && args+=(--model "$model")
   [[ -n "$thinking" ]] && args+=(--thinking "$thinking")
+  [[ -z "$speed" ]] || args+=(--speed "$speed")
   args+=("@$prompt_file")
   printf '%q ' "${args[@]}"
 }
@@ -150,10 +153,11 @@ run() {
 
   [[ -n "${argc_prompt_file:-}" ]] || fail "--prompt-file is required"
   [[ -n "${argc_task_slug:-}" ]] || fail "--task-slug is required"
-  [[ "${PI_BLOCK_NESTED:-}" != 1 ]] || fail "nested delegation is blocked; complete the task in this worker"
+  [[ "${PI_BLOCK_NESTED:-}" != 1 || -n "${argc_no_callback:-}" ]] || fail "nested supervised delegation is blocked; use --no-callback for fire-and-forget work"
   [[ -n "${argc_no_callback:-}" || -n "${PI_SESSION_ID:-}" ]] || fail "tmux-pi must be launched from a persisted parent Pi session unless --no-callback is used"
   [[ -z "${argc_source_ref:-}" || -n "${argc_worktree:-}" ]] || fail "--source-ref requires --worktree"
   [[ -z "${argc_worktree:-}" || -z "${argc_target:-}" ]] || fail "--worktree cannot be combined with --target"
+  [[ -z "${argc_speed:-}" || "${argc_speed}" == off || "${argc_speed}" == fast || "${argc_speed}" == ultrafast ]] || fail "--speed must be off, fast, or ultrafast"
 
   local task_name
   local session_id
@@ -171,7 +175,7 @@ run() {
   validate_task_name "$task_name"
   session_id=$(resolve_session_id "${argc_pi_session:-}")
   prepared_prompt=$(prepare_prompt "$session_id" "$argc_prompt_file" "${argc_block_nested:-}")
-  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$parent_session_id" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}" "${argc_block_nested:-}")
+  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$parent_session_id" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}" "${argc_block_nested:-}" "${argc_speed:-}")
 
   resolve_target "${argc_worktree:-}" "${argc_source_ref:-}" "${argc_target:-}"
   launch_pi_window "$task_name" "$TARGET_SESSION" "$TARGET_CWD" "$pi_command" || fail "failed to launch child Pi"

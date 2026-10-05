@@ -8,4 +8,5 @@ fi
 export PI_EXTENSION_CONFIG_DIR="${PI_EXTENSION_CONFIG_DIR:-$HOME/.pi/agent/extension-config}"
 
 pi_bin="$(mise which pi)"
-exec "$pi_bin" "$@"
+# Hide server displays so Pi copies via OSC 52 to the terminal client, not the server clipboard; child GUI commands lose display access too.
+exec env -u DISPLAY -u WAYLAND_DISPLAY "$pi_bin" "$@"

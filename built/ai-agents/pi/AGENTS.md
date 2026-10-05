@@ -12,6 +12,7 @@
 - Prefer table-driven tests when covering multiple similar cases.
 
 - Unless explicitly asked, prefer clean breaks over backwards compatibility; if unsure, ask instead of hedging with legacy paths, shims, or fallback layers.
+- Use blank lines to separate logical steps in code; keep closely related statements together rather than spacing every statement apart.
 
 ### TypeScript / JavaScript
 
@@ -47,11 +48,10 @@
 
 ## Workflow
 
-- Before implementation, consider `gh stack` for changes likely to exceed 400 reviewable changed lines or span multiple dependent concerns. Use it by default above 800 reviewable lines; above 1,200, ask before proceeding with a single PR.
 - Exclude lockfiles, generated code, snapshots, vendored files, build artifacts, and formatting-only changes from reviewable line counts unless they require meaningful review.
 - “🛑”, “LTF” (“let’s talk first”), or “LJT” (“let’s just talk”) means: discuss and agree on the approach first. Do not edit files, run mutating commands, or take external actions until I explicitly approve.
 - Default to delegating self-contained medium-sized implementation and research tasks through `tmux-pi`; perform higher-level work and complex thinking inline.
-- Use `openai-codex/gpt-5.6-terra` with `medium` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
+- Use `openai/gpt-6.1-sol` with `high` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
 - Only do git commits when I explicitly ask.
 - Treat these standalone messages as explicit authorization to run the corresponding command:
   - Decide on a succinct commit message that describes the changes and pass it to the command.
@@ -71,6 +71,12 @@
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use kagi ask-page <url> "<question>".
 - The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
+
+## Use pi-jq
+
+For pi session inspection, `pi-jq <session-id> --messages 1 --role assistant --chars 5000` prints the latest answer without repeating the request. Use `--messages 3` when recent conversational context is necessary, `--turn` for richer diagnostics with the latest request, status, tools, and errors, `--errors` for failures, `--log` for the whole compact conversation, `--path` for the JSONL path, and `--json` for structured output. IDs may be shortened to a unique prefix.
+
+If `pi-jq` needs another feature, read `~/code/nix-private/CLAUDE.md`, edit `~/code/nix-private/flake/modules/home-manager/dot-files/Scripts/pi-jq`, and run `just switch` from `~/code/nix-private` to deploy it.
 
 ## Overlay and scratch work
 

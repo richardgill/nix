@@ -105,7 +105,7 @@ local function launchCmus()
 end
 
 hs.hotkey.bind(hyper, "g", function()
-	hs.application.launchOrFocus("Ghostty")
+	hs.application.launchOrFocus(os.getenv("HOME") .. "/Applications/Overmux.app")
 end)
 
 hs.hotkey.bind(hyper, "m", function()
@@ -121,7 +121,7 @@ hs.hotkey.bind(hyper, "m", function()
 end)
 
 hs.hotkey.bind(hyper, "n", function()
-	hs.urlevent.openURL("https://ntfy.sh/app")
+	hs.urlevent.openURL("https://um790.tail98765.ts.net/notifications/all")
 end)
 
 hs.hotkey.bind(hyper, "h", function()

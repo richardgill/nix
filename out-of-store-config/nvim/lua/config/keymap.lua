@@ -9,6 +9,20 @@ require('custom.move-lines').setup()
 
 local xata_work_queue_path = vim.fn.expand '~/code/notes/content/projects/xata/work-queue.md'
 
+-- wrap ]l round at the end
+local navigate_location = function(command, boundary)
+  local wrap = vim.v.count == 0
+  local ok, err = pcall(vim.cmd, { cmd = command, count = vim.v.count1 })
+  if ok then
+    return
+  end
+  if wrap and tostring(err):match ':E553:' then
+    vim.cmd(boundary)
+    return
+  end
+  error(err, 0)
+end
+
 local code_diff_against = function(target)
   local command = { vim.fn.expand '~/Scripts/git-diff-base-ref', target }
   local result = vim.system(command, { text = true }):wait()
@@ -48,6 +62,13 @@ vim.keymap.set('n', ']d', function()
 end, { desc = 'Go to next [D]iagnostic message' })
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+
+vim.keymap.set('n', ']l', function()
+  navigate_location('lnext', 'lfirst')
+end, { desc = 'Next location, wrapping' })
+vim.keymap.set('n', '[l', function()
+  navigate_location('lprevious', 'llast')
+end, { desc = 'Previous location, wrapping' })
 
 -- half screen up and down zz: center cursor
 vim.keymap.set('n', '<C-d>', '<C-d>zz')

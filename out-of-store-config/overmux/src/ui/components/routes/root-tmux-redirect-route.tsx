@@ -9,7 +9,7 @@ import {
 import { tmuxParamsFromTarget } from "../../utils/tmux-routing";
 
 export const RootTmuxRedirectRoute = () => {
-  const tmux = useResource({ id: "tmuxState" });
+  const tmux = useResource({ id: "tmux" });
   const navigate = useNavigate();
   const search = useSearch({ strict: false });
   const notification = notificationFromSearch(search);

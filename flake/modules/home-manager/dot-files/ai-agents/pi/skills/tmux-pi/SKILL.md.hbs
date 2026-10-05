@@ -26,14 +26,16 @@ Child prompts must contain only the delegated work. Do not forward parent-only o
 
 - `wt` means spawn in a new worktree using `--worktree`. Ask whether callbacks should be enabled unless the request already specifies normal supervision, no callback, `FAF`, or `🔥`.
 - `FAF` and `🔥` mean fire-and-forget: launch with `--no-callback` and do not supervise the child.
-- Delegated Pis may delegate distinct, self-contained subtasks by default. Use `--block-nested` when the launched child must not delegate.
+- Delegated Pis may delegate distinct, self-contained subtasks by default. Use `--block-nested` when the launched child must not use supervised delegation. Fire-and-forget delegation with `--no-callback` remains allowed.
+- Always pass `--speed off` unless the user explicitly asks for `--speed fast` or `--speed ultrafast`. Off disables fast mode for this child, even if saved Pi settings enable it. Omitting `--speed` inherits saved Pi settings, so do not omit it for the default behavior. Speed never changes the model or thinking level.
 
 When running `tmux-pi`, confirm the launcher reaches `Launched`; if slow worktree setup moves the command to the background, wait only for its automatic completion notification and do not poll it.
 
-Current tmux session and working directory:
+Current tmux session and working directory (fast mode off, even when saved Pi settings enable it):
 
 ```bash
 tmux-pi \
+  --speed off \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
 ```
@@ -42,6 +44,7 @@ Launch without a callback to the parent:
 
 ```bash
 tmux-pi \
+  --speed off \
   --no-callback \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
@@ -49,10 +52,11 @@ tmux-pi \
 
 A no-callback child remains available in its tmux window, but the parent must not wait for, supervise, or expect a completion notification from it. It's fire-and-forget.
 
-Launch a child that cannot delegate:
+Launch a child that can only delegate fire-and-forget work:
 
 ```bash
 tmux-pi \
+  --speed off \
   --block-nested \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
@@ -62,37 +66,35 @@ Another existing repo or worktree tmux session:
 
 ```bash
 tmux-pi \
+  --speed off \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>' \
   --target '<repo-or-worktree>'
 ```
 
-New worktree from local `main` HEAD always uses the `strongHigh` profile:
+New worktree from local `main` HEAD always uses the `strong` profile:
 
 ```bash
 tmux-pi \
+  --speed off \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>' \
   --worktree '<branch>' \
-  --model "{{modelProfiles.strongHigh.providerModel}}" \
-  --thinking "{{modelProfiles.strongHigh.thinkingLevel}}"
+  --model "{{modelProfiles.strong.providerModel}}" \
+  --thinking "{{modelProfiles.strong.thinkingLevel}}"
 ```
 
 Add `--source-ref '<ref>'` only when the worktree should start from an explicit source ref. Add `--pi-session`, `--model`, or `--thinking` when supplied by the request. Skill metadata delegates use `--skill --block-nested` when `pi.allowChildDelegation` is `false`; `--skill` marks the child without exposing `PI_SKILL_CHILD` at the call site.
 
-`tmux-pi` launches the child with `PI_CHILD=1`, `PI_TASK_SLUG=<task-slug>`, and, unless `--no-callback` is used, `PI_PARENT_SESSION_ID=<parent-session-id>`. `--block-nested` adds `PI_BLOCK_NESTED=1`; a process with that marker cannot invoke `tmux-pi`. Skill children also receive `PI_SKILL_CHILD=1`. Keep the task, child Pi session ID, and window from its output available for supervision when callbacks are enabled.
+`tmux-pi` launches the child with `PI_CHILD=1`, `PI_TASK_SLUG=<task-slug>`, and, unless `--no-callback` is used, `PI_PARENT_SESSION_ID=<parent-session-id>`. `--block-nested` adds `PI_BLOCK_NESTED=1`; a process with that marker can invoke `tmux-pi` only with `--no-callback` (fire-and-forget). Skill children also receive `PI_SKILL_CHILD=1`. Keep the task, child Pi session ID, and window from its output available for supervision when callbacks are enabled.
 
 Child will let you know when it's finished; no need to wait or poll. Do not use `capture-pane`, `bash_process`, `sleep`, or repeated status commands while waiting. Inspect the pane only if the notification is incomplete or the user explicitly requests live monitoring.
 
 ## Oversee delegated work
 
+Use `pi-jq` to read Pi session.jsonl files.
+
 When `overmux-pi` delivers a `delegate-settled` notification, use the delegated status embedded in the notification as the primary report. Do not run `pi-jq` again unless the embedded status is incomplete, reports an inspection failure, or richer diagnostics are necessary. Use `tmux capture-pane` only if session inspection fails or terminal-only state is required.
-
-### Use pi-jq
-
-For fallback inspection, `pi-jq <session-id> --messages 1 --role assistant --chars 5000` prints the latest answer without repeating the delegated request. Use `--messages 3` when recent conversational context is necessary, `--turn` for richer diagnostics with the latest request, status, tools, and errors, `--errors` for failures, `--log` for the whole compact conversation, `--path` for the JSONL path, and `--json` for structured output. IDs may be shortened to a unique prefix.
-
-If `pi-jq` needs another feature, read `~/code/nix-private/CLAUDE.md`, edit `~/code/nix-private/flake/modules/home-manager/dot-files/Scripts/pi-jq`, and run `just switch` from `~/code/nix-private` to deploy it.
 
 If the task remains unresolved, send follow-up instructions through `overmux-pi` using the child Pi session ID recorded at launch. The child will notify the parent again when the follow-up turn settles; assess the fresh embedded status directly before deciding whether more work is needed.
 

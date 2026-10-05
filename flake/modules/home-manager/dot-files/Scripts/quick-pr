@@ -5,6 +5,7 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/git"
+source "$SCRIPT_DIR/lib/ai-agent"
 
 # Check for existing PR
 CURRENT_BRANCH=$(git branch --show-current)
@@ -27,4 +28,8 @@ else
 fi
 
 # Open in browser
-gh pr view "$PR_URL" --web
+if is_ai_agent; then
+    echo "$PR_URL"
+else
+    gh pr view "$PR_URL" --web
+fi

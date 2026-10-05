@@ -15,6 +15,7 @@ import {
   isNotificationChannel,
   notificationChannels,
   notificationPath,
+  type NotificationChannel,
   type NotificationOverlay,
 } from "./routing";
 
@@ -248,13 +249,16 @@ export const NotificationsRedirectRoute = () => {
   return null;
 };
 
-export const openNotifications = (router: ReturnType<typeof useRouter>) =>
+export const openNotifications = (
+  router: ReturnType<typeof useRouter>,
+  channel: NotificationChannel = "all",
+) =>
   router.navigate({
     hash: workspaceNavigationHash(router, { masked: true }),
-    mask: { to: notificationPath("all") },
+    mask: { to: notificationPath(channel) },
     search: (search) => ({
       ...search,
-      notification: { channel: "all" as const },
+      notification: { channel },
     }),
     to: ".",
   });

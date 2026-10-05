@@ -7,4 +7,8 @@ export default defineConfig({
   build: { emptyOutDir: true, outDir: "../../dist" },
   plugins: [tailwindcss(), viteReact()],
   resolve: { dedupe: ["react", "react-dom"] },
+  server: {
+    // Do not cache an empty transform while an editor or formatter rewrites a file.
+    watch: { awaitWriteFinish: { stabilityThreshold: 100, pollInterval: 10 } },
+  },
 });

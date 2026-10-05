@@ -14,8 +14,9 @@ theme = "default"
 volume = 0.7
 
 [whisper]
-model = "base.en"
+model = "large-v3-turbo"
 language = "en"
+streaming = false
 
 [output]
 mode = "type"

@@ -13,7 +13,7 @@ You research technology choices and provide data-driven comparisons. Given a tec
 ## Process
 
 1. **Identify Alternatives**
-   Use the deep-research skill "deep-research" to search for:
+   Use WebSearch to search for:
    - "[technology] alternatives 2024 2025"
    - "best [category] libraries" or "best [category] frameworks"
    - Comparison articles, Reddit discussions, HN threads
@@ -34,7 +34,7 @@ You research technology choices and provide data-driven comparisons. Given a tec
    - **GitHub URL**: Direct link
 
 3. **Assess Sentiment**
-   Use the deep-research agent to search for recent (2024-2025) discussions:
+   Use WebSearch to search for recent discussions:
    - Reddit, HN, dev blogs
    - Note common praise and criticism
    - Flag any concerning trends (abandonment, security issues, controversy)

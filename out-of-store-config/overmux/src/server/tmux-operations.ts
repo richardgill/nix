@@ -53,7 +53,7 @@ export const killTmuxPane = async ({
   await executeFile(join(homedir(), "Scripts", "tmux-kill-pane"), [paneId]);
 };
 
-export const tmuxOperationHandlers = ({
+export const customTmuxOperations = ({
   backend,
 }: {
   backend: TmuxBackend;

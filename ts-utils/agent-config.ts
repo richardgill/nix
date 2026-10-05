@@ -10,6 +10,7 @@ export type AgentModels = {
   luna: AgentModel;
   terra: AgentModel;
   astra: AgentModel;
+  sol: AgentModel;
 };
 
 export type AgentModelProfile = AgentModel & {
@@ -17,13 +18,10 @@ export type AgentModelProfile = AgentModel & {
 };
 
 export type AgentModelProfiles = {
-  economicalMedium: AgentModelProfile;
-  economicalHigh: AgentModelProfile;
-  balancedMedium: AgentModelProfile;
-  balancedHigh: AgentModelProfile;
-  strongMedium: AgentModelProfile;
-  strongHigh: AgentModelProfile;
-  strongXhigh: AgentModelProfile;
+  economical: AgentModelProfile;
+  balanced: AgentModelProfile;
+  strong: AgentModelProfile;
+  xstrong: AgentModelProfile;
 };
 
 export type WebSearchProvider = {
@@ -52,26 +50,24 @@ export type AgentConfig = {
   modelProfiles?: AgentModelProfiles;
 };
 
-const openAiCodexModel = (model: string): AgentModel => ({
-  provider: "openai-codex",
+const openAiModel = (model: string): AgentModel => ({
+  provider: "openai",
   model,
-  providerModel: `openai-codex/${model}`,
+  providerModel: `openai/${model}`,
 });
 
 const models = {
-  luna: openAiCodexModel("gpt-5.6-luna"),
-  terra: openAiCodexModel("gpt-5.6-terra"),
-  astra: openAiCodexModel("gpt-6-astra"),
+  luna: openAiModel("gpt-5.6-luna"),
+  terra: openAiModel("gpt-5.6-terra"),
+  astra: openAiModel("gpt-6-astra"),
+  sol: openAiModel("gpt-6.1-sol"),
 } satisfies AgentModels;
 
 const modelProfiles = {
-  economicalMedium: { ...models.luna, thinkingLevel: "medium" },
-  economicalHigh: { ...models.luna, thinkingLevel: "high" },
-  balancedMedium: { ...models.terra, thinkingLevel: "medium" },
-  balancedHigh: { ...models.terra, thinkingLevel: "high" },
-  strongMedium: { ...models.astra, thinkingLevel: "medium" },
-  strongHigh: { ...models.astra, thinkingLevel: "high" },
-  strongXhigh: { ...models.astra, thinkingLevel: "xhigh" },
+  economical: { ...models.luna, thinkingLevel: "medium" },
+  balanced: { ...models.terra, thinkingLevel: "medium" },
+  strong: { ...models.sol, thinkingLevel: "high" },
+  xstrong: { ...models.astra, thinkingLevel: "high" },
 } satisfies AgentModelProfiles;
 
 const webSearchSkill = "web-search";

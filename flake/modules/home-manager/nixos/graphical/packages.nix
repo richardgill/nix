@@ -21,6 +21,7 @@ in
     [
       alacritty
       bubblewrap
+      inputs.chatgpt-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
 
       # Fix Chromium crash on Wayland/Hyprland with color management
       # https://github.com/hyprwm/Hyprland/discussions/11843

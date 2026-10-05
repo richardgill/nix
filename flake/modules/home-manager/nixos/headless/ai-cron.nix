@@ -8,6 +8,8 @@ in
   systemd.user.services.ai-cron = {
     Unit = {
       Description = "AI cron";
+      After = [ "overmux.service" ];
+      Wants = [ "overmux.service" ];
     };
     Service = {
       WorkingDirectory = appDir;
@@ -17,8 +19,6 @@ in
       StateDirectory = "ai-cron";
       Environment = [
         "PATH=${pathEnv}"
-        "NTFY_AGENT_TOPIC_FILE=${config.home.sessionVariables.NTFY_AGENT_TOPIC_FILE}"
-        "NTFY_GITHUB_TOPIC_FILE=${config.home.sessionVariables.NTFY_GITHUB_TOPIC_FILE}"
       ];
     };
     Install = {

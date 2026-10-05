@@ -85,6 +85,27 @@
         "type": "github"
       }
     },
+    "chatgpt-desktop": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790834283,
+        "narHash": "sha256-RNTb7jeQjRkBqJzaa69RtqV3Ae6LWyBGwkJpujDCOyU=",
+        "owner": "danielbodart",
+        "repo": "chatgpt-desktop",
+        "rev": "81091718abffc59852bf6ccec7080203b9a0afab",
+        "type": "github"
+      },
+      "original": {
+        "owner": "danielbodart",
+        "repo": "chatgpt-desktop",
+        "rev": "81091718abffc59852bf6ccec7080203b9a0afab",
+        "type": "github"
+      }
+    },
     "crane": {
       "locked": {
         "lastModified": 1754269165,
@@ -983,6 +1004,7 @@
     },
     "root": {
       "inputs": {
+        "chatgpt-desktop": "chatgpt-desktop",
         "determinate": "determinate",
         "disko": "disko",
         "elephant": "elephant",
@@ -1272,16 +1294,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1769797803,
-        "narHash": "sha256-w2d65BKXgC2M7EKDJ43beOQ2JXECsPSR9Z45sOT1Hi8=",
+        "lastModified": 1790207480,
+        "narHash": "sha256-zw7Up84IdNv6p8Ae7VnBDuCC/smYHCpMB7C2aN1ZXyc=",
         "owner": "peteonrails",
         "repo": "voxtype",
-        "rev": "c15290a49fc3454f5cda6a46af49014e20e29e2e",
+        "rev": "e2638ca63f566f1682bcedc0abea8e4b25211c21",
         "type": "github"
       },
       "original": {
         "owner": "peteonrails",
-        "ref": "v0.5.5",
+        "ref": "v1.1.0",
         "repo": "voxtype",
         "type": "github"
       }

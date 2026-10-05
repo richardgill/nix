@@ -77,6 +77,13 @@
       flake = false;
     };
 
+    # Official Linux ChatGPT + Codex preview; nixpkgs currently packages ChatGPT only for macOS.
+    # https://github.com/danielbodart/chatgpt-desktop
+    chatgpt-desktop = {
+      url = "github:danielbodart/chatgpt-desktop/81091718abffc59852bf6ccec7080203b9a0afab";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     xremap-flake.url = "github:xremap/nix-flake";
 
     stylix = {
@@ -91,7 +98,7 @@
 
     # https://github.com/peteonrails/voxtype/pull/25
     voxtype = {
-      url = "github:peteonrails/voxtype/v0.5.5";
+      url = "github:peteonrails/voxtype/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

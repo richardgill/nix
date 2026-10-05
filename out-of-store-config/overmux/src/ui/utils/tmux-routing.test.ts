@@ -48,6 +48,11 @@ let terminalFocuses = 0;
 (globalThis as { IS_REACT_ACT_ENVIRONMENT: boolean }).IS_REACT_ACT_ENVIRONMENT =
   true;
 
+vi.mock("overmux/client", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("overmux/client")>()),
+  useCommand: vi.fn(),
+}));
+
 vi.mock("@overmux/tmux/react", () => ({
   TmuxXterm: forwardRef((_props, ref) => {
     useEffect(() => {

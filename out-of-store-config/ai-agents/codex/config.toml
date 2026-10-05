@@ -3,7 +3,7 @@
 
 # Model selection - use the default (gpt-6-astra for signed-in users)
 # model = "gpt-6-astra"
-model_reasoning_effort = "high"
+model_reasoning_effort = "low"
 
 # Recognize CLAUDE.md as fallback for projects without AGENTS.md
 project_doc_fallback_filenames = ["AGENTS.md", "CLAUDE.md", ".claude/CLAUDE.md"]
@@ -15,7 +15,7 @@ approval_policy = "never"
 # Options: read-only, workspace-write, danger-full-access
 sandbox_mode = "workspace-write"
 personality = "pragmatic"
-model = "gpt-6-astra"
+model = "gpt-6.1-sol"
 service_tier = "fast"
 
 notify = ["/Users/rich/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
@@ -40,9 +40,7 @@ inherit = "core"
 exclude = ["AWS_SECRET*", "AZURE_*", "GOOGLE_*"]
 
 [shell_environment_policy.set]
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/rich/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
 
 [projects."/home/rich/code/notes"]
 trust_level = "trusted"
@@ -149,14 +147,14 @@ trust_level = "trusted"
 [projects."/home/rich/code/overmux/main"]
 trust_level = "trusted"
 
+[projects."/home/rich/code/clay-shrinkage-ruler/main"]
+trust_level = "trusted"
+
 [notice.model_migrations]
 "gpt-5.3-codex" = "gpt-6-astra"
 "gpt-5.4" = "gpt-5.6-terra"
 
 [plugins."github@openai-curated"]
-enabled = true
-
-[plugins."sites@openai-bundled"]
 enabled = true
 
 [plugins."browser@openai-bundled"]
@@ -186,38 +184,45 @@ enabled = true
 [plugins."template-creator@openai-primary-runtime"]
 enabled = true
 
+[plugins."codex-app-tools@openai-bundled"]
+enabled = true
+
+[plugins."unified-computer-use@openai-bundled"]
+enabled = true
+
+[plugins."code-review@openai-bundled"]
+enabled = true
+
 [tui.model_availability_nux]
 "gpt-6-astra" = 4
 
 [marketplaces.openai-bundled]
-last_updated = "2026-08-05T22:10:37Z"
 source_type = "local"
-source = "/Users/rich/.codex/.tmp/bundled-marketplaces/openai-bundled"
+source = "/home/rich/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
-last_updated = "2026-08-05T22:11:12Z"
 source_type = "local"
-source = "/Users/rich/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+source = "/home/rich/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [mcp_servers.node_repl]
 args = []
-command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
+command = "/nix/store/fsrj8mfhmwp9wjrjjr5y65gkgl2jki9q-chatgpt-desktop-26.928.31416/lib/chatgpt/resources/cua_node/bin/node_repl"
 startup_timeout_sec = 120
 
 [mcp_servers.node_repl.env]
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
-NODE_REPL_NODE_MODULE_DIRS = "/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
-NODE_REPL_NODE_PATH = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/rich/.codex:/Applications/ChatGPT.app/Contents/Resources/cua_node/lib/node_modules"
-CODEX_HOME = "/Users/rich/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "091a81603ff202a16ed56557709bf42d97caf8f0dd2e07ae9e26d7c014d71035"
-BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
-NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
-NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
-NODE_REPL_INSTRUCTIONS_USE_CASE_COMPUTER_USE = "Control desktop apps on macOS through Computer Use."
+NODE_REPL_NODE_MODULE_DIRS = "/nix/store/fsrj8mfhmwp9wjrjjr5y65gkgl2jki9q-chatgpt-desktop-26.928.31416/lib/chatgpt/resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/nix/store/fsrj8mfhmwp9wjrjjr5y65gkgl2jki9q-chatgpt-desktop-26.928.31416/lib/chatgpt/resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/home/rich/.codex:/nix/store/fsrj8mfhmwp9wjrjjr5y65gkgl2jki9q-chatgpt-desktop-26.928.31416/lib/chatgpt/resources/cua_node/lib/node_modules"
+CODEX_HOME = "/home/rich/.codex"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab,mcpapps"
+BROWSER_USE_TINYSKY_ENABLED = "1"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = ""
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = ""
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.730.61639"
-CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+BROWSER_USE_CODEX_APP_VERSION = "26.928.31416"
+NODE_REPL_TRUSTED_SERVICES = '{"browser":"/home/rich/.codex/plugins/cache/openai-bundled/browser/26.928.31416/scripts/browser-service.mjs"}'
+CODEX_CLI_PATH = "/nix/store/fsrj8mfhmwp9wjrjjr5y65gkgl2jki9q-chatgpt-desktop-26.928.31416/lib/chatgpt/resources/codex"
 
 [mcp_servers.computer-use]
 command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
@@ -228,6 +233,7 @@ enabled = false
 [desktop]
 conversationDetailMode = "STEPS_COMMANDS"
 ambient-suggestions-enabled = true
+followUpQueueMode = "steer"
 
 [hooks.state]
 

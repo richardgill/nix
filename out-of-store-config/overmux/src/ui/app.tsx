@@ -16,4 +16,5 @@ export default defineOvermuxClient({
   ],
   commands,
   component: DesktopTerminalApp,
+  navigate: (route) => routes.history.push(route),
 });

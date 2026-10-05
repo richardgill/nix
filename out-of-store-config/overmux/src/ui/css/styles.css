@@ -117,6 +117,14 @@ body {
   background: var(--om-color-canvas);
 }
 
+html[data-om-platform="ios"] .om-terminal-layout {
+  position: fixed;
+  top: var(--ios-viewport-top, 0px);
+  inset-inline: 0;
+  height: var(--ios-viewport-height, 100dvh);
+  padding-top: env(safe-area-inset-top, 0px);
+}
+
 html[data-om-host="desktop"][data-om-platform="macos"] [data-om-xterm-terminal] {
   margin-bottom: 12px;
 }

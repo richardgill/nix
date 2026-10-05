@@ -3,40 +3,9 @@ import { useEffect, useId, useMemo, useRef, useState } from "react";
 import type { StoredNotification } from "../../zod-schemas";
 import { localDateTime } from "../utils/date-time";
 import type { NavigationArea } from "./navigation-area";
+import { notificationTime } from "./notification-time";
 import { toPlainTextPreview } from "./plain-text-preview";
 import type { NotificationChannel } from "./routing";
-
-const sameDay = (left: Date, right: Date) =>
-  left.getFullYear() === right.getFullYear() &&
-  left.getMonth() === right.getMonth() &&
-  left.getDate() === right.getDate();
-
-const relativeTime = (timestamp: string, now: number) => {
-  const sentAt = new Date(timestamp);
-  const current = new Date(now);
-  const elapsed = Math.max(0, now - sentAt.getTime());
-  const minutes = Math.floor(elapsed / 60_000);
-  if (minutes < 1) return "now";
-  if (minutes < 60) return `${minutes}m`;
-  if (sameDay(sentAt, current) && minutes < 6 * 60)
-    return `${Math.floor(minutes / 60)}h`;
-  if (sameDay(sentAt, current)) {
-    return new Intl.DateTimeFormat(undefined, { timeStyle: "short" }).format(
-      sentAt,
-    );
-  }
-  const yesterday = new Date(now);
-  yesterday.setDate(current.getDate() - 1);
-  if (sameDay(sentAt, yesterday)) return "Yesterday";
-  if (elapsed < 7 * 24 * 60 * 60_000) {
-    return new Intl.DateTimeFormat(undefined, { weekday: "short" }).format(
-      sentAt,
-    );
-  }
-  return new Intl.DateTimeFormat(undefined, { dateStyle: "medium" }).format(
-    sentAt,
-  );
-};
 
 const useCurrentMinute = () => {
   const [now, setNow] = useState(() => Date.now());
@@ -70,27 +39,39 @@ const NotificationListItem = ({
   now,
   onSelect,
   selected,
-}: NotificationListItemProps) => (
-  <div
-    aria-selected={selected}
-    className="flex w-full cursor-pointer flex-col gap-1 border-b px-4 py-3 text-left hover:bg-panel-muted aria-selected:bg-panel-muted aria-selected:font-semibold"
-    id={id}
-    onClick={() => onSelect(item.id)}
-    role="option"
-  >
-    <span className="flex items-start justify-between gap-3">
-      <span className="line-clamp-1 font-medium">{item.title}</span>
-      <time
-        className="shrink-0 text-xs text-foreground/55"
-        dateTime={item.sentAt}
-        title={localDateTime(item.sentAt)}
-      >
-        {relativeTime(item.sentAt, now)}
-      </time>
-    </span>
-    <span className="line-clamp-2 text-sm text-foreground/65">{item.preview}</span>
-  </div>
-);
+}: NotificationListItemProps) => {
+  const { label, time } = notificationTime(item.sentAt, now);
+
+  return (
+    <div
+      aria-selected={selected}
+      className="flex w-full cursor-pointer flex-col gap-1 border-b px-4 py-3 text-left hover:bg-panel-muted aria-selected:bg-panel-muted aria-selected:font-semibold"
+      id={id}
+      onClick={() => onSelect(item.id)}
+      role="option"
+    >
+      <span className="flex items-start justify-between gap-3">
+        <span className="min-w-0 truncate font-medium">{item.title}</span>
+        <time
+          className="flex shrink-0 flex-col items-end gap-x-1 whitespace-nowrap text-xs text-foreground/55 @min-[28rem]:flex-row"
+          dateTime={item.sentAt}
+          title={localDateTime(item.sentAt)}
+        >
+          <span>{label}</span>
+          {time ? (
+            <>
+              {" "}
+              <span>{time}</span>
+            </>
+          ) : null}
+        </time>
+      </span>
+      <span className="line-clamp-2 text-sm text-foreground/65">
+        {item.preview}
+      </span>
+    </div>
+  );
+};
 
 export const NotificationList = ({
   activeArea,
@@ -121,7 +102,7 @@ export const NotificationList = ({
   return (
     <section
       className={[
-        "min-h-0 flex-col border-r",
+        "@container min-h-0 flex-col border-r",
         activeArea === "list"
           ? "flex md:outline-2 md:-outline-offset-2 md:outline-accent"
           : "hidden md:flex",

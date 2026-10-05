@@ -1,17 +1,20 @@
 {
   "theme": "tokyo-night",
-  "defaultProvider": "openai-codex",
-  "defaultModel": "gpt-6-astra",
-  "defaultThinkingLevel": "medium",
+  "defaultProvider": "openai",
+  "defaultModel": "gpt-6.1-sol",
+  "defaultThinkingLevel": "high",
+  "defaultTools": [
+    "+codemode"
+  ],
   "tuiMode": "fullscreen",
   "enabledModels": [
-    "openai-codex/gpt-5.3-codex-spark",
-    "openai-codex/gpt-6-astra"
+    "openai/gpt-6.1-sol",
+    "openai/gpt-6-astra"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
   "shellCommandPrefix": "shopt -s expand_aliases",
-  "hideThinkingBlock": false,
+  "hideThinkingBlock": true,
   "collapseChangelog": false,
   "compaction": {
     "enabled": true,
@@ -32,7 +35,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "0.85.1",
+  "lastChangelogVersion": "1.0.3",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -50,11 +53,12 @@
     "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
     "~/code/pi-extensions/main/extensions/trust-all-projects",
-    "npm:@calesennett/pi-codex-fast",
+    "git:github.com/richardgill/pi-codex-fast@b1f97a192cc6eaefd2c4b791028ad90636d8ca1d",
     "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
     "enabled": true,
     "mode": "fast"
-  }
+  },
+  "deviceId": "368a62fc-b8f9-49f5-bc90-85c338ddd9eb"
 }

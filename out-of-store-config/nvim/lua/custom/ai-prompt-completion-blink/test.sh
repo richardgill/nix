@@ -298,11 +298,11 @@ run_case "07-slash-after-at" "@something/"
 echo "EXPECT 08-slash-root: show some pi skills"
 run_case "08-slash-root" "/"
 
-echo "EXPECT 09-slash-filter: show deep-research skill"
-run_case "09-slash-filter" "/skill:dee"
+echo "EXPECT 09-slash-filter: show tech-stack-researcher skill"
+run_case "09-slash-filter" "/skill:tech"
 
-echo "EXPECT 09b-slash-fuzzy-filter: fuzzy search /dr shows deep-research skill"
-run_case "09b-slash-fuzzy-filter" "/dr"
+echo "EXPECT 09b-slash-fuzzy-filter: fuzzy search /tsr shows tech-stack-researcher skill"
+run_case "09b-slash-fuzzy-filter" "/tsr"
 
 printf '\nIncremental snapshots directory: %s\n' "$snapshot_dir"
 
@@ -321,7 +321,7 @@ echo "EXPECT 10c-accept-file: Enter completes a file result and closes popup"
 run_accept_case "10c-accept-file" "@prompt-file.lua" "@out-of-store-config/nvim/lua/custom/ai-prompt-completion-blink/prompt-file.lua x"
 
 echo "EXPECT 10d-accept-skill: Enter completes a fuzzy skill result and closes popup"
-run_accept_case "10d-accept-skill" "/dr" "/skill:deep-research x"
+run_accept_case "10d-accept-skill" "/tsr" "/skill:tech-stack-researcher x"
 
 echo "EXPECT 10e-character-filter-refresh: every inserted character refreshes visible matches"
 run_incremental_file_case "10e-character-filter-refresh" ".gi" 0.4

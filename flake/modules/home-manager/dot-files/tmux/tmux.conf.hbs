@@ -54,7 +54,7 @@ unbind-key -a
 # Defaults we want to keep
 bind-key :     command-prompt
 # Enter tmux scrollback mode (navigate/search/copy terminal output)
-bind-key p     copy-mode
+# bind-key p     copy-mode
 bind-key D     detach-client
 bind-key 1     select-window -t 1
 bind-key 2     select-window -t 2
@@ -134,8 +134,15 @@ bind-key -T copy-mode-vi v send-keys -X begin-selection
 bind-key -T copy-mode-vi C-v send-keys -X rectangle-toggle
 bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel
 bind-key -T copy-mode-vi o run-shell "{{ homeDir }}/Scripts/tmux-open-url-at-cursor #{q:copy_cursor_line} #{copy_cursor_x}"
-bind-key -T copy-mode MouseDragEnd1Pane if-shell -F '#{?scroll_position,0,1}' 'send-keys -X copy-pipe-and-cancel "copy"' 'send-keys -X copy-pipe "copy"'
-bind-key -T copy-mode-vi MouseDragEnd1Pane if-shell -F '#{?scroll_position,0,1}' 'send-keys -X copy-pipe-and-cancel "copy"' 'send-keys -X copy-pipe "copy"'
+# Keep scrollback position after dragging; use tmux's terminal clipboard forwarding, not the server's clipboard.
+bind-key -T copy-mode MouseDragEnd1Pane \
+  if-shell -F '#{?scroll_position,0,1}' \
+    'send-keys -X copy-selection-and-cancel' \
+    'send-keys -X copy-selection'
+bind-key -T copy-mode-vi MouseDragEnd1Pane \
+  if-shell -F '#{?scroll_position,0,1}' \
+    'send-keys -X copy-selection-and-cancel' \
+    'send-keys -X copy-selection'
 
 set -g pane-active-border-style bg=default,fg=#333333
 set -g pane-border-style bg=default,fg=#333333

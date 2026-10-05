@@ -2,7 +2,7 @@
 source ~/Scripts/lib/git
 
 alias s="git status"
-alias d="revue diff"
+alias d="hunk diff"
 alias hard="git reset --hard"
 alias soft="git reset --soft HEAD~1"
 alias co="git checkout"

@@ -1,6 +1,8 @@
 import { TmuxXterm, useTmuxTerminal } from "@overmux/tmux/react";
 import { createWriteOnlyOsc52ClipboardAddon } from "@overmux/xterm/client";
+import type { XtermTerminalHandle } from "@overmux/xterm/react";
 import { createOvermuxSettingsPath } from "overmux";
+import { useCommand } from "overmux/client";
 import { Menu } from "lucide-react";
 import {
   Outlet,
@@ -10,8 +12,13 @@ import {
 } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 
-import { useOperation, useResource, useStream } from "../../utils/overmux-hooks";
+import {
+  useOperation,
+  useResource,
+  useStream,
+} from "../../utils/overmux-hooks";
 import { useTerminalPinchZoom } from "../../utils/use-terminal-pinch-zoom";
+import { useIosVisualViewport } from "../../utils/use-ios-visual-viewport";
 import {
   tmuxParamsFromTarget,
   tmuxPathFromLocation,
@@ -22,8 +29,21 @@ import {
   NotificationsRoute,
   openNotifications,
 } from "../../notifications";
+import { commands } from "../../commands";
+import { GitChangesRoute, openGitChanges } from "../../git";
+import {
+  PullRequestDialog,
+  usePullRequestDialog,
+} from "../../pull-request-dialog";
 import { xtermTheme } from "../../css/xterm-theme";
-import { MobileTmuxWindowBar, tmuxWindowLabel } from "../mobile-tmux-window-bar";
+import {
+  MobileTerminalKeys,
+  useMobileTerminalKeys,
+} from "../mobile-terminal-keys";
+import {
+  MobileTmuxWindowBar,
+  tmuxWindowLabel,
+} from "../mobile-tmux-window-bar";
 import { MobileTmuxWindowSwipe } from "../mobile-tmux-window-swipe";
 import { MobileWorkspaceSidebar } from "../mobile-workspace-sidebar";
 
@@ -31,15 +51,21 @@ const asError = (cause: unknown) =>
   cause instanceof Error ? cause : new Error(String(cause));
 
 export const TmuxTerminalLayoutRoute = () => {
-  const tmux = useResource({ id: "tmuxState" });
+  const layoutRef = useIosVisualViewport();
+  const tmux = useResource({ id: "tmux" });
   const createPiTmuxWindow = useOperation({ id: "createPiTmuxWindow" });
+  const findPullRequest = useOperation({ id: "findPullRequest" });
   const killTmuxPane = useOperation({ id: "killTmuxPane" });
-  const stream = useStream({ id: "tmuxTerminal" });
-  const terminal = useTmuxTerminal({ stream });
+  const stream = useStream({ id: "tmux" });
+  const terminalRef = useRef<XtermTerminalHandle>(null);
+  const mobileKeys = useMobileTerminalKeys(terminalRef);
+  const terminal = useTmuxTerminal({
+    stream,
+    onInputOwnerChange: mobileKeys.clear,
+  });
   const router = useRouter();
   const search = useSearch({ strict: false });
   const location = useRouterState({ select: (state) => state.location });
-  const terminalRef = useRef<{ focus: () => void }>(null);
   const {
     containerRef: terminalContainerRef,
     fontSize,
@@ -47,6 +73,21 @@ export const TmuxTerminalLayoutRoute = () => {
   } = useTerminalPinchZoom();
   const workspaceMenuButtonRef = useRef<HTMLButtonElement>(null);
   const notification = notificationFromSearch(search);
+  const pullRequestDialog = usePullRequestDialog({
+    findPullRequest: (cwd) => findPullRequest.mutateAsync({ cwd }),
+  });
+  useCommand(commands.openGitWorkingTree, {
+    run: () => {
+      pullRequestDialog.close(false);
+      return openGitChanges(router, "workingTree");
+    },
+  });
+  useCommand(commands.openGitChanges, {
+    run: () => {
+      pullRequestDialog.close(false);
+      return openGitChanges(router, "uncommitted");
+    },
+  });
   const requestedPath = useRef<string>(undefined);
   const pendingNavigation = useRef<symbol>(undefined);
   const [navigationPending, setNavigationPending] = useState(false);
@@ -77,18 +118,25 @@ export const TmuxTerminalLayoutRoute = () => {
         return;
       }
       setNavigationPending(true);
-      void terminal.goTo(target).catch(() => {}).finally(() => {
-        if (pendingNavigation.current === request) {
-          pendingNavigation.current = undefined;
-          setNavigationPending(false);
-        }
-      });
+      void terminal
+        .goTo(target)
+        .catch(() => {})
+        .finally(() => {
+          if (pendingNavigation.current === request) {
+            pendingNavigation.current = undefined;
+            setNavigationPending(false);
+          }
+        });
     } catch {
       pendingNavigation.current = undefined;
       setNavigationPending(false);
     }
   };
   useEffect(openUrlInTmux, [location.pathname, terminal.goTo]);
+
+  useEffect(() => {
+    if (notification) pullRequestDialog.close(false);
+  }, [notification, pullRequestDialog.close]);
 
   // Reflect the server-confirmed location in the address, without navigating tmux.
   // Replace the current history entry rather than recording each pane change.
@@ -141,6 +189,9 @@ export const TmuxTerminalLayoutRoute = () => {
       windowName: window.name,
     }),
   }));
+  useCommand(commands.openPullRequest, {
+    run: () => pullRequestDialog.open({ cwd: activePane?.path }),
+  });
   const message = !terminal.location
     ? tmux.status === "success" && tmux.data.hierarchy.sessions.length === 0
       ? "No tmux sessions."
@@ -197,7 +248,8 @@ export const TmuxTerminalLayoutRoute = () => {
   return (
     <main
       // Anchor overlays and stack children in a viewport-height column; zero minimums let xterm shrink when Android's keyboard resizes the viewport.
-      className="relative flex h-dvh min-h-0 min-w-0 flex-col bg-background text-foreground"
+      className="om-terminal-layout relative flex h-dvh min-h-0 min-w-0 flex-col bg-background text-foreground"
+      ref={layoutRef}
     >
       <MobileTmuxWindowBar
         actionsDisabled={!activePane}
@@ -217,18 +269,26 @@ export const TmuxTerminalLayoutRoute = () => {
             className="om-tmux-crop-status-mobile min-w-0"
             ref={terminalRef}
             createAddons={() => [createWriteOnlyOsc52ClipboardAddon()]}
+            keyMappings={[
+              ["Meta+ArrowLeft", "\x01"],
+              ["Meta+ArrowRight", "\x05"],
+              ["Meta+Backspace", "\x15"],
+              ["Meta+Delete", "\x0b"],
+            ]}
             options={{
               fontFamily: '"Hack Nerd Font Mono", ui-monospace, monospace',
               fontSize,
               theme: xtermTheme,
             }}
             terminal={terminal}
+            transformInput={mobileKeys.transformInput}
           />
         </MobileTmuxWindowSwipe>
       </div>
+      <MobileTerminalKeys {...mobileKeys} />
       <button
         aria-label="Open workspace menu"
-        className="absolute right-3 bottom-3 z-10 rounded-md border bg-background/90 p-2 shadow-sm backdrop-blur-sm md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        className="absolute right-3 bottom-16 z-10 rounded-md border bg-background/90 p-2 shadow-sm backdrop-blur-sm md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         onClick={() => setWorkspaceMenuOpen(true)}
         ref={workspaceMenuButtonRef}
         type="button"
@@ -236,6 +296,15 @@ export const TmuxTerminalLayoutRoute = () => {
         <Menu aria-hidden="true" size={20} />
       </button>
       <MobileWorkspaceSidebar
+        actionsDisabled={!activePane}
+        onGitChanges={() => {
+          pullRequestDialog.close(false);
+          void openGitChanges(router, "uncommitted");
+        }}
+        onGitWorkingTree={() => {
+          pullRequestDialog.close(false);
+          void openGitChanges(router, "workingTree");
+        }}
         onNotifications={() => void openNotifications(router)}
         onOpenChange={setWorkspaceMenuOpen}
         openerRef={workspaceMenuButtonRef}
@@ -252,6 +321,15 @@ export const TmuxTerminalLayoutRoute = () => {
       <Outlet />
       <NotificationsRoute
         onCloseAutoFocus={() => terminalRef.current?.focus()}
+      />
+      <GitChangesRoute
+        cwd={activePane?.path}
+        onCloseAutoFocus={() => terminalRef.current?.focus()}
+      />
+      <PullRequestDialog
+        onCloseAutoFocus={() => terminalRef.current?.focus()}
+        onOpenChange={pullRequestDialog.close}
+        target={pullRequestDialog.target}
       />
       {message && !error ? (
         <div className="shrink-0 p-2" role="status">

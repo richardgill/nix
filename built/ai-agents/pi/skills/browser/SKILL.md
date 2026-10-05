@@ -11,7 +11,7 @@ metadata:
     subProcess: true
     subProcessContext: fresh
     allowChildDelegation: false
-    model: openai-codex/gpt-5.6-terra
+    model: openai/gpt-5.6-terra
     thinkingLevel: medium
 ---
 

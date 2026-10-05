@@ -1,4 +1,4 @@
-import { tmuxStateResource, type TmuxState } from "@overmux/tmux/server";
+import { tmuxResource, type TmuxState } from "@overmux/tmux/server";
 import { expect, test as testCases, vi } from "vitest";
 import { orderTmuxState, orderedTmuxStateResource } from "./tmux-state";
 
@@ -119,12 +119,12 @@ testCases(
       subscribe: vi.fn(),
       subscribeNotifications: vi.fn(),
     };
-    const source = tmuxStateResource({ backend });
+    const source = tmuxResource({ backend });
     const derived = orderedTmuxStateResource({ contract: source.contract });
     expect(derived.kind).toBe("derived");
     expect(derived.contract).toBe(source.contract);
     expect(derived.dependencies).toEqual({
-      raw: "tmuxStateRaw",
+      raw: "tmuxRaw",
       recency: "tmuxSessionRecency",
     });
     const recency = { recordedAtByName: {}, liveById: {} };

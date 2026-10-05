@@ -3,7 +3,7 @@
   "currentOutputPath": "./overlay/branch/task-context.json",
   "maxSnapshots": 20,
   "model": {
-    "provider": "openai-codex",
+    "provider": "openai",
     "id": "gpt-5.3-codex",
     "thinkingLevel": "medium"
   },

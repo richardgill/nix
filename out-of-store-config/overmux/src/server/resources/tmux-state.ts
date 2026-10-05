@@ -34,6 +34,6 @@ export const orderedTmuxStateResource = ({
 }: Pick<TmuxStateResource, "contract">) => ({
   contract,
   kind: "derived" as const,
-  dependencies: { raw: "tmuxStateRaw", recency: "tmuxSessionRecency" } as const,
+  dependencies: { raw: "tmuxRaw", recency: "tmuxSessionRecency" } as const,
   combine: orderTmuxState,
 });

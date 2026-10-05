@@ -16,8 +16,12 @@
 
   xdg.desktopEntries.overmux-desktop = {
     name = "Overmux Desktop";
-    exec = "${config.home.homeDirectory}/Scripts/overmux-desktop";
+    icon = "${config.home.homeDirectory}/code/overmux/active-desktop/apps/desktop/build/icon.png";
+    exec = "${config.home.homeDirectory}/Scripts/overmux-desktop %u";
+    mimeType = [ "x-scheme-handler/overmux" ];
     categories = [ "Development" ];
     terminal = false;
   };
+
+  xdg.mimeApps.defaultApplications."x-scheme-handler/overmux" = "overmux-desktop.desktop";
 }
