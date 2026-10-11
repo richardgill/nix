@@ -6,4 +6,4 @@ export OVERMUX_DESKTOP_SOURCE="$desktop_source"
 export OVERMUX_ELECTRON_GPU_DIAGNOSTICS=1
 export OVERMUX_SERVER_URL="http://localhost:4242"
 
-exec nix run --impure "path:$OVERMUX_DESKTOP_SOURCE#overmux-desktop" -- "$@"
+exec nix run --impure "git+file://$OVERMUX_DESKTOP_SOURCE#overmux-desktop" -- "$@"

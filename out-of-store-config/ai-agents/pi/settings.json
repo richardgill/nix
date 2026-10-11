@@ -35,7 +35,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "1.0.3",
+  "lastChangelogVersion": "1.1.0",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [

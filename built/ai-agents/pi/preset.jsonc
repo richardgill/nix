@@ -9,7 +9,7 @@
     "xstrong": {
       "provider": "openai",
       "model": "gpt-6-astra",
-      "thinkingLevel": "high"
+      "thinkingLevel": "medium"
     }
   }
 }

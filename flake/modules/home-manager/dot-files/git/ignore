@@ -8,7 +8,6 @@ AGENTS.local.md
 .claude/prompts/
 local-ci.sh
 lefthook-local.yml
-.revue/
 pi-session-*
 overlay/
 overlay

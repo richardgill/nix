@@ -17,7 +17,7 @@ if [[ ! -d "$checkout/node_modules" ]]; then
   exit 1
 fi
 
-nix build --impure --no-link "path:$checkout#overmux-desktop"
+nix build --impure --no-link "git+file://$checkout#overmux-desktop"
 (
   cd "$checkout"
   pnpm --filter @overmux/desktop build

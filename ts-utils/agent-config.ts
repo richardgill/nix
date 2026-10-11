@@ -67,7 +67,7 @@ const modelProfiles = {
   economical: { ...models.luna, thinkingLevel: "medium" },
   balanced: { ...models.terra, thinkingLevel: "medium" },
   strong: { ...models.sol, thinkingLevel: "high" },
-  xstrong: { ...models.astra, thinkingLevel: "high" },
+  xstrong: { ...models.astra, thinkingLevel: "medium" },
 } satisfies AgentModelProfiles;
 
 const webSearchSkill = "web-search";

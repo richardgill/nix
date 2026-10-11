@@ -49,8 +49,6 @@
 [core]
 	editor = nvim +startinsert
 	pager = delta
-[pager]
-	diff = revuediff
 [interactive]
 	diffFilter = delta --color-only
 

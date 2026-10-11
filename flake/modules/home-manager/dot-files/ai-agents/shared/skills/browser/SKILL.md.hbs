@@ -200,8 +200,8 @@ agent-browser-request-capture stop /tmp/agent-browser-request-capture-...
 ### Tabs & Windows
 ```bash
 agent-browser tab                 # List tabs
-agent-browser tab new [url]       # New tab
-agent-browser tab 2               # Switch to tab
+agent-browser tab new [url]       # New tab - may foreground it; not for background work
+agent-browser tab 2               # Switch to tab - explicitly brings it to the front
 agent-browser tab close           # Close tab
 agent-browser window new          # New window
 ```
