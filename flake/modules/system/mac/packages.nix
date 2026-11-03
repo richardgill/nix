@@ -42,9 +42,7 @@ in
     taps = builtins.attrNames config.nix-homebrew.taps;
     # Installing desktop applications via nix puts them in a symlinked folder "~/Applications/Nix Apps" this stops spotlight and many other things (permissions?) from working. So we install them via brew instead
     casks = [
-      "1kc-razer"
       "1password"
-      "alacritty"
       "android-studio"
       "blender"
       "chatgpt"
@@ -59,7 +57,6 @@ in
       "hammerspoon"
       "karabiner-elements"
       "lunar"
-      "rectangle"
       "screen-studio"
       "slack"
       "sol"

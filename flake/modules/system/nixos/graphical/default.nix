@@ -4,7 +4,6 @@
     ../headless
     ./1password.nix
     ./devices.nix
-    ./firefox.nix
     ./fonts.nix
     ./gnome-desktop-manager.nix
     ./keyboard.nix

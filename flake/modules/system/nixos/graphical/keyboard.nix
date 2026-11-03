@@ -124,7 +124,6 @@
           exact_match = true;
           application = {
             not = [
-              "Alacritty"
               "com.mitchellh.ghostty"
               "ghostty"
               "overmux-desktop"
@@ -180,7 +179,6 @@
           exact_match = true;
           application = {
             only = [
-              "Alacritty"
               "com.mitchellh.ghostty"
               "ghostty"
             ];

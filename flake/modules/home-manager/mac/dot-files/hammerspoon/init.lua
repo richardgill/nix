@@ -1,11 +1,18 @@
 hs.window.animationDuration = 0 -- Disable animations globally
 
--- Define hyper key (all modifiers)
-local hyper = { "cmd", "alt", "ctrl", "shift" }
+local hyperMode = require("hyper-mode")
+local homeEnd = require("home-end")
 local delayedAppVisibility = require("delayed-app-visibility")
 local emojiMode = require("emoji-mode")
 
 emojiMode.start()
+homeEnd.start()
+-- Event taps are inserted at the head: Hyper must route before Home/End.
+hyperMode.start()
+hs.shutdownCallback = function()
+	hyperMode.stop()
+	homeEnd.stop()
+end
 
 delayedAppVisibility.register("slack", {
 	appName = "Slack",
@@ -19,25 +26,32 @@ hs.hotkey.bind({ "cmd", "shift" }, "4", function()
 	hs.task.new("/Applications/ksnip.app/Contents/MacOS/ksnip", function() end, { "--rectarea" }):start()
 end)
 
+hs.hotkey.bind({ "alt", "cmd" }, "up", function()
+	local window = hs.window.focusedWindow()
+	if window then
+		window:maximize()
+	end
+end)
+
 -- Application bindings
 
-hs.hotkey.bind(hyper, "a", function()
+hyperMode.bind("a", function()
 	hs.application.launchOrFocus("Activity Monitor")
 end)
 
-hs.hotkey.bind(hyper, "b", function()
+hyperMode.bind("b", function()
 	hs.application.launchOrFocus("Finder")
 end)
 
-hs.hotkey.bind(hyper, "c", function()
+hyperMode.bind("c", function()
 	hs.urlevent.openURL("https://chatgpt.com/new")
 end)
 
-hs.hotkey.bind(hyper, "d", function()
+hyperMode.bind("d", function()
 	hs.application.launchOrFocus("Discord")
 end)
 
-hs.hotkey.bind(hyper, "f", function()
+hyperMode.bind("f", function()
 	-- Opening firefox whilst holding hyper is holding shift, which launches firefox in safe mode.
 	local app = hs.application.get("org.mozilla.firefox")
 	if app then
@@ -52,7 +66,7 @@ hs.hotkey.bind(hyper, "f", function()
 	end
 end)
 
-hs.hotkey.bind(hyper, "i", function()
+hyperMode.bind("i", function()
 	local app = hs.application.get("com.google.Chrome")
 	if app then
 		app:activate()
@@ -104,11 +118,11 @@ local function launchCmus()
 		:start()
 end
 
-hs.hotkey.bind(hyper, "g", function()
+hyperMode.bind("g", function()
 	hs.application.launchOrFocus("Ghostty")
 end)
 
-hs.hotkey.bind(hyper, "m", function()
+hyperMode.bind("m", function()
 	if focusSpotify() then
 		return
 	end
@@ -120,27 +134,27 @@ hs.hotkey.bind(hyper, "m", function()
 	launchCmus()
 end)
 
-hs.hotkey.bind(hyper, "n", function()
+hyperMode.bind("n", function()
 	hs.urlevent.openURL("https://um790.tail98765.ts.net/notifications/all")
 end)
 
-hs.hotkey.bind(hyper, "h", function()
+hyperMode.bind("h", function()
 	hs.application.launchOrFocus("1Password")
 end)
 
-hs.hotkey.bind(hyper, "t", function()
+hyperMode.bind("t", function()
 	hs.application.launchOrFocus("Todoist")
 end)
 
-hs.hotkey.bind(hyper, "s", function()
+hyperMode.bind("s", function()
 	delayedAppVisibility.open("slack")
 end)
 
-hs.hotkey.bind(hyper, "w", function()
+hyperMode.bind("w", function()
 	hs.application.launchOrFocus("Beeper Desktop")
 end)
 
-hs.hotkey.bind(hyper, "z", function()
+hyperMode.bind("z", function()
 	hs.application.launchOrFocus("zoom.us.app")
 end)
 

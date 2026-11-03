@@ -19,7 +19,6 @@ in
   home.packages =
     with pkgs;
     [
-      alacritty
       bubblewrap
       inputs.chatgpt-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
 

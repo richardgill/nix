@@ -87,8 +87,6 @@ in
       # From built templates (in Nix store)
       # Note: .zshenv is managed by programs.zsh.envExtra in zsh.nix
       ".zprofile".source = "${builtTemplates}/zprofile/zprofile";
-      ".config/alacritty/alacritty.toml".source = "${builtTemplates}/alacritty/alacritty.toml";
-      ".config/alacritty/themes".source = "${builtTemplates}/alacritty/themes";
       ".config/ghostty/config".source = "${builtTemplates}/ghostty/config";
       ".config/ripgrep/.ripgreprc".source = "${builtTemplates}/ripgrep/ripgreprc";
       ".config/ripgrep/.rgignore".source = "${builtTemplates}/ripgrep/rgignore";

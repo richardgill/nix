@@ -57,7 +57,6 @@ _:
     before = [ ];
     data = ''
       mkdir -p "$HOME/Library/Preferences"
-      cp -f "${./dot-files}/Preferences/com.knollsoft.Rectangle.plist" "$HOME/Library/Preferences/com.knollsoft.Rectangle.plist"
       cp -f "${./dot-files}/Preferences/eu.exelban.Stats.plist" "$HOME/Library/Preferences/eu.exelban.Stats.plist"
       cp -f "${./dot-files}/Preferences/com.getcoldturkey.blocker.plist" "$HOME/Library/Preferences/com.getcoldturkey.blocker.plist"
     '';

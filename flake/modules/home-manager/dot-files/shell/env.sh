@@ -2,8 +2,6 @@ export XDG_CONFIG_HOME="$HOME/.config"
 export EDITOR="nvim"
 export COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 export BROWSER="tunnel-browser-open"
-export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-export PUPPETEER_EXECUTABLE_PATH=`which chromium`
 export RIPGREP_CONFIG_PATH="$XDG_CONFIG_HOME/ripgrep/.ripgreprc"
 export PI_EXTENSION_CONFIG_DIR="$HOME/.pi/agent/extension-config"
 

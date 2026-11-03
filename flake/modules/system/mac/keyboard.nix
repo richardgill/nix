@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 let
   monitorScript = pkgs.writeShellScript "qmk-keyboard-monitor" ''
     export PATH="${pkgs.coreutils}/bin:/run/current-system/sw/bin:/usr/sbin:$PATH"
@@ -13,6 +13,28 @@ let
   '';
 in
 {
+  system.keyboard = {
+    enableKeyMapping = true;
+    userKeyMapping = [
+      {
+        HIDKeyboardModifierMappingSrc = 30064771129; # Caps Lock (0x700000039)
+        HIDKeyboardModifierMappingDst = 30064771182; # F19 (0x70000006E), F18 is the emoji bridge
+      }
+    ];
+  };
+
+  # nix-darwin applies this at activation only; one agent handles login and new keyboards.
+  launchd.user.agents.hyper-key-mapping.serviceConfig = {
+    ProgramArguments = [
+      "/usr/bin/hidutil"
+      "property"
+      "--set"
+      (builtins.toJSON { UserKeyMapping = config.system.keyboard.userKeyMapping; })
+    ];
+    RunAtLoad = true;
+    StartInterval = 5;
+  };
+
   # Monitor USB devices and run qmk-keyboard-setup when Cyboard Imprint is connected
   # Note: macOS doesn't have direct udev equivalent, so we poll for the device
   launchd.user.agents.qmk-keyboard-monitor = {

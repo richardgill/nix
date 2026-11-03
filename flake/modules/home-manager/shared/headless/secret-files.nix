@@ -5,7 +5,6 @@
       [
         "kagiApiKey"
         "kagiSessionToken"
-        "kagiSearchToken"
         "exaApiKey"
       ]
       (

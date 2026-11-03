@@ -3,7 +3,6 @@ const DOT_FILES = "modules/home-manager/dot-files"
 // Directories to transform (will recursively process .hbs templates and copy static files)
 export const directories = [
   "ai-agents",
-  "alacritty",
   "firefox",
   "ghostty",
   "mise",

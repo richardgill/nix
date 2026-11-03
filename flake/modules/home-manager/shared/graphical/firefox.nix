@@ -7,8 +7,6 @@
 }:
 let
   homeDir = config.home.homeDirectory;
-
-  # Import shared templates
   templates = import ../headless/templates.nix {
     inherit
       lib
@@ -32,25 +30,8 @@ let
       "${firefoxConfigDir}/default";
 
   firefoxProxyPacPath =
-    if pkgs.stdenv.isDarwin then
-      "${firefoxConfigDir}/proxy.pac"
-    else
-      "${firefoxProfilePath}/proxy.pac";
+    if pkgs.stdenv.isDarwin then "${firefoxConfigDir}/proxy.pac" else "${firefoxProfilePath}/proxy.pac";
 
-  policyFolder =
-    if pkgs.stdenv.isDarwin then
-      "/Applications/Firefox.app/Contents/Resources/distribution"
-    else
-      "/etc/firefox/policies";
-
-  policiesJson = ../../dot-files/firefox/policies.json;
-  kagiSearchTokenCommand = ''
-    if [ -r "${config.custom.secretFiles.kagiSearchToken}" ]; then
-      cat "${config.custom.secretFiles.kagiSearchToken}"
-    else
-      printf 'broken'
-    fi
-  '';
   resolveDarwinFirefoxProfile = ''
     FIREFOX_PROFILE_PATH=""
     FIREFOX_PROFILE_PATH_INI=""
@@ -82,21 +63,23 @@ let
       fi
     fi
   '';
-  writeDarwinProfilesIni = ''
-    if [ -n "$FIREFOX_PROFILE_PATH_INI" ]; then
-      cat > "${firefoxConfigDir}/profiles.ini" <<EOF
-[Profile0]
-Name=default
-IsRelative=$FIREFOX_PROFILE_IS_RELATIVE
-Path=$FIREFOX_PROFILE_PATH_INI
-Default=1
 
-[General]
-StartWithLastProfile=1
-Version=2
-EOF
-    fi
+  writeDarwinProfilesIni = ''
+        if [ -n "$FIREFOX_PROFILE_PATH_INI" ]; then
+          cat > "${firefoxConfigDir}/profiles.ini" <<EOF
+    [Profile0]
+    Name=default
+    IsRelative=$FIREFOX_PROFILE_IS_RELATIVE
+    Path=$FIREFOX_PROFILE_PATH_INI
+    Default=1
+
+    [General]
+    StartWithLastProfile=1
+    Version=2
+    EOF
+        fi
   '';
+
 in
 {
   home.activation.copyFirefoxConfig = {
@@ -108,40 +91,27 @@ in
       ${lib.optionalString pkgs.stdenv.isDarwin ''
         ${resolveDarwinFirefoxProfile}
         ${writeDarwinProfilesIni}
-
-        if [ -d "/Applications/Firefox.app/Contents/Resources" ]; then
-          POLICIES_TEMP_DIR=$(mktemp -d)
-          cp -f "${policiesJson}" "$POLICIES_TEMP_DIR/policies.json"
-          /usr/bin/osascript <<APPLESCRIPT
-        tell application "Finder"
-          set resourcesFolder to POSIX file "/Applications/Firefox.app/Contents/Resources" as alias
-          if not (exists folder "distribution" of resourcesFolder) then
-            make new folder at resourcesFolder with properties {name:"distribution"}
-          end if
-          duplicate POSIX file "$POLICIES_TEMP_DIR/policies.json" to folder "distribution" of resourcesFolder with replacing
-        end tell
-        APPLESCRIPT
-          rm -rf "$POLICIES_TEMP_DIR"
-        fi
       ''}
       ${lib.optionalString (!pkgs.stdenv.isDarwin) ''
         FIREFOX_PROFILE_PATH="${firefoxProfilePath}"
         cp -f "${builtTemplates}/firefox/profiles.ini" "${firefoxConfigDir}/profiles.ini"
       ''}
 
-      rm -f "${firefoxProxyPacPath}"
-      cp -f "${builtTemplates}/firefox/proxy.pac" "${firefoxProxyPacPath}"
+      printf '%s\n' "Firefox: installing PAC file: ${firefoxProxyPacPath}"
+      if ! {
+        rm -f "${firefoxProxyPacPath}" &&
+          cp -f "${builtTemplates}/firefox/proxy.pac" "${firefoxProxyPacPath}"
+      }; then
+        printf '%s\n' \
+          "Firefox: failed to replace PAC file." \
+          "  Source: ${builtTemplates}/firefox/proxy.pac" \
+          "  Destination: ${firefoxProxyPacPath}" >&2
+        exit 1
+      fi
 
       if [ -n "$FIREFOX_PROFILE_PATH" ]; then
         mkdir -p "$FIREFOX_PROFILE_PATH"
         cp -f "${builtTemplates}/firefox/user.js" "$FIREFOX_PROFILE_PATH/user.js"
-        rm -f "$FIREFOX_PROFILE_PATH/search.json.mozlz4"
-
-        KAGI_TOKEN=$(${kagiSearchTokenCommand})
-        TEMP_JSON=$(mktemp)
-        ${pkgs.gnused}/bin/sed "s/KAGI_TOKEN_PLACEHOLDER/$KAGI_TOKEN/g" "${builtTemplates}/firefox/search.json" > "$TEMP_JSON"
-        ${pkgs.mozlz4a}/bin/mozlz4a "$TEMP_JSON" "$FIREFOX_PROFILE_PATH/search.json.mozlz4"
-        rm -f "$TEMP_JSON"
       fi
     '';
   };

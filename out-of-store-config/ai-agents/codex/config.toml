@@ -75,22 +75,10 @@ trust_level = "trusted"
 [projects."/home/rich/code/pi-extensions"]
 trust_level = "trusted"
 
-[projects."/home/rich/code/pi-pack/main"]
-trust_level = "trusted"
-
-[projects."/home/rich/code/pi-pack-example"]
-trust_level = "trusted"
-
-[projects."/home/rich/code/pi-pack-example-mono"]
-trust_level = "trusted"
-
 [projects."/home/rich/code/pi-mono/main"]
 trust_level = "trusted"
 
 [projects."/home/rich/code/pi-extensions/main"]
-trust_level = "trusted"
-
-[projects."/home/rich/code/pi-pack-extensions"]
 trust_level = "trusted"
 
 [projects."/home/rich/code/xata/gh-analysis"]
