@@ -12,8 +12,6 @@
     ./hardware-configuration.nix
 
     ../../../../modules/system/mac/default.nix
-    ../../../../modules/system/mac/optional/bambu-studio.nix
-    ../../../../modules/system/shared/headless/optional/vpn.nix
   ];
   # needed with nix determinate package
   nix.enable = false;
@@ -27,7 +25,6 @@
       ${vars.userName} = {
         imports = [
           ../../../../modules/home-manager/mac
-          ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
           ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
         ];
       };

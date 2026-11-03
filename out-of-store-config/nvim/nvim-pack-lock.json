@@ -25,6 +25,11 @@
       "rev": "d01b5c1943050fcda8edf5c89d4419c41a65890e",
       "src": "https://github.com/gbprod/cutlass.nvim"
     },
+    "diffview-plus.nvim": {
+      "rev": "d8f03aa733bae9af6ad3b6b87b026cd86401eaab",
+      "src": "https://github.com/richardgill/diffview-plus.nvim",
+      "version": "'d8f03aa733bae9af6ad3b6b87b026cd86401eaab'"
+    },
     "diffview.nvim": {
       "rev": "4516612fe98ff56ae0415a259ff6361a89419b0a",
       "src": "https://github.com/sindrets/diffview.nvim"

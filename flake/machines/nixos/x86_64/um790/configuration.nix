@@ -33,6 +33,7 @@
   home-manager.users.${vars.userName} = {
     imports = [
       ../../../../modules/home-manager/nixos/graphical
+      ../../../../modules/home-manager/shared/headless/optional/beeper.nix
       ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
       ../../../../modules/home-manager/nixos/graphical/optional/react-native-debugger.nix
       ../../../../modules/home-manager/nixos/graphical/optional/overmux-desktop.nix
@@ -42,6 +43,8 @@
   };
 
   # To get to secure-boot setup mode in bios: Security -> Custom -> Clear. You need to exit the bios without the machine restarting. Do not 'exit and reset', quit the bios without saving (back on far right hand side), which contiues boot.
+
+  services.tailscale.extraSetFlags = [ "--advertise-exit-node" ];
 
   # Faster boot loader
   boot.loader.timeout = lib.mkForce 3;

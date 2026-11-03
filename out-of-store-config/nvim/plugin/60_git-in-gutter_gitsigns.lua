@@ -42,6 +42,10 @@ require('gitsigns').setup {
     -- Actions
     map('n', '<leader>hs', gitsigns.stage_hunk, { desc = 'Stage hunk' })
     map('n', '<leader>hr', gitsigns.reset_hunk, { desc = 'Reset hunk' })
+    local diffview = package.loaded['custom.diff.diffview']
+    if diffview then
+      diffview.attach_hunk_reset(bufnr, gitsigns.reset_hunk)
+    end
     map('v', '<leader>hs', function()
       gitsigns.stage_hunk { vim.fn.line '.', vim.fn.line 'v' }
     end, { desc = 'Stage hunk' })

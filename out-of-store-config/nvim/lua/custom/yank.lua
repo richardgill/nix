@@ -2,7 +2,7 @@ local M = {}
 
 local get_codediff_path = function()
   local buffer_path = vim.api.nvim_buf_get_name(0)
-  if not vim.startswith(buffer_path, 'codediff://') then
+  if not package.loaded.codediff or not vim.startswith(buffer_path, 'codediff://') then
     return nil
   end
 
@@ -10,12 +10,24 @@ local get_codediff_path = function()
   return git_root and vim.fs.joinpath(git_root, relative_path) or nil
 end
 
+local get_diff_path = function()
+  local lib = package.loaded['diffview.lib']
+  local view = lib and lib.get_current_view()
+  local entry = view and view.cur_entry
+  for _, file in ipairs(entry and entry.layout:files() or {}) do
+    if file.bufnr == vim.api.nvim_get_current_buf() then
+      return file.absolute_path
+    end
+  end
+  return get_codediff_path()
+end
+
 M.get_buffer_absolute = function()
-  return get_codediff_path() or vim.fn.expand '%:p'
+  return get_diff_path() or vim.fn.expand '%:p'
 end
 
 M.get_buffer_cwd_relative = function()
-  local path = get_codediff_path()
+  local path = get_diff_path()
   local relative_path = path and vim.fn.fnamemodify(path, ':.') or vim.fn.expand '%:.'
   if relative_path == '' or relative_path == '..' or vim.startswith(relative_path, '../') or vim.startswith(relative_path, './') then
     return relative_path

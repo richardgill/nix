@@ -1,5 +1,6 @@
 {
   imports = [
+    ./agent-skills.nix
     ./bat.nix
     ./dot-files.nix
     ./ide.nix

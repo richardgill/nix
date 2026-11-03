@@ -189,8 +189,3 @@ _fzf_compgen_dir() {
 
 source <(argc --argc-completions zsh git-browse)
 source <(argc --argc-completions zsh worktree-open)
-
-# Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
-if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
-  source "$HOME/.config/shell/env-shell-loader.sh"
-fi

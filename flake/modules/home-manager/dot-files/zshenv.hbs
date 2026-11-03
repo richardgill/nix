@@ -1,3 +1,12 @@
+# BASH_ENV is sourced by non-interactive bash scripts
+# https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html
+export BASH_ENV="$HOME/.bash_profile"
+
 export KAGI_API_KEY="$(cat {{ kagiApiKeyPath }})"
 export KAGI_SESSION_TOKEN="$(cat {{ kagiSessionTokenPath }})"
 export EXA_API_KEY="$(cat {{ exaApiKeyPath }})"
+
+# Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
+if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then
+  source "$HOME/.config/shell/env-shell-loader.sh"
+fi

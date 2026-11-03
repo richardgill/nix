@@ -1,5 +1,10 @@
 # Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
 # Pattern inspired by https://gist.github.com/krzyzanowskim/07450322713433af08798a6ab0c0ce8f
+if [ "${__env_shell_initialized_pid:-}" = "$$" ]; then
+  return 0
+fi
+__env_shell_initialized_pid="$$"
+
 __env_shell_state_file="${XDG_RUNTIME_DIR:-/tmp}/env-shell-loader.$$"
 __env_shell_last_pwd=""
 
@@ -51,7 +56,7 @@ __env_shell_record_previous() {
 __env_shell_record_name() {
   local name="$1"
 
-  [[ "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || return
+  [[ "$name" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || return 0
 
   case "$__env_shell_loaded_names" in
     *$'\n'"$name"$'\n'*) ;;
@@ -147,14 +152,17 @@ __env_shell_zsh_hook() {
 
 __env_shell_install() {
   if [ -n "${ZSH_VERSION:-}" ]; then
-    autoload -Uz add-zsh-hook
-    add-zsh-hook chpwd __env_shell_zsh_hook
     __env_shell_zsh_hook
+    if [[ "$-" == *i* ]]; then
+      autoload -Uz add-zsh-hook
+      add-zsh-hook chpwd __env_shell_zsh_hook
+    fi
     return
   fi
 
   if [ -n "${BASH_VERSION:-}" ]; then
     __env_shell_bash_hook
+    [[ "$-" == *i* ]] || return 0
     if [[ ";${PROMPT_COMMAND[*]:-};" != *";__env_shell_bash_hook;"* ]]; then
       if [[ "$(declare -p PROMPT_COMMAND 2>&1)" == "declare -a"* ]]; then
         PROMPT_COMMAND=(__env_shell_bash_hook "${PROMPT_COMMAND[@]}")

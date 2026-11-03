@@ -8,7 +8,8 @@
 # @option --pi-session Pi session file to fork
 # @option --model Pi model
 # @option --thinking Pi thinking level
-# @option --speed Speed mode: off, fast, or ultrafast
+# @flag --no-fast Disable fast mode (default; overrides --fast and saved settings)
+# @flag --fast Enable fast mode for this child
 # @option --target Existing repo or worktree path (defaults to the current tmux session and directory)
 # @option --worktree Create a worktree with this branch name
 # @option --source-ref Explicit source ref for the new worktree
@@ -63,7 +64,7 @@ build_pi_command() {
   local thinking="$7"
   local skill="$8"
   local block_nested="$9"
-  local speed="${10}"
+  local fast_flag="${10}"
   local pi_binary
   local args
 
@@ -80,7 +81,7 @@ build_pi_command() {
   fi
   [[ -n "$model" ]] && args+=(--model "$model")
   [[ -n "$thinking" ]] && args+=(--thinking "$thinking")
-  [[ -z "$speed" ]] || args+=(--speed "$speed")
+  args+=("$fast_flag")
   args+=("@$prompt_file")
   printf '%q ' "${args[@]}"
 }
@@ -157,7 +158,6 @@ run() {
   [[ -n "${argc_no_callback:-}" || -n "${PI_SESSION_ID:-}" ]] || fail "tmux-pi must be launched from a persisted parent Pi session unless --no-callback is used"
   [[ -z "${argc_source_ref:-}" || -n "${argc_worktree:-}" ]] || fail "--source-ref requires --worktree"
   [[ -z "${argc_worktree:-}" || -z "${argc_target:-}" ]] || fail "--worktree cannot be combined with --target"
-  [[ -z "${argc_speed:-}" || "${argc_speed}" == off || "${argc_speed}" == fast || "${argc_speed}" == ultrafast ]] || fail "--speed must be off, fast, or ultrafast"
 
   local task_name
   local session_id
@@ -165,6 +165,11 @@ run() {
   local pi_command
   local parent_session_id="${PI_SESSION_ID:-}"
   local callback_status="enabled"
+  local fast_flag="--no-fast"
+
+  if [[ -n "${argc_fast:-}" && -z "${argc_no_fast:-}" ]]; then
+    fast_flag="--fast"
+  fi
 
   if [[ -n "${argc_no_callback:-}" ]]; then
     parent_session_id=""
@@ -175,7 +180,7 @@ run() {
   validate_task_name "$task_name"
   session_id=$(resolve_session_id "${argc_pi_session:-}")
   prepared_prompt=$(prepare_prompt "$session_id" "$argc_prompt_file" "${argc_block_nested:-}")
-  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$parent_session_id" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}" "${argc_block_nested:-}" "${argc_speed:-}")
+  pi_command=$(build_pi_command "$prepared_prompt" "${argc_pi_session:-}" "$session_id" "$parent_session_id" "$task_name" "${argc_model:-}" "${argc_thinking:-}" "${argc_skill:-}" "${argc_block_nested:-}" "$fast_flag")
 
   resolve_target "${argc_worktree:-}" "${argc_source_ref:-}" "${argc_target:-}"
   launch_pi_window "$task_name" "$TARGET_SESSION" "$TARGET_CWD" "$pi_command" || fail "failed to launch child Pi"

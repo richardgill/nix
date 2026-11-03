@@ -256,7 +256,7 @@ binds {
     Ctrl+Alt+Shift+Super+D repeat=false { spawn "~/Scripts/nixos/launch-app" "discord"; }
     Ctrl+Alt+Shift+Super+E repeat=false { spawn "~/Scripts/nixos/launch-app" "emulator"; }
     Ctrl+Alt+Shift+Super+F repeat=false { spawn "~/Scripts/nixos/launch-app" "browser"; }
-    Ctrl+Alt+Shift+Super+G repeat=false { spawn "~/Scripts/nixos/launch-app" "overmux"; }
+    Ctrl+Alt+Shift+Super+G repeat=false { spawn "~/Scripts/nixos/launch-app" "terminal"; }
     Ctrl+Alt+Shift+Super+H repeat=false { spawn "~/Scripts/nixos/launch-app" "password"; }
     Ctrl+Alt+Shift+Super+I repeat=false { spawn "~/Scripts/nixos/launch-app" "chrome"; }
     Ctrl+Alt+Shift+Super+M repeat=false { spawn "~/Scripts/nixos/launch-app" "music"; }
@@ -285,9 +285,9 @@ binds {
     Alt+XF86MonBrightnessUp allow-when-locked=true { spawn "swayosd-client" "--brightness" "+1"; }
     Alt+XF86MonBrightnessDown allow-when-locked=true { spawn "swayosd-client" "--brightness" "-1"; }
 
-    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
-    XF86AudioPause allow-when-locked=true { spawn "playerctl" "play-pause"; }
-    XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
-    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
-    XF86AudioStop allow-when-locked=true { spawn "playerctl" "stop"; }
+    XF86AudioPlay allow-when-locked=true { spawn "playerctl" "--player=spotify,%any" "play-pause"; }
+    XF86AudioPause allow-when-locked=true { spawn "playerctl" "--player=spotify,%any" "play-pause"; }
+    XF86AudioNext allow-when-locked=true { spawn "playerctl" "--player=spotify,%any" "next"; }
+    XF86AudioPrev allow-when-locked=true { spawn "playerctl" "--player=spotify,%any" "previous"; }
+    XF86AudioStop allow-when-locked=true { spawn "playerctl" "--player=spotify,%any" "stop"; }
 }

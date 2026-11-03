@@ -23,16 +23,6 @@ local navigate_location = function(command, boundary)
   error(err, 0)
 end
 
-local code_diff_against = function(target)
-  local command = { vim.fn.expand '~/Scripts/git-diff-base-ref', target }
-  local result = vim.system(command, { text = true }):wait()
-  if result.code ~= 0 then
-    vim.notify(vim.trim(result.stderr or 'Unable to resolve Git diff base'), vim.log.levels.ERROR)
-    return
-  end
-  vim.cmd('CodeDiff ' .. vim.trim(result.stdout) .. '...')
-end
-
 vim.keymap.set('n', '<leader>nw', function()
   local was_open = vim.fn.bufloaded(xata_work_queue_path) == 1
   vim.cmd.edit(xata_work_queue_path)
@@ -94,14 +84,6 @@ vim.api.nvim_set_keymap('v', '<', '<gv', { noremap = true, silent = true })
 
 -- Always use P instead of p in visual mode. P doesn't mess with registers.
 vim.api.nvim_set_keymap('v', 'p', 'P', { noremap = true, silent = true })
-
-vim.keymap.set('n', '<leader>dd', '<cmd>:CodeDiff<cr>', { desc = 'Git [d]iff [d]irty changes' })
-vim.keymap.set('n', '<leader>db', function()
-  code_diff_against 'base'
-end, { desc = 'Git [d]iff against PR [b]ase' })
-vim.keymap.set('n', '<leader>dm', function()
-  code_diff_against 'main'
-end, { desc = 'Git [d]iff against [m]ain' })
 
 -- stop ctrl-z from suspending
 vim.api.nvim_set_keymap('n', '<c-z>', '<nop>', { noremap = true, silent = true })

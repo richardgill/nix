@@ -27,7 +27,7 @@ Child prompts must contain only the delegated work. Do not forward parent-only o
 - `wt` means spawn in a new worktree using `--worktree`. Ask whether callbacks should be enabled unless the request already specifies normal supervision, no callback, `FAF`, or `🔥`.
 - `FAF` and `🔥` mean fire-and-forget: launch with `--no-callback` and do not supervise the child.
 - Delegated Pis may delegate distinct, self-contained subtasks by default. Use `--block-nested` when the launched child must not use supervised delegation. Fire-and-forget delegation with `--no-callback` remains allowed.
-- Always pass `--speed off` unless the user explicitly asks for `--speed fast` or `--speed ultrafast`. Off disables fast mode for this child, even if saved Pi settings enable it. Omitting `--speed` inherits saved Pi settings, so do not omit it for the default behavior. Speed never changes the model or thinking level.
+- Fast mode is disabled for delegated agents by default, even if saved Pi settings enable it. Pass `--no-fast` explicitly in launch commands; use `--fast` only when the user asks for fast mode. If both flags are passed, `--no-fast` wins, matching upstream Pi. These flags never change the model or thinking level.
 
 When running `tmux-pi`, confirm the launcher reaches `Launched`; if slow worktree setup moves the command to the background, wait only for its automatic completion notification and do not poll it.
 
@@ -35,7 +35,7 @@ Current tmux session and working directory (fast mode off, even when saved Pi se
 
 ```bash
 tmux-pi \
-  --speed off \
+  --no-fast \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
 ```
@@ -44,7 +44,7 @@ Launch without a callback to the parent:
 
 ```bash
 tmux-pi \
-  --speed off \
+  --no-fast \
   --no-callback \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
@@ -56,7 +56,7 @@ Launch a child that can only delegate fire-and-forget work:
 
 ```bash
 tmux-pi \
-  --speed off \
+  --no-fast \
   --block-nested \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>'
@@ -66,7 +66,7 @@ Another existing repo or worktree tmux session:
 
 ```bash
 tmux-pi \
-  --speed off \
+  --no-fast \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>' \
   --target '<repo-or-worktree>'
@@ -76,7 +76,7 @@ New worktree from local `main` HEAD always uses the `strong` profile:
 
 ```bash
 tmux-pi \
-  --speed off \
+  --no-fast \
   --task-slug 'auth-research' \
   --prompt-file '<prompt-file>' \
   --worktree '<branch>' \

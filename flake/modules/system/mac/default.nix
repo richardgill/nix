@@ -4,7 +4,6 @@
     ../shared/graphical
     ../shared/graphical/qmk-keyboard-setup.nix
     ./dock.nix
-    ./eternal-terminal-server.nix
     ./home-manager.nix
     ./keyboard.nix
     ./networking.nix

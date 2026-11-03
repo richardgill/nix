@@ -6,11 +6,9 @@
 let
   # Define all the API key secrets that should be available on both Darwin and NixOS
   apiKeySecrets = [
-    "anthropic-api-key"
     "kagi-api-key"
     "kagi-search-token"
     "kagi-session-token"
-    "openai-api-key"
     "exa-api-key"
   ];
 

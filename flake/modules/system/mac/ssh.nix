@@ -1,12 +1,10 @@
 {
+  lib,
   pkgs,
-  vars,
   ...
 }:
 {
-  services.openssh.enable = true;
-
-  users.users.${vars.userName}.openssh.authorizedKeys.keys = vars.sshAllPublicKeys;
+  services.openssh.enable = lib.mkDefault false;
 
   environment.systemPackages = with pkgs; [
     openssh

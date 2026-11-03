@@ -105,7 +105,7 @@ local function launchCmus()
 end
 
 hs.hotkey.bind(hyper, "g", function()
-	hs.application.launchOrFocus(os.getenv("HOME") .. "/Applications/Overmux.app")
+	hs.application.launchOrFocus("Ghostty")
 end)
 
 hs.hotkey.bind(hyper, "m", function()

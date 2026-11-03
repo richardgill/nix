@@ -10,7 +10,10 @@ local lsp_path = vim.fn.stdpath 'config' .. '/after/lsp'
 for name, type in vim.fs.dir(lsp_path) do
   if type == 'file' and name:match '%.lua$' then
     local server = name:match '(.+)%.lua$'
-    vim.lsp.enable(server)
+    -- Temporarily disabled while investigating Tailwind language-server memory failures.
+    if server ~= 'tailwindcss' then
+      vim.lsp.enable(server)
+    end
   end
 end
 

@@ -56,6 +56,7 @@ let
           name: type:
           type == "regular"
           && !(lib.hasSuffix ".hbs" name)
+          && name != "beeper-cli"
           && (pkgs.stdenv.isLinux || !(builtins.elem name linuxOnlyScripts))
         ) scriptFiles
       );

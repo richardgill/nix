@@ -143,6 +143,8 @@
           ".local/share/Rocket League"
           ".local/share/syncthing"
           ".steam"
+          # Mise's npm installations link to packages in Aube's shared store.
+          ".cache/aube"
           ".cache/cmus"
           ".cache/codex-runtimes"
           ".cache/elephant"
@@ -164,12 +166,15 @@
         files = [
           ".config/monitors.xml"
           ".config/adventofcode.session"
+          ".config/helm/repositories.yaml"
+          ".tilt-dev/config"
           ".zsh_history"
           ".claude.json"
           ".claude/.credentials.json"
           ".claude/history.jsonl"
           ".expo/state.json"
           ".pi/agent/auth.json"
+          ".pi/agent/trust.json"
         ];
       };
 

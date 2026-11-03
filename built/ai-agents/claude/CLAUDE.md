@@ -21,6 +21,7 @@
 - Prefer object arguments when there are too many positional args, or when names make the call site clearer; keep positional args when the order is conventional or obvious.
 - Favor `??` over `||` where it makes sense.
 - Never use nullish coalescing assignment (`??=`).
+- Avoid nested ternaries; prefer clear `if` / `else` branches or early returns.
 - Favor `Boolean(blah)` over `!!blah`
 - Do not use: `while`, `switch`, `continue`, `break`, `in`, `delete` keywords except if there is good reason to do so
 - New comments: Always single line // comments

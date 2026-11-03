@@ -1,0 +1,5 @@
+{ vars, ... }:
+{
+  services.openssh.enable = true;
+  users.users.${vars.userName}.openssh.authorizedKeys.keys = vars.sshAllPublicKeys;
+}

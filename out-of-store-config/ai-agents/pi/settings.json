@@ -17,7 +17,7 @@
   "hideThinkingBlock": true,
   "collapseChangelog": false,
   "compaction": {
-    "enabled": true,
+    "enabled": false,
     "reserveTokens": 16384,
     "keepRecentTokens": 20000
   },
@@ -35,7 +35,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "1.1.0",
+  "lastChangelogVersion": "1.5.0",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -53,12 +53,23 @@
     "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
     "~/code/pi-extensions/main/extensions/trust-all-projects",
-    "git:github.com/richardgill/pi-codex-fast@b1f97a192cc6eaefd2c4b791028ad90636d8ca1d",
+    "npm:@calesennett/pi-codex-fast@0.1.12",
     "npm:pi-codex-status"
   ],
   "pi-codex-fast": {
     "enabled": true,
     "mode": "fast"
   },
-  "deviceId": "368a62fc-b8f9-49f5-bc90-85c338ddd9eb"
+  "deviceId": "368a62fc-b8f9-49f5-bc90-85c338ddd9eb",
+  "extensionChangelogVersions": {
+    "{\"source\":\"~/code/pi-extensions/main/extensions/preset\",\"scope\":\"user\"}": "0.0.10",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/project-resources\",\"scope\":\"user\"}": "0.1.2",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/background-bash\",\"scope\":\"user\"}": "0.0.3",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/parrot\",\"scope\":\"user\"}": "0.0.3",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/pi-up-history\",\"scope\":\"user\"}": "0.0.2",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/context-commands\",\"scope\":\"user\"}": "0.0.4",
+    "{\"source\":\"~/code/overmux/main/packages/ecosystem/pi\",\"scope\":\"user\"}": "0.0.12",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/skill-metadata-templates\",\"scope\":\"user\"}": "0.0.2",
+    "{\"source\":\"npm:pi-codex-status\",\"scope\":\"user\"}": "0.1.0"
+  }
 }

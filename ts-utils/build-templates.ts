@@ -30,6 +30,7 @@ Handlebars.registerHelper("eq", (a, b) => a === b);
 
 const templateDataSchema = z
   .object({
+    beeperEnabled: z.boolean(),
     isDarwin: z.boolean(),
     isLinux: z.boolean(),
     isAarch64Linux: z.boolean(),
@@ -38,10 +39,8 @@ const templateDataSchema = z
     zshPath: z.string(),
     coreUtilsPath: z.string(),
     musicDir: z.string(),
-    anthropicApiKeyPath: z.string(),
     kagiApiKeyPath: z.string(),
     kagiSessionTokenPath: z.string(),
-    openaiApiKeyPath: z.string(),
     exaApiKeyPath: z.string(),
     defaultShell: z.string(),
     gwsSkillsPath: z.string(),
@@ -284,8 +283,10 @@ const processSharedContent = (
       webFetchName: config.webFetchName,
       webSearchProvider: activeWebSearchProvider,
     };
-    const excludeSkills: readonly string[] =
-      "excludeSkills" in config ? config.excludeSkills : [];
+    const excludeSkills: readonly string[] = [
+      ...((config as AgentConfig).excludeSkills ?? []),
+      ...(data.beeperEnabled ? [] : ["beeper"]),
+    ];
 
     // Process shared/skills/
     if (config.sharedSkills && existsSync(sharedPath)) {

@@ -40,6 +40,7 @@ let
   defaultAiAgent = "pi";
 in
 {
+  beeperEnabled = hmConfig.custom.agentSkills.beeper.enable;
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
   isAarch64Linux = pkgs.stdenv.isLinux && pkgs.stdenv.hostPlatform.isAarch64;
@@ -48,10 +49,8 @@ in
   zshPath = "${pkgs.zsh}/bin/zsh";
   coreUtilsPath = "${pkgs.coreutils}";
   musicDir = config.customDirs.music;
-  anthropicApiKeyPath = config.sops.secrets."anthropic-api-key".path;
   kagiApiKeyPath = config.sops.secrets."kagi-api-key".path;
   kagiSessionTokenPath = config.sops.secrets."kagi-session-token".path;
-  openaiApiKeyPath = config.sops.secrets."openai-api-key".path;
   exaApiKeyPath = config.sops.secrets."exa-api-key".path;
   defaultShell = "${pkgs.zsh}/bin/zsh";
   gwsSkillsPath = "${pkgs.unstablePkgs.gws.src}/skills";
