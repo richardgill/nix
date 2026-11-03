@@ -61,7 +61,6 @@ in
     ++ lib.optionals (!isAarch64Linux) [
       ghostty
       slack
-      spotify
       discord
       (google-chrome.override {
         commandLineArgs = [

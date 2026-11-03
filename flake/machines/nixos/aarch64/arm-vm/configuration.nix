@@ -16,6 +16,8 @@
     })
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/optional/local-music.nix
+    ../../../../modules/system/nixos/graphical/optional/spotify.nix
   ];
 
   home-manager.users.${vars.userName} = {

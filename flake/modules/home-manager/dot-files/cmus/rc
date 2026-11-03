@@ -12,6 +12,6 @@ bind -f library space win-toggle
 unbind -f common D
 unbind -f common delete
 
-cd {{ musicDir }}
+cd ~/Music
 add .
 

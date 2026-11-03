@@ -5,7 +5,6 @@ description: Use the Slack MCP via mcpc.
 
 Use `mcpc @slack` for Slack operations.
 
-
 If the session is missing or unauthorized, ask Richard to run:
 
 ```bash

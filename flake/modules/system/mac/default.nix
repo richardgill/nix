@@ -9,7 +9,6 @@
     ./networking.nix
     ./nix.nix
     ./packages.nix
-    ./secrets.nix
     ./security.nix
     ./ssh.nix
     ./stylix.nix

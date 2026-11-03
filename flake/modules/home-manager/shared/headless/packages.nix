@@ -24,28 +24,59 @@ in
 
   home.packages = with pkgs; [
     argc
+    autossh
+    bash
     bat
     btop
+    cargo
+    coreutils
+    curl
+    datamash
     delta
     dnsutils # dig, nslookup
+    docker_29
+    eternal-terminal
     eza
     fd
+    ffmpeg
     file # yazi uses this for mime type detection (previews)
+    findutils
     fzf
+    gawk
+    gcc
     unstable.gh
     gh-stack
+    git
+    git-lfs
+    gnugrep
+    gnused
+    gnumake
+    home-manager
+    jq
+    just
     lefthook
+    less
+    nix-fast-build
     nixfmt
     ncdu
     oh-my-posh
+    openssl
+    # Needed for Firefox build tooling (pkg-config).
+    pkg-config
     postgresql
+    qrencode
     ripgrep
+    sops
     stripe-cli
     unstable.gws
     unstable.todoist
     socat
+    unzip
+    which
     xdg-utils
+    xxd
     yazi
+    zip
     zoxide
   ];
 }

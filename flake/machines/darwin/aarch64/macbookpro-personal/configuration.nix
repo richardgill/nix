@@ -12,6 +12,8 @@
     ./hardware-configuration.nix
 
     ../../../../modules/system/mac/default.nix
+    ../../../../modules/system/mac/optional/local-music.nix
+    ../../../../modules/system/mac/optional/spotify.nix
     ../../../../modules/system/mac/optional/bambu-studio.nix
     ../../../../modules/system/mac/optional/beeper.nix
     ../../../../modules/system/mac/optional/discord.nix

@@ -4,7 +4,6 @@ const DOT_FILES = "modules/home-manager/dot-files"
 export const directories = [
   "ai-agents",
   "alacritty",
-  "cmus",
   "firefox",
   "ghostty",
   "mise",

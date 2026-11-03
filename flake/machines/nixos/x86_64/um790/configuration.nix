@@ -15,6 +15,8 @@
     })
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/optional/local-music.nix
+    ../../../../modules/system/nixos/graphical/optional/spotify.nix
     ../../../../modules/system/nixos/graphical/android.nix
     ../../../../modules/system/nixos/graphical/optional/bambu-studio.nix
     ../../../../modules/system/nixos/graphical/optional/bluetooth.nix

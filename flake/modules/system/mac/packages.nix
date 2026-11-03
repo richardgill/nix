@@ -63,7 +63,6 @@ in
       "screen-studio"
       "slack"
       "sol"
-      "spotify"
       "stats"
       "tailscale-app"
       "todoist-app"

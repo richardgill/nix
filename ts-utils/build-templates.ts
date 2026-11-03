@@ -38,7 +38,6 @@ const templateDataSchema = z
     homeDirectory: z.string(),
     zshPath: z.string(),
     coreUtilsPath: z.string(),
-    musicDir: z.string(),
     kagiApiKeyPath: z.string(),
     kagiSessionTokenPath: z.string(),
     exaApiKeyPath: z.string(),

@@ -20,6 +20,8 @@
   };
 
   home-manager = {
+    # User-level SOPS needs the user's runtime directory and systemd session.
+    startAsUserService = true;
     extraSpecialArgs = {
       inherit inputs outputs vars;
     };

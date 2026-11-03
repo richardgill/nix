@@ -2,8 +2,6 @@
   lib,
   pkgs,
   config,
-  osConfig,
-  vars,
   inputs,
   ...
 }:
@@ -18,8 +16,6 @@ let
       lib
       pkgs
       config
-      osConfig
-      vars
       inputs
       ;
   };
@@ -63,15 +59,6 @@ let
 
 in
 {
-  # Cmus files (from built templates)
-  home.activation.copyCmusFiles = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    mkdir -p ${homeDir}/.config/cmus
-    cp -f ${builtTemplates}/cmus/start ${homeDir}/.config/cmus/start
-    chmod +x ${homeDir}/.config/cmus/start
-    cp -f ${builtTemplates}/cmus/rc ${homeDir}/.config/cmus/rc
-    cp -f ${builtTemplates}/cmus/tokyo-night.theme ${homeDir}/.config/cmus/tokyo-night.theme
-  '';
-
   home.file =
     scriptsEntries
     // lib.genAttrs (map (name: ".pi/agent/extension-config/${name}") [

@@ -1,9 +1,9 @@
 # Extracts template configuration from a NixOS configuration
 # Used by: flake.nix templateConfig output, templates.nix derivation
-{ lib, pkgs, config, userName }:
+# Accepts the user's Home Manager config directly, including in standalone Home Manager.
+{ lib, pkgs, config }:
 let
-  hmConfig = config.home-manager.users.${userName};
-  homeDir = hmConfig.home.homeDirectory;
+  homeDir = config.home.homeDirectory;
 
   firefoxConfigDir =
     if pkgs.stdenv.isDarwin then
@@ -40,7 +40,7 @@ let
   defaultAiAgent = "pi";
 in
 {
-  beeperEnabled = hmConfig.custom.agentSkills.beeper.enable;
+  beeperEnabled = config.custom.agentSkills.beeper.enable;
   isDarwin = pkgs.stdenv.isDarwin;
   isLinux = pkgs.stdenv.isLinux;
   isAarch64Linux = pkgs.stdenv.isLinux && pkgs.stdenv.hostPlatform.isAarch64;
@@ -48,10 +48,9 @@ in
   homeDirectory = homeDir;
   zshPath = "${pkgs.zsh}/bin/zsh";
   coreUtilsPath = "${pkgs.coreutils}";
-  musicDir = config.customDirs.music;
-  kagiApiKeyPath = config.sops.secrets."kagi-api-key".path;
-  kagiSessionTokenPath = config.sops.secrets."kagi-session-token".path;
-  exaApiKeyPath = config.sops.secrets."exa-api-key".path;
+  kagiApiKeyPath = config.custom.secretFiles.kagiApiKey;
+  kagiSessionTokenPath = config.custom.secretFiles.kagiSessionToken;
+  exaApiKeyPath = config.custom.secretFiles.exaApiKey;
   defaultShell = "${pkgs.zsh}/bin/zsh";
   gwsSkillsPath = "${pkgs.unstablePkgs.gws.src}/skills";
   catppuccinPlugin = "${pkgs.tmuxPlugins.catppuccin}/share/tmux-plugins/catppuccin/catppuccin.tmux";

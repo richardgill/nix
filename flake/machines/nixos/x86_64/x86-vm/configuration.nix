@@ -14,6 +14,8 @@
     })
     ../../../../modules/system/nixos/common
     ../../../../modules/system/nixos/graphical
+    ../../../../modules/system/nixos/graphical/optional/local-music.nix
+    ../../../../modules/system/nixos/graphical/optional/spotify.nix
     ../../../../modules/system/nixos/headless/optional/btrbk.nix
     ../../../../modules/system/nixos/headless/optional/dev-ports.nix
     ../../../../modules/system/nixos/headless/optional/remote-unlock.nix

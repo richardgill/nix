@@ -2,8 +2,6 @@
   pkgs,
   lib,
   config,
-  osConfig,
-  vars,
   inputs,
   ...
 }:
@@ -14,8 +12,6 @@ let
       lib
       pkgs
       config
-      osConfig
-      vars
       inputs
       ;
   };

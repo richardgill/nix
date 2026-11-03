@@ -7,4 +7,4 @@ if ! pgrep -x "cmuscontrold" > /dev/null; then
 fi
 
 # Start cmus with the music folder
-exec cmus "/home/rich/Music"
+exec cmus "$HOME/Music"

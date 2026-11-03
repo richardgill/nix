@@ -79,7 +79,6 @@
           "Games"
           "Backups"
           "Screenshots"
-          (lib.removePrefix "/home/${vars.userName}/" config.customDirs.music)
           "go"
           ".alchemy"
           ".aws"
@@ -102,7 +101,6 @@
           ".config/Codex"
           ".config/google-chrome"
           ".config/google-chrome-remote-debug"
-          ".config/cmus"
           ".config/dconf" # GNOME application settings database
           ".config/gtk-3.0"
           ".config/discord"
@@ -118,7 +116,6 @@
           ".config/BambuStudio"
           ".config/BeeperTexts"
           ".config/blender"
-          ".config/spotify"
           ".config/Todoist"
           ".config/todoist"
           ".config/sunshine"
@@ -145,7 +142,6 @@
           ".steam"
           # Mise's npm installations link to packages in Aube's shared store.
           ".cache/aube"
-          ".cache/cmus"
           ".cache/codex-runtimes"
           ".cache/elephant"
           ".cache/ms-playwright"

@@ -2,7 +2,7 @@
 let
   appDir = "${config.home.homeDirectory}/code/nix-private/out-of-store-config/services/ai-cron";
   pnpmPath = "${config.home.homeDirectory}/.local/share/mise/shims/pnpm";
-  pathEnv = "${config.home.homeDirectory}/.local/share/mise/shims:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+  pathEnv = "${config.home.homeDirectory}/.local/share/mise/shims:${config.home.path}/bin:/usr/bin:/bin";
 in
 {
   systemd.user.services.ai-cron = {

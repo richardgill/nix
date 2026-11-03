@@ -2,8 +2,6 @@
   config,
   lib,
   pkgs,
-  osConfig,
-  vars,
   inputs,
   ...
 }:
@@ -16,8 +14,6 @@ let
       lib
       pkgs
       config
-      osConfig
-      vars
       inputs
       ;
   };
@@ -49,8 +45,8 @@ let
 
   policiesJson = ../../dot-files/firefox/policies.json;
   kagiSearchTokenCommand = ''
-    if [ -r "${osConfig.sops.secrets."kagi-search-token".path}" ]; then
-      cat "${osConfig.sops.secrets."kagi-search-token".path}"
+    if [ -r "${config.custom.secretFiles.kagiSearchToken}" ]; then
+      cat "${config.custom.secretFiles.kagiSearchToken}"
     else
       printf 'broken'
     fi

@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  pathEnv = "${config.home.homeDirectory}/.local/share/mise/shims:/etc/profiles/per-user/${config.home.username}/bin:/run/current-system/sw/bin:/usr/bin:/bin";
+  pathEnv = "${config.home.homeDirectory}/.local/share/mise/shims:${config.home.path}/bin:/usr/bin:/bin";
 in
 {
   systemd.user.services.tmux-worktree-pr-autokill = {

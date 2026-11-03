@@ -247,8 +247,7 @@
         import ./utils/template-config.nix {
           inherit (nixpkgs) lib;
           inherit (nixosConfig) pkgs;
-          inherit (nixosConfig) config;
-          inherit (vars) userName;
+          config = nixosConfig.config.home-manager.users.${vars.userName};
         }
       ) self.nixosConfigurations;
     };

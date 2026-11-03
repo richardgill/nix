@@ -14,7 +14,6 @@
     ./oom-protection.nix
     ./packages.nix
     ./power-management.nix
-    ./secrets.nix
     ./ssh.nix
     ./systemd.nix
     ./system.nix

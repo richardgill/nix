@@ -1,9 +1,7 @@
 {
   lib,
   pkgs,
-  vars,
   config,
-  osConfig,
   inputs,
   ...
 }:
@@ -14,12 +12,12 @@ let
       lib
       pkgs
       config
-      osConfig
-      vars
       inputs
       ;
   };
 in
 {
+  home.packages = [ pkgs.tmux ];
+
   home.file.".config/tmux/tmux.conf".source = "${templates.builtTemplates}/tmux/tmux.conf";
 }

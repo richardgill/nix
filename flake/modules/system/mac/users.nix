@@ -1,6 +1,5 @@
 {
   vars,
-  config,
   ...
 }:
 {
@@ -14,14 +13,6 @@
       if [ ! -d "$SCREENSHOTS_DIR" ]; then
         mkdir -p "$SCREENSHOTS_DIR"
         chown ${vars.userName}:staff "$SCREENSHOTS_DIR"
-      fi
-
-      echo "Setting up Music folder..."
-      MUSIC_DIR="${config.customDirs.music}"
-
-      if [ ! -d "$MUSIC_DIR" ]; then
-        mkdir -p "$MUSIC_DIR"
-        chown ${vars.userName}:staff "$MUSIC_DIR"
       fi
     '';
   };

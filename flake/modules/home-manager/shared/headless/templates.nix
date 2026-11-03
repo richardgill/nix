@@ -4,8 +4,6 @@
   lib,
   pkgs,
   config,
-  osConfig,
-  vars,
   inputs,
 }:
 let
@@ -13,9 +11,7 @@ let
 
   # Import shared template config
   templateData = import ../../../../utils/template-config.nix {
-    inherit lib pkgs;
-    config = osConfig;
-    userName = vars.userName;
+    inherit lib pkgs config;
   };
 
   # Build templates as a Nix derivation (runs at eval time)
