@@ -40,4 +40,4 @@ Subdirectories create prefixes. `frontend/component.md` → `/component (project
 
 ## Documentation
 
-See "Prompt Templates" section in `/home/rich/code/reference-repos/pi-mono/packages/coding-agent/README.md`
+See "Prompt Templates" section in `~/code/reference-repos/pi-mono/packages/coding-agent/README.md`

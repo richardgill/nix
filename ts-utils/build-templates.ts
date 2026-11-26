@@ -48,7 +48,6 @@ const templateDataSchema = z
     continuumPlugin: z.string(),
     firefoxProfilePath: z.string(),
     firefoxProxyPacPathUrlEncoded: z.string(),
-    defaultEngineIdHash: z.string(),
     defaultAiAgent: z.string(),
     profilePath: z.string(),
   })

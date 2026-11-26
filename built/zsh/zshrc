@@ -39,9 +39,6 @@ bindkey -e
 if [[ $- == *i* ]]; then
   eval "$(zoxide init zsh --cmd cd)"
   source <(fzf --zsh)
-  # Cache zsh completions and skip compaudit to speed startup
-  mkdir -p "$HOME/.cache/zsh"
-  alias compinit="compinit -C -d $HOME/.cache/zsh/zcompdump"
 
   # Override default fzf-history-widget (ctrl-r) to accept query as command when no match
   # To see default implementation: fzf --zsh 2>&1 | grep -A 30 "fzf-history-widget"

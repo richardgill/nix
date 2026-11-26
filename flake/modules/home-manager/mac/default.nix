@@ -7,6 +7,7 @@
 {
   imports = [
     ../shared/headless
+    ../shared/headless/secrets.nix
     ../shared/graphical
     ./dot-files.nix
     ./home.nix

@@ -1,4 +1,4 @@
-vim.pack.add({ { src = 'https://github.com/saghen/blink.cmp', version = '1.*' } })
+vim.pack.add({ { src = 'https://github.com/saghen/blink.cmp', version = vim.version.range('1.*') } })
 require('blink.cmp').setup {
   -- If <C-Space> isn't working on mac, check your preferences
   -- System Preferences > Keyboard > Keyboard Shortcuts > Input Sources > (remove Ctrl+Space and Ctrl+Shift+Space).

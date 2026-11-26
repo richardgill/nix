@@ -59,8 +59,8 @@ const openAiModel = (model: string): AgentModel => ({
 const models = {
   luna: openAiModel("gpt-5.6-luna"),
   terra: openAiModel("gpt-5.6-terra"),
-  astra: openAiModel("gpt-6-astra"),
-  sol: openAiModel("gpt-6.1-sol"),
+  astra: openAiModel("gpt-6.2-astra"),
+  sol: openAiModel("gpt-6.2-sol"),
 } satisfies AgentModels;
 
 const modelProfiles = {

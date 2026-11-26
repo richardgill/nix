@@ -32,4 +32,8 @@ settings=$(jq -nc \
     }
   }')
 
-exec mise exec npm:@anthropic-ai/claude-code -- claude --settings "$settings" "$@"
+# Merge gateway settings when this machine opts in (installed by optional/ch-ai-gateway.nix)
+gateway_settings="$HOME/.claude/settings.ch-gateway.json"
+[[ -f "$gateway_settings" ]] && settings=$(jq -sc '.[0] * .[1]' <(echo "$settings") "$gateway_settings")
+
+exec mise exec claude -- claude --settings "$settings" "$@"

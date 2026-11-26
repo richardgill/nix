@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-prefix=$("$HOME/Scripts/overmux" instance --json | jq -er '.deepLinkPrefix')
-exec open "$prefix/notifications/all"

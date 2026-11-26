@@ -126,7 +126,6 @@
             not = [
               "com.mitchellh.ghostty"
               "ghostty"
-              "overmux-desktop"
             ];
           };
           remap = {

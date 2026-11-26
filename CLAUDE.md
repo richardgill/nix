@@ -27,8 +27,6 @@ Dotfile templates may use the `.hbs` suffix. Use `*.ext*` globs when searching f
 - Edit the repository sources for dotfiles rather than their symlinks in `~/`.
 - Prefer keeping dotfiles as text files on disk, using Handlebars templates when needed.
 - Put temporary package pins in `./flake/overlays/pins.nix`. Above each pin, explain why it exists, when to remove or revisit it, and include relevant upstream or Nixpkgs links.
-- Run `overmux docs ai-context` for documentation about Overmux.
-
 
 - Add new impermanence persistence directories and files to `./flake/modules/system/nixos/headless/impermanence.nix`.
 - If a build fails with `Path X already exists`, move the conflicting files to persistence first:

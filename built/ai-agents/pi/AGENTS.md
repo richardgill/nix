@@ -7,6 +7,7 @@
 - Check invariants with guards at the top of functions; return or throw if they fail.
 - Push side effects to the edges: fetch, transform (pure), emit. Don't interleave I/O with logic.
 - Pre-existing comments: Leave pre-existing comments (from before this PR) intact when editing code
+- Use brief, evergreen comments to explain non-obvious intent and prevented failures, not PR history.
 - Prefer less indirection unless it helps DRY or readability
 - Follow existing code patterns when deciding whether and how to add tests; otherwise, test useful behavior and prioritize readability over test volume.
 - Prefer table-driven tests when covering multiple similar cases.
@@ -38,7 +39,7 @@
 ## Dev environment
 
 - I work on Mac or NixOS and the filesystem is case sensitive
-- My macOS and NixOS systems are configured declaratively with Nix in /home/rich/code/nix-private; edit that configuration when system changes are needed (do not commit though).
+- My macOS and NixOS systems are configured declaratively with Nix in `~/code/nix-private`; edit that configuration when system changes are needed (do not commit though).
 - To run software without installing it, prefer `nix shell nixpkgs#<pkg> -c <cmd>`; fall back to `mise` for specific tool versions.
 - Prefer not to use npx or bunx for anything where package.json has it. Rely on pnpm exec
 - You can `gh repo clone` helpful repos to `~/code/reference-repos/` and then explore them to figure out how things work.
@@ -52,7 +53,8 @@
 - Exclude lockfiles, generated code, snapshots, vendored files, build artifacts, and formatting-only changes from reviewable line counts unless they require meaningful review.
 - “🛑”, “LTF” (“let’s talk first”), or “LJT” (“let’s just talk”) means: discuss and agree on the approach first. Do not edit files, run mutating commands, or take external actions until I explicitly approve.
 - Default to delegating self-contained medium-sized implementation and research tasks through `tmux-pi`; perform higher-level work and complex thinking inline.
-- Use `openai/gpt-6.1-sol` with `high` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
+- Use `openai/gpt-6.2-sol` with `high` thinking for straightforward delegated tasks with clear requirements. Use a stronger profile when investigation or difficult design decisions are required.
+- Before handing off nontrivial changes, run a fresh-context simplify review for readability and scope, apply worthwhile suggestions, and revalidate.
 - Only do git commits when I explicitly ask.
 - Treat these standalone messages as explicit authorization to run the corresponding command:
   - Decide on a succinct commit message that describes the changes and pass it to the command.
@@ -71,7 +73,7 @@
   - “🟢”, “green”, “baby”, or “babysit” means: watch the gh checks until they're successful, make any small fixes, and rerun any transient failures until all checks are green. If the issue needs my input, notify me.
 - When the user asks to open/show/launch a URL or link on their machine, use: `open '<url>'`. If ambiguous, ask: “Should I just open it for you, or should I inspect/interact with it?”
 - To retrieve page content from a URL, use kagi ask-page <url> "<question>".
-- The items I'm working on for Xata go here /home/rich/code/notes/content/projects/xata/work-queue.md
+- The items I'm working on for Xata go here `~/code/notes/content/projects/xata/work-queue.md`
 
 ## Use pi-jq
 
@@ -95,6 +97,7 @@ Avoid putting large, generated, vendored, or external trees in overlay/. Use `~/
 - Use `-` instead of an em dash; never use em dashes.
 - When referencing files, use repo-relative paths: `./folder/file.txt`, `./folder/file.txt:5`, or `./folder/file.txt:4-7`.
 - Prefer: sketch shape → confirm → implement. Get agreement on structure / APIs / "interfaces" / code seams before implementation details.
+- For UI/email designs, show compact ASCII sketches with real copy, controls, context, and relevant states before coding.
 - If I mention “parrot”, it means I'm going to take your response -> edit it -> send it back to you. Be sure to optimize message structure so that it's in a format where it just includes the decisions / requirements / main points so I can modify it easily.
 
 ### Brevity and response style
@@ -137,10 +140,4 @@ scp -P ${TUNNEL_PORT:-1999} ./screenshot.png localhost:~/Screenshots/
 scp -P ${TUNNEL_PORT:-1999} localhost:~/Downloads/file ./
 scp -P ${TUNNEL_PORT:-1999} localhost:~/Screenshots/screenshot.png ./
 ```
-
-## Overmux
-
-Run `overmux instance --json` to discover the running server's `instanceId` and `deepLinkPrefix`; do not assume the instance name matches the hostname.
-
-Link to tmux using `<deepLinkPrefix>/tmux/<session>/<window>/<pane>`. Use numeric tmux IDs with the `$`, `@`, and `%` prefixes removed, not window or pane indices. For example, session `$1`, window `@2`, pane `%647` becomes `overmux://um790-4242/tmux/1/2/647`. Session-only (`overmux://um790-4242/tmux/1`) and session/window (`overmux://um790-4242/tmux/1/2`) links also work.
 

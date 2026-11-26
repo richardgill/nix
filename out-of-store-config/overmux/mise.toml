@@ -1,4 +1,0 @@
-[tools]
-node = "22"
-pnpm = "10"
-"npm:overmux" = "0.0.2"

@@ -2,9 +2,15 @@
 # https://www.gnu.org/software/bash/manual/html_node/Bash-Startup-Files.html
 export BASH_ENV="$HOME/.bash_profile"
 
-export KAGI_API_KEY="$(cat {{ kagiApiKeyPath }})"
-export KAGI_SESSION_TOKEN="$(cat {{ kagiSessionTokenPath }})"
-export EXA_API_KEY="$(cat {{ exaApiKeyPath }})"
+if [ -r "{{ kagiApiKeyPath }}" ]; then
+  export KAGI_API_KEY="$(cat "{{ kagiApiKeyPath }}")"
+fi
+if [ -r "{{ kagiSessionTokenPath }}" ]; then
+  export KAGI_SESSION_TOKEN="$(cat "{{ kagiSessionTokenPath }}")"
+fi
+if [ -r "{{ exaApiKeyPath }}" ]; then
+  export EXA_API_KEY="$(cat "{{ exaApiKeyPath }}")"
+fi
 
 # Dynamically loads .env.shell and .env.*.shell files by traversing up parent directories
 if [ -f "$HOME/.config/shell/env-shell-loader.sh" ]; then

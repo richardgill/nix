@@ -3,7 +3,11 @@ default:
 
 # path:. uses the path protocol to include untracked files (git protocol would require files to be staged)
 _rebuild action machine='' extra_flags='':
-    @if [ "$(uname)" = "Darwin" ]; then \
+    @if [ "$(uname)" = "Linux" ] && [ ! -e /etc/NIXOS ]; then \
+      scripts/home-rebuild.sh "{{ action }}" "{{ machine }}" {{ extra_flags }}; \
+      exit $?; \
+    fi; \
+    if [ "$(uname)" = "Darwin" ]; then \
       command="nix run nix-darwin --"; \
       sudo_prefix="{{ if action == "switch" { "sudo" } else { "" } }}"; \
     else \
@@ -26,7 +30,7 @@ build machine='':
 
 switch machine='':
     @just template-bundle
-    @if [ "$(uname)" = "Darwin" ]; then \
+    @if [ "$(uname)" = "Darwin" ] || [ ! -e /etc/NIXOS ]; then \
       just _rebuild switch "{{ machine }}"; \
     else \
       scripts/switch-fast.sh "{{ machine }}"; \

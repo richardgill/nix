@@ -17,10 +17,12 @@
     ../../../../modules/system/mac/optional/bambu-studio.nix
     ../../../../modules/system/mac/optional/beeper.nix
     ../../../../modules/system/mac/optional/discord.nix
+    ../../../../modules/system/mac/optional/docker-desktop.nix
     ../../../../modules/system/mac/optional/dolphin-emu.nix
     ../../../../modules/system/mac/optional/eternal-terminal-server.nix
     ../../../../modules/system/mac/optional/moonlight.nix
     ../../../../modules/system/mac/optional/ssh-server.nix
+    ../../../../modules/system/mac/optional/zoom.nix
   ];
   # needed with nix determinate package
   nix.enable = false;
@@ -35,8 +37,11 @@
         imports = [
           ../../../../modules/home-manager/mac
           ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
+          ../../../../modules/home-manager/shared/graphical/optional/ntfy.nix
           ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
         ];
+
+        custom.aiAgents.pi.mcp.servers = [ "superlogical" ];
       };
     };
   };

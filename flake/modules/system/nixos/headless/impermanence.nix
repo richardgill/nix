@@ -134,7 +134,6 @@
           ".local/share/nautilus"
           ".local/share/gvfs-metadata" # Nautilus per-folder sorting and view preferences
           ".local/share/opencode"
-          ".local/share/overmux"
           ".local/share/voxtype"
           ".local/share/Steam"
           ".local/share/Rocket League"
@@ -149,7 +148,6 @@
           ".local/state/ai-cron"
           ".local/state/codex"
           ".local/state/nvim"
-          ".local/state/overmux"
           ".local/state/tmux"
           ".local/state/yazi"
           ".local/state/wireplumber"
@@ -170,6 +168,7 @@
           ".claude/history.jsonl"
           ".expo/state.json"
           ".pi/agent/auth.json"
+          ".pi/agent/mcp-auth.json"
           ".pi/agent/trust.json"
         ];
       };

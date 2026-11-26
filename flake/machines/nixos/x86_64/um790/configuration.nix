@@ -37,11 +37,13 @@
       ../../../../modules/home-manager/nixos/graphical
       ../../../../modules/home-manager/shared/headless/optional/beeper.nix
       ../../../../modules/home-manager/shared/graphical/optional/gaming-emulators.nix
+      ../../../../modules/home-manager/shared/graphical/optional/ntfy.nix
       ../../../../modules/home-manager/nixos/graphical/optional/react-native-debugger.nix
-      ../../../../modules/home-manager/nixos/graphical/optional/overmux-desktop.nix
       ../../../../modules/home-manager/nixos/headless/optional/playwright.nix
-      ../../../../modules/home-manager/nixos/headless/overmux.nix
+      ../../../../modules/home-manager/linux/headless/optional/agent-browser.nix
     ];
+
+    custom.aiAgents.pi.mcp.servers = [ "superlogical" ];
   };
 
   # To get to secure-boot setup mode in bios: Security -> Custom -> Clear. You need to exit the bios without the machine restarting. Do not 'exit and reset', quit the bios without saving (back on far right hand side), which contiues boot.

@@ -40,6 +40,7 @@ Configuration is split onto folders:
 │   ├── vars.nix              # Shared variables (username, etc.)
 │   ├── treefmt.nix
 │   ├── machines/             # Per-machine configurations
+│   ├── home-manager/         # Standalone Home Manager configurations (e.g. Ubuntu host)
 │   ├── modules/              # System + home-manager modules
 │   ├── overlays/
 │   ├── assets/
@@ -54,6 +55,12 @@ Configuration is split onto folders:
 ## Getting started 
 
 Check [flake/vars.nix](./flake/vars.nix) and update your username, public keys etc.
+
+To add a standalone Home Manager host, add `flake/home-manager/<system>/<hostname>/configuration.nix` returning `{ userName, module }`, where `module` is a Home Manager module. Then run `just switch <hostname>`.
+
+## Installation - Ubuntu (standalone Home Manager)
+
+For the headless `rg-devbox` home environment on Ubuntu 26.04, see [the bootstrap guide](docs/ubuntu.md). This manages user packages, dotfiles and user services without replacing Ubuntu or importing NixOS system configuration.
 
 ## Installation - NixOS (Linux)
 

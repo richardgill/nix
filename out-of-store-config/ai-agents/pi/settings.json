@@ -1,15 +1,15 @@
 {
   "theme": "tokyo-night",
   "defaultProvider": "openai",
-  "defaultModel": "gpt-6.1-sol",
+  "defaultModel": "gpt-6.2-sol",
   "defaultThinkingLevel": "high",
   "defaultTools": [
     "+codemode"
   ],
   "tuiMode": "fullscreen",
   "enabledModels": [
-    "openai/gpt-6.1-sol",
-    "openai/gpt-6-astra"
+    "openai/gpt-6.2-sol",
+    "openai/gpt-6.2-astra"
   ],
   "steeringMode": "one-at-a-time",
   "followUpMode": "one-at-a-time",
@@ -35,7 +35,7 @@
     "blockImages": false
   },
   "doubleEscapeAction": "tree",
-  "lastChangelogVersion": "1.5.0",
+  "lastChangelogVersion": "1.6.1",
   "editorPaddingX": 1,
   "enableSkillCommands": true,
   "packages": [
@@ -48,7 +48,7 @@
     "~/code/pi-extensions/main/extensions/footer",
     "~/code/pi-extensions/main/extensions/handoff",
     "~/code/pi-extensions/main/extensions/notify",
-    "~/code/overmux/main/packages/ecosystem/pi",
+    "~/code/pi-extensions/main/extensions/ipc",
     "~/code/pi-extensions/main/extensions/process-info",
     "~/code/pi-extensions/main/extensions/skill-metadata-templates",
     "~/code/pi-extensions/main/extensions/thinking-toggle",
@@ -68,8 +68,8 @@
     "{\"source\":\"~/code/pi-extensions/main/extensions/parrot\",\"scope\":\"user\"}": "0.0.3",
     "{\"source\":\"~/code/pi-extensions/main/extensions/pi-up-history\",\"scope\":\"user\"}": "0.0.2",
     "{\"source\":\"~/code/pi-extensions/main/extensions/context-commands\",\"scope\":\"user\"}": "0.0.4",
-    "{\"source\":\"~/code/overmux/main/packages/ecosystem/pi\",\"scope\":\"user\"}": "0.0.12",
     "{\"source\":\"~/code/pi-extensions/main/extensions/skill-metadata-templates\",\"scope\":\"user\"}": "0.0.2",
-    "{\"source\":\"npm:pi-codex-status\",\"scope\":\"user\"}": "0.1.0"
+    "{\"source\":\"npm:pi-codex-status\",\"scope\":\"user\"}": "0.1.0",
+    "{\"source\":\"~/code/pi-extensions/main/extensions/ipc\",\"scope\":\"user\"}": "0.0.1"
   }
 }

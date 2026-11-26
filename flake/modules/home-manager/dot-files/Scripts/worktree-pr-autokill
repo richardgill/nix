@@ -269,10 +269,10 @@ main() {
     return
   fi
   cleanup_quarantine_rows
-  tmux list-sessions -F '#{session_name}' 2>/dev/null | while IFS= read -r session; do
+  while IFS= read -r session; do
     [[ -n "$session" ]] || continue
     maybe_quarantine_session "$session"
-  done
+  done < <(tmux list-sessions -F '#{session_name}' 2>/dev/null || true)
 }
 
 main

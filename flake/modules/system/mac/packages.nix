@@ -1,6 +1,7 @@
 {
   config,
   inputs,
+  lib,
   pkgs,
   vars,
   ...
@@ -35,7 +36,7 @@ in
     onActivation = {
       autoUpdate = false;
       upgrade = false;
-      cleanup = "zap";
+      cleanup = lib.mkDefault "zap";
     };
     brews = [
     ];
@@ -48,11 +49,9 @@ in
       "chatgpt"
       "codex-app"
       "cursor"
-      "docker-desktop"
       "figma"
       "firefox"
-      "ghostty@tip"
-      "ksnip"
+      "ghostty"
       "google-chrome"
       "hammerspoon"
       "karabiner-elements"
@@ -65,7 +64,6 @@ in
       "todoist-app"
       "visual-studio-code"
       "vlc"
-      "zoom"
     ];
     masApps = {
     };

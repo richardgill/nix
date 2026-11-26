@@ -63,7 +63,6 @@ in
     scriptsEntries
     // lib.genAttrs (map (name: ".pi/agent/extension-config/${name}") [
       "context-commands.jsonc"
-      "overmux-pi.jsonc"
       "parrot.jsonc"
       "skill-metadata-templates.jsonc"
       "task-context.jsonc"
@@ -139,10 +138,6 @@ in
       ".config/amp/settings.json".source = "${builtTemplates}/ai-agents/ampcode/settings.json";
       ".config/amp/commands".source = "${builtTemplates}/ai-agents/ampcode/commands";
 
-      ".config/mcpc/mcp.json".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/mcpc/mcp.json";
-      ".config/overmux".source =
-        config.lib.file.mkOutOfStoreSymlink "${homeDir}/code/nix-private/out-of-store-config/overmux";
 
       # Static files (not templated)
       ".config/obs-studio".source =

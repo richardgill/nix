@@ -14,17 +14,31 @@ hs.shutdownCallback = function()
 	homeEnd.stop()
 end
 
+local audio = hs.audiodevice
+local fiioConnected = false
+
+local function preferFiio(event)
+	if event and event ~= "dev#" then
+		return
+	end
+
+	local fiio = audio.findOutputByName("FiiO K11 R2R")
+	if fiio and not fiioConnected then
+		fiio:setDefaultOutputDevice()
+	end
+	fiioConnected = fiio ~= nil
+end
+
+audio.watcher.setCallback(preferFiio)
+audio.watcher.start()
+preferFiio()
+
 delayedAppVisibility.register("slack", {
 	appName = "Slack",
 	bundleID = "com.tinyspeck.slackmacgap",
 	gateSeconds = 8,
 	graceSeconds = 180,
 })
-
--- Requires Hammerspoon to have Privacy -> Screen Recording permissions
-hs.hotkey.bind({ "cmd", "shift" }, "4", function()
-	hs.task.new("/Applications/ksnip.app/Contents/MacOS/ksnip", function() end, { "--rectarea" }):start()
-end)
 
 hs.hotkey.bind({ "alt", "cmd" }, "up", function()
 	local window = hs.window.focusedWindow()
@@ -135,7 +149,10 @@ hyperMode.bind("m", function()
 end)
 
 hyperMode.bind("n", function()
-	hs.urlevent.openURL("https://um790.tail98765.ts.net/notifications/all")
+	local configDir = os.getenv("XDG_CONFIG_HOME") or (os.getenv("HOME") .. "/.config")
+	if hs.fs.attributes(configDir .. "/notify/ntfy.json") then
+		hs.urlevent.openURL("https://ntfy.sh/app")
+	end
 end)
 
 hyperMode.bind("h", function()

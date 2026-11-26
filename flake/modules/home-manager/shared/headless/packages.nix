@@ -3,6 +3,7 @@
 {
   config,
   lib,
+  inputs,
   pkgs,
   ...
 }:
@@ -25,6 +26,7 @@ in
   home.packages = with pkgs; [
     argc
     autossh
+    awscli2
     bash
     bat
     btop
@@ -51,6 +53,7 @@ in
     gnugrep
     gnused
     gnumake
+    (google-cloud-sdk.withExtraComponents [ google-cloud-sdk.components.gke-gcloud-auth-plugin ])
     home-manager
     jq
     just
@@ -65,8 +68,10 @@ in
     pkg-config
     postgresql
     qrencode
+    inputs.rex.packages.${pkgs.stdenv.hostPlatform.system}.rex
     ripgrep
     sops
+    ssm-session-manager-plugin
     stripe-cli
     unstable.gws
     unstable.todoist

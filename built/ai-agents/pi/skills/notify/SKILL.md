@@ -1,14 +1,10 @@
 ---
 name: notify
-description: Send Richard an Overmux notification.
+description: Send Richard a notification
 ---
 
-Always use `"topic":"agent"`.
-
 ```bash
-overmux call notification --input '{"title":"Agent","body":"Need your input","topic":"agent"}'
+notify "Need your input"
+notify --title "CI failed" --click "https://github.com/owner/repo/actions" "See the logs"
 ```
-
-When an agent conversation finishes, prefer linking to its tmux pane so Richard can return to it.
-
-Optionally add `"link":"/tmux/<session>/<window>/<pane>"` using numeric tmux IDs without `$`, `@`, or `%` prefixes, or an HTTPS URL. Omit `link` to open the inbox entry; do not use `overmux://` links.
+The default topic is Agent. 

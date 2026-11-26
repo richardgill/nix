@@ -16,7 +16,7 @@ Delegate work to another Pi:
 - In another existing repo or worktree tmux session with `--target`.
 - In a new worktree and tmux session with `--worktree`. This pulls local `main` first and creates the branch from its updated HEAD unless `--source-ref` is supplied.
 
-Delegation remains supervised without blocking the parent. `tmux-pi` launches the child with the parent Pi session ID, reports the child Pi session ID and tmux window, then returns. The `overmux-pi` extension notifies the parent after every child `agent_settled` event.
+Delegation remains supervised without blocking the parent. `tmux-pi` launches the child with the parent Pi session ID, reports the child Pi session ID and tmux window, then returns. The `pi-ipc` extension notifies the parent after every child `agent_settled` event.
 
 ## Launch the delegate
 
@@ -94,18 +94,19 @@ Child will let you know when it's finished; no need to wait or poll. Do not use 
 
 Use `pi-jq` to read Pi session.jsonl files.
 
-When `overmux-pi` delivers a `delegate-settled` notification, use the delegated status embedded in the notification as the primary report. Do not run `pi-jq` again unless the embedded status is incomplete, reports an inspection failure, or richer diagnostics are necessary. Use `tmux capture-pane` only if session inspection fails or terminal-only state is required.
+When `pi-ipc` delivers a `pi-ipc.delegate-settled` notification, use the delegated status embedded in the notification as the primary report. Do not run `pi-jq` again unless the embedded status is incomplete, reports an inspection failure, or richer diagnostics are necessary. Use `tmux capture-pane` only if session inspection fails or terminal-only state is required.
 
-If the task remains unresolved, send follow-up instructions through `overmux-pi` using the child Pi session ID recorded at launch. The child will notify the parent again when the follow-up turn settles; assess the fresh embedded status directly before deciding whether more work is needed.
+If the task remains unresolved, send follow-up instructions with `pi-ipc-send` using the child Pi session ID recorded at launch. The child will notify the parent again when the follow-up turn settles; assess the fresh embedded status directly before deciding whether more work is needed.
 
 Write multiline follow-up messages to a file under `/tmp`, then pipe the file contents to the sender:
 
 ```bash
 followup_file=/tmp/pi-followup-<task>.md
 # Write the multiline instructions to "$followup_file" with the write tool.
-pnpm --dir /home/rich/code/overmux/active-server \
-  --filter @overmux/pi \
-  overmux-pi-send '<child-session-id>' --after-turn < "$followup_file"
+(
+  cd "$HOME/code/pi-extensions/main" &&
+    pnpm --silent --filter pi-ipc pi-ipc-send '<child-session-id>' --after-turn < "$followup_file"
+)
 ```
 
 `--after-turn` delivers immediately when the child is idle and otherwise steers after its current assistant turn and tools. Use `--follow-up` only when the message must wait for the entire active agent run. Send the file contents, not an `@file` reference. If delivery is unavailable, report the failure instead of silently falling back to `tmux send-keys`; use tmux input only when the user explicitly asks for terminal interaction.
@@ -118,7 +119,4 @@ tmux kill-window -t '<window-id>'
 
 Worktree delegates are the exception: leave their tmux windows open after completion for human follow-ups. Do not kill a worktree delegate's window unless the user explicitly asks.
 
-When the launcher prints an `overmux://` URL, include it as `[<slug>](<overmux-url>)` in your response, outside a code block.
-When referring to the delegate later, link its task slug as `[<slug>](<overmux-url>)`.
-
-After launch, end the current turn with a brief delegation-in-progress status; do not claim the task is complete. `overmux-pi` will start or steer a later parent turn when the child settles. Then resume supervision and do not present the task as complete while notified work remains unresolved.
+After launch, end the current turn with a brief delegation-in-progress status; do not claim the task is complete. `pi-ipc` will start or steer a later parent turn when the child settles. Then resume supervision and do not present the task as complete while notified work remains unresolved.

@@ -67,6 +67,7 @@ resetTo() {
 alias c="~/Scripts/cl"
 alias t="~/Scripts/tmux-start"
 alias pi="~/Scripts/pi"
+alias codex="~/Scripts/codex"
 alias pnx="pnpm exec nx"
 alias ls="~/Scripts/ls"
 alias lso="/nix/store/5kcc5rnag7yymmsr6yqs7993xpdqs62w-coreutils-9.11/bin/ls"

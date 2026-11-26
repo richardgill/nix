@@ -591,6 +591,22 @@
         "type": "github"
       }
     },
+    "homebrew-cone": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1792538724,
+        "narHash": "sha256-539ib+6WBQ1CGIw0zmD9id3FxFAa+w/UuJX3BUKAOZs=",
+        "owner": "conductorone",
+        "repo": "homebrew-cone",
+        "rev": "68678b06dc22dde7fa90b7dd61724546765f8d4f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "conductorone",
+        "repo": "homebrew-cone",
+        "type": "github"
+      }
+    },
     "homebrew-core": {
       "flake": false,
       "locked": {
@@ -1002,6 +1018,23 @@
         "type": "github"
       }
     },
+    "rex": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1794599376,
+        "narHash": "sha256-EXeKXr+NeDEc6JyfZHckVzkJCiCU0/rRkR3EVOFR3vE=",
+        "type": "tarball",
+        "url": "https://pkgs.superlogical.com/rex/nix/preview/0.1.0-preview.19.tar.gz"
+      },
+      "original": {
+        "type": "tarball",
+        "url": "https://pkgs.superlogical.com/rex/nix/preview.tar.gz"
+      }
+    },
     "root": {
       "inputs": {
         "chatgpt-desktop": "chatgpt-desktop",
@@ -1012,6 +1045,7 @@
         "home-manager": "home-manager",
         "homebrew-bundle": "homebrew-bundle",
         "homebrew-cask": "homebrew-cask",
+        "homebrew-cone": "homebrew-cone",
         "homebrew-core": "homebrew-core",
         "impermanence": "impermanence",
         "lanzaboote": "lanzaboote",
@@ -1023,6 +1057,7 @@
         "nixpkgs-firefox-151-stable": "nixpkgs-firefox-151-stable",
         "nixpkgs-unstable": "nixpkgs-unstable",
         "playwright": "playwright",
+        "rex": "rex",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix_2",

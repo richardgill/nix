@@ -36,6 +36,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    rex = {
+      url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -67,6 +72,11 @@
 
     homebrew-core = {
       url = "github:homebrew/homebrew-core";
+      flake = false;
+    };
+
+    homebrew-cone = {
+      url = "github:conductorone/homebrew-cone";
       flake = false;
     };
 
@@ -142,32 +152,42 @@
         system: treefmt-nix.lib.evalModule nixpkgs.legacyPackages.${system} ./treefmt.nix
       );
 
-      # Auto-discover machine configurations in the ./machines/ directory
-      discoverHosts =
-        platform:
-        let
-          osType = if platform == "darwin" then "darwin" else "linux";
-          archDirs = builtins.readDir (./machines + "/${platform}");
-          getHostsForArch =
-            arch:
-            let
-              archPath = ./machines + "/${platform}/${arch}";
-              hostDirs = builtins.readDir archPath;
-              toHostConfig =
-                name: _:
-                nixpkgs.lib.nameValuePair name {
-                  system = "${arch}-${osType}";
-                  path = archPath + "/${name}/configuration.nix";
-                };
-            in
-            nixpkgs.lib.mapAttrs' toHostConfig (
-              nixpkgs.lib.filterAttrs (name: type: type == "directory") hostDirs
-            );
-        in
-        nixpkgs.lib.foldl' (acc: arch: acc // (getHostsForArch arch)) { } (builtins.attrNames archDirs);
+      directoryNames =
+        path:
+        if builtins.pathExists path then
+          builtins.attrNames (nixpkgs.lib.filterAttrs (_: type: type == "directory") (builtins.readDir path))
+        else
+          [ ];
 
-      nixosHosts = discoverHosts "nixos";
-      darwinHosts = discoverHosts "darwin";
+      discoverHosts =
+        root: systemForDir:
+        let
+          getHosts =
+            dir:
+            let
+              systemPath = root + "/${dir}";
+            in
+            nixpkgs.lib.genAttrs (directoryNames systemPath) (name: {
+              system = systemForDir dir;
+              path = systemPath + "/${name}/configuration.nix";
+            });
+          addHosts =
+            hosts: dir:
+            let
+              newHosts = getHosts dir;
+              duplicates = builtins.attrNames (builtins.intersectAttrs hosts newHosts);
+            in
+            if duplicates == [ ] then
+              hosts // newHosts
+            else
+              throw "Duplicate host names under ${toString root}: ${builtins.concatStringsSep ", " duplicates}";
+        in
+        nixpkgs.lib.foldl' addHosts { } (directoryNames root);
+
+      # Auto-discover machine configurations in the ./machines/ directory
+      nixosHosts = discoverHosts ./machines/nixos (arch: "${arch}-linux");
+      darwinHosts = discoverHosts ./machines/darwin (arch: "${arch}-darwin");
+      homeManagerHosts = discoverHosts ./home-manager (system: system);
 
       mkNixOSConfig =
         hostName: path:
@@ -206,8 +226,33 @@
           ];
         };
 
+      mkHomeConfig =
+        { system, path }:
+        let
+          inherit (import path) userName module;
+        in
+        inputs.home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+            overlays = [
+              (import ./overlays/unstable-packages.nix { inherit inputs; })
+              (import ./overlays/pins.nix { inherit inputs; })
+            ];
+          };
+          extraSpecialArgs = {
+            inherit inputs outputs;
+            vars = vars // {
+              inherit userName;
+            };
+          };
+          modules = [ module ];
+        };
+
     in
     {
+      homeConfigurations = nixpkgs.lib.mapAttrs (_: mkHomeConfig) homeManagerHosts;
+
       ghStackSkill = "${inputs.gh-stack}/skills/gh-stack";
 
       # Enables `nix fmt` at root of repo to format all nix files
@@ -219,6 +264,9 @@
         {
           formatting = treefmtEval.${system}.config.build.check self;
         }
+        // nixpkgs.lib.mapAttrs' (
+          name: _: nixpkgs.lib.nameValuePair "home-${name}" self.homeConfigurations.${name}.activationPackage
+        ) (nixpkgs.lib.filterAttrs (_: config: config.system == system) homeManagerHosts)
         // nixpkgs.lib.mapAttrs' (
           name: config:
           nixpkgs.lib.nameValuePair "nixos-${name}" (mkNixOSConfig name config.path)
@@ -242,13 +290,21 @@
 
       # Export template config for manual template building
       # Usage: nix eval --json .#templateConfig.<machine> > config.json
-      templateConfig = nixpkgs.lib.mapAttrs (
-        name: nixosConfig:
-        import ./utils/template-config.nix {
-          inherit (nixpkgs) lib;
-          inherit (nixosConfig) pkgs;
-          config = nixosConfig.config.home-manager.users.${vars.userName};
-        }
-      ) self.nixosConfigurations;
+      templateConfig =
+        nixpkgs.lib.mapAttrs (
+          name: nixosConfig:
+          import ./utils/template-config.nix {
+            inherit (nixpkgs) lib;
+            inherit (nixosConfig) pkgs;
+            config = nixosConfig.config.home-manager.users.${vars.userName};
+          }
+        ) self.nixosConfigurations
+        // nixpkgs.lib.mapAttrs (
+          name: homeConfig:
+          import ./utils/template-config.nix {
+            inherit (nixpkgs) lib;
+            inherit (homeConfig) pkgs config;
+          }
+        ) self.homeConfigurations;
     };
 }

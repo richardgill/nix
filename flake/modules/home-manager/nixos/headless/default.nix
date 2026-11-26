@@ -1,12 +1,6 @@
 {
-  ...
-}:
-{
   imports = [
-    ../../shared/headless
-    ./ai-cron.nix
-    ./home.nix
-    ./packages.nix
-    ./tmux-worktree-pr-autokill.nix
+    ../../linux/headless
+    ../../shared/headless/secrets.nix
   ];
 }

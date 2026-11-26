@@ -1,3 +1,5 @@
+Include ~/.ssh/config.local
+
 Host *
   ServerAliveInterval 60
   ServerAliveCountMax 3

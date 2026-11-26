@@ -20,7 +20,14 @@ if ! git diff --quiet || ! git diff --cached --quiet || [ -n "$(git ls-files --o
 fi
 
 echo "Building templates..."
-just template
+# Render public templates from a public host, not the machine running publish.
+publish_host=um790
+just template "$publish_host"
+
+mcp_path=flake/modules/home-manager/shared/headless/mcp.json
+publish_user=$(nix eval --raw 'path:./flake#vars.userName')
+# Reading home.file directly can require building templates for the host's platform.
+mcp_config=$(nix eval --raw "path:./flake#nixosConfigurations.$publish_host.config.home-manager.users.\"$publish_user\".custom.aiAgents.pi.mcp.rendered")
 
 github_repo_dir=$(mktemp -d)
 
@@ -40,10 +47,37 @@ git checkout -b "$branch_name"
 find . -mindepth 1 -maxdepth 1 ! -name ".git" -exec rm -rf {} +
 
 # Copy everything from current repo except .git and gitignored files
-rsync -av --filter=':- .gitignore' --exclude='.git' --exclude='overlay/***' --exclude='flake/modules/home-manager/dot-files/Scripts/beeper-cli' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/beeper/***' --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/posthog/***' --exclude='flake/modules/system/nixos/headless/optional/tailscaled-work.nix' --exclude='out-of-store-config/services/ai-cron/***' --exclude='todo.md' "$source_dir/" .
+rsync_options=(
+  --filter=':- .gitignore'
+  --exclude='.git'
+  --exclude='overlay/***'
+  --exclude='flake/machines/darwin/aarch64/macbookair-work/***'
+  --exclude='/flake/home-manager/*/rg-devbox/***'
+  --exclude='docs/ubuntu.md'
+  --exclude='flake/packages/cone.nix'
+  --exclude='flake/modules/home-manager/dot-files/git/ch'
+  --exclude='flake/modules/home-manager/dot-files/Scripts/beeper-cli'
+  --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/beeper/***'
+  --exclude='flake/modules/home-manager/dot-files/ai-agents/shared/skills/posthog/***'
+  --exclude='flake/modules/home-manager/shared/headless/optional/ch-ai-gateway.nix'
+  --exclude='*ch-gateway*'
+  --exclude="/$mcp_path"
+  --exclude='/out-of-store-config/mcpc/***'
+  --exclude='out-of-store-config/services/ai-cron/***'
+  --exclude='todo.md'
+)
+rsync -av "${rsync_options[@]}" "$source_dir/" .
+
+# The public flake reads only the MCP servers selected by the publish host.
+printf '%s\n' "$mcp_config" > "$mcp_path"
 
 # Copy built/ separately since it's gitignored in source but tracked in public repo
-rsync -av --exclude='ai-agents/*/skills/beeper/***' --exclude='ai-agents/*/skills/slack/***' --exclude='ai-agents/*/skills/posthog/***' "$source_dir/built/" ./built/
+rsync -av \
+  --exclude='ai-agents/*/skills/beeper/***' \
+  --exclude='ai-agents/*/skills/slack/***' \
+  --exclude='ai-agents/*/skills/posthog/***' \
+  --exclude='*ch-gateway*' \
+  "$source_dir/built/" ./built/
 
 # Remove built/ from .gitignore so built templates are tracked in public repo
 sed -i '/^built\/$/d' .gitignore

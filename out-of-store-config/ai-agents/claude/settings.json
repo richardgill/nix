@@ -182,11 +182,12 @@
     ]
   },
   "alwaysThinkingEnabled": true,
-  "voiceEnabled": true,
   "skipDangerousModePermissionPrompt": true,
+  "voiceEnabled": true,
   "excludeSkills": [],
   "bypassPermissionsModeAccepted": true,
   "feedbackSurveyState": {
     "lastShownTime": 1754325484811
-  }
+  },
+  "theme": "dark"
 }

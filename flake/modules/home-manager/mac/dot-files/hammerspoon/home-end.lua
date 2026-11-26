@@ -26,7 +26,6 @@ local excludedBundles = {
 	"^com%.apple%.Terminal$",
 	"^com%.github%.wez%.wezterm$",
 	"^com%.mitchellh%.ghostty$",
-	"^com%.overmux%.desktop$",
 }
 
 local function excludedApplication()

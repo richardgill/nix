@@ -21,6 +21,13 @@ in
   programs.zsh = {
     enable = true;
     enableCompletion = true;
+    # Initialize completion before custom shell setup: argc completions require compdef.
+    completionInit = ''
+      # Cache zsh completions and skip compaudit to speed startup
+      mkdir -p "$HOME/.cache/zsh"
+      autoload -U compinit
+      compinit -C -d "$HOME/.cache/zsh/zcompdump"
+    '';
     autosuggestion.enable = true;
     syntaxHighlighting.enable = true;
 
@@ -28,6 +35,6 @@ in
     envExtra = builtins.readFile "${builtTemplates}/zshenv/zshenv";
 
     # Source the built zshrc from Nix store
-    initContent = lib.mkBefore (builtins.readFile "${builtTemplates}/zsh/zshrc");
+    initContent = builtins.readFile "${builtTemplates}/zsh/zshrc";
   };
 }

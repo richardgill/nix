@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Codex launcher; applies gateway overrides when this machine opts in (installed by optional/ch-ai-gateway.nix)
+
+gateway_args=()
+gateway_file="$HOME/.codex/ch-gateway-args.sh"
+[[ -f "$gateway_file" ]] && source "$gateway_file"
+
+exec mise exec codex -- codex "${gateway_args[@]}" "$@"
